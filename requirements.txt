@@ -1,4 +1,6 @@
 numpy
+scipy
+operator
 torchio
 torch
 os
