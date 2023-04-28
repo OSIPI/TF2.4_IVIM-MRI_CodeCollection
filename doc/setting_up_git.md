@@ -1,0 +1,2 @@
+## Installing Git
+To install a fresh copy of Git or to upgrade to the latest version, please follow the instructions outlined in: [Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
