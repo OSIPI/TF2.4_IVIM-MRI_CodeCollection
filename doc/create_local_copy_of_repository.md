@@ -8,4 +8,4 @@ The instructions outlined below shows a few (but far from all) ways for creating
 # Alternative approach
 - Create a github user
 - `git clone <repository name>`
-- e.g. `git clone git@github.com:DKuppens/TF2.4_IVIM_code_collection.git`
+- e.g. `git clone git@github.com:OSIPI/TF2.4_IVIM-MRI_CodeCollection.git`
