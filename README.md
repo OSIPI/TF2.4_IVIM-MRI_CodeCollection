@@ -14,7 +14,7 @@ If you would like to contribute with code, please follow the instructions below:
 
 *   [Setting up Git](doc/setting_up_git.md)
 *   [How to create a copy of the respository and contribute changes to the repository](doc/create_local_copy_of_repository.md)
-*   [Guidelines for code contribution](doc/guidelines_for_contributions.md)
+*   [Guidelines for IVIM code contribution](doc/guidelines_for_contributions.md)
 *   [Guidelines to creating a test file](doc/creating_test.md) 
 
 ## Repository Organization
@@ -23,7 +23,7 @@ The repository is organized in four main folders along with configuration files 
 
 The **doc** folder contains all documentation related to the repository of task force 2.4.
 
-The **src** folder contains source code contributed by the the community. Within **src**, the **original** folder contains the code to be tested, and the **wrappers** folder contains code for harmizing the calls the different code contributions. Within the **original** folders, contributions are stored in Initials_InstitutionCountry, e.g. src/original/OGC_AmsterdamUMC.
+The **src** folder contains source code contributed by the the community. Within **src**, the **original** folder contains the code to be tested, and the **wrappers** folder contains code for harmizing the calls the different code contributions. Within the **original** folders, contributions are stored in Initials_Institution, e.g. src/original/OGC_AmsterdamUMC.
 
 The **test** folder contains the test files corresponding to the contributed code in **src**. *to be structured*
 
