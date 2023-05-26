@@ -6,3 +6,4 @@ logging
 joblib
 dipy
 matplotlib
+scienceplots
