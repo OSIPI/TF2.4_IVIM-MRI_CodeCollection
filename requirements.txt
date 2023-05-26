@@ -7,3 +7,4 @@ joblib
 dipy
 matplotlib
 scienceplots
+cvxpy
