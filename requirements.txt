@@ -5,3 +5,4 @@ torch
 logging
 joblib
 dipy
+matplotlib

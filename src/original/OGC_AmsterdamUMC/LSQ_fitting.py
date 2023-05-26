@@ -705,7 +705,7 @@ def goodness_of_fit(bvalues, Dt, Fp, Dp, S0, dw_data, Fp2=None, Dp2=None):
         # plt.show()
         # print(R2[vox])
     return R2, adjust
-ed_R2
+# ed_R2
 
 def MSE(bvalues, Dt, Fp, Dp, S0, dw_data):
     """
