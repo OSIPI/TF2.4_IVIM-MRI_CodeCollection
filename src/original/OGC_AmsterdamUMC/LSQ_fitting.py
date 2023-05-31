@@ -494,7 +494,7 @@ def empirical_neg_log_prior(Dt0, Fp0, Dp0, S00=None):
     # define the prior
     def neg_log_prior(p):
         # depends on whether S0 is fitted or not
-        if len(p) is 4:
+        if len(p) == 4:
             Dt, Fp, Dp, S0 = p[0], p[1], p[2], p[3]
         else:
             Dt, Fp, Dp = p[0], p[1], p[2]
@@ -507,7 +507,7 @@ def empirical_neg_log_prior(Dt0, Fp0, Dp0, S00=None):
             Dt_prior = stats.lognorm.pdf(Dt, Dt_shape, scale=Dt_scale)
             Fp_prior = stats.beta.pdf(Fp, Fp_a, Fp_b)
             # determine and return the prior for D, f and D* (and S0)
-            if len(p) is 4:
+            if len(p) == 4:
                 S0_prior = stats.beta.pdf(S0 / 2, S0_a, S0_b)
                 return -np.log(Dp_prior + eps) - np.log(Dt_prior + eps) - np.log(Fp_prior + eps) - np.log(
                     S0_prior + eps)
@@ -525,7 +525,7 @@ def neg_log_likelihood(p, bvalues, dw_data):
     :param dw_data: 1D Array diffusion-weighted data
     :returns: the log-likelihood of the parameters given the data
     """
-    if len(p) is 4:
+    if len(p) == 4:
         return 0.5 * (len(bvalues) + 1) * np.log(
             np.sum((ivim(bvalues, p[0], p[1], p[2], p[3]) - dw_data) ** 2))  # 0.5*sum simplified
     else:
@@ -705,7 +705,7 @@ def goodness_of_fit(bvalues, Dt, Fp, Dp, S0, dw_data, Fp2=None, Dp2=None):
         # plt.show()
         # print(R2[vox])
     return R2, adjust
-ed_R2
+# ed_R2
 
 def MSE(bvalues, Dt, Fp, Dp, S0, dw_data):
     """

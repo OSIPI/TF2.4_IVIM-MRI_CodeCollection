@@ -24,8 +24,8 @@ def ivim_fit(author, signals=None, bvalues=None, data=None, initial_guess=None, 
 
 
     # Some implementations can only fit a voxel at a time (i.e. all inputs must be 2-dimensional)
-    requires_2D = True if author in []
-    requires_4D = True if author in []
+    requires_2D = True if author in [] else False
+    requires_4D = True if author in [] else False
 
     # Bounds and initial guess for parameters
     initial_guess = []

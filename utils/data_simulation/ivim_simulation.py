@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-from utils.ivim.ivim_fit import ivim_parameters_to_signal
+from utils.ivim.forward_model import ivim_parameters_to_signal
 
 
 def simulate_ivim_signal(D, Dp, f, S0, bvalues, SNR_array, rg):
