@@ -28,8 +28,8 @@ def simulate_ivim_signal(D, Dp, f, S0, bvalues, SNR_array, rg):
     simulated_data = simulated_data.cpu().detach().numpy()
 
     # create 2 signal arrays filled with gaussian noise
-    noise_real = rg.normal(0, 1 / SNR_array, (1, len(bvalues)))
-    noise_imag = rg.normal(0, 1 / SNR_array, (1, len(bvalues)))
+    noise_real = rg.normal(0, 1 / SNR, (1, len(bvalues)))
+    noise_imag = rg.normal(0, 1 / SNR, (1, len(bvalues)))
 
     # add Rician noise to the simulated data
     simulated_data = np.sqrt(np.power(simulated_data + noise_real, 2) + np.power(noise_imag, 2)).squeeze()
