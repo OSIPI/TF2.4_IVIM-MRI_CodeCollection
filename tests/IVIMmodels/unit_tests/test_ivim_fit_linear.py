@@ -45,3 +45,19 @@ def test_ivim_fit(f, D, Dp, bvals):
     npt.assert_allclose([f, D], [f_fit, D_fit], atol=1e-5)
     if not np.allclose(f, 0):
         npt.assert_allclose(Dp, Dp_fit, rtol=1e-2, atol=1e-3)
+
+# def test_multidimentional_ivim_fit():
+#     num_bvals = 11
+#     f = 0.1
+#     D = 0.01
+#     Dp = 0.05
+#     bvals = np.linspace(0, 1000, num_bvals)
+
+#     gd = GenerateData()
+#     max_dim = 6
+#     for dim in range(max_dim):
+#         print(dim)
+#         gd_signal = np.broadcast_to(gd.ivim_signal(D, Dp, f, 1, bvals), (num_bvals))
+#         assert gd_signal.shape == [num_bvals, max_dim * 2]
+#         print(gd_signal)
+        
