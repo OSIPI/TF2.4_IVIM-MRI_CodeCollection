@@ -1,9 +1,7 @@
 import numpy as np
 import numpy.polynomial.polynomial as poly
 
-from utils.data_simulation.GenerateData import GenerateData
-
-
+from utilities.data_simulation.GenerateData import GenerateData
 
 class LinearFit:
     """

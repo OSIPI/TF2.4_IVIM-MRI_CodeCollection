@@ -3,7 +3,7 @@ import numpy.testing as npt
 import pytest
 import torch
 
-from utils.data_simulation.GenerateData import GenerateData
+from utilities.data_simulation.GenerateData import GenerateData
 
 #run using python -m pytest from the root folder
 
