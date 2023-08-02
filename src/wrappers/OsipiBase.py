@@ -1,13 +1,17 @@
 
 
 
-class ivim_fit_osipi:
+class OsipiBase:
     """The base class for OSIPI IVIM fitting"""
+    
+    #def __init__(self, author, data_dimension, thresholds_required, guess_required, bounds_required):
+    #    pass
 
-    def fit_osipi(self, data=None, bvalues=None, initial_guess=None, bounds=None, **kwargs):
+    def fit_osipi(self, data=None, b_values=None, initial_guess=None, bounds=None, **kwargs):
         """Fits the data with the bvalues
-        Returns [S0, f, D, D*]
+        Returns [S0, f, D*, D]
         """
+        #self.parameter_estimates = self.ivim_fit(data, b_values)
         pass
 
     def accepted_dimensions_osipi(self):
@@ -24,6 +28,10 @@ class ivim_fit_osipi:
         if dim < 0 or dim > len(accepted):
             return False
         return accepted[dim]
+    
+    def thresholds_required_osipi():
+        """How many segmentation thresholds does it require?"""
+        return 0
 
     def guess_required_osipi():
         """Does it require an initial guess?"""
@@ -36,3 +44,7 @@ class ivim_fit_osipi:
     def author_osipi():
         """Author identification"""
         return ''
+    
+    def simple_test():
+        pass
+    
