@@ -82,86 +82,86 @@ def contrast_curve_calc():
     tissue_included = np.array([1, 2, 3, 4, 5, 6, 7, 8, 13, 17, 18, 20, 22, 23, 24, 25, 26, 30, 36, 37, 40, 41, 42, 43, 50, 73])
 
     D = np.zeros(74)
-    D[1] = 2e-3  # 1 Myocardium LV
-    D[2] = 2e-3  # 2 myocardium RV
+    D[1] = 2.4e-3  # 1 Myocardium LV : Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    D[2] = 2.4e-3  # 2 myocardium RV: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
     D[3] = 2e-3  # 3 myocardium la
     D[4] = 1.5e-3  # 4 myocardium ra
     D[5] = 3e-3  # 5 Blood LV
     D[6] = 3e-3  # 6 Blood RV
     D[7] = 3e-3  # 7 Blood la
     D[8] = 3e-3  # 8 Blood ra
-    D[13] = 1.2e-3  # 13 liver
-    D[17] = 1e-3  # 17 esophagus
-    D[18] = 1e-3  # 18 esophagus cont
-    D[20] = 1e-3  # 20 stomach wall
+    D[13] = 1.5e-3  # 13 liver: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    D[17] = 1.67e-3  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
+    D[18] = 1.67e-3  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
+    D[20] = 1.5e-3  # 20 stomach wall: Li et al. doi: 10.3389/fonc.2022.821586
     D[22] = 1.3e-3  # 22 Pancreas (from literature)
-    D[23] = 2e-3   # 23 right kydney cortex
-    D[24] = 1e-3   # 23 right kydney medulla
-    D[25] = 2e-3   # 23 left kydney cortex
-    D[26] = 1e-3   # 23 left kydney medulla
-    D[30] = 0.8e-3  # 30 spleen
+    D[23] = 2.12e-3  # 23 right kydney cortex : van Baalen et al. Doi: jmri.25519
+    D[24] = 2.09e-3  # 23 right kydney medulla : van Baalen et al. Doi: jmri.25519
+    D[25] = 2.12e-3  # 23 left kydney cortex : van Baalen et al. Doi: jmri.25519
+    D[26] = 2.09e-3  # 23 left kydney medulla : van Baalen et al. Doi: jmri.25519
+    D[30] = 1.3e-3  # 30 spleen : Taimouri et al. Doi: 10.1118/1.4915495
     D[36] = 3e-3  # 36 artery
-    D[37] = 3e-3   # 37 vein
-    D[40] = 3e-3  # 40 asc lower intestine
-    D[41] = 3e-3  # 41 trans lower intestine
-    D[42] = 3e-3  # 42 desc lower intestine
-    D[43] = 3e-3  # 43 small intestine
+    D[37] = 3e-3  # 37 vein
+    D[40] = 1.31e-3  # 40 asc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
+    D[41] = 1.31e-3  # 41 trans lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
+    D[42] = 1.31e-3  # 42 desc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
+    D[43] = 1.31e-3  # 43 small intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
     D[50] = 3e-3  # 50 pericardium
     D[73] = 1.8e-3  # 73 Pancreatic tumor (advanced state, from literature)
 
     f = np.zeros(74)
-    f[1] = 0.7  # 1 Myocardium LV
-    f[2] = 0.7  # 2 myocardium RV
-    f[3] = 0.7  # 3 myocardium la
-    f[4] = 0.7  # 4 myocardium ra
+    f[1] = 0.15  # 1 Myocardium LV : Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    f[2] = 0.15  # 2 myocardium RV : Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    f[3] = 0.07  # 3 myocardium la
+    f[4] = 0.07  # 4 myocardium ra
     f[5] = 1.00  # 5 Blood LV
     f[6] = 1.00  # 6 Blood RV
     f[7] = 1.00  # 7 Blood la
     f[8] = 1.00  # 8 Blood ra
-    f[13] = 0.25  # 13 liver
-    f[17] = 0.1  # 17 esophagus
-    f[18] = 0.1  # 18 esophagus cont
-    f[20] = 0.3  # 20 stomach wall
+    f[13] = 0.11  # 13 liver : Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    f[17] = 0.32  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
+    f[18] = 0.32  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
+    f[20] = 0.3  # 20 stomach wall: Li et al. doi: 10.3389/fonc.2022.821586
     f[22] = 0.15  # 22 Pancreas (from literature)
-    f[23] = 0.3   # 23 right kydney cortex
-    f[24] = 0.2   # 23 right kydney medulla
-    f[25] = 0.3   # 23 left kydney cortex
-    f[26] = 0.2   # 23 left kydney medulla
-    f[30] = 0.4  # 30 spleen
-    f[36] = 1.0   # 36 artery
-    f[37] = 1.0   # 37 vein
-    f[40] = 0.19  # 40 asc lower intestine
-    f[41] = 0.19  # 41 trans lower intestine
-    f[42] = 0.19  # 42 desc lower intestine
-    f[43] = 0.19  # 43 small intestine
+    f[23] = 0.097  # 23 right kydney cortex : van Baalen et al. Doi: jmri.25519
+    f[24] = 0.158  # 23 right kydney medulla : van Baalen et al. Doi: jmri.25519
+    f[25] = 0.097  # 23 left kydney cortex : van Baalen et al. Doi: jmri.25519
+    f[26] = 0.158  # 23 left kydney medulla : van Baalen et al. Doi: jmri.25519
+    f[30] = 0.2  # 30 spleen : Taimouri et al. Doi: 10.1118/1.4915495
+    f[36] = 1.0  # 36 artery
+    f[37] = 1.0  # 37 vein
+    f[40] = 0.69  # 40 asc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
+    f[41] = 0.69  # 41 trans lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
+    f[42] = 0.69  # 42 desc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
+    f[43] = 0.69  # 43 small intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
     f[50] = 0.07  # 50 pericardium
     f[73] = 0.37  # 73 Pancreatic tumor (advanced state, from literature)
 
     Ds = np.zeros(74)
-    Ds[1] = 0.07  # 1 Myocardium LV
-    Ds[2] = 0.07  # 2 myocardium RV
+    Ds[1] = 0.08  # 1 Myocardium LV: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    Ds[2] = 0.08  # 2 myocardium RV: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
     Ds[3] = 0.07  # 3 myocardium la
     Ds[4] = 0.07  # 4 myocardium ra
     Ds[5] = 0.1  # 5 Blood LV
     Ds[6] = 0.1  # 6 Blood RV
     Ds[7] = 0.1  # 7 Blood la
     Ds[8] = 0.1  # 8 Blood ra
-    Ds[13] = 0.05  # 13 liver
-    Ds[17] = 0.05  # 17 esophagus
-    Ds[18] = 0.05  # 18 esophagus cont
-    Ds[20] = 0.07  # 20 stomach wall
+    Ds[13] = 0.1  # 13 liver: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    Ds[17] = 0.03  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
+    Ds[18] = 0.03  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
+    Ds[20] = 0.012  # 20 stomach wall: Li et al. doi: 10.3389/fonc.2022.821586
     Ds[22] = 0.01  # 22 Pancreas (from literature)
-    Ds[23] = 0.02   # 23 right kydney cortex
-    Ds[24] = 0.07   # 23 right kydney medulla
-    Ds[25] = 0.02   # 23 left kydney cortex
-    Ds[26] = 0.07   # 23 left kydney medulla
-    Ds[30] = 0.08  # 30 spleen
-    Ds[36] = 0.1   # 36 artery
-    Ds[37] = 0.1   # 37 vein
-    Ds[40] = 0.09  # 40 asc lower intestine
-    Ds[41] = 0.09  # 41 trans lower intestine
-    Ds[42] = 0.09  # 42 desc lower intestine
-    Ds[43] = 0.09  # 43 small intestine
+    Ds[23] = 0.02  # 23 right kydney cortex : van Baalen et al. Doi: jmri.25519
+    Ds[24] = 0.019  # 23 right kydney medulla : van Baalen et al. Doi: jmri.25519
+    Ds[25] = 0.02  # 23 left kydney cortex : van Baalen et al. Doi: jmri.25519
+    Ds[26] = 0.019  # 23 left kydney medulla : van Baalen et al. Doi: jmri.25519
+    Ds[30] = 0.03  # 30 spleen : Taimouri et al. Doi: 10.1118/1.4915495
+    Ds[36] = 0.1  # 36 artery
+    Ds[37] = 0.1  # 37 vein
+    Ds[40] = 0.029  # 40 asc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
+    Ds[41] = 0.029  # 41 trans lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
+    Ds[42] = 0.029  # 42 desc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
+    Ds[43] = 0.029  # 43 small intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
     Ds[50] = 0.01  # 50 pericardium
     Ds[73] = 0.01  # 73 Pancreatic tumor (advanced state, from literature)
     # Return values
@@ -169,7 +169,7 @@ def contrast_curve_calc():
     return tissue_included, D, f, Ds
 
 
-def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, tissue_included, D, f, Ds, b0=3, ivim_cont = True, Contrast = 'SE', FA=90):
+def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, tissue_included, D, f, Ds, b0=3, ivim_cont = True):
     ###########################################################################################
     # This script converts XCAT tissue values to MR contrast based on the SSFP signal equation.
     # Christopher W. Roy 2018-12-04 # fetal.xcmr@gmail.com
@@ -355,19 +355,8 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, tissue_included, D, f, Ds, b0=3, ivim_c
                 #S0 = np.zeros(len(bvalue))
             S0 = ivim(bvalue,Dtemp,ftemp,Dstemp)
             if T1 > 0 or T2 > 0:
-                if Contrast == 'GRE':
-                    if iTissue not in [31, 32, 33]:
-                        MR = MR + (XCAT == iTissue) * np.sin(np.deg2rad(FA)) * (1 - np.exp(-TR / T1)) / (
-                                    1 - (np.cos(np.deg2rad(FA)) * np.exp(-TR / T1)))
-                elif Contrast == 'bSSFP':
-                    MR = MR + (XCAT == iTissue) * np.sin(np.deg2rad(FA)) * (1 - np.exp(-TR / T1)) * np.exp(-TE / T2) / (
-                                1 - (np.exp(-TR / T1) - np.exp(-TR / T2)) * np.cos(np.deg2rad(FA)) - np.exp(
-                            -TR / T1) * np.exp(-TR / T2))
-                elif Contrast == 'SE':
-                    MR = MR + np.tile(np.expand_dims(XCAT == iTissue,3),len(S0)) * S0 * (1 - 2 * np.exp(-(TR - TE / 2) / T1) + np.exp(-TR / T1)) * np.exp(
-                        -TE / T2)
-                else:
-                    raise ValueError('Unknown MR contrast. Use only GRE, bSSFP, or SE.')
+                MR = MR + np.tile(np.expand_dims(XCAT == iTissue,3),len(S0)) * S0 * (1 - 2 * np.exp(-(TR - TE / 2) / T1) + np.exp(-TR / T1)) * np.exp(
+                    -TE / T2)
             Dim = Dim + (XCAT == iTissue) * Dtemp
             fim = fim + (XCAT == iTissue) * ftemp
             Dpim = Dpim + (XCAT == iTissue) * Dstemp
@@ -396,18 +385,21 @@ if __name__ == '__main__':
     output_file = 'output_xcat.nii.gz'  # Replace with your desired output file name
     nib.save(nifti_img, output_file)
 
-    nifti_img = nib.Nifti1Image(Dim*1000000, affine=res)  # Replace affine if necessary
+    nifti_img = nib.Nifti1Image(Dim, affine=res)  # Replace affine if necessary
     # Save the NIfTI image to a file
+    nifti_img.header.set_data_dtype(np.float64)
     output_file = 'D.nii.gz'  # Replace with your desired output file name
     nib.save(nifti_img, output_file)
 
-    nifti_img = nib.Nifti1Image(fim*1000, affine=res)  # Replace affine if necessary
+    nifti_img = nib.Nifti1Image(fim, affine=res)  # Replace affine if necessary
     # Save the NIfTI image to a file
+    nifti_img.header.set_data_dtype(np.float64)
     output_file = 'f.nii.gz'  # Replace with your desired output file name
     nib.save(nifti_img, output_file)
 
-    nifti_img = nib.Nifti1Image(Dpim*1000, affine=res)  # Replace affine if necessary
+    nifti_img = nib.Nifti1Image(Dpim, affine=res)  # Replace affine if necessary
     # Save the NIfTI image to a file
+    nifti_img.header.set_data_dtype(np.float64)
     output_file = 'Dp.nii.gz'  # Replace with your desired output file name
     nib.save(nifti_img, output_file)
 
