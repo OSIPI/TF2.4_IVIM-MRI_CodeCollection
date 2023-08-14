@@ -385,7 +385,7 @@ if __name__ == '__main__':
         generic_data[name] = {
             'D': np.mean(Dim[selector], axis=0),
             'f': np.mean(fim[selector], axis=0),
-            'Dpim': np.mean(Dpim[selector], axis=0),
+            'Dp': np.mean(Dpim[selector], axis=0),
             'data': signals
         }
     generic_data['config'] = {
