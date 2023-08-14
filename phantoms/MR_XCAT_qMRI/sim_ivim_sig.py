@@ -377,11 +377,17 @@ if __name__ == '__main__':
 
     generic_data = {}
     for level, name in legend.items():
-        voxels = sig[XCAT == level]
+        selector = XCAT == level
+        voxels = sig[selector]
         if len(voxels) < 1:
             continue
         signals = np.mean(voxels, axis=0).tolist()
-        generic_data[name] = signals
+        generic_data[name] = {
+            'D': np.mean(Dim[selector], axis=0),
+            'f': np.mean(fim[selector], axis=0),
+            'Dpim': np.mean(Dpim[selector], axis=0),
+            'data': signals
+        }
     with open('generic.json', 'w') as f:
         json.dump(generic_data, f, indent=4)
 
