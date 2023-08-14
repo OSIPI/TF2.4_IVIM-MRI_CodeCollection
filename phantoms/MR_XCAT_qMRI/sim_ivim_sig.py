@@ -388,6 +388,9 @@ if __name__ == '__main__':
             'Dpim': np.mean(Dpim[selector], axis=0),
             'data': signals
         }
+    generic_data['config'] = {
+        'bvalues': bvalue.tolist()
+    }
     with open('generic.json', 'w') as f:
         json.dump(generic_data, f, indent=4)
 
