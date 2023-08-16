@@ -355,11 +355,9 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
                 Dtemp=5e-4+np.random.rand(1)*3e-3
                 ftemp=np.random.rand(1)*0.5
                 Dstemp=5e-3+np.random.rand(1)*1e-1
-                #S0 = np.zeros(len(bvalue))
             S0 = ivim(bvalue,Dtemp,ftemp,Dstemp)
             if T1 > 0 or T2 > 0:
-                MR = MR + np.tile(np.expand_dims(XCAT == iTissue,3),len(S0)) * S0 * (1 - 2 * np.exp(-(TR - TE / 2) / T1) + np.exp(-TR / T1)) * np.exp(
-                    -TE / T2)
+                MR = MR + np.tile(np.expand_dims(XCAT == iTissue,3),len(S0)) * S0 * (1 - 2 * np.exp(-(TR - TE / 2) / T1) + np.exp(-TR / T1)) * np.exp(-TE / T2)
             Dim = Dim + (XCAT == iTissue) * Dtemp
             fim = fim + (XCAT == iTissue) * ftemp
             Dpim = Dpim + (XCAT == iTissue) * Dstemp
@@ -367,21 +365,26 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
 
 if __name__ == '__main__':
     bvalue = np.array([0., 1, 2, 5, 10, 20, 30, 50, 75, 100, 150, 250, 350, 400, 550, 700, 850, 1000])
-    noise = 0.005
+    noise = 0.0  # 0.005
     motion = False
     sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise,motion=motion,interleaved=False)
-    sig = np.flip(sig,axis=0)
-    sig = np.flip(sig,axis=1)
+    # sig = np.flip(sig,axis=0)
+    # sig = np.flip(sig,axis=1)
     res=np.eye(4)
     res[2]=2
 
+    D, f, Ds = contrast_curve_calc()
+    ignore = np.isnan(D)
     generic_data = {}
     for level, name in legend.items():
+        if len(ignore) > level and ignore[level]:
+            continue
         selector = XCAT == level
         voxels = sig[selector]
         if len(voxels) < 1:
             continue
         signals = np.mean(voxels, axis=0).tolist()
+        std = np.std(XCAT[selector], axis=0).tolist()
         generic_data[name] = {
             'D': np.mean(Dim[selector], axis=0),
             'f': np.mean(fim[selector], axis=0),
