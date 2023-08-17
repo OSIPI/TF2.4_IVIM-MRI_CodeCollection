@@ -13,35 +13,39 @@ class ETP_SRI_LinearFitting(OsipiBase):
     # the user inputs fulfil the requirements
     
     # Some basic stuff that identifies the algorithm
-    author = "Eric T. Peterson, SRI"
-    algorithm_type = "Linear fit"
-    return_parameters = "f, D*, D"
-    units = "seconds per milli metre squared"
+    id_author = "Eric T. Peterson, SRI"
+    id_algorithm_type = "Linear fit"
+    id_return_parameters = "f, D*, D"
+    id_units = "seconds per milli metre squared"
     
     # Algorithm requirements
-    b_values_required = 3
-    thresholds_required = [1,1] # Interval from 1 to 1, in case submissions allow a custom number of thresholds
-    bounds_required = False
+    required_bvalues = 3
+    required_thresholds = [1,1] # Interval from 1 to 1, in case submissions allow a custom number of thresholds
+    required_bounds = False
+    required_bounds_optional = True # Bounds may not be required but are optional
+    required_initial_guess = False
+    required_initial_guess_optional = False
     accepted_dimensions = 1
     
-    def __init__(self, thresholds, weighting=None, stats=False):
+    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
         """
             Everything this method requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
             
-            Our OsipiBase object could contain functions compare the inputs with
+            Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        self.thresholds = thresholds
+        super(ETP_SRI_LinearFitting, self).__init__(bvalues, thresholds, bounds, initial_guess)
+        
         # Could be a good idea to have all the submission-specfic variable be 
         # defined with initials?
         self.ETP_weighting = weighting
+        self.ETP_stats = stats
         
         # Check the inputs
-        self.check_thresholds_required_osipi()
         
     
-    def ivim_fit(self, signals, b_values):
+    def ivim_fit(self, signals, bvalues):
         """
             We may want this function to be as simple as
             data and b-values in -> parameter estimates out.
@@ -51,8 +55,9 @@ class ETP_SRI_LinearFitting(OsipiBase):
             This makes the execution of submissions easy and predictable.
             All execution stepts requires should be performed here.
         """
+        
         ETP_object = LinearFit(self.thresholds[0])
-        f, D, Dstar = ETP_object.ivim_fit(b_values, signals)
+        f, D, Dstar = ETP_object.ivim_fit(bvalues, signals)
         
         
         
@@ -61,13 +66,14 @@ class ETP_SRI_LinearFitting(OsipiBase):
 
 
 # Simple test code... 
-b_values = np.array([0, 200, 500, 800])
+bvalues = np.array([0, 200, 500, 800])
 
 def ivim_model(b, S0=1, f=0.1, Dstar=0.03, D=0.001):
     return S0*(f*np.exp(-b*Dstar) + (1-f)*np.exp(-b*D))
 
-signals = ivim_model(b_values)
+signals = ivim_model(bvalues)
 
-model = ETP_SRI_LinearFitting([200])
-results = model.ivim_fit(signals, b_values)
-test = model.simple_bias_and_RMSE_test(SNR=20, b_values=b_values, f=0.1, Dstar=0.03, D=0.001, noise_realizations=10)
+model = ETP_SRI_LinearFitting(thresholds=[200])
+results = model.ivim_fit(signals, bvalues)
+test = model.osipi_simple_bias_and_RMSE_test(SNR=20, bvalues=bvalues, f=0.1, Dstar=0.03, D=0.001, noise_realizations=10)
+#model.print_requirements_osipi()
