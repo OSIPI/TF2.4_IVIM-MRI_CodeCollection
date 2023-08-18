@@ -5,11 +5,19 @@ import numpy as np
 import nibabel as nib
 from scipy.ndimage import zoom
 
-regime = 'diffusive'#'ballistic' # 
-snr = 200
-resolution = [3,3,3]
+DIFFUSIVE_REGIME = 'diffusive'
+BALLISTIC_REGIME = 'ballistic'
 
 folder = os.path.dirname(__file__)
+
+###########################
+#  Simulation parameters  #
+regime = DIFFUSIVE_REGIME
+snr = 200
+resolution = [3,3,3]
+#                         #
+###########################
+
 
 # Ground truth
 nii = nib.load(os.path.join(folder,'ground_truth','hrgt_icbm_2009a_nls_3t.nii.gz'))
@@ -22,14 +30,14 @@ S0 = 1
 # Sequence parameters
 bval_file = os.path.join(folder,'ground_truth',regime+'.bval')
 b = np.loadtxt(bval_file)
-if regime == 'ballistic':
+if regime == BALLISTIC_REGIME:
     cval_file = bval_file.replace('bval','cval')
     c = np.loadtxt(cval_file)
 
 # Calculate signal
 S = np.zeros(list(np.shape(segmentation))+[b.size])
 
-if regime == 'ballistic':
+if regime == BALLISTIC_REGIME:
     Db = ivim_pars["Db"]
     for i,(D,f,vd) in enumerate(zip(ivim_pars["D"],ivim_pars["f"],ivim_pars["vd"])):
         S[segmentation==i+1,:] = S0*((1-f)*np.exp(-b*D)+f*np.exp(-b*Db-c**2*vd**2))
@@ -49,5 +57,5 @@ nii_out = nib.Nifti1Image(im_noise,np.eye(4))
 base_name = os.path.join(folder,'data','{}_snr{}'.format(regime,snr))
 nib.save(nii_out,base_name+'.nii.gz')
 shutil.copyfile(bval_file,base_name+'.bval')
-if regime == 'ballistic':
+if regime == BALLISTIC_REGIME:
     shutil.copyfile(cval_file,base_name+'.cval')
