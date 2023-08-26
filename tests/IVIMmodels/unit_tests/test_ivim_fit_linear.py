@@ -1,7 +1,6 @@
 import numpy as np
 import numpy.testing as npt
 import pytest
-import torch
 import json
 import pathlib
 
