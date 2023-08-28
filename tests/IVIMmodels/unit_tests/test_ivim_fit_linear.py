@@ -1,7 +1,8 @@
 import numpy as np
 import numpy.testing as npt
 import pytest
-import torch
+import json
+import pathlib
 
 from utilities.data_simulation.GenerateData import GenerateData
 from src.original.ETP_SRI.LinearFitting import LinearFit
@@ -46,18 +47,24 @@ def test_ivim_fit(f, D, Dp, bvals):
     if not np.allclose(f, 0):
         npt.assert_allclose(Dp, Dp_fit, rtol=1e-2, atol=1e-3)
 
-# def test_multidimentional_ivim_fit():
-#     num_bvals = 11
-#     f = 0.1
-#     D = 0.01
-#     Dp = 0.05
-#     bvals = np.linspace(0, 1000, num_bvals)
-
-#     gd = GenerateData()
-#     max_dim = 6
-#     for dim in range(max_dim):
-#         print(dim)
-#         gd_signal = np.broadcast_to(gd.ivim_signal(D, Dp, f, 1, bvals), (num_bvals))
-#         assert gd_signal.shape == [num_bvals, max_dim * 2]
-#         print(gd_signal)
-        
+def test_ivim_fit_saved(request):
+    file = pathlib.Path(request.node.fspath)
+    # print('current test file:', file)
+    generic = file.with_name('generic.json')
+    # print('current config file:', generic)
+    fit = LinearFit()
+    with generic.open() as f:
+        data = json.load(f)
+        bvals = data.pop('config')
+        bvals = bvals['bvalues']
+        for name, data in data.items():
+            print(f'{name} {data}')
+            signal = np.asarray(data['data'])
+            signal /= signal[0]
+            if data['f'] == 1.0:
+                linear_fit = fit.linear_fit(bvals, np.log(signal))
+                npt.assert_allclose([data['f'], data['Dp']], linear_fit, atol=1e-2)
+            else:
+                [f_fit, D_fit, Dp_fit] = fit.ivim_fit(bvals, signal)
+                npt.assert_allclose([data['f'], data['D']], [f_fit, D_fit], atol=1e-2)
+                npt.assert_allclose(data['Dp'], Dp_fit, atol=1e-1)  # go easy on the perfusion as it's a linear fake
