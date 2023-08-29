@@ -12,14 +12,34 @@ class OsipiBase:
         self.bounds = np.asarray(bounds) if bounds is not None else None
         self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
 
-    def osipi_fit(self, data=None, bvalues=None, initial_guess=None, bounds=None, thresholds=None, **kwargs):
+    def osipi_fit(self, data=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, **kwargs):
         """Fits the data with the bvalues
-        Returns [S0, f, D*, D]
+        Returns [S0, f, Dstar, D]
         """
         if bvalues is None:
             bvalues = self.bvalues
         
-        args = [data, bvalues, initial_guess, bounds, thresholds]
+        # We should first check whether the attributes in the __init__ are not None
+        # Then check if they are input here, if they are, these should overwrite the attributes
+        use_bvalues = bvalues if self.bvalues is None else self.bvalues
+        use_thresholds = thresholds if self.bvalues is None else self.thresholds
+        use_bounds = bounds if self.bounds is None else self.bounds
+        use_initial_guess = initial_guess if self.initial_guess is None else self.initial_guess
+        
+        args = [data, use_bvalues, use_thresholds]
+        if reqired_bounds or required_bounds_optional:
+            args.append(use_bounds)
+        if required_initial_guess or required_initial_guess_optional:
+            args.append(use_initial_guess)
+            
+        # Run a check_requirements method that makes sure that these inputs fulfil the requirements
+        
+        
+        # Then we check which inputs are required for the algorithm using the requirements attributes in the template 
+        
+        # Then we pass everything into the ivim_fit method which performs the fit according to the algorithm
+        
+        #args = [data, use_bvalues, use_initial_guess, use_bounds, use_thresholds]
         args = [arg for arg in args if arg is not None]
         f, Dstar, D = self.ivim_fit(*args)
         
