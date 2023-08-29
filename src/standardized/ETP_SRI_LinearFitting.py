@@ -20,7 +20,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
     
     # Algorithm requirements
     required_bvalues = 3
-    required_thresholds = [1,1] # Interval from 1 to 1, in case submissions allow a custom number of thresholds
+    required_thresholds = [0,1] # Interval from 1 to 1, in case submissions allow a custom number of thresholds
     required_bounds = False
     required_bounds_optional = True # Bounds may not be required but are optional
     required_initial_guess = False
@@ -45,7 +45,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
         # Check the inputs
         
     
-    def ivim_fit(self, signals, bvalues):
+    def ivim_fit(self, signals, bvalues=None):
         """
             We may want this function to be as simple as
             data and b-values in -> parameter estimates out.
@@ -55,8 +55,13 @@ class ETP_SRI_LinearFitting(OsipiBase):
             This makes the execution of submissions easy and predictable.
             All execution stepts requires should be performed here.
         """
+        if bvalues is None:
+            bvalues = self.bvalues
         
-        ETP_object = LinearFit(self.thresholds[0])
+        if self.thresholds is None:
+            ETP_object = LinearFit()
+        else:
+            ETP_object = LinearFit(self.thresholds[0])
         f, D, Dstar = ETP_object.ivim_fit(bvalues, signals)
         
         
@@ -73,7 +78,6 @@ def ivim_model(b, S0=1, f=0.1, Dstar=0.03, D=0.001):
 
 signals = ivim_model(bvalues)
 
-model = ETP_SRI_LinearFitting(thresholds=[200])
+model = ETP_SRI_LinearFitting()
 results = model.ivim_fit(signals, bvalues)
 test = model.osipi_simple_bias_and_RMSE_test(SNR=20, bvalues=bvalues, f=0.1, Dstar=0.03, D=0.001, noise_realizations=10)
-#model.print_requirements_osipi()

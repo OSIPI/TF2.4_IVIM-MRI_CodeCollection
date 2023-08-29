@@ -10,3 +10,4 @@ __pycache__/
 .cache
 nosetests.xml
 coverage.xml
+*.pyc
