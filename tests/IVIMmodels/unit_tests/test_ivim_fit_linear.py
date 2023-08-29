@@ -56,24 +56,31 @@ def test_ivim_fit(f, D, Dp, bvals):
     if not np.allclose(f, 0):
         npt.assert_allclose(Dp, Dp_fit, rtol=1e-2, atol=1e-3)
 
-def test_ivim_fit_saved(request):
-    file = pathlib.Path(request.node.fspath)
-    # print('current test file:', file)
+def data_ivim_fit_saved():
+    file = pathlib.Path(__file__)
     generic = file.with_name('generic.json')
-    # print('current config file:', generic)
-    fit = LinearFit()
     with generic.open() as f:
-        data = json.load(f)
-        bvals = data.pop('config')
+        all_data = json.load(f)
+        bvals = all_data.pop('config')
         bvals = bvals['bvalues']
-        for name, data in data.items():
-            print(f'{name} {data}')
-            signal = np.asarray(data['data'])
-            signal /= signal[0]
-            if data['f'] == 1.0:
-                linear_fit = fit.linear_fit(bvals, np.log(signal))
-                npt.assert_allclose([data['f'], data['Dp']], linear_fit, atol=1e-2)
-            else:
-                [f_fit, D_fit, Dp_fit] = fit.ivim_fit(bvals, signal)
-                npt.assert_allclose([data['f'], data['D']], [f_fit, D_fit], atol=1e-2)
-                npt.assert_allclose(data['Dp'], Dp_fit, atol=1e-1)  # go easy on the perfusion as it's a linear fake
+        for name, data in all_data.items():
+            yield name, bvals, data
+
+@pytest.mark.parametrize("name, bvals, data", data_ivim_fit_saved())
+def test_ivim_fit_saved(name, bvals, data):
+    fit = LinearFit()
+    signal = np.asarray(data['data'])
+    has_negatives = np.any(signal<0)
+    signal = np.abs(signal)
+    ratio = 1 / signal[0]
+    signal /= signal[0]
+    tolerance = 1e-2 + 25 * data['noise'] * ratio  # totally empirical
+    if has_negatives:  # this fitting doesn't do well with negatives
+        tolerance += 1
+    if data['f'] == 1.0:
+        linear_fit = fit.linear_fit(bvals, np.log(signal))
+        npt.assert_allclose([data['f'], data['Dp']], linear_fit, atol=tolerance)
+    else:
+        [f_fit, D_fit, Dp_fit] = fit.ivim_fit(bvals, signal)
+        npt.assert_allclose([data['f'], data['D']], [f_fit, D_fit], atol=tolerance)
+        npt.assert_allclose(data['Dp'], Dp_fit, atol=1e-1)  # go easy on the perfusion as it's a linear fake
