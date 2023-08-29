@@ -26,6 +26,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
     required_initial_guess = False
     required_initial_guess_optional = False
     accepted_dimensions = 1
+    # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
     
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
         """
@@ -45,16 +46,18 @@ class ETP_SRI_LinearFitting(OsipiBase):
         # Check the inputs
         
     
-    def ivim_fit(self, signals, bvalues=None):
+    def ivim_fit(self, signals, bvalues=None, linear_fit_option=False):
+        """Perform the IVIM fit
+
+        Args:
+            signals (array-like)
+            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
+            linear_fit_option (bool, optional): This fit has an option to only run a linear fit. Defaults to False.
+
+        Returns:
+            _type_: _description_
         """
-            We may want this function to be as simple as
-            data and b-values in -> parameter estimates out.
-            Everything else such as segmentation thresholds, bounds, etc. should
-            be object attributes.
             
-            This makes the execution of submissions easy and predictable.
-            All execution stepts requires should be performed here.
-        """
         if bvalues is None:
             bvalues = self.bvalues
         
@@ -62,22 +65,23 @@ class ETP_SRI_LinearFitting(OsipiBase):
             ETP_object = LinearFit()
         else:
             ETP_object = LinearFit(self.thresholds[0])
-        f, D, Dstar = ETP_object.ivim_fit(bvalues, signals)
-        
-        
-        
-        return (f, Dstar, D)
+            
+        if linear_fit_option:
+            f, Dstar = ETP_object.linear_fit(bvalues, signals)
+            return f, Dstar
+        else: 
+            f, D, Dstar = ETP_object.ivim_fit(bvalues, signals)
+            return f, Dstar, D
     
 
+## Simple test code... 
+#bvalues = np.array([0, 200, 500, 800])
 
-# Simple test code... 
-bvalues = np.array([0, 200, 500, 800])
+#def ivim_model(b, S0=1, f=0.1, Dstar=0.03, D=0.001):
+    #return S0*(f*np.exp(-b*Dstar) + (1-f)*np.exp(-b*D))
 
-def ivim_model(b, S0=1, f=0.1, Dstar=0.03, D=0.001):
-    return S0*(f*np.exp(-b*Dstar) + (1-f)*np.exp(-b*D))
+#signals = ivim_model(bvalues)
 
-signals = ivim_model(bvalues)
-
-model = ETP_SRI_LinearFitting()
-results = model.ivim_fit(signals, bvalues)
-test = model.osipi_simple_bias_and_RMSE_test(SNR=20, bvalues=bvalues, f=0.1, Dstar=0.03, D=0.001, noise_realizations=10)
+#model = ETP_SRI_LinearFitting()
+#results = model.ivim_fit(signals, bvalues)
+#test = model.osipi_simple_bias_and_RMSE_test(SNR=20, bvalues=bvalues, f=0.1, Dstar=0.03, D=0.001, noise_realizations=10)

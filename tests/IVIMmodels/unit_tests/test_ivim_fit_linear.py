@@ -45,10 +45,11 @@ def test_ivim_fit(f, D, Dp, bvals):
     # An additional inputs to these functions could perhaps be a "settings" class with attributes that are the settings to the
     # algorithms. I.e. bvalues, thresholds, bounds, initial guesses.
     # That way, we can write something that defines a range of settings, and then just run them through here.
+    
     gd = GenerateData()
     gd_signal = gd.ivim_signal(D, Dp, f, 1, bvals)
-    #fit = LinearFit()   # This is the old code by ETP
     
+    #fit = LinearFit()   # This is the old code by ETP
     fit = ETP_SRI_LinearFitting() # This is the standardized format by IAR, which every algorithm will be implemented with
     
     [f_fit, Dp_fit, D_fit] = fit.ivim_fit(gd_signal, bvals) # Note that I have transposed Dp and D. We should decide on a standard order for these. I usually go with f, Dp, and D ordered after size.
@@ -68,7 +69,8 @@ def data_ivim_fit_saved():
 
 @pytest.mark.parametrize("name, bvals, data", data_ivim_fit_saved())
 def test_ivim_fit_saved(name, bvals, data):
-    fit = LinearFit()
+    #fit = LinearFit()
+    fit = ETP_SRI_LinearFitting()
     signal = np.asarray(data['data'])
     has_negatives = np.any(signal<0)
     signal = np.abs(signal)
@@ -78,9 +80,9 @@ def test_ivim_fit_saved(name, bvals, data):
     if has_negatives:  # this fitting doesn't do well with negatives
         tolerance += 1
     if data['f'] == 1.0:
-        linear_fit = fit.linear_fit(bvals, np.log(signal))
+        linear_fit = fit.ivim_fit(np.log(signal), bvals, linear_fit_option=True)
         npt.assert_allclose([data['f'], data['Dp']], linear_fit, atol=tolerance)
     else:
-        [f_fit, D_fit, Dp_fit] = fit.ivim_fit(bvals, signal)
+        [f_fit, Dp_fit, D_fit] = fit.ivim_fit(signal, bvals)
         npt.assert_allclose([data['f'], data['D']], [f_fit, D_fit], atol=tolerance)
         npt.assert_allclose(data['Dp'], Dp_fit, atol=1e-1)  # go easy on the perfusion as it's a linear fake
