@@ -7,6 +7,8 @@ import pathlib
 from utilities.data_simulation.GenerateData import GenerateData
 from src.original.ETP_SRI.LinearFitting import LinearFit
 
+# Import the standardized version of the algorithm
+from src.standardized.ETP_SRI_LinearFitting import ETP_SRI_LinearFitting
 
 #run using python -m pytest from the root folder
 
@@ -39,10 +41,17 @@ test_ivim_data = [
 ]
 @pytest.mark.parametrize("f, D, Dp, bvals", test_ivim_data)
 def test_ivim_fit(f, D, Dp, bvals):
+    # We should make a wrapper that runs this for a range of different settings, such as b thresholds, bounds, etc.
+    # An additional inputs to these functions could perhaps be a "settings" class with attributes that are the settings to the
+    # algorithms. I.e. bvalues, thresholds, bounds, initial guesses.
+    # That way, we can write something that defines a range of settings, and then just run them through here.
     gd = GenerateData()
     gd_signal = gd.ivim_signal(D, Dp, f, 1, bvals)
-    fit = LinearFit()
-    [f_fit, D_fit, Dp_fit] = fit.ivim_fit(bvals, gd_signal)
+    #fit = LinearFit()   # This is the old code by ETP
+    
+    fit = ETP_SRI_LinearFitting() # This is the standardized format by IAR, which every algorithm will be implemented with
+    
+    [f_fit, Dp_fit, D_fit] = fit.ivim_fit(gd_signal, bvals) # Note that I have transposed Dp and D. We should decide on a standard order for these. I usually go with f, Dp, and D ordered after size.
     npt.assert_allclose([f, D], [f_fit, D_fit], atol=1e-5)
     if not np.allclose(f, 0):
         npt.assert_allclose(Dp, Dp_fit, rtol=1e-2, atol=1e-3)
