@@ -6,15 +6,23 @@ class OsipiBase:
     """The base class for OSIPI IVIM fitting"""
     
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None):
-        self.bvalues = np.asarray(bvalues)
-        self.thresholds = np.asarray(thresholds)
-        self.bounds = np.asarray(bounds)
-        self.initial_guess = np.asarray(initial_guess)
+        # Define the attributes as numpy arrays only if they are not None
+        self.bvalues = np.asarray(bvalues) if bvalues is not None else None
+        self.thresholds = np.asarray(thresholds) if thresholds is not None else None
+        self.bounds = np.asarray(bounds) if bounds is not None else None
+        self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
 
     def osipi_fit(self, data=None, bvalues=None, initial_guess=None, bounds=None, thresholds=None, **kwargs):
         """Fits the data with the bvalues
         Returns [S0, f, D*, D]
         """
+        if bvalues is None:
+            bvalues = self.bvalues
+        
+        args = [data, bvalues, initial_guess, bounds, thresholds]
+        args = [arg for arg in args if arg is not None]
+        f, Dstar, D = self.ivim_fit(*args)
+        
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         pass
     
