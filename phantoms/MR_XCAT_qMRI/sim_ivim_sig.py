@@ -365,14 +365,15 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
 
 if __name__ == '__main__':
     bvalue = np.array([0., 1, 2, 5, 10, 20, 30, 50, 75, 100, 150, 250, 350, 400, 550, 700, 850, 1000])
-    noise = 0.0  # 0.005
+    noise = 0.0005
     motion = False
-    sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise,motion=motion,interleaved=False)
+    sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=False)
     # sig = np.flip(sig,axis=0)
     # sig = np.flip(sig,axis=1)
     res=np.eye(4)
     res[2]=2
 
+    voxel_selector_fraction = 0.5
     D, f, Ds = contrast_curve_calc()
     ignore = np.isnan(D)
     generic_data = {}
@@ -383,9 +384,9 @@ if __name__ == '__main__':
         voxels = sig[selector]
         if len(voxels) < 1:
             continue
-        signals = np.mean(voxels, axis=0).tolist()
-        std = np.std(XCAT[selector], axis=0).tolist()
+        signals = np.squeeze(voxels[int(voxels.shape[0] * voxel_selector_fraction)]).tolist()
         generic_data[name] = {
+            'noise': noise,
             'D': np.mean(Dim[selector], axis=0),
             'f': np.mean(fim[selector], axis=0),
             'Dp': np.mean(Dpim[selector], axis=0),
