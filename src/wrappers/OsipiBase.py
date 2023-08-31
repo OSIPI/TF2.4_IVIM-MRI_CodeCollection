@@ -27,9 +27,9 @@ class OsipiBase:
         use_initial_guess = initial_guess if self.initial_guess is None else self.initial_guess
         
         args = [data, use_bvalues, use_thresholds]
-        if reqired_bounds or required_bounds_optional:
+        if self.required_bounds or self.required_bounds_optional:
             args.append(use_bounds)
-        if required_initial_guess or required_initial_guess_optional:
+        if self.required_initial_guess or self.required_initial_guess_optional:
             args.append(use_initial_guess)
             
         # Run a check_requirements method that makes sure that these inputs fulfil the requirements
@@ -44,7 +44,7 @@ class OsipiBase:
         f, Dstar, D = self.ivim_fit(*args)
         
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
-        pass
+        return f, Dstar, D
     
     def osipi_print_requirements(self):
         """
