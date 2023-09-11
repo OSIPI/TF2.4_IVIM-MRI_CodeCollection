@@ -57,7 +57,6 @@ class ETP_SRI_LinearFitting(OsipiBase):
         Returns:
             _type_: _description_
         """
-            
         if bvalues is None:
             bvalues = self.bvalues
         
