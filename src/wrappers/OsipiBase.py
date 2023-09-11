@@ -16,17 +16,17 @@ class OsipiBase:
         """Fits the data with the bvalues
         Returns [S0, f, Dstar, D]
         """
-        if bvalues is None:
-            bvalues = self.bvalues
         
         # We should first check whether the attributes in the __init__ are not None
         # Then check if they are input here, if they are, these should overwrite the attributes
-        use_bvalues = bvalues if self.bvalues is None else self.bvalues
+        use_bvalues = bvalues if bvalues is not None else self.bvalues
+        kwargs["bvalues"] = use_bvalues
         use_thresholds = thresholds if self.bvalues is None else self.thresholds
         use_bounds = bounds if self.bounds is None else self.bounds
         use_initial_guess = initial_guess if self.initial_guess is None else self.initial_guess
         
-        args = [data, use_bvalues, use_thresholds]
+        #args = [data, use_bvalues, use_thresholds]
+        args = [data, use_thresholds]
         if self.required_bounds or self.required_bounds_optional:
             args.append(use_bounds)
         if self.required_initial_guess or self.required_initial_guess_optional:
@@ -41,10 +41,10 @@ class OsipiBase:
         
         #args = [data, use_bvalues, use_initial_guess, use_bounds, use_thresholds]
         args = [arg for arg in args if arg is not None]
-        f, Dstar, D = self.ivim_fit(*args)
+        results = self.ivim_fit(*args, **kwargs)
         
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
-        return f, Dstar, D
+        return results
     
     def osipi_print_requirements(self):
         """
