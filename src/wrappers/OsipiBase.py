@@ -16,9 +16,9 @@ class OsipiBase:
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
-            self.osipi_initiate_algorithm(algorithm)
+            self.osipi_initiate_algorithm(algorithm, bvalues=bvalues, thresholds=thresholds, bounds=bounds, initial_guess=initial_guess)
             
-    def osipi_initiate_algorithm(self, algorithm):
+    def osipi_initiate_algorithm(self, algorithm, **kwargs):
         """Turns the class into a specified one by the input.
         This method can be used instead of specifically importing that class and initiating it.
         
@@ -32,7 +32,9 @@ class OsipiBase:
         import_base_path = "src.standardized"
         import_path = import_base_path + "." + algorithm
         #Algorithm = getattr(importlib.import_module(import_path), algorithm)
+        # Change the class from OsipiBase to the specified algorithm
         self.__class__ = getattr(importlib.import_module(import_path), algorithm)
+        self.__init__(**kwargs)
 
     def osipi_fit(self, data=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, **kwargs):
         """Fits the data with the bvalues
