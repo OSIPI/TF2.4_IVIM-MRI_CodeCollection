@@ -65,6 +65,8 @@ class IAR_LU_biexp(OsipiBase):
         if self.IAR_algorithm is None:
             if bvalues is None:
                 bvalues = self.bvalues
+            else:
+                bvalues = np.asarray(bvalues)
             
             bvec = np.zeros((bvalues.size, 3))
             bvec[:,2] = 1
