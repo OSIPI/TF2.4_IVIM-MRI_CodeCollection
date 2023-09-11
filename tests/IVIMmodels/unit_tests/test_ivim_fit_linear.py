@@ -3,7 +3,9 @@ import numpy.testing as npt
 import pytest
 import json
 import pathlib
+import os
 
+from src.wrappers.OsipiBase import OsipiBase
 from utilities.data_simulation.GenerateData import GenerateData
 from src.original.ETP_SRI.LinearFitting import LinearFit
 
@@ -58,6 +60,20 @@ def test_ivim_fit(f, D, Dp, bvals):
         npt.assert_allclose(Dp, Dp_fit, rtol=1e-2, atol=1e-3)
 
 def data_ivim_fit_saved():
+    # Find the algorithm file in the folder structure
+    path = pathlib.Path(__file__).resolve().parents[3] # Move up to the root folder
+    path_standardized_algortihms = path / "src" / "standardized" # Move to the folder containing the algorithms
+    algorithms = os.listdir(path_standardized_algortihms) # Get the contents of the folder
+
+    # Remove some crap in the folder
+    algorithms.remove("__init__.py")
+    algorithms.remove("__pycache__")
+    algorithms.remove("template.py")
+
+    # Remove the .py extensions from the algorithms names
+    algorithms = [algorithm.split(".")[0] for algorithm in algorithms]
+    
+     
     file = pathlib.Path(__file__)
     generic = file.with_name('generic.json')
     with generic.open() as f:
@@ -65,24 +81,30 @@ def data_ivim_fit_saved():
         bvals = all_data.pop('config')
         bvals = bvals['bvalues']
         for name, data in all_data.items():
-            yield name, bvals, data
-
-@pytest.mark.parametrize("name, bvals, data", data_ivim_fit_saved())
-def test_ivim_fit_saved(name, bvals, data):
+            yield name, bvals, data, algorithms
+            
+            
+@pytest.mark.parametrize("name, bvals, data, algorithms", data_ivim_fit_saved())
+def test_ivim_fit_saved(name, bvals, data, algorithms):
     #fit = LinearFit()
-    fit = ETP_SRI_LinearFitting()
-    signal = np.asarray(data['data'])
-    has_negatives = np.any(signal<0)
-    signal = np.abs(signal)
-    ratio = 1 / signal[0]
-    signal /= signal[0]
-    tolerance = 1e-2 + 25 * data['noise'] * ratio  # totally empirical
-    if has_negatives:  # this fitting doesn't do well with negatives
-        tolerance += 1
-    if data['f'] == 1.0:
-        linear_fit = fit.ivim_fit(np.log(signal), bvals, linear_fit_option=True)
-        npt.assert_allclose([data['f'], data['Dp']], linear_fit, atol=tolerance)
-    else:
+    #fit = ETP_SRI_LinearFitting()
+    for algorithm in algorithms:
+        fit = OsipiBase(algorithm=algorithm, thresholds=[500])
+        signal = np.asarray(data['data'])
+        has_negatives = np.any(signal<0)
+        signal = np.abs(signal)
+        ratio = 1 / signal[0]
+        signal /= signal[0]
+        tolerance = 1e-2 + 25 * data['noise'] * ratio  # totally empirical
+        #if has_negatives:  # this fitting doesn't do well with negatives
+        #    tolerance += 1
+        #if data['f'] == 1.0:
+            #linear_fit = fit.ivim_fit(np.log(signal), bvals, linear_fit_option=True)
+            #npt.assert_allclose([data['f'], data['Dp']], linear_fit, atol=tolerance)
+        #else:
+            #[f_fit, Dp_fit, D_fit] = fit.ivim_fit(signal, bvals)
+            #npt.assert_allclose([data['f'], data['D']], [f_fit, D_fit], atol=tolerance)
+            #npt.assert_allclose(data['Dp'], Dp_fit, atol=1e-1)  # go easy on the perfusion as it's a linear fake
         [f_fit, Dp_fit, D_fit] = fit.ivim_fit(signal, bvals)
         npt.assert_allclose([data['f'], data['D']], [f_fit, D_fit], atol=tolerance)
         npt.assert_allclose(data['Dp'], Dp_fit, atol=1e-1)  # go easy on the perfusion as it's a linear fake
