@@ -1,16 +1,38 @@
 import numpy as np
+import importlib
 from scipy.stats import norm
 
 
 class OsipiBase:
     """The base class for OSIPI IVIM fitting"""
     
-    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None):
+    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, algorithm=None):
         # Define the attributes as numpy arrays only if they are not None
         self.bvalues = np.asarray(bvalues) if bvalues is not None else None
         self.thresholds = np.asarray(thresholds) if thresholds is not None else None
         self.bounds = np.asarray(bounds) if bounds is not None else None
         self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
+        
+        # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
+        # an algorithm object with that name.
+        if algorithm:
+            self.osipi_initiate_algorithm(algorithm)
+            
+    def osipi_initiate_algorithm(self, algorithm):
+        """Turns the class into a specified one by the input.
+        This method can be used instead of specifically importing that class and initiating it.
+        
+        WIP: Add args and kwargs!
+
+        Args:
+            algorithm (string): The name of the algorithm, should be the same as the file in the src/standardized folder without the .py extension.
+        """
+        
+        # Import the algorithm
+        import_base_path = "src.standardized"
+        import_path = import_base_path + "." + algorithm
+        #Algorithm = getattr(importlib.import_module(import_path), algorithm)
+        self.__class__ = getattr(importlib.import_module(import_path), algorithm)
 
     def osipi_fit(self, data=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, **kwargs):
         """Fits the data with the bvalues
