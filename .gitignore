@@ -1,12 +1,11 @@
 .idea*
 .github*
-*.nii.gz
 __pycache__/
 
 
 # Unit test / coverage reports
 .tox/
-.coverage
+.coveragee
 .cache
 nosetests.xml
 coverage.xml
