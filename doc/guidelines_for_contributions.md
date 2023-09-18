@@ -7,5 +7,5 @@ Follow the [general instructions for code constributions](create_local_copy_of_r
 For each contribution make sure to list the names and affiliations of all contributors of the particular code in the message of the pull request.
 
 ## Source code format
-Contributions of must be place in a folder named "Initials_Institution" under src/original, e.g. "src/original/OGC_AmsterdamUMC"
+Contributions must be place in a folder named "Initials_Institution" under src/original, e.g. "src/original/OGC_AmsterdamUMC"
 
