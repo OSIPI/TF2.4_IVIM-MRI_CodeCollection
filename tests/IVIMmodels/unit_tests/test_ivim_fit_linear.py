@@ -65,12 +65,7 @@ def data_ivim_fit_saved():
     path_standardized_algortihms = path / "src" / "standardized" # Move to the folder containing the algorithms
     algorithms = os.listdir(path_standardized_algortihms) # Get the contents of the folder
 
-    # Remove some crap in the folder
-    #algorithms.remove("__init__.py")
-    #algorithms.remove("__pycache__")
-    #algorithms.remove("template.py")
-
-    # Remove the .py extensions from the algorithms names
+    # Remove the .py extensions from the algorithm names
     algorithms = [algorithm for algorithm in algorithms if algorithm[0:2].isupper()]
     algorithms = [algorithm.split(".")[0] for algorithm in algorithms]
     
@@ -88,9 +83,6 @@ def data_ivim_fit_saved():
             
 @pytest.mark.parametrize("name, bvals, data, algorithm", data_ivim_fit_saved())
 def test_ivim_fit_saved(name, bvals, data, algorithm):
-    #fit = LinearFit()
-    #fit = ETP_SRI_LinearFitting()
-    #for algorithm in algorithms:
     fit = OsipiBase(algorithm=algorithm, thresholds=[500])
     signal = np.asarray(data['data'])
     has_negatives = np.any(signal<0)
