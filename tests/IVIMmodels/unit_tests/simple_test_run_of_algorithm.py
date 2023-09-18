@@ -27,17 +27,3 @@ model2 = IAR_LU_biexp()
 
 test_run(model1, linear_fit_option=True)
 test_run(model2)
-
-###########################################
-
-path = Path(__file__).resolve().parents[3] # Move up to the root folder
-path_standardized_algortihms = path / "src" / "standardized" # Move to the folder containing the algorithms
-algorithms = os.listdir(path_standardized_algortihms) # Get the contents of the folder
-
-# Remove some crap
-algorithms.remove("__init__.py")
-algorithms.remove("__pycache__")
-algorithms.remove("template.py")
-
-# Remove the .py extensions from the algorithms names
-algorithms = [algorithm.split(".")[0] for algorithm in algorithms]
