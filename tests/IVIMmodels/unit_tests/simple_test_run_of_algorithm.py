@@ -6,7 +6,7 @@ from src.standardized.IAR_LU_biexp import IAR_LU_biexp
 
 ## Simple test code... 
 # Used to just do a test run of an algorithm during development
-def test_run(model, **kwargs):
+def dev_test_run(model, **kwargs):
     bvalues = np.array([0, 200, 500, 800])
 
     def ivim_model(b, S0=1, f=0.1, Dstar=0.03, D=0.001):
@@ -25,5 +25,5 @@ def test_run(model, **kwargs):
 model1 = ETP_SRI_LinearFitting(thresholds=[200])
 model2 = IAR_LU_biexp()
 
-test_run(model1, linear_fit_option=True)
-test_run(model2)
+dev_test_run(model1, linear_fit_option=True)
+dev_test_run(model2)
