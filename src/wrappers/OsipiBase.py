@@ -43,11 +43,11 @@ class OsipiBase:
         
         # We should first check whether the attributes in the __init__ are not None
         # Then check if they are input here, if they are, these should overwrite the attributes
-        use_bvalues = bvalues if bvalues is not None else self.bvalues
+        use_bvalues = np.asarray(bvalues) if bvalues is not None else self.bvalues
         kwargs["bvalues"] = use_bvalues
-        use_thresholds = thresholds if self.bvalues is None else self.thresholds
-        use_bounds = bounds if self.bounds is None else self.bounds
-        use_initial_guess = initial_guess if self.initial_guess is None else self.initial_guess
+        use_thresholds = np.asarray(thresholds) if self.bvalues is None else self.thresholds
+        use_bounds = np.asarray(bounds) if self.bounds is None else self.bounds
+        use_initial_guess = np.asarray(initial_guess) if self.initial_guess is None else self.initial_guess
         
         #args = [data, use_bvalues, use_thresholds]
         args = [data, use_thresholds]
