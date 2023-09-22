@@ -1,6 +1,7 @@
-Technique	Catagory	Subcategory	notes	subfolder	Link to source code	Authors	Institution	function/module	DOI	Tester	test status
-IVIM	Fitting	LSQ fitting		OGC_AmsterdamUMC	TF2.4_IVIM-MRI_CodeCollection/src/original/OGC_AmsterdamUMC/	Oliver Gurney-Champion	Amsterdam UMC	fit_least_squares/fit_least_squares_array		tbd	
-IVIM	Fitting	segmented LSQ fitting		OGC_AmsterdamUMC	TF2.4_IVIM-MRI_CodeCollection/src/original/OGC_AmsterdamUMC/	Oliver Gurney-Champion	Amsterdam UMC	fit_segmented/fit_segmented_array		tbd	
-Tri-exponential	Fitting	LSQ fitting		OGC_AmsterdamUMC	TF2.4_IVIM-MRI_CodeCollection/src/original/OGC_AmsterdamUMC/	Oliver Gurney-Champion	Amsterdam UMC	fit_least_squares_tri_exp/fit_least_squares_array_tri_exp		tbd	
-Tri-exponential	Fitting	Segmented LSQ fitting		OGC_AmsterdamUMC	TF2.4_IVIM-MRI_CodeCollection/src/original/OGC_AmsterdamUMC/	Oliver Gurney-Champion	Amsterdam UMC	fit_segmented_tri_exp/fit_segmented_array_tri_exp	https://doi.org/10.3389/fphys.2022.942495	tbd	
-IVIM	Fitting	Bayesian		OGC_AmsterdamUMC	TF2.4_IVIM-MRI_CodeCollection/src/original/OGC_AmsterdamUMC/	Oliver Gurney-Champion/Sebastiano Barbieri	Amsterdam UMC	fit_bayesian_array	https://doi.org/10.1002/mrm.28852	tbd	
+Technique,Category,Subcategory,notes,subfolder,Link to source code,Authors,Institution,function/module,DOI,Tester,test status
+IVIM,Fitting,LSQ fitting,,OGC_AmsterdamUMC,TF2.4_IVIM-MRI_CodeCollection/src/original/OGC_AmsterdamUMC/,Oliver Gurney-Champion,Amsterdam UMC,fit_least_squares/fit_least_squares_array,,tbd,
+IVIM,Fitting,segmented LSQ fitting,,OGC_AmsterdamUMC,TF2.4_IVIM-MRI_CodeCollection/src/original/OGC_AmsterdamUMC/,Oliver Gurney-Champion,Amsterdam UMC,fit_segmented/fit_segmented_array,,tbd,
+Tri-exponential,Fitting,LSQ fitting,,OGC_AmsterdamUMC,TF2.4_IVIM-MRI_CodeCollection/src/original/OGC_AmsterdamUMC/,Oliver Gurney-Champion,Amsterdam UMC,fit_least_squares_tri_exp/fit_least_squares_array_tri_exp,,tbd,
+Tri-exponential,Fitting,Segmented LSQ fitting,,OGC_AmsterdamUMC,TF2.4_IVIM-MRI_CodeCollection/src/original/OGC_AmsterdamUMC/,Oliver Gurney-Champion,Amsterdam UMC,fit_segmented_tri_exp/fit_segmented_array_tri_exp,https://doi.org/10.3389/fphys.2022.942495,tbd,
+IVIM,Fitting,Bayesian,,OGC_AmsterdamUMC,TF2.4_IVIM-MRI_CodeCollection/src/original/OGC_AmsterdamUMC/,Oliver Gurney-Champion/Sebastiano Barbieri,Amsterdam UMC,fit_bayesian_array,https://doi.org/10.1002/mrm.28852,tbd,
+IVIM,Fitting,two-step segmented fit approach,also includes ADC calculation as a separate function,PvH_KB_NKI,TF2.4_IVIM-MRI_CodeCollection/src/original/PvH_KB_NKI/,Petra van Houdt/Stefan Zijlema/Koen Baas,the Netherlands Cancer Institute,DWI_functions_standalone.py,https://doi.org/10.3389/fonc.2021.705964,tbd,
