@@ -1,7 +1,8 @@
 import numpy as np
 import importlib
 from scipy.stats import norm
-
+import pathlib
+import sys
 
 class OsipiBase:
     """The base class for OSIPI IVIM fitting"""
@@ -29,11 +30,16 @@ class OsipiBase:
         """
         
         # Import the algorithm
+        root_path = pathlib.Path(__file__).resolve().parents[2]
+        if str(root_path) not in sys.path:
+            print("Root folder not in PYTHONPATH")
+            return False
+            
         import_base_path = "src.standardized"
         import_path = import_base_path + "." + algorithm
         #Algorithm = getattr(importlib.import_module(import_path), algorithm)
         # Change the class from OsipiBase to the specified algorithm
-        self.__class__ = getattr(importlib.import_module(import_path), algorithm)
+        self.__class__ = getattr(importlib.import_module(import_path, package=package), algorithm)
         self.__init__(**kwargs)
 
     def osipi_fit(self, data=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, **kwargs):
