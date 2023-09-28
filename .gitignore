@@ -1,6 +1,5 @@
 .idea*
 .github*
-*.nii.gz
 __pycache__/
 
 
