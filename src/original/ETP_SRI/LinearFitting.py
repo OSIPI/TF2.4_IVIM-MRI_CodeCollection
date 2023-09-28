@@ -33,6 +33,8 @@ class LinearFit:
         stats : boolean
             If true, return the polyfit statistics
         """
+        bvalues = np.asarray(bvalues)
+        signal = np.asarray(signal)
         assert bvalues.size == signal.size, "Signal and b-values don't have the same number of values"
         if stats:
             D, stats = poly.polyfit(np.asarray(bvalues), signal, 1, full=True, w=weighting)
