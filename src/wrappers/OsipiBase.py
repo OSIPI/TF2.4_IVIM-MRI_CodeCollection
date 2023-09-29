@@ -39,7 +39,7 @@ class OsipiBase:
         import_path = import_base_path + "." + algorithm
         #Algorithm = getattr(importlib.import_module(import_path), algorithm)
         # Change the class from OsipiBase to the specified algorithm
-        self.__class__ = getattr(importlib.import_module(import_path, package=package), algorithm)
+        self.__class__ = getattr(importlib.import_module(import_path), algorithm)
         self.__init__(**kwargs)
 
     def osipi_fit(self, data=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, **kwargs):
