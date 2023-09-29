@@ -1,0 +1,7 @@
+{
+    "developers": "Oscar Jalnefjord",
+    "institutions": ["University of Gothenburg, Gothenburg, Sweden", "Sahlgrenska University Hospital, Gothenburg, Sweden"],
+    "publications": ["Gustafsson et al. Impact of prior distributions and central tendency measures on Bayesian intravoxel incoherent motion model fitting. Magnetic Resonance in Medicine 2018; 79(3):1674-1683. https://doi.org/10.1002/mrm.26783 ", 
+                     "Jalnefjord et al. Comparison of methods for estimation of the intravoxel incoherent motion (IVIM) diffusion coefficient (D) and perfusion fraction (f). Magnetic Resonance Materials in Physics, Biology and Medicine 2018; 31(6):715-723. https://doi.org/10.1007/s10334-018-0697-5"],
+    "other_info": "Also available at: https://mathworks.com/matlabcentral/fileexchange/65579-ivim-model-fitting"
+}
