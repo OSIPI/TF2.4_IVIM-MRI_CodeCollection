@@ -8,7 +8,7 @@ cvxpy, have_cvxpy, _ = optional_package("cvxpy")
 
 class IvimModelTopoPro(ReconstModel):
 
-    def __init__(self, gtab, bounds=[[0,1], [0.005, 0.1], [1e-5, 0.004]], \
+    def __init__(self, gtab, bounds=[[0, 0.005, 1e-5], [1, 0.1, 0.004]], \
         rescale_units=False, shgo_iters=5, rescale_results_to_mm2_s=False):
         r""" Initialize an IvimModelTP class.
         This particular script was modified as the DIPY version has stringent 
@@ -80,9 +80,9 @@ class IvimModelTopoPro(ReconstModel):
             # Bounds expressed as (lower bound, upper bound) for [f, D*, D].
             self.bounds = np.array([(0, 1), (5, 100), (0, 4)])
         elif (bounds[0][1] <= 1) or rescale_units: # Realistically, if mm2/s units are used, D* bound is <= 1
-            self.bounds = np.array([(bounds[0][0], bounds[0][1]), \
-                                    (bounds[1][0]*1000, bounds[1][1]*1000), \
-                                    (bounds[2][0]*1000, bounds[2][1]*1000)])
+            self.bounds = np.array([(bounds[0][0], bounds[1][0]), \
+                                    (bounds[0][1]*1000, bounds[1][1]*1000), \
+                                    (bounds[0][2]*1000, bounds[1][2]*1000)])
         else: # Finally, if units if µm2/ms are already used
             self.bounds = np.array([(bounds[0][0], bounds[1][0], \
                                     (bounds[0][1], bounds[1][1]), \
