@@ -1,6 +1,6 @@
 import numpy as np
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.PV_MUMC.ivim_fit_method_biexp import fit_least_squares_array
+from src.original.PV_MUMC.two_step_IVIM_fit import fit_least_squares_array
 
 
 class PV_MUMC_biexp(OsipiBase):
@@ -31,7 +31,7 @@ class PV_MUMC_biexp(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(PV_MUMC, self).__init__(bvalues, None, bounds, None)
+        super(PV_MUMC_biexp, self).__init__(bvalues, None, bounds, None)
         self.PV_algorithm = fit_least_squares_array
         
     
