@@ -80,9 +80,9 @@ class IvimModelTopoPro(ReconstModel):
             # Bounds expressed as (lower bound, upper bound) for [f, D*, D].
             self.bounds = np.array([(0, 1), (5, 100), (0, 4)])
         elif (bounds[0][1] <= 1) or rescale_units: # Realistically, if mm2/s units are used, D* bound is <= 1
-            self.bounds = np.array([(bounds[0][0], bounds[1][0]), \
-                                    (bounds[0][1]*1000, bounds[1][1]*1000), \
-                                    (bounds[0][2]*1000, bounds[1][2]*1000)])
+            self.bounds = np.array([(bounds[0][0], bounds[0][1]), \
+                                    (bounds[1][0]*1000, bounds[1][1]*1000), \
+                                    (bounds[2][0]*1000, bounds[2][1]*1000)])
         else: # Finally, if units if µm2/ms are already used
             self.bounds = np.array([(bounds[0][0], bounds[1][0], \
                                     (bounds[0][1], bounds[1][1]), \
