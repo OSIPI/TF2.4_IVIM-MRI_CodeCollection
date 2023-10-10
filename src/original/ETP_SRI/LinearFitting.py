@@ -1,9 +1,7 @@
 import numpy as np
 import numpy.polynomial.polynomial as poly
 
-from utils.data_simulation.GenerateData import GenerateData
-
-
+from utilities.data_simulation.GenerateData import GenerateData
 
 class LinearFit:
     """
@@ -17,6 +15,9 @@ class LinearFit:
             The b-value after which it can be assumed that the perfusion value is negligible
         """
         self.linear_cutoff = linear_cutoff
+
+    def accepted_dimensions(self):
+        return (1, 1)
     
     def linear_fit(self, bvalues, signal, weighting=None, stats=False):
         """
