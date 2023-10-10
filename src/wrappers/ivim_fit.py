@@ -4,8 +4,20 @@
 
 # osipi implementations
 
+import numpy as np
 
-def ivim_fit(author, signals=None, bvalues=None, data=None, initial_guess=None, bounds=None):
+# from utils.data_simulation.GenerateData import GenerateData
+from src.original.ETP_SRI.LinearFitting import LinearFit
+
+author_lookup = {
+    'ETP_SRI': LinearFit
+}
+
+# print('hi!')
+
+
+
+def ivim_fit(authors=None, signals=None, bvalues=None, data=None, initial_guess=None, bounds=None):
     """
     wrapper function to use OSIPI code contributions for IVIM fit
     :param author: str, can be one of []
@@ -18,9 +30,18 @@ def ivim_fit(author, signals=None, bvalues=None, data=None, initial_guess=None, 
     """
 
     # Unpack variables if data object is given
-    if not data == None:
+    if data is not None:
         bvalues = data.bvalues
         signals = data.signals
+    
+
+    if bvalues is None:
+        print('Missing required argument bvalues')
+        return
+
+    if signals is None:
+        print('Missing required argument signals')
+        return
 
 
     # Some implementations can only fit a voxel at a time (i.e. all inputs must be 2-dimensional)
@@ -28,10 +49,24 @@ def ivim_fit(author, signals=None, bvalues=None, data=None, initial_guess=None, 
     requires_4D = True if author in [] else False
 
     # Bounds and initial guess for parameters
-    initial_guess = []
-    bounds = []
+    if initial_guess is None:
+        initial_guess = []
+
+    if bounds is None:
+        bounds = []
 
     # Create a fitting function for the chosen author/implementation
-    if author == "":
-        pass
+    if authors is None:
+        print('Missing required argument authors')
+    
+    for author in authors:
+        if author not in author_lookup:
+            print(f'Unknown author {author}')
+            continue
+        print(f'author {author} accepts dimensions {author_lookup[author].accepted_dimensions()}')
 
+
+
+
+if __name__ == '__main__':
+    ivim_fit()
