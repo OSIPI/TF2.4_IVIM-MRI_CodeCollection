@@ -150,7 +150,7 @@ def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cu
 
 
 def fit_least_squares_array(bvalues, dw_data, S0_output=True, fitS0=True, njobs=4,
-                            bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3])):
+                            bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]),p0=[1, 1, 0.1, 1]):
     """
     This is an implementation of the conventional IVIM fit. It is fitted in array form.
     :param bvalues: 1D Array with the b-values
@@ -175,7 +175,7 @@ def fit_least_squares_array(bvalues, dw_data, S0_output=True, fitS0=True, njobs=
             try:
                 # defining parallel function
                 def parfun(i):
-                    return fit_least_squares(bvalues, dw_data[i, :], S0_output=S0_output, fitS0=fitS0, bounds=bounds)
+                    return fit_least_squares(bvalues, dw_data[i, :], S0_output=S0_output, fitS0=fitS0, bounds=bounds,p0=p0)
 
                 output = Parallel(n_jobs=njobs)(delayed(parfun)(i) for i in tqdm(range(len(dw_data)), position=0, leave=True))
                 Dt, Fp, Dp, S0 = np.transpose(output)
@@ -192,14 +192,14 @@ def fit_least_squares_array(bvalues, dw_data, S0_output=True, fitS0=True, njobs=
             # running in a single loop and filling arrays
             for i in tqdm(range(len(dw_data)), position=0, leave=True):
                 Dt[i], Fp[i], Dp[i], S0[i] = fit_least_squares(bvalues, dw_data[i, :], S0_output=S0_output, fitS0=fitS0,
-                                                               bounds=bounds)
+                                                               bounds=bounds,p0=p0)
         return [Dt, Fp, Dp, S0]
     else:
         # if S0 is not exported
         if njobs > 1:
             try:
                 def parfun(i):
-                    return fit_least_squares(bvalues, dw_data[i, :], fitS0=fitS0, bounds=bounds)
+                    return fit_least_squares(bvalues, dw_data[i, :], fitS0=fitS0, bounds=bounds,p0=p0)
 
                 output = Parallel(n_jobs=njobs)(delayed(parfun)(i) for i in tqdm(range(len(dw_data)), position=0, leave=True))
                 Dt, Fp, Dp = np.transpose(output)
@@ -213,12 +213,12 @@ def fit_least_squares_array(bvalues, dw_data, S0_output=True, fitS0=True, njobs=
             Fp = np.zeros(len(dw_data))
             for i in range(len(dw_data)):
                 Dt[i], Fp[i], Dp[i] = fit_least_squares(bvalues, dw_data[i, :], S0_output=S0_output, fitS0=fitS0,
-                                                        bounds=bounds)
+                                                        bounds=bounds,p0=p0)
         return [Dt, Fp, Dp]
 
 
 def fit_least_squares(bvalues, dw_data, S0_output=False, fitS0=True,
-                      bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3])):
+                      bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]),p0=[1, 1, 0.1, 1]):
     """
     This is an implementation of the conventional IVIM fit. It fits a single curve
     :param bvalues: Array with the b-values
@@ -242,7 +242,7 @@ def fit_least_squares(bvalues, dw_data, S0_output=False, fitS0=True,
             # bounds are rescaled such that each parameter changes at roughly the same rate to help fitting.
             bounds = ([bounds[0][0] * 1000, bounds[0][1] * 10, bounds[0][2] * 10, bounds[0][3]],
                       [bounds[1][0] * 1000, bounds[1][1] * 10, bounds[1][2] * 10, bounds[1][3]])
-            params, _ = curve_fit(ivimN, bvalues, dw_data, p0=[1, 1, 0.1, 1], bounds=bounds)
+            params, _ = curve_fit(ivimN, bvalues, dw_data, p0=p0, bounds=bounds)
             S0 = params[3]
         # correct for the rescaling of parameters
         Dt, Fp, Dp = params[0] / 1000, params[1] / 10, params[2] / 10
@@ -563,7 +563,6 @@ def fit_bayesian_array(bvalues, dw_data, paramslsq, arg):
     :return Dp: Array with Dp in each voxel
     :return S0: Array with S0 in each voxel
     """
-    arg = checkarg_lsq(arg)
     # fill out missing args
     Dt0, Fp0, Dp0, S00 = paramslsq
     # determine prior
