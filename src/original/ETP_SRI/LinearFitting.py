@@ -66,6 +66,7 @@ class LinearFit:
         gt_cutoff = bvalues >= self.linear_cutoff
         linear_signal = np.log(signal)
         D = self.linear_fit(bvalues[gt_cutoff], linear_signal[gt_cutoff])
+        D[1] = max(D[1], 0)  # constrain to positive values
         
         if lt_cutoff.sum() > 0:
             signal_Dp = linear_signal[lt_cutoff] - gd.linear_signal(D[1], bvalues[lt_cutoff], np.log(D[0]))
