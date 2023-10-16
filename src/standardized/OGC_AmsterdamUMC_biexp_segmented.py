@@ -2,7 +2,7 @@ from src.wrappers.OsipiBase import OsipiBase
 from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_segmented
 
 
-class OGC_AmsterdamUMC_segbiexp(OsipiBase):
+class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
     """
     Segmented bi-exponential fitting algorithm by Oliver Gurney-Champion, Amsterdam UMC
     """
@@ -35,7 +35,7 @@ class OGC_AmsterdamUMC_segbiexp(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(OGC_AmsterdamUMC_segbiexp, self).__init__(bvalues, bounds, initial_guess)
+        super(OGC_AmsterdamUMC_biexp_segmented, self).__init__(bvalues, bounds, initial_guess)
         self.OGC_algorithm = fit_segmented
         self.bounds=bounds
         self.initial_guess=initial_guess
