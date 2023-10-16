@@ -8,7 +8,7 @@ cvxpy, have_cvxpy, _ = optional_package("cvxpy")
 
 class IvimModelTopoPro(ReconstModel):
 
-    def __init__(self, gtab, bounds=[[0,1], [0.005, 0.1], [1e-5, 0.004]], \
+    def __init__(self, gtab, bounds=[[0, 0.005, 1e-5], [1, 0.1, 0.004]], \
         rescale_units=False, shgo_iters=5, rescale_results_to_mm2_s=False):
         r""" Initialize an IvimModelTP class.
         This particular script was modified as the DIPY version has stringent 
