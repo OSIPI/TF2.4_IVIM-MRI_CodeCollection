@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from pathlib import Path
-from src.standardized.ETP_SRI_LinearFitting import ETP_SRI_LinearFitting
+#from src.standardized.ETP_SRI_LinearFitting import ETP_SRI_LinearFitting
 from src.standardized.IAR_LU_biexp import IAR_LU_biexp
 
 ## Simple test code... 
@@ -22,8 +22,8 @@ def dev_test_run(model, **kwargs):
     print(results)
     #test = model.osipi_simple_bias_and_RMSE_test(SNR=20, bvalues=bvalues, f=0.1, Dstar=0.03, D=0.001, noise_realizations=10)
     
-model1 = ETP_SRI_LinearFitting(thresholds=[200])
+#model1 = ETP_SRI_LinearFitting(thresholds=[200])
 model2 = IAR_LU_biexp()
 
-dev_test_run(model1, linear_fit_option=True)
+#dev_test_run(model1, linear_fit_option=True)
 dev_test_run(model2)
