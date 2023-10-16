@@ -39,7 +39,7 @@ class OsipiBase:
         import_path = import_base_path + "." + algorithm
         #Algorithm = getattr(importlib.import_module(import_path), algorithm)
         # Change the class from OsipiBase to the specified algorithm
-        self.__class__ = getattr(importlib.import_module(import_path, package=package), algorithm)
+        self.__class__ = getattr(importlib.import_module(import_path), algorithm)
         self.__init__(**kwargs)
 
     def osipi_fit(self, data=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, **kwargs):
@@ -49,11 +49,17 @@ class OsipiBase:
         
         # We should first check whether the attributes in the __init__ are not None
         # Then check if they are input here, if they are, these should overwrite the attributes
-        use_bvalues = np.asarray(bvalues) if bvalues is not None else self.bvalues
+        use_bvalues = bvalues if bvalues is not None else self.bvalues
         kwargs["bvalues"] = use_bvalues
-        use_thresholds = np.asarray(thresholds) if self.bvalues is None else self.thresholds
-        use_bounds = np.asarray(bounds) if self.bounds is None else self.bounds
-        use_initial_guess = np.asarray(initial_guess) if self.initial_guess is None else self.initial_guess
+        use_thresholds = thresholds if self.bvalues is None else self.thresholds
+        use_bounds = bounds if self.bounds is None else self.bounds
+        use_initial_guess = initial_guess if self.initial_guess is None else self.initial_guess
+
+        # Make sure we don't make arrays of None's
+        if use_bvalues is not None: use_bvalues = np.asarray(use_bvalues) 
+        if use_thresholds is not None: use_thresholds = np.asarray(use_thresholds) 
+        if use_bounds is not None: use_bounds = np.asarray(use_bounds) 
+        if use_initial_guess is not None: use_initial_guess = np.asarray(use_initial_guess) 
         
         #args = [data, use_bvalues, use_thresholds]
         args = [data, use_thresholds]
