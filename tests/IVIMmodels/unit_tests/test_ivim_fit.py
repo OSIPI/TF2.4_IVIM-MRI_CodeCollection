@@ -75,29 +75,44 @@ def data_ivim_fit_saved():
     for name, data in all_data.items():
         for algorithm in algorithms:
             algorithm_dict = algorithm_information.get(algorithm, {})
-            xfail = name in algorithm_dict.get("xfail_names", [])
+            xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
+                "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
             kwargs = algorithm_dict.get("options", {})
-            tolerances = algorithm_dict.get("tolerances", None)
+            tolerances = algorithm_dict.get("tolerances", {})
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances
             
             
 @pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances", data_ivim_fit_saved())
 def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances, request):
-    if xfail:
-        mark = pytest.mark.xfail(reason="xfail", strict=True)
+    if xfail["xfail"]:
+        mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
         request.node.add_marker(mark)
     fit = OsipiBase(algorithm=algorithm, **kwargs)
     signal = np.asarray(data['data'])
     signal = np.abs(signal)
     signal /= signal[0]
+    ratio = 1 / signal[0]
     # has_negatives = np.any(signal<0)
-    if tolerances is None:
-        # signal = np.abs(signal)
-        # ratio = 1 / signal[0]
-        # signal /= signal[0]
-        # tolerance = 1e-2 + 25 * data['noise'] * ratio  # totally empirical
-        # tolerance = 1
-        tolerances = {"f": 5, "D": 5, "Dp": 25}
+    if "dynamic_rtol" in tolerances:
+        dyn_rtol = tolerances["dynamic_rtol"]
+        scale = dyn_rtol["offset"] + dyn_rtol["ratio"]*ratio + dyn_rtol["noise"]*data["noise"] + dyn_rtol["noiseCrossRatio"]*ratio*data["noise"]
+        tolerances["rtol"] = {"f": scale*dyn_rtol["f"], "D": scale*dyn_rtol["D"], "Dp": scale*dyn_rtol["Dp"]}
+    else:
+        tolerances["rtol"] = tolerances.get("rtol", {"f": 5, "D": 5, "Dp": 25})
+    if "dynamic_atol" in tolerances:
+        dyn_atol = tolerances["dynamic_atol"]
+        scale = dyn_atol["offset"] + dyn_atol["ratio"]*ratio + dyn_atol["noise"]*data["noise"] + dyn_atol["noiseCrossRatio"]*ratio*data["noise"]
+        tolerances["atol"] = {"f": scale*dyn_atol["f"], "D": scale*dyn_atol["D"], "Dp": scale*dyn_atol["Dp"]}
+    else:
+        tolerances["atol"] = tolerances.get("atol", {"f": 1e-2, "D": 1e-2, "Dp": 1e-1})
+    # if tolerances:
+    #     # signal = np.abs(signal)
+    #     # ratio = 1 / signal[0]
+    #     # signal /= signal[0]
+    #     # tolerance = 1e-2 + 25 * data['noise'] * ratio  # totally empirical
+    #     # tolerance = 1
+    #     tolerances = {"rtol": {"f": 5, "D": 5, "Dp": 25},
+    #         "atol": {"f": 1e-2, "D": 1e-2, "Dp": 1e-1}}
     #if has_negatives:  # this fitting doesn't do well with negatives
     #    tolerance += 1
     #if data['f'] == 1.0:
@@ -108,6 +123,6 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
         #npt.assert_allclose([data['f'], data['D']], [f_fit, D_fit], atol=tolerance)
         #npt.assert_allclose(data['Dp'], Dp_fit, atol=1e-1)  # go easy on the perfusion as it's a linear fake
     [f_fit, Dp_fit, D_fit] = fit.ivim_fit(signal, bvals)
-    npt.assert_allclose(data['f'], f_fit, rtol=tolerances["f"])
-    npt.assert_allclose(data['D'], D_fit, rtol=tolerances["D"])
-    npt.assert_allclose(data['Dp'], Dp_fit, rtol=tolerances["Dp"])  # go easy on the perfusion as it's a linear fake
+    npt.assert_allclose(data['f'], f_fit, rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
+    npt.assert_allclose(data['D'], D_fit, rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
+    npt.assert_allclose(data['Dp'], Dp_fit, rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
