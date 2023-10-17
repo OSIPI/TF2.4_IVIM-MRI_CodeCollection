@@ -9,94 +9,125 @@
         "IAR_LU_subtracted"
     ],
     "IAR_LU_biexp": {
-        "xfail_names": [
-            "Vein",
-            "Blood RV",
-            "Blood LV",
-            "Blood RA"
-        ],
         "tolerances": {
-            "f": 5,
-            "D": 5,
-            "Dp": 25
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
         }
     },
     "IAR_LU_modified_mix": {
-        "xfail_names": [
-            "Blood LV"
-        ],
         "tolerances": {
-            "f": 5,
-            "D": 5,
-            "Dp": 25
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
         }
     },
     "IAR_LU_modified_topopro": {
-        "xfail_names": [
-            "Vein",
-            "Blood RV",
-            "Blood LV",
-            "Blood RA"
-        ],
         "tolerances": {
-            "f": 5,
-            "D": 5,
-            "Dp": 25
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
         }
     },
     "IAR_LU_segmented_2step": {
-        "xfail_names": [
-            "Blood RV",
-            "Blood LV",
-            "Blood RA"
-        ],
         "tolerances": {
-            "f": 5,
-            "D": 5,
-            "Dp": 25
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
         }
     },
     "IAR_LU_segmented_3step": {
-        "xfail_names": [
-            "Blood RV",
-            "Blood LV",
-            "Blood RA"
-        ],
         "tolerances": {
-            "f": 5,
-            "D": 5,
-            "Dp": 25
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
         }
     },
     "IAR_LU_subtracted": {
-        "xfail_names": [
-            "Blood RV",
-            "Blood LV",
-            "Blood RA"
-        ],
         "tolerances": {
-            "f": 5,
-            "D": 5,
-            "Dp": 25
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
         }
     },
     "ETP_SRI_LinearFitting": {
-        "xfail_names": [
-            "Artery",
-            "Blood RV",
-            "Blood LV",
-            "myocardium RV",
-            "myocardium ra",
-            "Liver",
-            "Blood RA"
-        ],
+        "xfail_names": {
+            "Vein": true
+        },
         "options": {
             "thresholds": [500]
         },
         "tolerances": {
-            "f": 5,
-            "D": 5,
-            "Dp": 25
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 0,
+                "D": 0,
+                "Dp": 0
+            },
+            "dynamic_rtol": {
+                "offset": 0,
+                "noise": 0,
+                "ratio": 0,
+                "noiseCrossRatio": 10,
+                "f": 1,
+                "D": 1,
+                "Dp": 2
+            },
+            "dynamic_atol": {
+                "offset": 5e-2,
+                "noise": 0,
+                "ratio": 0,
+                "noiseCrossRatio": 10,
+                "f": 1,
+                "D": 1,
+                "Dp": 2
+            }
         }
     }
 }
