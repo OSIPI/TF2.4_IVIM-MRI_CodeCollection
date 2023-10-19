@@ -1,6 +1,6 @@
 from src.wrappers.OsipiBase import OsipiBase
 from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_segmented
-
+import numpy as np
 
 class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
     """
@@ -19,15 +19,15 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
 
     # Algorithm requirements
     required_bvalues = 4
-    required_thresholds = [0,
-                           0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
+    required_thresholds = [1,
+                           1]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
     required_bounds = False
     required_bounds_optional = True  # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
-    def __init__(self, bvalues=None, thershold=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=True):
+    def __init__(self, bvalues=None, thresholds=75, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), initial_guess=[0.001, 0.01, 0.01,1]):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -35,12 +35,17 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(OGC_AmsterdamUMC_biexp_segmented, self).__init__(bvalues, bounds, initial_guess)
+        super(OGC_AmsterdamUMC_biexp_segmented, self).__init__(bvalues,thresholds, bounds, initial_guess)
         self.OGC_algorithm = fit_segmented
-        self.bounds=bounds
-        self.initial_guess=initial_guess
-        self.fitS0=fitS0
-        self.thershold=thershold
+        if bounds is None:
+            self.bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3])
+        else:
+            self.bounds=bounds
+        if initial_guess is None:
+            self.initial_guess = [0.001, 0.001, 0.01, 1]
+        else:
+            self.initial_guess = initial_guess
+        self.thresholds=thresholds
 
     def ivim_fit(self, signals, bvalues=None):
         """Perform the IVIM fit
@@ -52,8 +57,8 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         Returns:
             _type_: _description_
         """
-
-        fit_results = self.OGC_algorithm(bvalues, signals,bounds=self.bounds,p0=self.initial_guess,fitS0=self.fitS0)
+        bvalues=np.array(bvalues)
+        fit_results = self.OGC_algorithm(bvalues, signals,bounds=self.bounds,cutoff=self.thresholds,p0=self.initial_guess)
 
         D = fit_results[0]
         f = fit_results[1]
