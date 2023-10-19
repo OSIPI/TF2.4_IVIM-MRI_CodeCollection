@@ -1,4 +1,4 @@
-f# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 DWI_functions.py
 ====================================
