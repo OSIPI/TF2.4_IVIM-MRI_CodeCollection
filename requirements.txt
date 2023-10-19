@@ -8,3 +8,4 @@ dipy
 matplotlib
 scienceplots
 cvxpy
+matlabengine

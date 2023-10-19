@@ -190,14 +190,18 @@ function [pars,mask, gof] = IVIM_seg(Y,b,lim,blim,disp_prog)
         maskDstar = maskf;
     
         % Optimization
-        [Dstar(maskf),maskDstar(maskf)] = optimizeD(Y(:,maskf)-repmat(A(maskf),length(b),1).*exp(-b*D(maskf)),b,optlim,lim(:,4),disp_prog);
-    
+        if sum(maskf) > 0
+            [Dstar(maskf),maskDstar(maskf)] = optimizeD(Y(:,maskf)-repmat(A(maskf),length(b),1).*exp(-b*D(maskf)),b,optlim,lim(:,4),disp_prog);
+        end
+
         % Calculates f
         f = lim(1,1)*ones(1,n);
         f(f1 < lim(1,3)) = lim(1,3);
         f(f2 > lim(2,3)) = lim(2,3); 
-        f(maskDstar) = fcalc(Dstar(maskDstar),maskDstar);
-    
+        if sum(maskDstar) > 0
+            f(maskDstar) = fcalc(Dstar(maskDstar),maskDstar);
+        end
+        
         % Checks for f out of bounds
         maskf = maskf & (f > lim(1,3)) & (f < lim(2,3));
         Dstar(f < lim(1,3)) = lim(1,4);
