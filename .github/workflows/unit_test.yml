@@ -36,10 +36,10 @@ jobs:
         run: echo "C:\Program Files\MATLAB\R2023a\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append     
       - name: Prepend MATLAB to PATH on Linux
         if: runner.os == 'Linux'
-        run: echo "/usr/local/MATLAB/R2023a/bin/maci64" >> $GITHUB_PATH
+        run: echo "/usr/local/MATLAB/R2023a/bin" >> $GITHUB_PATH
       - name: Prepend MATLAB to PATH on macOS
         if: runner.os == 'macOS'
-        run: echo "/Applications/MATLAB_R2023a.app/bin" >> $GITHUB_PATH
+        run: echo "/Applications/MATLAB_R2023a.app/bin/maci64" >> $GITHUB_PATH
       # Installs other dependenvies
       - name: Install dependencies
         run: |
