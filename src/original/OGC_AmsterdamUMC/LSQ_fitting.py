@@ -66,7 +66,7 @@ def order(Dt, Fp, Dp, S0=None):
         return Dt, Fp, Dp, S0
 
 
-def fit_segmented_array(bvalues, dw_data, njobs=4, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cutoff=75):
+def fit_segmented_array(bvalues, dw_data, njobs=4, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cutoff=75,p0=[0.001, 0.1, 0.01,1]):
     """
     This is an implementation of the segmented fit, in which we first estimate D using a curve fit to b-values>cutoff;
     then estimate f from the fitted S0 and the measured S0 and finally estimate D* while fixing D and f. This fit
@@ -90,7 +90,7 @@ def fit_segmented_array(bvalues, dw_data, njobs=4, bounds=([0, 0, 0.005],[0.005,
         try:
             # define the parallel function
             def parfun(i):
-                return fit_segmented(bvalues, dw_data[i, :], bounds=bounds, cutoff=cutoff)
+                return fit_segmented(bvalues, dw_data[i, :], bounds=bounds, cutoff=cutoff,p0=p0)
 
             output = Parallel(n_jobs=njobs)(delayed(parfun)(i) for i in tqdm(range(len(dw_data)), position=0, leave=True))
             Dt, Fp, Dp = np.transpose(output)
@@ -107,11 +107,11 @@ def fit_segmented_array(bvalues, dw_data, njobs=4, bounds=([0, 0, 0.005],[0.005,
         Fp = np.zeros(len(dw_data))
         for i in tqdm(range(len(dw_data)), position=0, leave=True):
             # fill arrays with fit results on a per voxel base:
-            Dt[i], Fp[i], Dp[i] = fit_segmented(bvalues, dw_data[i, :], bounds=bounds, cutoff=cutoff)
+            Dt[i], Fp[i], Dp[i] = fit_segmented(bvalues, dw_data[i, :], bounds=bounds, cutoff=cutoff,p0=p0)
     return [Dt, Fp, Dp, S0]
 
 
-def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cutoff=75):
+def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cutoff=75,p0=[0.001, 0.1, 0.01,1]):
     """
     This is an implementation of the segmented fit, in which we first estimate D using a curve fit to b-values>cutoff;
     then estimate f from the fitted S0 and the measured S0 and finally estimate D* while fixing D and f.
@@ -124,23 +124,24 @@ def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cu
     :return Dp: Fitted Dp
     :return S0: Fitted S0
     """
+    p0 = [p0[0] * 1000, p0[1] * 10, p0[2] * 10, p0[3]]
     try:
         # determine high b-values and data for D
         high_b = bvalues[bvalues >= cutoff]
         high_dw_data = dw_data[bvalues >= cutoff]
         # correct the bounds. Note that S0 bounds determine the max and min of f
-        bounds1 = ([bounds[0][0] * 1000., 1 - bounds[1][1]], [bounds[1][0] * 1000., 1. - bounds[0][
+        bounds1 = ([bounds[0][0] * 1000., 0.7 - bounds[1][1]], [bounds[1][0] * 1000., 1.3 - bounds[0][
             1]])  # By bounding S0 like this, we effectively insert the boundaries of f
         # fit for S0' and D
         params, _ = curve_fit(lambda b, Dt, int: int * np.exp(-b * Dt / 1000), high_b, high_dw_data,
-                              p0=(1, 1),
+                              p0=(p0[0], p0[3]-p0[1]/10),
                               bounds=bounds1)
         Dt, Fp = params[0] / 1000, 1 - params[1]
         # remove the diffusion part to only keep the pseudo-diffusion
         dw_data_remaining = dw_data - (1 - Fp) * np.exp(-bvalues * Dt)
         bounds2 = (bounds[0][2], bounds[1][2])
         # fit for D*
-        params, _ = curve_fit(lambda b, Dp: Fp * np.exp(-b * Dp), bvalues, dw_data_remaining, p0=(0.1), bounds=bounds2)
+        params, _ = curve_fit(lambda b, Dp: Fp * np.exp(-b * Dp), bvalues, dw_data_remaining, p0=(p0[2]), bounds=bounds2)
         Dp = params[0]
         return Dt, Fp, Dp
     except:
@@ -150,7 +151,7 @@ def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cu
 
 
 def fit_least_squares_array(bvalues, dw_data, S0_output=True, fitS0=True, njobs=4,
-                            bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]),p0=[1, 1, 0.1, 1]):
+                            bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]),p0=[0.001, 0.1, 0.01, 1]):
     """
     This is an implementation of the conventional IVIM fit. It is fitted in array form.
     :param bvalues: 1D Array with the b-values
@@ -218,7 +219,7 @@ def fit_least_squares_array(bvalues, dw_data, S0_output=True, fitS0=True, njobs=
 
 
 def fit_least_squares(bvalues, dw_data, S0_output=False, fitS0=True,
-                      bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]),p0=[1, 1, 0.1, 1]):
+                      bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), p0=[0.001, 0.1, 0.01, 1]):
     """
     This is an implementation of the conventional IVIM fit. It fits a single curve
     :param bvalues: Array with the b-values
@@ -236,12 +237,14 @@ def fit_least_squares(bvalues, dw_data, S0_output=False, fitS0=True,
             # bounds are rescaled such that each parameter changes at roughly the same rate to help fitting.
             bounds = ([bounds[0][0] * 1000, bounds[0][1] * 10, bounds[0][2] * 10],
                       [bounds[1][0] * 1000, bounds[1][1] * 10, bounds[1][2] * 10])
-            params, _ = curve_fit(ivimN_noS0, bvalues, dw_data, p0=[1, 1, 0.1], bounds=bounds)
+            p0=[p0[0]*1000,p0[1]*10,p0[2]*10]
+            params, _ = curve_fit(ivimN_noS0, bvalues, dw_data, p0=p0, bounds=bounds)
             S0 = 1
         else:
             # bounds are rescaled such that each parameter changes at roughly the same rate to help fitting.
             bounds = ([bounds[0][0] * 1000, bounds[0][1] * 10, bounds[0][2] * 10, bounds[0][3]],
                       [bounds[1][0] * 1000, bounds[1][1] * 10, bounds[1][2] * 10, bounds[1][3]])
+            p0=[p0[0]*1000,p0[1]*10,p0[2]*10,p0[3]]
             params, _ = curve_fit(ivimN, bvalues, dw_data, p0=p0, bounds=bounds)
             S0 = params[3]
         # correct for the rescaling of parameters
