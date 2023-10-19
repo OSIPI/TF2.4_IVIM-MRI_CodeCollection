@@ -8,4 +8,4 @@ dipy
 matplotlib
 scienceplots
 cvxpy
-matlabengine
+matlabengine==9.14.3
