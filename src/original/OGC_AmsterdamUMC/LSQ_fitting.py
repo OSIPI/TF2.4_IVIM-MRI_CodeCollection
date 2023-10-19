@@ -519,7 +519,37 @@ def empirical_neg_log_prior(Dt0, Fp0, Dp0, S00=None):
 
     return neg_log_prior
 
+def flat_neg_log_prior(Dt_range, Fp_range, Dp_range, S0_range=None):
+    """
+    This function determines the negative of the log of the empirical prior probability of the IVIM parameters
+    :param Dt0: 1D Array with the initial D estimates
+    :param Dt0: 1D Array with the initial f estimates
+    :param Dt0: 1D Array with the initial D* estimates
+    :param Dt0: 1D Array with the initial S0 estimates (optional)
+    """
+    def neg_log_prior(p):
+        # depends on whether S0 is fitted or not
+        if len(p) == 4:
+            Dt, Fp, Dp, S0 = p[0], p[1], p[2], p[3]
+        else:
+            Dt, Fp, Dp = p[0], p[1], p[2]
+        # make D*<D very unlikely
+        if (Dp < Dt):
+            return 1e8
+        else:
+            eps = 1e-8
+            Dp_prior = stats.loguniform.pdf(Dp, Dp_range[0], scale=Dp_range[1]-Dp_range[0])
+            Dt_prior = stats.loguniform.pdf(Dt, Dt_range[0], scale=Dt_range[1]-Dt_range[0])
+            Fp_prior = stats.loguniform.pdf(Fp, Fp_range[0], scale=Fp_range[1]-Fp_range[0])
+            # determine and return the prior for D, f and D* (and S0)
+            if len(p) == 4:
+                S0_prior = stats.loguniform.pdf(S0, S0_range[0], scale=S0_range[1] - S0_range[0])
+                return -np.log(Dp_prior + eps) - np.log(Dt_prior + eps) - np.log(Fp_prior + eps) - np.log(
+                    S0_prior + eps)
+            else:
+                return -np.log(Dp_prior + eps) - np.log(Dt_prior + eps) - np.log(Fp_prior + eps)
 
+    return neg_log_prior
 def neg_log_likelihood(p, bvalues, dw_data):
     """
     This function determines the negative of the log of the likelihood of parameters p, given the data dw_data for the Bayesian fit
