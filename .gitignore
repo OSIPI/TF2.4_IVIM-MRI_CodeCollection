@@ -1,2 +1,12 @@
 .idea*
 .github*
+__pycache__/
+
+
+# Unit test / coverage reports
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.pyc

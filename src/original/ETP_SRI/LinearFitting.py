@@ -1,9 +1,7 @@
 import numpy as np
 import numpy.polynomial.polynomial as poly
 
-from utils.data_simulation.GenerateData import GenerateData
-
-
+from utilities.data_simulation.GenerateData import GenerateData
 
 class LinearFit:
     """
@@ -17,6 +15,9 @@ class LinearFit:
             The b-value after which it can be assumed that the perfusion value is negligible
         """
         self.linear_cutoff = linear_cutoff
+
+    def accepted_dimensions(self):
+        return (1, 1)
     
     def linear_fit(self, bvalues, signal, weighting=None, stats=False):
         """
@@ -33,6 +34,8 @@ class LinearFit:
         stats : boolean
             If true, return the polyfit statistics
         """
+        bvalues = np.asarray(bvalues)
+        signal = np.asarray(signal)
         assert bvalues.size == signal.size, "Signal and b-values don't have the same number of values"
         if stats:
             D, stats = poly.polyfit(np.asarray(bvalues), signal, 1, full=True, w=weighting)

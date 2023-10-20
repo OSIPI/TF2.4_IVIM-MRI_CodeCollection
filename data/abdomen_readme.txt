@@ -1,0 +1,1 @@
+Scanned on a Philips 3T system. Taken from https://github.com/oliverchampion/IVIMNET
