@@ -54,7 +54,7 @@ def fit_least_squares_array(bvalues, dw_data, fitS0=True, bounds=([0.9, 0.0001, 
     return [Dpar, Fmv, Dmv, S0]
 
 
-def fit_least_squares(bvalues, dw_data, IR=True, S0_output=False, fitS0=True,
+def fit_least_squares(bvalues, dw_data, IR=False, S0_output=False, fitS0=True,
                       bounds=([0.9, 0.0001, 0.0, 0.0025], [1.1, 0.0025, 0.2, 0.2]), cutoff=200):
     """
    This is the LSQ implementation, in which we first estimate Dpar using a curve fit to b-values>=cutoff;
