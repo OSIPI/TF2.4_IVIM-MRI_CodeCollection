@@ -34,3 +34,8 @@ jobs:
         run: |
           pip install pytest pytest-cov
           python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
+
+      - name: Build notebooks
+        run: |
+          pip install -r notebooks/requirements.txt
+          jupyter-book build notebooks/
