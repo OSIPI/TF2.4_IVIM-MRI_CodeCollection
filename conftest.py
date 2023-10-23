@@ -43,6 +43,12 @@ def pytest_addoption(parser):
         type=float,
         help="Absolute tolerance",
     )
+    parser.addoption(
+        "--fitCount",
+        default=10,
+        type=int,
+        help="Number of fits to perform on the same parameters",
+    )
 
 
 @pytest.fixture(scope="session")
@@ -67,6 +73,10 @@ def rtol(request):
 @pytest.fixture(scope="session")
 def atol(request):
     return request.config.getoption("--atol")
+
+@pytest.fixture(scope="session")
+def fit_count(request):
+    return request.config.getoption("--fitCount")
 
 
 def pytest_generate_tests(metafunc):
