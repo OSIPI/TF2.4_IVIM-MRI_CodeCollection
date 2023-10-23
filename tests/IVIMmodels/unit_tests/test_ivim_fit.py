@@ -4,6 +4,9 @@ import pytest
 import json
 import pathlib
 import os
+import pandas as pd
+import csv
+import shutil
 
 from src.wrappers.OsipiBase import OsipiBase
 from utilities.data_simulation.GenerateData import GenerateData
@@ -77,7 +80,18 @@ def data_ivim_fit_saved():
         for name, data in all_data.items():
             for algorithm in algorithms:
                 yield name, bvals, data, algorithm
-            
+
+def setup_module(module):
+    shutil.rmtree('./tests/results')
+    os.mkdir('./tests/results')
+
+def log_results(filename_label, row_data):
+    filename = './tests/results/' + filename_label + '.csv'
+    if not os.path.exists(filename):
+        with open(filename, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['label','D_true','f_true','Dp_true','D_fit','f_fit','Dp_fit'])
+    pd.DataFrame(data=row_data).to_csv(filename, index=False, header=False, mode='a')
             
 @pytest.mark.parametrize("name, bvals, data, algorithm", data_ivim_fit_saved())
 def test_ivim_fit_saved(name, bvals, data, algorithm):
@@ -98,5 +112,6 @@ def test_ivim_fit_saved(name, bvals, data, algorithm):
         #npt.assert_allclose([data['f'], data['D']], [f_fit, D_fit], atol=tolerance)
         #npt.assert_allclose(data['Dp'], Dp_fit, atol=1e-1)  # go easy on the perfusion as it's a linear fake
     [f_fit, Dp_fit, D_fit] = fit.ivim_fit(signal, bvals)
+    log_results(algorithm, [[name, data['D'], data['f'], data['Dp'], D_fit, f_fit, Dp_fit]])
     npt.assert_allclose([data['f'], data['D']], [f_fit, D_fit], atol=tolerance)
     npt.assert_allclose(data['Dp'], Dp_fit, atol=1e-1)  # go easy on the perfusion as it's a linear fake
