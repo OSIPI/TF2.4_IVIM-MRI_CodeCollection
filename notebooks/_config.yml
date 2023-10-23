@@ -1,0 +1,13 @@
+# Book settings
+# More info: https://jupyterbook.org/customize/config.html
+title: OSIPI Code
+author: OSIPI
+copyright: "2023"
+logo: logo.png
+execute:
+  timeout: 600
+repository:
+  url                       : https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection
+  path_to_book              : notebooks 
+launch_buttons:
+  notebook_interface: "jupyterlab"

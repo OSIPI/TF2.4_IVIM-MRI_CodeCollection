@@ -1,0 +1,9 @@
+# Table of contents
+# More info: https://jupyterbook.org/customize/toc.html
+
+format: jb-article
+root: intro.md
+sections:
+- file: fitting_results.ipynb
+
+
