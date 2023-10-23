@@ -41,3 +41,9 @@ jobs:
           jupyter-book build notebooks/
           touch notebooks/_build/html/.nojekyll
           mv notebooks/_build/html doc/nb
+
+      - name: Push changes
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.10'}}
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

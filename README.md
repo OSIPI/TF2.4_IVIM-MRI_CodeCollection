@@ -30,4 +30,4 @@ The **test** folder contains the test files corresponding to the contributed cod
 The **utils** folder contains various helpful tools.
 
 ## View Testing Reports
-*to be added*
+Very preliminary [test-results](doc/nb/intro.html).
