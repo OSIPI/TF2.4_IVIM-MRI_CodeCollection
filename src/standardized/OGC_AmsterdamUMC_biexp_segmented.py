@@ -27,7 +27,7 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
     required_initial_guess_optional = True
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
-    def __init__(self, bvalues=None, thresholds=75, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), initial_guess=[0.001, 0.01, 0.01,1]):
+    def __init__(self, bvalues=None, thresholds=150, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), initial_guess=[0.001, 0.01, 0.01,1]):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
