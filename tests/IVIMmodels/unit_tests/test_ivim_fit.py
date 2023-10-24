@@ -56,7 +56,7 @@ from utilities.data_simulation.GenerateData import GenerateData
 #     else:
 #         signal = data["data"]
 #     fit = OsipiBase(algorithm=ivim_algorithm)
-#     [f_fit, Dp_fit, D_fit] = fit.ivim_fit(signal, bvals)
+#     [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals)
 #     npt.assert_allclose([f, D, Dp], [f_fit, D_fit, Dp_fit])
 
 
@@ -167,7 +167,7 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
     fit = OsipiBase(algorithm=algorithm, **kwargs)
     signal, ratio = signal_helper(data["data"])
     tolerances = tolerances_helper(tolerances, ratio, data["noise"])
-    [f_fit, Dp_fit, D_fit] = fit.ivim_fit(signal, bvals)
+    [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals)
     npt.assert_allclose(data['f'], f_fit, rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
     npt.assert_allclose(data['D'], D_fit, rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
     npt.assert_allclose(data['Dp'], Dp_fit, rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])

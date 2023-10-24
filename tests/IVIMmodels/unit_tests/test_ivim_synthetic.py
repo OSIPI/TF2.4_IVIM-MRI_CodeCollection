@@ -27,7 +27,7 @@ def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, save_f
         signal = gd.ivim_signal(D, Dp, f, S0, bvals, SNR)
         # else:
         #     signal = data["data"]
-        [f_fit, Dp_fit, D_fit] = fit.ivim_fit(signal, bvals)
+        [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals)
         if save_file:
             save_results(save_file, ivim_algorithm, name, SNR, [f, D, Dp], [f_fit, Dp_fit, D_fit])
         npt.assert_allclose([f, D, Dp], [f_fit, D_fit, Dp_fit], rtol, atol)
