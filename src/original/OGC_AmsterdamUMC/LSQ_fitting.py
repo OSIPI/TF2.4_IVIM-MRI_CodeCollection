@@ -466,6 +466,20 @@ def fit_segmented_tri_exp(bvalues, dw_data, bounds=([0, 0, 0, 0.005, 0, 0.06], [
         return 0., 0., 0., 0., 0., 0.
 
 
+def neg_log_likelihood(p, bvalues, dw_data):
+    """
+    This function determines the negative of the log of the likelihood of parameters p, given the data dw_data for the Bayesian fit
+    :param p: 1D Array with the estimates of D, f, D* and (optionally) S0
+    :param bvalues: 1D array with b-values
+    :param dw_data: 1D Array diffusion-weighted data
+    :returns: the log-likelihood of the parameters given the data
+    """
+    if len(p) == 4:
+        return 0.5 * (len(bvalues) + 1) * np.log(
+            np.sum((ivim(bvalues, p[0], p[1], p[2], p[3]) - dw_data) ** 2))  # 0.5*sum simplified
+    else:
+        return 0.5 * (len(bvalues) + 1) * np.log(
+            np.sum((ivim(bvalues, p[0], p[1], p[2], 1) - dw_data) ** 2))  # 0.5*sum simplified
 def empirical_neg_log_prior(Dt0, Fp0, Dp0, S00=None):
     """
     This function determines the negative of the log of the empirical prior probability of the IVIM parameters
@@ -519,6 +533,18 @@ def empirical_neg_log_prior(Dt0, Fp0, Dp0, S00=None):
 
     return neg_log_prior
 
+def neg_log_posterior(p, bvalues, dw_data, neg_log_prior):
+    """
+    This function determines the negative of the log of the likelihood of parameters p, given the prior likelihood and the data
+    :param p: 1D Array with the estimates of D, f, D* and (optionally) S0
+    :param bvalues: 1D array with b-values
+    :param dw_data: 1D Array diffusion-weighted data
+    :param neg_log_prior: prior likelihood function (created with empirical_neg_log_prior)
+    :returns: the posterior probability given the data and the prior
+    """
+    return neg_log_likelihood(p, bvalues, dw_data) + neg_log_prior(p)
+
+
 def flat_neg_log_prior(Dt_range, Fp_range, Dp_range, S0_range=None):
     """
     This function determines the negative of the log of the empirical prior probability of the IVIM parameters
@@ -537,45 +563,19 @@ def flat_neg_log_prior(Dt_range, Fp_range, Dp_range, S0_range=None):
         if (Dp < Dt):
             return 1e8
         else:
-            eps = 1e-8
-            Dp_prior = stats.loguniform.pdf(Dp, Dp_range[0], scale=Dp_range[1]-Dp_range[0])
-            Dt_prior = stats.loguniform.pdf(Dt, Dt_range[0], scale=Dt_range[1]-Dt_range[0])
-            Fp_prior = stats.loguniform.pdf(Fp, Fp_range[0], scale=Fp_range[1]-Fp_range[0])
             # determine and return the prior for D, f and D* (and S0)
             if len(p) == 4:
-                S0_prior = stats.loguniform.pdf(S0, S0_range[0], scale=S0_range[1] - S0_range[0])
-                return -np.log(Dp_prior + eps) - np.log(Dt_prior + eps) - np.log(Fp_prior + eps) - np.log(
-                    S0_prior + eps)
+                if Dt_range[0] < Dt < Dt_range[1] and Fp_range[0] < Fp < Fp_range[1] and Dp_range[0] < Dp < Dp_range[1]: # and S0_range[0] < S0 < S0_range[1]: << not sure whether this helps. Technically it should be here
+                    return 0
+                else:
+                    return 1e8
             else:
-                return -np.log(Dp_prior + eps) - np.log(Dt_prior + eps) - np.log(Fp_prior + eps)
+                if Dt_range[0] < Dt < Dt_range[1] and Fp_range[0] < Fp < Fp_range[1] and Dp_range[0] < Dp < Dp_range[1]:
+                    return 0
+                else:
+                    return 1e8
 
     return neg_log_prior
-def neg_log_likelihood(p, bvalues, dw_data):
-    """
-    This function determines the negative of the log of the likelihood of parameters p, given the data dw_data for the Bayesian fit
-    :param p: 1D Array with the estimates of D, f, D* and (optionally) S0
-    :param bvalues: 1D array with b-values
-    :param dw_data: 1D Array diffusion-weighted data
-    :returns: the log-likelihood of the parameters given the data
-    """
-    if len(p) == 4:
-        return 0.5 * (len(bvalues) + 1) * np.log(
-            np.sum((ivim(bvalues, p[0], p[1], p[2], p[3]) - dw_data) ** 2))  # 0.5*sum simplified
-    else:
-        return 0.5 * (len(bvalues) + 1) * np.log(
-            np.sum((ivim(bvalues, p[0], p[1], p[2], 1) - dw_data) ** 2))  # 0.5*sum simplified
-
-
-def neg_log_posterior(p, bvalues, dw_data, neg_log_prior):
-    """
-    This function determines the negative of the log of the likelihood of parameters p, given the prior likelihood and the data
-    :param p: 1D Array with the estimates of D, f, D* and (optionally) S0
-    :param bvalues: 1D array with b-values
-    :param dw_data: 1D Array diffusion-weighted data
-    :param neg_log_prior: prior likelihood function (created with empirical_neg_log_prior)
-    :returns: the posterior probability given the data and the prior
-    """
-    return neg_log_likelihood(p, bvalues, dw_data) + neg_log_prior(p)
 
 
 def fit_bayesian_array(bvalues, dw_data, paramslsq, arg):
@@ -655,7 +655,7 @@ def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05], fitS0=T
     '''
     try:
         # define fit bounds
-        bounds = [(0, 0.005), (0, 0.7), (0.005, 0.2), (0, 2.5)]
+        bounds = [(0, 0.005), (0, 1), (0, 2), (0, 2.5)]
         # Find the Maximum a posterior probability (MAP) by minimising the negative log of the posterior
         if fitS0:
             params = minimize(neg_log_posterior, x0=x0, args=(bvalues, dw_data, neg_log_prior), bounds=bounds)

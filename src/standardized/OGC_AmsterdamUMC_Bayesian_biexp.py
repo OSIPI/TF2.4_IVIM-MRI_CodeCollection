@@ -37,13 +37,15 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         """
         super(OGC_AmsterdamUMC_Bayesian_biexp, self).__init__(bvalues, bounds,initial_guess,fitS0)
         if bounds is None:
-            self.bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3])
+            self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
         else:
             self.bounds=bounds
-        self.neg_log_prior=flat_neg_log_prior([self.bounds[0][0],self.bounds[1][0]],[self.bounds[0][1],self.bounds[1][1]],[self.bounds[0][1],self.bounds[1][1]],[self.bounds[0][2],self.bounds[1][2]])
+        self.neg_log_prior=flat_neg_log_prior([self.bounds[0][0],self.bounds[1][0]],[self.bounds[0][1],self.bounds[1][1]],[self.bounds[0][2],self.bounds[1][2]],[self.bounds[0][3],self.bounds[1][3]])
         self.OGC_algorithm = fit_bayesian
-        self.bounds=bounds
-        self.initial_guess=initial_guess
+        if initial_guess is None:
+            self.initial_guess = [0.001, 0.001, 0.01, 1]
+        else:
+            self.initial_guess = initial_guess
         self.fitS0=fitS0
 
     def ivim_fit(self, signals, bvalues=None):
