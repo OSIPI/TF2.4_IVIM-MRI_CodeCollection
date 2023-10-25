@@ -12,9 +12,12 @@ Group: Uulke van der Heide - NKI
 import numpy as np
 from DWI_functions_standalone import generate_ADC_standalone, generate_IVIMmaps_standalone
 import matplotlib.pyplot as plt
+import pathlib
 
 #Load some DWI data
-DWI_data = np.load(r'IVIM_b0_15_150_500.npy')
+file=pathlib.Path(__file__)
+file_path = file.with_name('IVIM_b0_15_150_500.npy').as_posix()
+DWI_data = np.load(file_path)
 
 # Specify b values that are in the data
 bvalues = [0, 15, 150, 500]
