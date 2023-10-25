@@ -14,7 +14,7 @@ from DWI_functions_standalone import generate_ADC_standalone, generate_IVIMmaps_
 import matplotlib.pyplot as plt
 
 #Load some DWI data
-DWI_data = np.load(r'<YOUR_PATH>\IVIM_b0_15_150_500.npy')
+DWI_data = np.load(r'IVIM_b0_15_150_500.npy')
 
 # Specify b values that are in the data
 bvalues = [0, 15, 150, 500]
