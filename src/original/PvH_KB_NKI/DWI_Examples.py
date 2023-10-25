@@ -27,7 +27,7 @@ ADClog, b0_intercept, used_bvalues = generate_ADC_standalone(DWI_data,bvalues, b
 
 # Generate ADC and define the min and max b value that will be used for ADC fitting as well as the max b value
 # that will be used for separate Dstar fitting
-ADClog, perfFrac, Dstar = generate_IVIMmaps_standalone(DWI_data, bvalues, bminADC=150, bmaxADC=200, bmaxDstar=150)
+ADClog, perfFrac, Dstar = generate_IVIMmaps_standalone(DWI_data, bvalues, bminADC=150, bmaxADC=500, bmaxDstar=150)
 Slice = 5
 
 # Plot the ADC, f and D* maps
