@@ -2,7 +2,7 @@ import pytest
 import pathlib
 import json
 import csv
-import datetime
+# import datetime
 
 
 def pytest_addoption(parser):
@@ -49,6 +49,12 @@ def pytest_addoption(parser):
         type=int,
         help="Number of fits to perform on the same parameters",
     )
+    parser.addoption(
+        "--saveDurationFileName",
+        default="",
+        type=str,
+        help="Saved duration results file name",
+    )
 
 
 @pytest.fixture(scope="session")
@@ -60,9 +66,25 @@ def save_file(request):
         # print(filename)
         # filename.unlink(missing_ok=True)
         filename = filename.as_posix()
-        with open(filename, "a") as csv_file:
-            writer = csv.writer(csv_file, delimiter='#')
-            writer.writerow(["", datetime.datetime.now()])
+        with open(filename, "w") as csv_file:
+            writer = csv.writer(csv_file, delimiter=',')
+            writer.writerow(("Algorithm", "Region", "SNR", "f", "Dp", "D", "f_fitted", "Dp_fitted", "D_fitted"))
+            # writer.writerow(["", datetime.datetime.now()])
+    return filename
+
+@pytest.fixture(scope="session")
+def save_duration_file(request):
+    filename = request.config.getoption("--saveDurationFileName")
+    if filename:
+        current_folder = pathlib.Path.cwd()
+        filename = current_folder / filename
+        # print(filename)
+        # filename.unlink(missing_ok=True)
+        filename = filename.as_posix()
+        with open(filename, "w") as csv_file:
+            writer = csv.writer(csv_file, delimiter=',')
+            writer.writerow(("Algorithm", "Region", "SNR", "Duration [us]", "Count"))
+            # writer.writerow(["", datetime.datetime.now()])
     return filename
 
 @pytest.fixture(scope="session")
