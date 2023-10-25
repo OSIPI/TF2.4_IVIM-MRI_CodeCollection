@@ -11,7 +11,8 @@ from src.wrappers.OsipiBase import OsipiBase
 from utilities.data_simulation.GenerateData import GenerateData
 
 #run using pytest <path_to_this_file> --saveFileName test_output.txt --SNR 50 100 200
-#e.g. pytest tests/IVIMmodels/unit_tests/test_ivim_synthetic.py --saveFileName test_output.txt --SNR 50 100 200
+#e.g. pytest -m slow tests/IVIMmodels/unit_tests/test_ivim_synthetic.py  --saveFileName test_output.csv --SNR 10 50 100 200 --fitCount 20
+@pytest.mark.slow
 def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, save_file):
     # assert save_file == "test"
     random.seed(42)
