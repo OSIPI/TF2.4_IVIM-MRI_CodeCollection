@@ -139,7 +139,7 @@ def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cu
         Dt, Fp = params[0] / 1000, 1 - params[1]
         # remove the diffusion part to only keep the pseudo-diffusion
         dw_data_remaining = dw_data - (1 - Fp) * np.exp(-bvalues * Dt)
-        bounds2 = (bounds[0][2], bounds[1][2])
+        bounds2 = (bounds[0][2]*10, bounds[1][2]*10)
         # fit for D*
         params, _ = curve_fit(lambda b, Dp: Fp * np.exp(-b * Dp), bvalues, dw_data_remaining, p0=(p0[2]), bounds=bounds2)
         Dp = params[0]
@@ -561,19 +561,19 @@ def flat_neg_log_prior(Dt_range, Fp_range, Dp_range, S0_range=None):
             Dt, Fp, Dp = p[0], p[1], p[2]
         # make D*<D very unlikely
         if (Dp < Dt):
-            return 1e8
+            return 1e3
         else:
             # determine and return the prior for D, f and D* (and S0)
             if len(p) == 4:
                 if Dt_range[0] < Dt < Dt_range[1] and Fp_range[0] < Fp < Fp_range[1] and Dp_range[0] < Dp < Dp_range[1]: # and S0_range[0] < S0 < S0_range[1]: << not sure whether this helps. Technically it should be here
                     return 0
                 else:
-                    return 1e8
+                    return 1e3
             else:
                 if Dt_range[0] < Dt < Dt_range[1] and Fp_range[0] < Fp < Fp_range[1] and Dp_range[0] < Dp < Dp_range[1]:
                     return 0
                 else:
-                    return 1e8
+                    return 1e3
 
     return neg_log_prior
 
@@ -638,7 +638,7 @@ def fit_bayesian_array(bvalues, dw_data, paramslsq, arg):
     return Dt_pred, Fp_pred, Dp_pred, S0_pred
 
 
-def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05], fitS0=True):
+def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05, 1], fitS0=True):
     '''
     This is an implementation of the Bayesian IVIM fit. It returns the Maximum a posterior probability.
     The fit is taken from Barbieri et al. which was initially introduced in http://arxiv.org/10.1002/mrm.25765 and
@@ -655,7 +655,7 @@ def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05], fitS0=T
     '''
     try:
         # define fit bounds
-        bounds = [(0, 0.005), (0, 1), (0, 2), (0, 2.5)]
+        bounds = [(0, 0.005), (0, 1.5), (0, 2), (0, 2.5)]
         # Find the Maximum a posterior probability (MAP) by minimising the negative log of the posterior
         if fitS0:
             params = minimize(neg_log_posterior, x0=x0, args=(bvalues, dw_data, neg_log_prior), bounds=bounds)
