@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 
-def seg(Y: npt.NDArray[np.float64], b: npt.NDArray[np.float64], bthr: float = 200, verbose: bool = False) -> dict:
+def seg(Y, b, bthr = 200, verbose = False):
     """
     Segmented fitting of the IVIM model.
 
@@ -12,7 +12,7 @@ def seg(Y: npt.NDArray[np.float64], b: npt.NDArray[np.float64], bthr: float = 20
         verbose:   (optional) if True, diagnostics during fitting is printet to terminal
     """
 
-    def valid_signal(Y: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+    def valid_signal(Y):
         """
         Return a mask representing all rows in Y with valid values (not non-positive, NaN or infinite).
 
@@ -26,7 +26,7 @@ def seg(Y: npt.NDArray[np.float64], b: npt.NDArray[np.float64], bthr: float = 20
         mask = ~np.any((Y<=0) | np.isnan(Y) | np.isinf(Y), axis=1)
         return mask
     
-    def monoexp_model(b: npt.NDArray[np.float64], D: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+    def monoexp_model(b, D):
         """
         Return the monoexponential e^(-b*D).
         
@@ -43,7 +43,7 @@ def seg(Y: npt.NDArray[np.float64], b: npt.NDArray[np.float64], bthr: float = 20
         return np.reshape(S, list(D.shape) + [b.size]) # reshape as np.outer flattens D is ndim > 1
 
 
-    def _monoexp(Y: npt.NDArray[np.float64], b: npt.NDArray[np.float64], lim: list = [0, 3e-3], validate: bool = True, verbose: bool = False) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+    def _monoexp(Y, b, lim = [0, 3e-3], validate = True, verbose = False):
         """ Estimate D and A (y axis intercept) from a monoexponential model. """
 
         if validate:
@@ -70,18 +70,13 @@ def seg(Y: npt.NDArray[np.float64], b: npt.NDArray[np.float64], bthr: float = 20
 
         return D, A
 
-    def _get_S0(Y: npt.NDArray[np.float64], b: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        """ Return the signal values at b = 0."""
-        return np.mean(Y[:, b==0], axis=1)
-
-
-    def _f_from_intercept(A: npt.NDArray[np.float64], S0: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+    def _f_from_intercept(A, S0):
         """ Calculate f from S(b=0) and extrapolated y axis intercept A."""
         f = 1 - A/S0
         f[f<0] = 0
         return f
     
-    def _optimizeD(Y: npt.NDArray[np.float64], b: npt.NDArray[np.float64], lim: list, optlim: float = 1e-6, disp_prog: bool = False) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+    def _optimizeD(Y, b, lim, optlim = 1e-6, disp_prog = False):
         """ Specfically tailored function for finding the least squares solution of monoexponenital fit. """
 
         n = Y.shape[0]
@@ -177,7 +172,7 @@ def seg(Y: npt.NDArray[np.float64], b: npt.NDArray[np.float64], bthr: float = 20
         return D, A
 
 
-    def _Ddiff(Y: npt.NDArray[np.float64], yb: npt.NDArray[np.float64], b: npt.NDArray[np.float64], D: npt.NDArray[np.float64]):
+    def _Ddiff(Y, yb, b, D):
         """
         Return the difference between q1 = e^(-2*b*D)*yb*e^(-b*D) and 
         q2 = Y*e^(-b*D)*b*e^(-2*b*D) summed over b as well as the ratio q1/q2
