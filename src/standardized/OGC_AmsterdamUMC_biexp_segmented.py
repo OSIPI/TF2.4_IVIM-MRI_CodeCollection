@@ -42,7 +42,7 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         else:
             self.bounds=bounds
         if initial_guess is None:
-            self.initial_guess = [0.001, 0.001, 0.01, 1]
+            self.initial_guess = [0.001, 0.1, 0.03, 1]
         else:
             self.initial_guess = initial_guess
         self.thresholds=thresholds

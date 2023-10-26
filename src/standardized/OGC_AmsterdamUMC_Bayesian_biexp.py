@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.OGC_AmsterdamUMC.LSQ_fitting import flat_neg_log_prior, fit_bayesian
+from src.original.OGC_AmsterdamUMC.LSQ_fitting import flat_neg_log_prior, fit_bayesian, empirical_neg_log_prior, fit_segmented
 import numpy as np
 
 class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
@@ -27,23 +27,32 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
     required_initial_guess_optional = True
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
-    def __init__(self, bvalues=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=True, thresholds=None):
+    def __init__(self, bvalues=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=True, thresholds=None, prior_in=None):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
 
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
+
+            Args:
+                 datain is a 2D array with values of D, f, D* (and S0) that will form the prior.
         """
-        super(OGC_AmsterdamUMC_Bayesian_biexp, self).__init__(bvalues, bounds,initial_guess,fitS0)
+        super(OGC_AmsterdamUMC_Bayesian_biexp, self).__init__(bvalues, bounds,initial_guess,fitS0,prior_in)
         if bounds is None:
-            self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
+            self.bounds=([0, 0, 0.005, 0.7],[0.005, 1, 0.2, 1.3])
         else:
             self.bounds=bounds
-        self.neg_log_prior=flat_neg_log_prior([self.bounds[0][0],self.bounds[1][0]],[self.bounds[0][1],self.bounds[1][1]],[self.bounds[0][2],self.bounds[1][2]],[self.bounds[0][3],self.bounds[1][3]])
+        if prior_in is None:
+            self.neg_log_prior=flat_neg_log_prior([self.bounds[0][0],self.bounds[1][0]],[self.bounds[0][1],self.bounds[1][1]],[self.bounds[0][2],self.bounds[1][2]],[self.bounds[0][3],self.bounds[1][3]])
+        else:
+            if len(prior_in) is 4:
+                self.neg_log_prior = empirical_neg_log_prior(prior_in[0], prior_in[1], prior_in[2],prior_in[3])
+            else:
+                self.neg_log_prior = empirical_neg_log_prior(prior_in[0], prior_in[1], prior_in[2])
         self.OGC_algorithm = fit_bayesian
         if initial_guess is None:
-            self.initial_guess = [0.001, 0.001, 0.01, 1]
+            self.initial_guess = [0.001, 0.5, 0.1, 1]
         else:
             self.initial_guess = initial_guess
         self.fitS0=fitS0
@@ -59,7 +68,9 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             _type_: _description_
         """
         bvalues=np.array(bvalues)
-        fit_results = self.OGC_algorithm(bvalues, signals, self.neg_log_prior, x0=self.initial_guess, fitS0=self.fitS0)
+        fit_results = fit_segmented(bvalues, signals,bounds=self.bounds,cutoff=150,p0=self.initial_guess)
+        fit_results=fit_results+(1,)
+        fit_results = self.OGC_algorithm(bvalues, signals, self.neg_log_prior, x0=fit_results, fitS0=self.fitS0)
 
         D = fit_results[0]
         f = fit_results[1]
