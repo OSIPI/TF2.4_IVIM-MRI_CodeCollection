@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.io import loadmat
 import nibabel as nib
+import json
 
 ##########
 # code written by Oliver J Gurney-Champion
@@ -21,8 +22,8 @@ def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleav
         XCAT = mat_data['IMG']
         XCAT = XCAT[0:-1:2,0:-1:2,10:160:4]
 
-        tissue_included, D, f, Ds = contrast_curve_calc()
-        S, Dim, fim, Dpim = XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, tissue_included, D, f, Ds)
+        D, f, Ds = contrast_curve_calc()
+        S, Dim, fim, Dpim, legend = XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds)
         if state == 1:
             Dim_out = Dim
             fim_out = fim
@@ -72,16 +73,15 @@ def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleav
                         state2 = state2+1
     else:
         S=np.squeeze(totsig)
-    return S, XCAT, Dim_out, fim_out, Dpim_out
+    return S, XCAT, Dim_out, fim_out, Dpim_out, legend
 
 
 def ivim(bvalues,D,f,Ds):
     return (1-f) * np.exp(-D * bvalues) + f * np.exp(-Ds * bvalues)
 
 def contrast_curve_calc():
-    tissue_included = np.array([1, 2, 3, 4, 5, 6, 7, 8, 13, 17, 18, 20, 22, 23, 24, 25, 26, 30, 36, 37, 40, 41, 42, 43, 50, 73])
 
-    D = np.zeros(74)
+    D = np.full(74, np.nan)
     D[1] = 2.4e-3  # 1 Myocardium LV : Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
     D[2] = 2.4e-3  # 2 myocardium RV: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
     D[3] = 2e-3  # 3 myocardium la
@@ -109,7 +109,7 @@ def contrast_curve_calc():
     D[50] = 3e-3  # 50 pericardium
     D[73] = 1.8e-3  # 73 Pancreatic tumor (advanced state, from literature)
 
-    f = np.zeros(74)
+    f = np.full(74, np.nan)
     f[1] = 0.15  # 1 Myocardium LV : Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
     f[2] = 0.15  # 2 myocardium RV : Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
     f[3] = 0.07  # 3 myocardium la
@@ -137,7 +137,7 @@ def contrast_curve_calc():
     f[50] = 0.07  # 50 pericardium
     f[73] = 0.37  # 73 Pancreatic tumor (advanced state, from literature)
 
-    Ds = np.zeros(74)
+    Ds = np.full(74, np.nan)
     Ds[1] = 0.08  # 1 Myocardium LV: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
     Ds[2] = 0.08  # 2 myocardium RV: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
     Ds[3] = 0.07  # 3 myocardium la
@@ -166,10 +166,10 @@ def contrast_curve_calc():
     Ds[73] = 0.01  # 73 Pancreatic tumor (advanced state, from literature)
     # Return values
 
-    return tissue_included, D, f, Ds
+    return D, f, Ds
 
 
-def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, tissue_included, D, f, Ds, b0=3, ivim_cont = True):
+def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
     ###########################################################################################
     # This script converts XCAT tissue values to MR contrast based on the SSFP signal equation.
     # Christopher W. Roy 2018-12-04 # fetal.xcmr@gmail.com
@@ -180,78 +180,81 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, tissue_included, D, f, Ds, b0=3, ivim_c
     # Stanisz GJ, Odrobina EE, Pun J, Escaravage M, Graham SJ, Bronskill MJ, Henkelman RM. T1, T2 relaxation and magnetization transfer in tissue at 3T. Magnetic resonance in medicine. 2005;54:507�12.
     # Portnoy S, Osmond M, Zhu MY, Seed M, Sled JG, Macgowan CK. Relaxation properties of human umbilical cord blood at 1.5 Tesla. Magnetic Resonance in Medicine. 2016;00:1�13.
     # https://www.itis.ethz.ch/virtual-population/tissue-properties/XCATbase/relaxation-times/ #Tissue legend:
-    # 1 Myocardium LV
-    # 2 myocardium RV #
-    # 3 myocardium la
-    # 4 myocardium ra # 5 Blood LV
-    #6 Blood RV
-    #7 Blood LA
-    #8 Blood RA
-    #9 body
-    #10 muscle
-    #11 Brain
-    #12 Sinus
-    #13 Liver
-    #14 gall bladder
-    #15 Right Lung
-    #16 Left Lung
-    #17 esophagus
-    #18 esophagus cont
-    #19 laryngopharynx
-    #20 st wall
-    #21 Stomach Contents
-    #22 pancreas
-    #23 Right kydney cortex
-    #24 right kidney medulla
-    #25 Left kidney cortex
-    #26 left kidney medulla
-    #27 adrenal
-    #28 Right Renal Pelvis
-    #29 Left Renal Pelvis
-    #30 spleen
-    #31 Ribs
-    #32 Cortical Bone
-    #33 Spine
-    #34 spinal cord
-    #35 Bone Marrow
-    #36 Artery
-    #37 Vein
-    #38 bladder
-    #39 prostate
-    #40 asc lower intestine
-    #41 trans lower intestine
-    #42 desc lower intestine
-    #43 small intestine
-    #44 rectum
-    #45 seminal vescile
-    #46 vas deference
-    #47 testicles
-    #48 epididymus
-    #49 ejac duct
-    #50 pericardium
-    #51 Cartilage
-    #52 Intestine Cavity
-    #53 ureter
-    #54 urethra
-    #55 Lymph
-    #56 lymph abnormal
-    #57 trach bronch
-    #58 Airway
-    #59 uterus
-    #60 vagina
-    #61 right ovary
-    #62 left ovary
-    #63 FAllopian tubes
-    #64 Parathyroid
-    #65 Thyroid
-    #66 Thymus
-    #67 salivary
-    #68 Pituitary
-    #69 Eye
-    #70 eye lens
-    #71 lesion
-    #72 Fat
-    # 73 Pancreas tumor ##############################################################################
+    legend = {
+        1: 'Myocardium LV',
+        2: 'myocardium RV', #
+        3: 'myocardium la',
+        4: 'myocardium ra', # 5 Blood LV
+        6: 'Blood RV',
+        7: 'Blood LA',
+        8: 'Blood RA',
+        9: 'body',
+        10: 'muscle',
+        11: 'Brain',
+        12: 'Sinus',
+        13: 'Liver',
+        14: 'gall bladder',
+        15: 'Right Lung',
+        16: 'Left Lung',
+        17: 'esophagus',
+        18: 'esophagus cont',
+        19: 'laryngopharynx',
+        20: 'st wall',
+        21: 'Stomach Contents',
+        22: 'pancreas',
+        23: 'Right kydney cortex',
+        24: 'right kidney medulla',
+        25: 'Left kidney cortex',
+        26: 'left kidney medulla',
+        27: 'adrenal',
+        28: 'Right Renal Pelvis',
+        29: 'Left Renal Pelvis',
+        30: 'spleen',
+        31: 'Ribs',
+        32: 'Cortical Bone',
+        33: 'Spine',
+        34: 'spinal cord',
+        35: 'Bone Marrow',
+        36: 'Artery',
+        37: 'Vein',
+        38: 'bladder',
+        39: 'prostate',
+        40: 'asc lower intestine',
+        41: 'trans lower intestine',
+        42: 'desc lower intestine',
+        43: 'small intestine',
+        44: 'rectum',
+        45: 'seminal vescile',
+        46: 'vas deference',
+        47: 'testicles',
+        48: 'epididymus',
+        49: 'ejac duct',
+        50: 'pericardium',
+        51: 'Cartilage',
+        52: 'Intestine Cavity',
+        53: 'ureter',
+        54: 'urethra',
+        55: 'Lymph',
+        56: 'lymph abnormal',
+        57: 'trach bronch',
+        58: 'Airway',
+        59: 'uterus',
+        60: 'vagina',
+        61: 'right ovary',
+        62: 'left ovary',
+        63: 'FAllopian tubes',
+        64: 'Parathyroid',
+        65: 'Thyroid',
+        66: 'Thymus',
+        67: 'salivary',
+        68: 'Pituitary',
+        69: 'Eye',
+        70: 'eye lens',
+        71: 'lesion',
+        72: 'Fat',
+        73: 'Pancreas tumor',
+    }
+    ###############################################################################
     np.random.seed(42)
     Tissue = np.zeros((74, 4))
     Tissue[1] = [1030, 40, 1471, 47]
@@ -343,7 +346,7 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, tissue_included, D, f, Ds, b0=3, ivim_c
                 T1 = Tissue[iTissue, 2]
                 T2 = Tissue[iTissue, 3]
 
-            if ivim_cont and iTissue in tissue_included:
+            if ivim_cont and not np.isnan([D[iTissue], f[iTissue], Ds[iTissue]]).any():
                 # note we are assuming blood fraction has the same T1 as tissue fraction here for simplicity. Can be changed in future.
                 Dtemp=D[iTissue]
                 ftemp=f[iTissue]
@@ -352,28 +355,53 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, tissue_included, D, f, Ds, b0=3, ivim_c
                 Dtemp=5e-4+np.random.rand(1)*3e-3
                 ftemp=np.random.rand(1)*0.5
                 Dstemp=5e-3+np.random.rand(1)*1e-1
-                #S0 = np.zeros(len(bvalue))
             S0 = ivim(bvalue,Dtemp,ftemp,Dstemp)
             if T1 > 0 or T2 > 0:
-                MR = MR + np.tile(np.expand_dims(XCAT == iTissue,3),len(S0)) * S0 * (1 - 2 * np.exp(-(TR - TE / 2) / T1) + np.exp(-TR / T1)) * np.exp(
-                    -TE / T2)
+                MR = MR + np.tile(np.expand_dims(XCAT == iTissue,3),len(S0)) * S0 * (1 - 2 * np.exp(-(TR - TE / 2) / T1) + np.exp(-TR / T1)) * np.exp(-TE / T2)
             Dim = Dim + (XCAT == iTissue) * Dtemp
             fim = fim + (XCAT == iTissue) * ftemp
             Dpim = Dpim + (XCAT == iTissue) * Dstemp
-    return MR, Dim, fim, Dpim
+    return MR, Dim, fim, Dpim, legend
 
 if __name__ == '__main__':
     bvalue = np.array([0., 1, 2, 5, 10, 20, 30, 50, 75, 100, 150, 250, 350, 400, 550, 700, 850, 1000])
-    noise = 0.005
+    noise = 0.0005
     motion = False
-    sig, XCAT, Dim,fim,Dpim = phantom(bvalue, noise,motion=motion,interleaved=False)
-    sig = sig * 50000
-    sig = np.flip(sig,axis=0)
-    sig = np.flip(sig,axis=1)
+    sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=False)
+    # sig = np.flip(sig,axis=0)
+    # sig = np.flip(sig,axis=1)
     res=np.eye(4)
     res[2]=2
+
+    voxel_selector_fraction = 0.5
+    D, f, Ds = contrast_curve_calc()
+    ignore = np.isnan(D)
+    generic_data = {}
+    for level, name in legend.items():
+        if len(ignore) > level and ignore[level]:
+            continue
+        selector = XCAT == level
+        voxels = sig[selector]
+        if len(voxels) < 1:
+            continue
+        signals = np.squeeze(voxels[int(voxels.shape[0] * voxel_selector_fraction)]).tolist()
+        generic_data[name] = {
+            'noise': noise,
+            'D': np.mean(Dim[selector], axis=0),
+            'f': np.mean(fim[selector], axis=0),
+            'Dp': np.mean(Dpim[selector], axis=0),
+            'data': signals
+        }
+    generic_data['config'] = {
+        'bvalues': bvalue.tolist()
+    }
+    with open('generic.json', 'w') as f:
+        json.dump(generic_data, f, indent=4)
+
+
     nifti_img = nib.Nifti1Image(sig, affine=res)  # Replace affine if necessary
     # Save the NIfTI image to a file
+    nifti_img.header.set_data_dtype(np.float64)
     if motion:
         output_file = 'output_resp_int.nii.gz'  # Replace with your desired output file name
     else:
