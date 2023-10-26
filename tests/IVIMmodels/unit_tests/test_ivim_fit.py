@@ -98,5 +98,6 @@ def test_ivim_fit_saved(name, bvals, data, algorithm):
         #npt.assert_allclose([data['f'], data['D']], [f_fit, D_fit], atol=tolerance)
         #npt.assert_allclose(data['Dp'], Dp_fit, atol=1e-1)  # go easy on the perfusion as it's a linear fake
     [f_fit, Dp_fit, D_fit] = fit.ivim_fit(signal, bvals)
-    npt.assert_allclose([data['f'], data['D']], [f_fit, D_fit], atol=tolerance)
+    npt.assert_allclose(data['D'], D_fit, atol=tolerance)
+    npt.assert_allclose(data['f'], f_fit, atol=tolerance)
     npt.assert_allclose(data['Dp'], Dp_fit, atol=1e-1)  # go easy on the perfusion as it's a linear fake
