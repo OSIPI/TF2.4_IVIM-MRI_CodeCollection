@@ -68,7 +68,7 @@ def save_file(request):
         filename = filename.as_posix()
         with open(filename, "w") as csv_file:
             writer = csv.writer(csv_file, delimiter=',')
-            writer.writerow(("Algorithm", "Region", "SNR", "f", "Dp", "D", "f_fitted", "Dp_fitted", "D_fitted"))
+            writer.writerow(("Algorithm", "Region", "SNR", "index", "f", "Dp", "D", "f_fitted", "Dp_fitted", "D_fitted"))
             # writer.writerow(["", datetime.datetime.now()])
     return filename
 

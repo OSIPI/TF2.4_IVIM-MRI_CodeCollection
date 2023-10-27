@@ -26,6 +26,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
     required_initial_guess = False
     required_initial_guess_optional = True
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
+    accepts_priors = True
 
     def __init__(self, bvalues=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=True, thresholds=None, prior_in=None):
         """
@@ -38,7 +39,11 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             Args:
                  datain is a 2D array with values of D, f, D* (and S0) that will form the prior.
         """
-        super(OGC_AmsterdamUMC_Bayesian_biexp, self).__init__(bvalues, bounds,initial_guess,fitS0,prior_in)
+        super(OGC_AmsterdamUMC_Bayesian_biexp, self).__init__(bvalues, thresholds, bounds, initial_guess) #, fitS0, prior_in)
+        self.OGC_algorithm = fit_bayesian
+        self.initialize(bounds, initial_guess, fitS0, thresholds, prior_in)
+
+    def initialize(self, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=True, thresholds=None, prior_in=None):
         if bounds is None:
             self.bounds=([0, 0, 0.005, 0.7],[0.005, 1, 0.2, 1.3])
         else:
@@ -50,14 +55,13 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
                 self.neg_log_prior = empirical_neg_log_prior(prior_in[0], prior_in[1], prior_in[2],prior_in[3])
             else:
                 self.neg_log_prior = empirical_neg_log_prior(prior_in[0], prior_in[1], prior_in[2])
-        self.OGC_algorithm = fit_bayesian
         if initial_guess is None:
             self.initial_guess = [0.001, 0.5, 0.1, 1]
         else:
             self.initial_guess = initial_guess
         self.fitS0=fitS0
 
-    def ivim_fit(self, signals, bvalues=None):
+    def ivim_fit(self, signals, bounds, initial_guess, bvalues=None):
         """Perform the IVIM fit
 
         Args:
