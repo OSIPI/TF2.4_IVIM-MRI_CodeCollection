@@ -2,7 +2,7 @@ from src.wrappers.OsipiBase import OsipiBase
 from src.original.PvH_KB_NKI.DWI_functions_standalone import generate_IVIMmaps_standalone
 import numpy as np
 
-class PvH_KB_NKI_IVIMfit(OsipiBase):
+class PVH_KB_NKI_IVIMfit(OsipiBase):
     """
     Bi-exponential fitting algorithm by Petra van Houdt and Koen Baas, NKI
     """
@@ -27,7 +27,7 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
     required_initial_guess_optional =False
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
-    def __init__(self, bvalues=None, bminADC=150, bmaxADC=1000,):
+    def __init__(self, bvalues=None, thresholds=None,bounds=None,initial_guess=None):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -35,7 +35,7 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(PvH_KB_NKI_IVIMfit, self).__init__(bvalues, bminADC,bmaxADC)
+        super(PVH_KB_NKI_IVIMfit, self).__init__(bvalues, thresholds,bounds,initial_guess)
         self.NKI_algorithm = generate_IVIMmaps_standalone
 
 
