@@ -6,7 +6,10 @@
         "IAR_LU_modified_topopro",
         "IAR_LU_segmented_2step",
         "IAR_LU_segmented_3step",
-        "IAR_LU_subtracted"
+        "IAR_LU_subtracted",
+        "OGC_AmsterdamUMC_Bayesian_biexp",
+        "OGC_AmsterdamUMC_biexp_segmented",
+        "OGC_AmsterdamUMC_biexp"
     ],
     "IAR_LU_biexp": {
         "tolerances": {

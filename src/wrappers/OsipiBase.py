@@ -7,7 +7,7 @@ import sys
 class OsipiBase:
     """The base class for OSIPI IVIM fitting"""
     
-    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, algorithm=None):
+    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, algorithm=None, **kwargs):
         # Define the attributes as numpy arrays only if they are not None
         self.bvalues = np.asarray(bvalues) if bvalues is not None else None
         self.thresholds = np.asarray(thresholds) if thresholds is not None else None
@@ -17,7 +17,7 @@ class OsipiBase:
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
-            self.osipi_initiate_algorithm(algorithm, bvalues=bvalues, thresholds=thresholds, bounds=bounds, initial_guess=initial_guess)
+            self.osipi_initiate_algorithm(algorithm, bvalues=bvalues, thresholds=thresholds, bounds=bounds, initial_guess=initial_guess, **kwargs)
             
     def osipi_initiate_algorithm(self, algorithm, **kwargs):
         """Turns the class into a specified one by the input.
@@ -41,6 +41,10 @@ class OsipiBase:
         # Change the class from OsipiBase to the specified algorithm
         self.__class__ = getattr(importlib.import_module(import_path), algorithm)
         self.__init__(**kwargs)
+    
+    def initialize(**kwargs):
+        """Placeholder for subclass initialization"""
+        pass
 
     def osipi_fit(self, data=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, **kwargs):
         """Fits the data with the bvalues
@@ -51,9 +55,9 @@ class OsipiBase:
         # Then check if they are input here, if they are, these should overwrite the attributes
         use_bvalues = bvalues if bvalues is not None else self.bvalues
         kwargs["bvalues"] = use_bvalues
-        use_thresholds = thresholds if self.bvalues is None else self.thresholds
-        use_bounds = bounds if self.bounds is None else self.bounds
-        use_initial_guess = initial_guess if self.initial_guess is None else self.initial_guess
+        use_thresholds = thresholds if thresholds is not None else self.thresholds
+        use_bounds = bounds if bounds is not None else self.bounds
+        use_initial_guess = initial_guess if initial_guess is not None else self.initial_guess
 
         # Make sure we don't make arrays of None's
         if use_bvalues is not None: use_bvalues = np.asarray(use_bvalues) 
@@ -61,7 +65,7 @@ class OsipiBase:
         if use_bounds is not None: use_bounds = np.asarray(use_bounds) 
         if use_initial_guess is not None: use_initial_guess = np.asarray(use_initial_guess) 
         
-        #args = [data, use_bvalues, use_thresholds]
+        # args = [data, use_bvalues, use_thresholds]
         args = [data, use_thresholds]
         if self.required_bounds or self.required_bounds_optional:
             args.append(use_bounds)
@@ -77,6 +81,8 @@ class OsipiBase:
         
         #args = [data, use_bvalues, use_initial_guess, use_bounds, use_thresholds]
         args = [arg for arg in args if arg is not None]
+        # print(args)
+        # print(kwargs)
         results = self.ivim_fit(*args, **kwargs)
         
         #self.parameter_estimates = self.ivim_fit(data, bvalues)

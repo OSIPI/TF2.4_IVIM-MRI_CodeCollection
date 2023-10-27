@@ -24,6 +24,10 @@ def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, save_f
     f = data["f"]
     Dp = data["Dp"]
     fit = OsipiBase(algorithm=ivim_algorithm)
+    # here try a prior, but it's not seeing it, why?
+    # if hasattr(fit, "accepts_priors") and fit.accepts_priors:
+    #     prior = [np.repeat(D, 10), np.repeat(f, 10), np.repeat(Dp, 10)]  # D, f, D*
+    #     fit.initialize(prior_in=prior)
     time_delta = datetime.timedelta()
     for idx in range(fit_count):
         # if "data" not in data:
@@ -34,16 +38,16 @@ def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, save_f
         [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals)
         time_delta += datetime.datetime.now() - start_time
         if save_file:
-            save_results(save_file, ivim_algorithm, name, SNR, [f, Dp, D], [f_fit, Dp_fit, D_fit])
+            save_results(save_file, ivim_algorithm, name, SNR, idx, [f, Dp, D], [f_fit, Dp_fit, D_fit])
         npt.assert_allclose([f, Dp, D], [f_fit, Dp_fit, D_fit], rtol, atol)
     if save_duration_file:
         save_duration(save_duration_file, ivim_algorithm, name, SNR, time_delta, fit_count)
 
 
-def save_results(filename, algorithm, name, SNR, truth, fit):
+def save_results(filename, algorithm, name, SNR, idx, truth, fit):
     with open(filename, "a") as csv_file:
         writer = csv.writer(csv_file, delimiter=',')
-        data = [algorithm, name, SNR, *truth, *fit]
+        data = [algorithm, name, SNR, idx, *truth, *fit]
         writer.writerow(data)
 
 def save_duration(filename, algorithm, name, SNR, duration, count):
