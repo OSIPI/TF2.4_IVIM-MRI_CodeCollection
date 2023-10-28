@@ -36,12 +36,12 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(OGC_AmsterdamUMC_biexp_segmented, self).__init__(bvalues,thresholds, bounds, initial_guess)
+        super(OGC_AmsterdamUMC_biexp_segmented, self).__init__(bvalues, thresholds, bounds, initial_guess)
         self.OGC_algorithm = fit_segmented
         self.initialize(bounds, initial_guess, thresholds)
         
 
-    def initialize(self, bounds, initial_guess, thresholds):
+    def initialize(self, bounds, initial_guess, thresholds=300):
         if bounds is None:
             self.bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3])
         else:
@@ -52,7 +52,7 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
             self.initial_guess = initial_guess
         self.thresholds=thresholds
 
-    def ivim_fit(self, signals, bounds, initial_guess, bvalues=None):
+    def ivim_fit(self, signals, bvalues, bounds=None, initial_guess=None, thresholds=None, **kwargs):
         """Perform the IVIM fit
 
         Args:
@@ -63,7 +63,7 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
             _type_: _description_
         """
         bvalues=np.array(bvalues)
-        fit_results = self.OGC_algorithm(bvalues, signals,bounds=self.bounds,cutoff=self.thresholds,p0=self.initial_guess)
+        fit_results = self.OGC_algorithm(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds, p0=self.initial_guess)
 
         D = fit_results[0]
         f = fit_results[1]

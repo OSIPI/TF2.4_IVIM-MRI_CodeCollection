@@ -28,7 +28,7 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
     accepts_priors = True
 
-    def __init__(self, bvalues=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=True, thresholds=None):
+    def __init__(self, bvalues=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=False, thresholds=None):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -51,7 +51,7 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
             self.initial_guess = initial_guess
         self.fitS0=fitS0
 
-    def ivim_fit(self, signals, bounds, initial_guess, bvalues=None):
+    def ivim_fit(self, signals, bvalues, bounds=None, initial_guess=None, fitS0=False, **kwargs):
         """Perform the IVIM fit
 
         Args:
@@ -61,8 +61,9 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
+        self.initialize(bounds, initial_guess, fitS0)
         bvalues=np.array(bvalues)
-        fit_results = self.OGC_algorithm(bvalues, signals, p0=self.initial_guess, bounds=self.bounds,fitS0=self.fitS0)
+        fit_results = self.OGC_algorithm(bvalues, signals, p0=self.initial_guess, bounds=self.bounds, fitS0=self.fitS0)
 
         D = fit_results[0]
         f = fit_results[1]
