@@ -28,7 +28,7 @@ class IAR_LU_subtracted(OsipiBase):
     required_initial_guess_optional = True
     accepted_dimensions = 1 # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
     
-    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
+    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -51,7 +51,7 @@ class IAR_LU_subtracted(OsipiBase):
             self.IAR_algorithm = None
         
     
-    def ivim_fit(self, signals, bvalues=None):
+    def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
 
         Args:

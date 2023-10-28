@@ -158,7 +158,7 @@ def data_ivim_fit_saved():
             tolerances = algorithm_dict.get("tolerances", {})
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances
             
-            
+
 @pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances", data_ivim_fit_saved())
 def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances, request):
     if xfail["xfail"]:
@@ -171,3 +171,4 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
     npt.assert_allclose(data['f'], f_fit, rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
     npt.assert_allclose(data['D'], D_fit, rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
     npt.assert_allclose(data['Dp'], Dp_fit, rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
+

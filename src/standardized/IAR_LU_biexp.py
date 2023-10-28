@@ -51,7 +51,7 @@ class IAR_LU_biexp(OsipiBase):
             self.IAR_algorithm = None
         
     
-    def ivim_fit(self, signals, bvalues=None):
+    def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
 
         Args:
