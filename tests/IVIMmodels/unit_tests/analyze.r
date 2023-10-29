@@ -42,3 +42,23 @@ Dp_model <- lm(Dp ~ Dp_fitted_IAR_LU_biexp + Dp_fitted_IAR_LU_modified_mix + Dp_
 # Dp_model <- lm(Dp ~ Dp_fitted_ETP_SRI_LinearFitting + Dp_fitted_IAR_LU_biexp + Dp_fitted_IAR_LU_modified_mix + Dp_fitted_IAR_LU_modified_topopro + Dp_fitted_IAR_LU_segmented_2step + Dp_fitted_IAR_LU_segmented_3step + Dp_fitted_IAR_LU_subtracted, data=data_new_wide)
 # predict new data from existing model
 predict(object = f_model, newdata = data_wide)
+
+
+ivim_decay <- function(f, D, Dp, bvalues) {
+    return(f*exp(-Dp*bvalues) + (1-f)*exp(-D*bvalues))
+}
+bvalues <- c(0.0, 1.0, 2.0, 5.0, 10.0, 20.0, 30.0, 50.0, 75.0, 100.0, 150.0, 250.0, 350.0, 400.0, 550.0, 700.0, 850.0, 1000.0)
+
+generate_curves <- function(data, bvalues, appended_string) {
+    curves <-apply(data[,c(paste("f", appended_string, sep=""), paste("D", appended_string, sep=""), paste("Dp", appended_string, sep=""))], 1, function(x) ivim_decay(x[1], x[2], x[3], bvalues))
+    curves <- transpose(data.frame(curves))
+    colnames(curves) <- paste("b", bvalues, sep="_")
+    data_curves <- cbind(data, curves)
+    data_curves <- pivot_longer(data_curves, starts_with("b_"), names_to="bvalue", values_to=paste("signal", appended_string, sep=""), names_prefix="b_", names_transform=list(bvalue = as.numeric))
+    return(data_curves)
+}
+curves_restricted_fitted <- generate_curves(data_restricted, bvalues, "_fitted")
+curves_restricted <- generate_curves(data_restricted, bvalues, "")
+
+data_curves_restricted <- cbind(curves_restricted, signal_fitted=curves_restricted_fitted$signal_fitted)
+ggplot(data_curves_restricted, aes(x=bvalue))  + facet_grid(Region ~ SNR) + geom_line(alpha=0.2, aes(y=signal_fitted, group=interaction(Algorithm, index), color=Algorithm)) + geom_line(aes(y=signal)) + ylim(0, 1) + ylab("Signal (a.u.)")
