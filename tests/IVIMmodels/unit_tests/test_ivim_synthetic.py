@@ -35,7 +35,7 @@ def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician
         # else:
         #     signal = data["data"]
         start_time = datetime.datetime.now()
-        [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals)  # prior_in=prior
+        [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals)  #, prior_in=prior
         time_delta += datetime.datetime.now() - start_time
         if save_file:
             save_results(save_file, ivim_algorithm, name, SNR, idx, [f, Dp, D], [f_fit, Dp_fit, D_fit])
