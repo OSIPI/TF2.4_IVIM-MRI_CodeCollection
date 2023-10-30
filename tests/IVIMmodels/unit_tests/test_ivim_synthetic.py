@@ -25,9 +25,10 @@ def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician
     Dp = data["Dp"]
     fit = OsipiBase(algorithm=ivim_algorithm)
     # here try a prior, but it's not seeing it, why?
-    # if hasattr(fit, "accepts_priors") and fit.accepts_priors:
-    prior = [np.repeat(D, 10)+np.random.normal(0,D/3,np.shape(np.repeat(D, 10))), np.repeat(f, 10)+np.random.normal(0,f/3,np.shape(np.repeat(D, 10))), np.repeat(Dp, 10)+np.random.normal(0,Dp/3,np.shape(np.repeat(D, 10))),np.repeat(np.ones_like(Dp), 10)+np.random.normal(0,1/3,np.shape(np.repeat(D, 10)))]  # D, f, D*
-    #     fit.initialize(prior_in=prior)
+    if hasattr(fit, "accepts_priors") and fit.accepts_priors:
+        prior = [np.random.normal(D, D/3, 10), np.random.normal(f, f/3, 10), np.random.normal(Dp, Dp/3, 10), np.random.normal(1, 1/3, 10)]
+        # prior = [np.repeat(D, 10)+np.random.normal(0,D/3,np.shape(np.repeat(D, 10))), np.repeat(f, 10)+np.random.normal(0,f/3,np.shape(np.repeat(D, 10))), np.repeat(Dp, 10)+np.random.normal(0,Dp/3,np.shape(np.repeat(D, 10))),np.repeat(np.ones_like(Dp), 10)+np.random.normal(0,1/3,np.shape(np.repeat(D, 10)))]  # D, f, D*
+        fit.initialize(prior_in=prior)
     time_delta = datetime.timedelta()
     for idx in range(fit_count):
         # if "data" not in data:
@@ -35,7 +36,7 @@ def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician
         # else:
         #     signal = data["data"]
         start_time = datetime.datetime.now()
-        [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals, prior_in=prior)
+        [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals) #, prior_in=prior
         time_delta += datetime.datetime.now() - start_time
         if save_file:
             save_results(save_file, ivim_algorithm, name, SNR, idx, [f, Dp, D], [f_fit, Dp_fit, D_fit])
