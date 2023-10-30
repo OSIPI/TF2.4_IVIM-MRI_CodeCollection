@@ -28,7 +28,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
     accepts_priors = True
 
-    def __init__(self, bvalues=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=False, thresholds=None, prior_in=None):
+    def __init__(self, bvalues=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=True, thresholds=None, prior_in=None):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -43,7 +43,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         self.OGC_algorithm = fit_bayesian
         self.initialize(bounds, initial_guess, fitS0, thresholds, prior_in)
 
-    def initialize(self, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=False, thresholds=None, prior_in=None):
+    def initialize(self, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=True, thresholds=None, prior_in=None):
         if bounds is None:
             self.bounds=([0, 0, 0.005, 0.7],[0.005, 1, 0.2, 1.3])
         else:
@@ -61,7 +61,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             self.initial_guess = initial_guess
         self.fitS0=fitS0
 
-    def ivim_fit(self, signals, bvalues, bounds=None, initial_guess=None, fitS0=False, thresholds=None, prior_in=None, **kwargs):
+    def ivim_fit(self, signals, bvalues, bounds=None, initial_guess=None, fitS0=True, thresholds=None, prior_in=None, **kwargs):
         """Perform the IVIM fit
 
         Args:
