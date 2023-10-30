@@ -50,7 +50,10 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
             self.initial_guess = [0.001, 0.1, 0.03, 1]
         else:
             self.initial_guess = initial_guess
-        self.thresholds=thresholds
+        if thresholds is None:
+            self.thresholds = 150
+        else:
+            self.thresholds = thresholds
 
     def ivim_fit(self, signals, bvalues, bounds=None, initial_guess=None, thresholds=None, **kwargs):
         """Perform the IVIM fit
