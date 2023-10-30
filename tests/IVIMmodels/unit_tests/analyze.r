@@ -61,4 +61,6 @@ curves_restricted_fitted <- generate_curves(data_restricted, bvalues, "_fitted")
 curves_restricted <- generate_curves(data_restricted, bvalues, "")
 
 data_curves_restricted <- cbind(curves_restricted, signal_fitted=curves_restricted_fitted$signal_fitted)
-ggplot(data_curves_restricted, aes(x=bvalue))  + facet_grid(Region ~ SNR) + geom_line(alpha=0.2, aes(y=signal_fitted, group=interaction(Algorithm, index), color=Algorithm)) + geom_line(aes(y=signal)) + ylim(0, 1) + ylab("Signal (a.u.)")
+curve_plot <- ggplot(data_curves_restricted, aes(x=bvalue))  + facet_grid(Region ~ SNR) + geom_line(alpha=0.2, aes(y=signal_fitted, group=interaction(Algorithm, index), color=Algorithm)) + geom_line(aes(y=signal)) + ylim(0, 1) + ylab("Signal (a.u.)")
+print(curve_plot)
+ggsave("curve_plot.pdf", plot=curve_plot, width = 30, height = 30, units = "cm")
