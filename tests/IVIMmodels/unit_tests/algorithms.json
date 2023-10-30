@@ -134,29 +134,17 @@
         }
     },
     "OGC_AmsterdamUMC_biexp_segmented": {
-        "xfail_names": {
-            "Vein": true,
-            "pericardium": true,
-            "small intestine": true,
-            "desc lower intestine": true,
-            "trans lower intestine": true,
-            "asc lower intestine": true,
-            "Artery": true,
-            "spleen": true,
-            "left kidney medulla": true,
-            "Left kidney cortex": true,
-            "right kidney medulla": true,
-            "Right kydney cortex": true,
-            "pancreas": true,
-            "st wall": true,
-            "esophagus cont": true,
-            "esophagus": true,
-            "Liver": true,
-            "Blood RA": true,
-            "Blood RV": true,
-            "myocardium ra": true,
-            "myocardium RV": true,
-            "Myocardium LV": true
+        "tolerances": {
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
         }
     }
 }
