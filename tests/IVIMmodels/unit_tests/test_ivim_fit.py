@@ -157,7 +157,7 @@ def data_ivim_fit_saved():
             kwargs = algorithm_dict.get("options", {})
             tolerances = algorithm_dict.get("tolerances", {})
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances
-            
+
 
 @pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances", data_ivim_fit_saved())
 def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances, request):
