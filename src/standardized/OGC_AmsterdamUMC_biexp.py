@@ -27,7 +27,7 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
     required_initial_guess_optional = True
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
-    def __init__(self, bvalues=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=True, thresholds=None):
+    def __init__(self, bvalues=None, thresholds=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=False):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -35,8 +35,11 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds,initial_guess,fitS0)
+        super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
         self.OGC_algorithm = fit_least_squares
+        self.initialize(bounds, initial_guess, fitS0)
+
+    def initialize(self, bounds, initial_guess, fitS0):
         if bounds is None:
             self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
         else:
@@ -47,7 +50,7 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
             self.initial_guess = initial_guess
         self.fitS0=fitS0
 
-    def ivim_fit(self, signals, bvalues=None):
+    def ivim_fit(self, signals, bvalues, initial_guess=None, **kwargs):
         """Perform the IVIM fit
 
         Args:
@@ -57,8 +60,10 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
+        if initial_guess is not None and len(initial_guess) == 4:
+            self.initial_guess = initial_guess
         bvalues=np.array(bvalues)
-        fit_results = self.OGC_algorithm(bvalues, signals, p0=self.initial_guess, bounds=self.bounds,fitS0=self.fitS0)
+        fit_results = self.OGC_algorithm(bvalues, signals, p0=self.initial_guess, bounds=self.bounds, fitS0=self.fitS0)
 
         D = fit_results[0]
         f = fit_results[1]
