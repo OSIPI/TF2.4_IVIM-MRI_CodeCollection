@@ -46,7 +46,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
         # Check the inputs
         
     
-    def ivim_fit(self, signals, bvalues=None, linear_fit_option=False):
+    def ivim_fit(self, signals, bvalues=None, linear_fit_option=False, **kwargs):
         """Perform the IVIM fit
 
         Args:

@@ -3,7 +3,6 @@
 __pycache__/
 *.nii.gz
 bvals.txt
-*json
 # Unit test / coverage reports
 .tox/
 .coverage
