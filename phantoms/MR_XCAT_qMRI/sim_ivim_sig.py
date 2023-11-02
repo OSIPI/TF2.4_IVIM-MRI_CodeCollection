@@ -8,7 +8,7 @@ import json
 # code adapted from MAtlab code by Eric Schrauben: https://github.com/schrau24/XCAT-ERIC
 # This code generates a 4D IVIM phantom as nifti file
 
-def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleaved=False):
+def phantom(bvalue, noise, TR=8000, TE=80, motion=False, rician=False, interleaved=False):
     np.random.seed(42)
     if motion:
         states = range(1,21)
@@ -367,7 +367,8 @@ if __name__ == '__main__':
     bvalue = np.array([0., 1, 2, 5, 10, 20, 30, 50, 75, 100, 150, 250, 350, 400, 550, 700, 850, 1000])
     noise = 0.0005
     motion = False
-    sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=False)
+    interleaved = False
+    sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=interleaved)
     # sig = np.flip(sig,axis=0)
     # sig = np.flip(sig,axis=1)
     res=np.eye(4)
@@ -402,11 +403,15 @@ if __name__ == '__main__':
     nifti_img = nib.Nifti1Image(sig, affine=res)  # Replace affine if necessary
     # Save the NIfTI image to a file
     nifti_img.header.set_data_dtype(np.float64)
-    if motion:
+    if not motion:
+        output_file = 'output.nii.gz'  # Replace with your desired output file name
+    elif interleaved:
         output_file = 'output_resp_int.nii.gz'  # Replace with your desired output file name
     else:
-        output_file = 'output.nii.gz'  # Replace with your desired output file name
+        output_file = 'output_resp.nii.gz'  # Replace with your desired output file name
+
     nib.save(nifti_img, output_file)
+
 
     nifti_img = nib.Nifti1Image(XCAT, affine=res)  # Replace affine if necessary
     # Save the NIfTI image to a file

@@ -66,7 +66,7 @@ def order(Dt, Fp, Dp, S0=None):
         return Dt, Fp, Dp, S0
 
 
-def fit_segmented_array(bvalues, dw_data, njobs=4, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cutoff=75):
+def fit_segmented_array(bvalues, dw_data, njobs=4, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cutoff=75,p0=[0.001, 0.1, 0.01,1]):
     """
     This is an implementation of the segmented fit, in which we first estimate D using a curve fit to b-values>cutoff;
     then estimate f from the fitted S0 and the measured S0 and finally estimate D* while fixing D and f. This fit
@@ -90,7 +90,7 @@ def fit_segmented_array(bvalues, dw_data, njobs=4, bounds=([0, 0, 0.005],[0.005,
         try:
             # define the parallel function
             def parfun(i):
-                return fit_segmented(bvalues, dw_data[i, :], bounds=bounds, cutoff=cutoff)
+                return fit_segmented(bvalues, dw_data[i, :], bounds=bounds, cutoff=cutoff,p0=p0)
 
             output = Parallel(n_jobs=njobs)(delayed(parfun)(i) for i in tqdm(range(len(dw_data)), position=0, leave=True))
             Dt, Fp, Dp = np.transpose(output)
@@ -107,11 +107,11 @@ def fit_segmented_array(bvalues, dw_data, njobs=4, bounds=([0, 0, 0.005],[0.005,
         Fp = np.zeros(len(dw_data))
         for i in tqdm(range(len(dw_data)), position=0, leave=True):
             # fill arrays with fit results on a per voxel base:
-            Dt[i], Fp[i], Dp[i] = fit_segmented(bvalues, dw_data[i, :], bounds=bounds, cutoff=cutoff)
+            Dt[i], Fp[i], Dp[i] = fit_segmented(bvalues, dw_data[i, :], bounds=bounds, cutoff=cutoff,p0=p0)
     return [Dt, Fp, Dp, S0]
 
 
-def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cutoff=75):
+def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cutoff=75,p0=[0.001, 0.1, 0.01,1]):
     """
     This is an implementation of the segmented fit, in which we first estimate D using a curve fit to b-values>cutoff;
     then estimate f from the fitted S0 and the measured S0 and finally estimate D* while fixing D and f.
@@ -124,23 +124,24 @@ def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cu
     :return Dp: Fitted Dp
     :return S0: Fitted S0
     """
+    p0 = [p0[0] * 1000, p0[1] * 10, p0[2] * 10, p0[3]]
     try:
         # determine high b-values and data for D
         high_b = bvalues[bvalues >= cutoff]
         high_dw_data = dw_data[bvalues >= cutoff]
         # correct the bounds. Note that S0 bounds determine the max and min of f
-        bounds1 = ([bounds[0][0] * 1000., 1 - bounds[1][1]], [bounds[1][0] * 1000., 1. - bounds[0][
+        bounds1 = ([bounds[0][0] * 1000., 0.7 - bounds[1][1]], [bounds[1][0] * 1000., 1.3 - bounds[0][
             1]])  # By bounding S0 like this, we effectively insert the boundaries of f
         # fit for S0' and D
         params, _ = curve_fit(lambda b, Dt, int: int * np.exp(-b * Dt / 1000), high_b, high_dw_data,
-                              p0=(1, 1),
+                              p0=(p0[0], p0[3]-p0[1]/10),
                               bounds=bounds1)
         Dt, Fp = params[0] / 1000, 1 - params[1]
         # remove the diffusion part to only keep the pseudo-diffusion
         dw_data_remaining = dw_data - (1 - Fp) * np.exp(-bvalues * Dt)
-        bounds2 = (bounds[0][2], bounds[1][2])
+        bounds2 = (bounds[0][2]*10, bounds[1][2]*10)
         # fit for D*
-        params, _ = curve_fit(lambda b, Dp: Fp * np.exp(-b * Dp), bvalues, dw_data_remaining, p0=(0.1), bounds=bounds2)
+        params, _ = curve_fit(lambda b, Dp: Fp * np.exp(-b * Dp), bvalues, dw_data_remaining, p0=(p0[2]), bounds=bounds2)
         Dp = params[0]
         return Dt, Fp, Dp
     except:
@@ -150,7 +151,7 @@ def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cu
 
 
 def fit_least_squares_array(bvalues, dw_data, S0_output=True, fitS0=True, njobs=4,
-                            bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3])):
+                            bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]),p0=[0.001, 0.1, 0.01, 1]):
     """
     This is an implementation of the conventional IVIM fit. It is fitted in array form.
     :param bvalues: 1D Array with the b-values
@@ -175,7 +176,7 @@ def fit_least_squares_array(bvalues, dw_data, S0_output=True, fitS0=True, njobs=
             try:
                 # defining parallel function
                 def parfun(i):
-                    return fit_least_squares(bvalues, dw_data[i, :], S0_output=S0_output, fitS0=fitS0, bounds=bounds)
+                    return fit_least_squares(bvalues, dw_data[i, :], S0_output=S0_output, fitS0=fitS0, bounds=bounds,p0=p0)
 
                 output = Parallel(n_jobs=njobs)(delayed(parfun)(i) for i in tqdm(range(len(dw_data)), position=0, leave=True))
                 Dt, Fp, Dp, S0 = np.transpose(output)
@@ -192,14 +193,14 @@ def fit_least_squares_array(bvalues, dw_data, S0_output=True, fitS0=True, njobs=
             # running in a single loop and filling arrays
             for i in tqdm(range(len(dw_data)), position=0, leave=True):
                 Dt[i], Fp[i], Dp[i], S0[i] = fit_least_squares(bvalues, dw_data[i, :], S0_output=S0_output, fitS0=fitS0,
-                                                               bounds=bounds)
+                                                               bounds=bounds,p0=p0)
         return [Dt, Fp, Dp, S0]
     else:
         # if S0 is not exported
         if njobs > 1:
             try:
                 def parfun(i):
-                    return fit_least_squares(bvalues, dw_data[i, :], fitS0=fitS0, bounds=bounds)
+                    return fit_least_squares(bvalues, dw_data[i, :], fitS0=fitS0, bounds=bounds,p0=p0)
 
                 output = Parallel(n_jobs=njobs)(delayed(parfun)(i) for i in tqdm(range(len(dw_data)), position=0, leave=True))
                 Dt, Fp, Dp = np.transpose(output)
@@ -213,12 +214,12 @@ def fit_least_squares_array(bvalues, dw_data, S0_output=True, fitS0=True, njobs=
             Fp = np.zeros(len(dw_data))
             for i in range(len(dw_data)):
                 Dt[i], Fp[i], Dp[i] = fit_least_squares(bvalues, dw_data[i, :], S0_output=S0_output, fitS0=fitS0,
-                                                        bounds=bounds)
+                                                        bounds=bounds,p0=p0)
         return [Dt, Fp, Dp]
 
 
 def fit_least_squares(bvalues, dw_data, S0_output=False, fitS0=True,
-                      bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3])):
+                      bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), p0=[0.001, 0.1, 0.01, 1]):
     """
     This is an implementation of the conventional IVIM fit. It fits a single curve
     :param bvalues: Array with the b-values
@@ -236,13 +237,15 @@ def fit_least_squares(bvalues, dw_data, S0_output=False, fitS0=True,
             # bounds are rescaled such that each parameter changes at roughly the same rate to help fitting.
             bounds = ([bounds[0][0] * 1000, bounds[0][1] * 10, bounds[0][2] * 10],
                       [bounds[1][0] * 1000, bounds[1][1] * 10, bounds[1][2] * 10])
-            params, _ = curve_fit(ivimN_noS0, bvalues, dw_data, p0=[1, 1, 0.1], bounds=bounds)
+            p0=[p0[0]*1000,p0[1]*10,p0[2]*10]
+            params, _ = curve_fit(ivimN_noS0, bvalues, dw_data, p0=p0, bounds=bounds)
             S0 = 1
         else:
             # bounds are rescaled such that each parameter changes at roughly the same rate to help fitting.
             bounds = ([bounds[0][0] * 1000, bounds[0][1] * 10, bounds[0][2] * 10, bounds[0][3]],
                       [bounds[1][0] * 1000, bounds[1][1] * 10, bounds[1][2] * 10, bounds[1][3]])
-            params, _ = curve_fit(ivimN, bvalues, dw_data, p0=[1, 1, 0.1, 1], bounds=bounds)
+            p0=[p0[0]*1000,p0[1]*10,p0[2]*10,p0[3]]
+            params, _ = curve_fit(ivimN, bvalues, dw_data, p0=p0, bounds=bounds)
             S0 = params[3]
         # correct for the rescaling of parameters
         Dt, Fp, Dp = params[0] / 1000, params[1] / 10, params[2] / 10
@@ -463,6 +466,20 @@ def fit_segmented_tri_exp(bvalues, dw_data, bounds=([0, 0, 0, 0.005, 0, 0.06], [
         return 0., 0., 0., 0., 0., 0.
 
 
+def neg_log_likelihood(p, bvalues, dw_data):
+    """
+    This function determines the negative of the log of the likelihood of parameters p, given the data dw_data for the Bayesian fit
+    :param p: 1D Array with the estimates of D, f, D* and (optionally) S0
+    :param bvalues: 1D array with b-values
+    :param dw_data: 1D Array diffusion-weighted data
+    :returns: the log-likelihood of the parameters given the data
+    """
+    if len(p) == 4:
+        return 0.5 * (len(bvalues) + 1) * np.log(
+            np.sum((ivim(bvalues, p[0], p[1], p[2], p[3]) - dw_data) ** 2))  # 0.5*sum simplified
+    else:
+        return 0.5 * (len(bvalues) + 1) * np.log(
+            np.sum((ivim(bvalues, p[0], p[1], p[2], 1) - dw_data) ** 2))  # 0.5*sum simplified
 def empirical_neg_log_prior(Dt0, Fp0, Dp0, S00=None):
     """
     This function determines the negative of the log of the empirical prior probability of the IVIM parameters
@@ -516,23 +533,6 @@ def empirical_neg_log_prior(Dt0, Fp0, Dp0, S00=None):
 
     return neg_log_prior
 
-
-def neg_log_likelihood(p, bvalues, dw_data):
-    """
-    This function determines the negative of the log of the likelihood of parameters p, given the data dw_data for the Bayesian fit
-    :param p: 1D Array with the estimates of D, f, D* and (optionally) S0
-    :param bvalues: 1D array with b-values
-    :param dw_data: 1D Array diffusion-weighted data
-    :returns: the log-likelihood of the parameters given the data
-    """
-    if len(p) == 4:
-        return 0.5 * (len(bvalues) + 1) * np.log(
-            np.sum((ivim(bvalues, p[0], p[1], p[2], p[3]) - dw_data) ** 2))  # 0.5*sum simplified
-    else:
-        return 0.5 * (len(bvalues) + 1) * np.log(
-            np.sum((ivim(bvalues, p[0], p[1], p[2], 1) - dw_data) ** 2))  # 0.5*sum simplified
-
-
 def neg_log_posterior(p, bvalues, dw_data, neg_log_prior):
     """
     This function determines the negative of the log of the likelihood of parameters p, given the prior likelihood and the data
@@ -543,6 +543,39 @@ def neg_log_posterior(p, bvalues, dw_data, neg_log_prior):
     :returns: the posterior probability given the data and the prior
     """
     return neg_log_likelihood(p, bvalues, dw_data) + neg_log_prior(p)
+
+
+def flat_neg_log_prior(Dt_range, Fp_range, Dp_range, S0_range=None):
+    """
+    This function determines the negative of the log of the empirical prior probability of the IVIM parameters
+    :param Dt0: 1D Array with the initial D estimates
+    :param Dt0: 1D Array with the initial f estimates
+    :param Dt0: 1D Array with the initial D* estimates
+    :param Dt0: 1D Array with the initial S0 estimates (optional)
+    """
+    def neg_log_prior(p):
+        # depends on whether S0 is fitted or not
+        if len(p) == 4:
+            Dt, Fp, Dp, S0 = p[0], p[1], p[2], p[3]
+        else:
+            Dt, Fp, Dp = p[0], p[1], p[2]
+        # make D*<D very unlikely
+        if (Dp < Dt):
+            return 1e3
+        else:
+            # determine and return the prior for D, f and D* (and S0)
+            if len(p) == 4:
+                if Dt_range[0] < Dt < Dt_range[1] and Fp_range[0] < Fp < Fp_range[1] and Dp_range[0] < Dp < Dp_range[1]: # and S0_range[0] < S0 < S0_range[1]: << not sure whether this helps. Technically it should be here
+                    return 0
+                else:
+                    return 1e3
+            else:
+                if Dt_range[0] < Dt < Dt_range[1] and Fp_range[0] < Fp < Fp_range[1] and Dp_range[0] < Dp < Dp_range[1]:
+                    return 0
+                else:
+                    return 1e3
+
+    return neg_log_prior
 
 
 def fit_bayesian_array(bvalues, dw_data, paramslsq, arg):
@@ -563,7 +596,6 @@ def fit_bayesian_array(bvalues, dw_data, paramslsq, arg):
     :return Dp: Array with Dp in each voxel
     :return S0: Array with S0 in each voxel
     """
-    arg = checkarg_lsq(arg)
     # fill out missing args
     Dt0, Fp0, Dp0, S00 = paramslsq
     # determine prior
@@ -606,7 +638,7 @@ def fit_bayesian_array(bvalues, dw_data, paramslsq, arg):
     return Dt_pred, Fp_pred, Dp_pred, S0_pred
 
 
-def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05], fitS0=True):
+def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05, 1], fitS0=True):
     '''
     This is an implementation of the Bayesian IVIM fit. It returns the Maximum a posterior probability.
     The fit is taken from Barbieri et al. which was initially introduced in http://arxiv.org/10.1002/mrm.25765 and
@@ -623,7 +655,7 @@ def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05], fitS0=T
     '''
     try:
         # define fit bounds
-        bounds = [(0, 0.005), (0, 0.7), (0.005, 0.2), (0, 2.5)]
+        bounds = [(0, 0.005), (0, 1.5), (0, 2), (0, 2.5)]
         # Find the Maximum a posterior probability (MAP) by minimising the negative log of the posterior
         if fitS0:
             params = minimize(neg_log_posterior, x0=x0, args=(bvalues, dw_data, neg_log_prior), bounds=bounds)
@@ -704,7 +736,7 @@ def goodness_of_fit(bvalues, Dt, Fp, Dp, S0, dw_data, Fp2=None, Dp2=None):
         # plt.ion()
         # plt.show()
         # print(R2[vox])
-    return R2, adjust
+    return R2, adjusted_R2
 # ed_R2
 
 def MSE(bvalues, Dt, Fp, Dp, S0, dw_data):
