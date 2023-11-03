@@ -43,8 +43,8 @@ plot_ivim(data_restricted, "_limited.pdf")
 data_duration <- read.csv(duration_name)
 data_duration <- data_duration %>% mutate_if(is.character, as.factor)
 data_duration$ms <- data_duration$Duration..us./data_duration$Count/1000
-ggplot(data_duration, aes(x=Algorithm, y=ms)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 90)) + ggtitle("Fit Duration") + ylab("Time (ms)")
-ggsave("durations.pdf", width = 20, height = 20, units = "cm")
+duration_plot <- ggplot(data_duration, aes(x=Algorithm, y=ms)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 90)) + ggtitle("Fit Duration") + ylab("Time (ms)")
+ggsave("durations.pdf", plot=duration_plot, width = 20, height = 20, units = "cm")
 
 
 if (runPrediction) {
