@@ -1,9 +1,10 @@
-name: Unit tests
+name: Algorithm Analysis
 
-on: push
-  branches:
-    - main
-    - analysis/workflow
+on:
+  push:
+    branches:
+      - main
+      - analysis/workflow
 
 jobs:
   build:
