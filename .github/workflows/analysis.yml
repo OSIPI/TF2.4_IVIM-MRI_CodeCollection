@@ -36,14 +36,16 @@ jobs:
         uses: r-lib/actions/setup-r@v2
         with: 
           use-public-rspm: true
-      - uses: r-lib/actions/setup-r-dependencies@v2
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
             any::plyr
             any::dplyr
             any::tidyverse
             any::data.table
-          needs: check
+            any::ggplot2
+          # needs: check
       - name: Generate fitting data
         run: |
           pip install pytest
