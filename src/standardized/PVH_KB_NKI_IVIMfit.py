@@ -49,10 +49,10 @@ class PVH_KB_NKI_IVIMfit(OsipiBase):
         Returns:
             _type_: _description_
         """
-        bvalues=np.array(bvalues)
-        # reshape signal as the function expects a 4D array
-        signals = np.reshape(signals, (1, 1, 1, len(signals)))  # Question = signals always a 1D array in the tests?
-        # to do reshape signals into a 4D array as this is what the function expects as input
+        #bvalues = np.array(bvalues)
+        bvalues = bvalues.tolist() #NKI code expects a list instead of nparray
+        # reshape signal as the NKI code expects a 4D array
+        signals = np.reshape(signals, (1, 1, 1, len(signals)))  # assuming that in this test the signals are always single voxel
         fit_results = self.NKI_algorithm(signals,bvalues)
 
         D = fit_results[0]/1000
