@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.PvH_KB_NKI.DWI_functions_standalone import generate_IVIMmaps_standalone
+from src.original.PvH_KB_NKI.DWI_functions_standalone import generate_IVIMmaps_standalone, generate_ADC_standalone
 import numpy as np
 
 class PVH_KB_NKI_IVIMfit(OsipiBase):
@@ -12,7 +12,7 @@ class PVH_KB_NKI_IVIMfit(OsipiBase):
     # the user inputs fulfil the requirements
 
     # Some basic stuff that identifies the algorithm
-    id_author = "Petra van Houdt and Koen Baas, NKI"
+    id_author = "Group Uulke van der Heide, NKI"
     id_algorithm_type = "Bi-exponential fit"
     id_return_parameters = "f, D*, D"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
@@ -50,10 +50,13 @@ class PVH_KB_NKI_IVIMfit(OsipiBase):
             _type_: _description_
         """
         bvalues=np.array(bvalues)
+        # reshape signal as the function expects a 4D array
+        signals = np.reshape(signals, (1, 1, 1, len(signals)))  # Question = signals always a 1D array in the tests?
+        # to do reshape signals into a 4D array as this is what the function expects as input
         fit_results = self.NKI_algorithm(signals,bvalues)
 
-        D = fit_results[0]
+        D = fit_results[0]/1000
         f = fit_results[1]
-        Dstar = fit_results[2]
+        Dstar = fit_results[2]/1000
 
         return f, Dstar, D
