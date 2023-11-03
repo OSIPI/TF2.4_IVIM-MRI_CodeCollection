@@ -1,12 +1,15 @@
 name: Unit tests
 
-on: [push]
+on: push
+  branches:
+    - main
+    - analysis/workflow
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    # if: github.ref == 'refs/heads/main'
     continue-on-error: false
     strategy:
       fail-fast: false
