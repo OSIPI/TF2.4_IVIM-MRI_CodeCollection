@@ -3,8 +3,8 @@ name: Algorithm Analysis
 on:
   push:
     branches:
-      - main
-      - analysis/workflow
+      - 'main'
+      - 'analysis/workflow'
 
 jobs:
   build:
