@@ -46,6 +46,7 @@ jobs:
           python -m pytest -m slow --saveFileName test_output.csv --SNR 10 --fitCount 10 --saveDurationFileName test_duration.csv
       - name: Generate figures
         run: Rscript --vanilla tests/IVIMmodels/unit_tests/analyze.r test_output.csv test_duration.csv
+      - name: Upload figures
         with:
             name: code-coverage-report
             path: |
