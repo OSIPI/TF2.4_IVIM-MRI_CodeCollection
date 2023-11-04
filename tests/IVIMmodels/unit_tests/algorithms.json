@@ -9,7 +9,9 @@
         "IAR_LU_subtracted",
         "OGC_AmsterdamUMC_Bayesian_biexp",
         "OGC_AmsterdamUMC_biexp_segmented",
-        "OGC_AmsterdamUMC_biexp"
+        "OGC_AmsterdamUMC_biexp",
+        "PV_MUMC_biexp",
+        "PvH_KB_NKI_IVIMfit"
     ],
     "IAR_LU_biexp": {
         "tolerances": {
