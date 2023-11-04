@@ -39,6 +39,7 @@ jobs:
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          packages: any::sessioninfo
           extra-packages: |
             any::plyr
             any::dplyr
