@@ -25,7 +25,7 @@ plot_ivim <- function(data, fileExtension) {
     f_plot <- ggplot(data, aes(x=Algorithm)) + geom_boxplot(aes(y=f_fitted)) + geom_boxplot(color="red", aes(y=f)) + facet_grid(SNR ~ Region) + scale_x_discrete(guide = guide_axis(angle = 90)) + ylim(0, 1) + ggtitle("Perfusion fraction grid") + ylab("Perfusion fraction")
     print(f_plot)
     ggsave(paste("f", fileExtension, sep=""), plot=f_plot, width = 50, height = 50, units = "cm")
-    D_plot <- ggplot(data, aes(x=Algorithm)) + geom_boxplot(aes(y=D_fitted)) + geom_boxplot(color="red", aes(y=D)) + facet_grid(SNR ~ Region) + scale_x_discrete(guide = guide_axis(angle = 90)) + ggtitle("Diffusion grid") + ylab("Diffusion")
+    D_plot <- ggplot(data, aes(x=Algorithm)) + geom_boxplot(aes(y=D_fitted)) + geom_boxplot(color="red", aes(y=D)) + facet_grid(SNR ~ Region) + scale_x_discrete(guide = guide_axis(angle = 90)) + ylim(0, 0.005) + ggtitle("Diffusion grid") + ylab("Diffusion")
     print(D_plot)
     ggsave(paste("D", fileExtension, sep=""), plot=D_plot, width = 50, height = 50, units = "cm")
     Dp_plot <- ggplot(data, aes(x=Algorithm)) + geom_boxplot(aes(y=Dp_fitted)) + geom_boxplot(color="red", aes(y=Dp)) + facet_grid(SNR ~ Region) + scale_x_discrete(guide = guide_axis(angle = 90)) + ylim(0, 0.25) + ggtitle("Perfusion grid") + ylab("Perfusion")
