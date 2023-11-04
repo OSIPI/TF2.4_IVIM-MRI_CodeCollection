@@ -51,7 +51,7 @@ class IAR_LU_subtracted(OsipiBase):
             self.IAR_algorithm = None
         
     
-    def ivim_fit(self, signals, bvalues):
+    def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
 
         Args:

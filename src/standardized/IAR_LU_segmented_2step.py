@@ -51,7 +51,7 @@ class IAR_LU_segmented_2step(OsipiBase):
             self.IAR_algorithm = None
         
     
-    def ivim_fit(self, signals, bvalues, thresholds=None):
+    def ivim_fit(self, signals, bvalues, thresholds=None, **kwargs):
         """Perform the IVIM fit
 
         Args:

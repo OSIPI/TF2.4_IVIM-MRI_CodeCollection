@@ -48,7 +48,7 @@ def fit_least_squares_array(bvalues, dw_data, fitS0=False, bounds=([0.9, 0.0001,
     Fmv = np.zeros(len(dw_data))
     for i in tqdm.tqdm(range(len(dw_data)), position=0, leave=True):
         # fill arrays with fit results on a per voxel base:
-        Dpar[i], Fmv[i], Dmv[i], S0[i] = fit_least_squares(bvalues, dw_data[i, :], S0_output=True, fitS0=fitS0, bounds=bounds)
+        Dpar[i], Fmv[i], Dmv[i], S0[i] = fit_least_squares(bvalues, dw_data[i, :], S0_output=False, fitS0=fitS0, bounds=bounds)
     return [Dpar, Fmv, Dmv, S0]
 
 

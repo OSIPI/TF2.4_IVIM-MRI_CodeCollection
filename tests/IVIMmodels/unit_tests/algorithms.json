@@ -1,0 +1,164 @@
+{
+    "algorithms": [
+        "ETP_SRI_LinearFitting",
+        "IAR_LU_biexp",
+        "IAR_LU_modified_mix",
+        "IAR_LU_modified_topopro",
+        "IAR_LU_segmented_2step",
+        "IAR_LU_segmented_3step",
+        "IAR_LU_subtracted",
+        "OGC_AmsterdamUMC_Bayesian_biexp",
+        "OGC_AmsterdamUMC_biexp_segmented",
+        "OGC_AmsterdamUMC_biexp"
+    ],
+    "IAR_LU_biexp": {
+        "tolerances": {
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
+        }
+    },
+    "IAR_LU_modified_mix": {
+        "tolerances": {
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
+        }
+    },
+    "IAR_LU_modified_topopro": {
+        "tolerances": {
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
+        }
+    },
+    "IAR_LU_segmented_2step": {
+        "tolerances": {
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
+        }
+    },
+    "IAR_LU_segmented_3step": {
+        "tolerances": {
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
+        }
+    },
+    "IAR_LU_subtracted": {
+        "tolerances": {
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
+        }
+    },
+    "ETP_SRI_LinearFitting": {
+        "xfail_names": {
+            "Vein": true
+        },
+        "options": {
+            "thresholds": [500]
+        },
+        "tolerances": {
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 0,
+                "D": 0,
+                "Dp": 0
+            },
+            "dynamic_rtol": {
+                "offset": 0,
+                "noise": 0,
+                "ratio": 0,
+                "noiseCrossRatio": 10,
+                "f": 1,
+                "D": 1,
+                "Dp": 2
+            },
+            "dynamic_atol": {
+                "offset": 5e-2,
+                "noise": 0,
+                "ratio": 0,
+                "noiseCrossRatio": 10,
+                "f": 1,
+                "D": 1,
+                "Dp": 2
+            }
+        }
+    },
+    "OGC_AmsterdamUMC_biexp_segmented": {
+        "tolerances": {
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
+        }
+    },
+    "OJ_GU_seg": {
+        "tolerances": {
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 1e-2,
+                "D": 1e-2,
+                "Dp": 1e-1
+            }
+        }
+    }
+}
