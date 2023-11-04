@@ -10,18 +10,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    # if: github.ref == 'refs/heads/main'
     continue-on-error: false
     strategy:
       fail-fast: false
-      # matrix:
-      #   os: [ubuntu-latest, macos-latest, windows-latest]
-      #   python-version: ["3.8", "3.9", "3.10", "3.11"]
-        # exclude:
-        #   - os: macos-latest
-        #     python-version: "3.7"
-        #   - os: windows-latest
-        #     python-version: "3.7"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -39,24 +30,22 @@ jobs:
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          packages: any::sessioninfo
-          extra-packages: |
+          packages: |
             any::plyr
             any::dplyr
             any::tidyverse
             any::data.table
             any::ggplot2
-          # needs: check
       - name: Generate fitting data
         run: |
           pip install pytest
-          python -m pytest -m slow --saveFileName test_output.csv --SNR 10 --fitCount 10 --saveDurationFileName test_duration.csv
+          python -m pytest -m slow --saveFileName test_output.csv --SNR 10 30 50 100 200 --fitCount 1000 --saveDurationFileName test_duration.csv
       - name: Generate figures
         run: Rscript --vanilla tests/IVIMmodels/unit_tests/analyze.r test_output.csv test_duration.csv
       - name: Upload figures
         uses: actions/upload-artifact@v3
         with:
-            name: code-coverage-report
+            name: Fit figures
             path: |
               D.pdf
               f.pdf
