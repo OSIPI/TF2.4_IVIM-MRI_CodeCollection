@@ -3,7 +3,8 @@ import os
 from pathlib import Path
 #from src.standardized.ETP_SRI_LinearFitting import ETP_SRI_LinearFitting
 from src.standardized.IAR_LU_biexp import IAR_LU_biexp
-from src.standardized.IAR_LU_segmented_2step import IAR_LU_segmented_2step
+#from src.standardized.IAR_LU_segmented_2step import IAR_LU_segmented_2step
+from src.standardized.PvH_KB_NKI_IVIMfit import PvH_KB_NKI_IVIMfit
 #from src.standardized.PV_MUMC_biexp import PV_MUMC_biexp
 
 ## Simple test code... 
@@ -26,7 +27,7 @@ def dev_test_run(model, **kwargs):
     
 #model1 = ETP_SRI_LinearFitting(thresholds=[200])
 #model2 = IAR_LU_biexp()
-model2 = IAR_LU_segmented_2step()
+model2 = PvH_KB_NKI_IVIMfit()
 
 #dev_test_run(model1, linear_fit_option=True)
-dev_test_run(model2, thresholds="Arbitrary kwarg for ivim_fit")
+dev_test_run(model2)
