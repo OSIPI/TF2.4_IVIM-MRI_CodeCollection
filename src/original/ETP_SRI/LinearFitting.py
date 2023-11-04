@@ -66,11 +66,20 @@ class LinearFit:
         gt_cutoff = bvalues >= self.linear_cutoff
         linear_signal = np.log(signal)
         D = self.linear_fit(bvalues[gt_cutoff], linear_signal[gt_cutoff])
+        # print(D)
+        D[1] = max(D[1], 0)  # constrain to positive values
         
         if lt_cutoff.sum() > 0:
             signal_Dp = linear_signal[lt_cutoff] - gd.linear_signal(D[1], bvalues[lt_cutoff], np.log(D[0]))
-            
-            Dp_prime = self.linear_fit(bvalues[lt_cutoff], np.log(signal_Dp))
+            # print(signal_Dp)
+            signal_valid = signal_Dp > 0
+            lt_cutoff_dual = np.logical_and(lt_cutoff[:len(signal_Dp)], signal_valid)
+            # print(lt_cutoff_dual)
+            Dp_prime = [-1, -1]
+            if lt_cutoff_dual.sum() > 0:
+                # print(np.log(signal_Dp[lt_cutoff_dual]))
+                Dp_prime = self.linear_fit(bvalues[:len(signal_Dp)][lt_cutoff_dual], np.log(signal_Dp[lt_cutoff_dual]))
+                # print(Dp_prime)
             
             if np.any(np.asarray(Dp_prime) < 0) or not np.all(np.isfinite(Dp_prime)):
                 print('Perfusion fit failed')
