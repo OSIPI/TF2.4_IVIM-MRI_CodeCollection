@@ -39,7 +39,7 @@ jobs:
       - name: Generate fitting data
         run: |
           pip install pytest
-          python -m pytest -m slow --saveFileName test_output.csv --SNR 10 30 50 100 200 --fitCount 1000 --saveDurationFileName test_duration.csv
+          python -m pytest -m slow --saveFileName test_output.csv --SNR 10 30 50 100 200 --fitCount 300 --saveDurationFileName test_duration.csv
       - name: Generate figures
         run: Rscript --vanilla tests/IVIMmodels/unit_tests/analyze.r test_output.csv test_duration.csv
       - name: Upload figures
