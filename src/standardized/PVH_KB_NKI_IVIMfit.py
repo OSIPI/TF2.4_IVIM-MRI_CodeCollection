@@ -2,7 +2,7 @@ from src.wrappers.OsipiBase import OsipiBase
 from src.original.PvH_KB_NKI.DWI_functions_standalone import generate_IVIMmaps_standalone, generate_ADC_standalone
 import numpy as np
 
-class PVH_KB_NKI_IVIMfit(OsipiBase):
+class PvH_KB_NKI_IVIMfit(OsipiBase):
     """
     Bi-exponential fitting algorithm by Petra van Houdt and Koen Baas, NKI
     """
@@ -35,7 +35,7 @@ class PVH_KB_NKI_IVIMfit(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(PVH_KB_NKI_IVIMfit, self).__init__(bvalues, thresholds,bounds,initial_guess)
+        super(PvH_KB_NKI_IVIMfit, self).__init__(bvalues, thresholds,bounds,initial_guess)
         self.NKI_algorithm = generate_IVIMmaps_standalone
 
 
