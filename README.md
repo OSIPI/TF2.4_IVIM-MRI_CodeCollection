@@ -30,4 +30,4 @@ The **test** folder contains the test files corresponding to the contributed cod
 The **utils** folder contains various helpful tools.
 
 ## View Testing Reports
-*to be added*
+[![Unit tests](https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection/actions/workflows/unit_test.yml/badge.svg?branch=main)](https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection/actions/workflows/unit_test.yml)
