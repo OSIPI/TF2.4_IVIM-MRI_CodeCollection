@@ -14,7 +14,7 @@ from utilities.data_simulation.GenerateData import GenerateData
 #run using pytest <path_to_this_file> --saveFileName test_output.txt --SNR 50 100 200
 #e.g. pytest -m slow tests/IVIMmodels/unit_tests/test_ivim_synthetic.py  --saveFileName test_output.csv --SNR 10 50 100 200 --fitCount 20
 @pytest.mark.slow
-def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician_noise, save_file, save_duration_file):
+def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician_noise, save_file, save_duration_file, use_prior):
     # assert save_file == "test"
     random.seed(42)
     S0 = 1
@@ -24,8 +24,8 @@ def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician
     f = data["f"]
     Dp = data["Dp"]
     fit = OsipiBase(algorithm=ivim_algorithm)
-    # here try a prior, but it's not seeing it, why?
-    if hasattr(fit, "accepts_priors") and fit.accepts_priors:
+    # here is a prior
+    if use_prior and hasattr(fit, "accepts_priors") and fit.accepts_priors:
         prior = [np.random.normal(D, D/3, 10), np.random.normal(f, f/3, 10), np.random.normal(Dp, Dp/3, 10), np.random.normal(1, 1/3, 10)]
         # prior = [np.repeat(D, 10)+np.random.normal(0,D/3,np.shape(np.repeat(D, 10))), np.repeat(f, 10)+np.random.normal(0,f/3,np.shape(np.repeat(D, 10))), np.repeat(Dp, 10)+np.random.normal(0,Dp/3,np.shape(np.repeat(D, 10))),np.repeat(np.ones_like(Dp), 10)+np.random.normal(0,1/3,np.shape(np.repeat(D, 10)))]  # D, f, D*
         fit.initialize(prior_in=prior)
