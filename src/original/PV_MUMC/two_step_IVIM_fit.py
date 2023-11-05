@@ -50,7 +50,7 @@ def fit_least_squares_array(bvalues, dw_data, fitS0=True, bounds=([0.9, 0.0001, 
     Fmv = np.zeros(len(dw_data))
     for i in tqdm.tqdm(range(len(dw_data)), position=0, leave=True):
         # fill arrays with fit results on a per voxel base:
-        Dpar[i], Fmv[i], Dmv[i], S0[i] = fit_least_squares(bvalues, dw_data[i, :], S0_output=True, fitS0=fitS0, bounds=bounds)
+        Dpar[i], Fmv[i], Dmv[i], S0[i] = fit_least_squares(bvalues, dw_data[i, :], S0_output=False, fitS0=fitS0, bounds=bounds)
     return [Dpar, Fmv, Dmv, S0]
 
 
@@ -75,45 +75,48 @@ def fit_least_squares(bvalues, dw_data, IR=False, S0_output=False, fitS0=True,
     :return Dmv: scalar with Dmv of the specific voxel
     """
      
-    try:
-        def monofit(bvalues, Dpar):
-             return np.exp(-bvalues * Dpar)
+    #try:
+    def monofit(bvalues, Dpar):
+            return np.exp(-bvalues * Dpar)
+    
+    high_b = bvalues[bvalues >= cutoff]
+    high_dw_data = dw_data[bvalues >= cutoff]
+    boundspar = ([bounds[0][1]], [bounds[1][1]])
+    params, _ = curve_fit(monofit, high_b, high_dw_data, p0=[(bounds[1][1]-bounds[0][1])/2], bounds=boundspar)
+    Dpar = params[0]
+
+    if not fitS0:
+        boundsupdated=([Dpar1 , bounds[0][2] , bounds[0][3] ],
+                    [Dpar1 , bounds[1][2] , bounds[1][3] ])    
+        params, _ = curve_fit(two_exp_noS0, bvalues, dw_data, p0=[Dpar1, (bounds[0][2]+bounds[1][2])/2, (bounds[0][3]+bounds[1][3])/2], bounds=boundsupdated)
+        Dpar1, Fmv, Dmv = params[0], params[1], params[2]
+        #when the fraction of a compartment equals zero (or very very small), the corresponding diffusivity is non-existing (=NaN)
+        if Fmv < 1e-4:
+            Dmv = float("NaN")
         
-        high_b = bvalues[bvalues >= cutoff]
-        high_dw_data = dw_data[bvalues >= cutoff]
-        boundspar = ([bounds[0][1]], [bounds[1][1]])
-        params, _ = curve_fit(monofit, high_b, high_dw_data, p0=[(bounds[1][1]-bounds[0][1])/2], bounds=boundspar)
-        Dpar1 = params[0]
-
-        if not fitS0:
-            boundsupdated=([Dpar1 , bounds[0][2] , bounds[0][3] ],
-                      [Dpar1 , bounds[1][2] , bounds[1][3] ])    
-            params, _ = curve_fit(two_exp_noS0, bvalues, dw_data, p0=[Dpar1, (bounds[0][2]+bounds[1][2])/2, (bounds[0][3]+bounds[1][3])/2], bounds=boundsupdated)
-            Dpar, Fmv, Dmv = params[0], params[1], params[2]
-            #when the fraction of a compartment equals zero (or very very small), the corresponding diffusivity is non-existing (=NaN)
-            if Fmv < 1e-4:
-                Dmv = float("NaN")
+    else: 
+        #boundsupdated = ([bounds[0][0] , Dpar1 , bounds[0][2] , bounds[0][3] ],
+        #            [bounds[1][0] , Dpar1, bounds[1][2] , bounds[1][3] ])   
+        #params, _ = curve_fit(two_exp, bvalues, dw_data, p0=[1, Dpar1, (bounds[0][2]+bounds[1][2])/2, (bounds[0][3]+bounds[1][3])/2], bounds=boundsupdated)
+        boundsupdated = ([bounds[0][0] , bounds[0][2] , bounds[0][3] ],
+                    [bounds[1][0] , bounds[1][2] , bounds[1][3] ])   
+        params, _ = curve_fit(lambda bvalues, S0, Fmv, Dmv: two_exp(bvalues, S0, Dpar, Fmv, Dmv), bvalues, dw_data, p0=[1, (bounds[0][2]+bounds[1][2])/2, (bounds[0][3]+bounds[1][3])/2], bounds=boundsupdated)
+        S0 = params[0]
+        Fmv, Dmv = params[1] , params[2]
+        #when the fraction of a compartment equals zero (or very very small), the corresponding diffusivity is non-existing (=NaN)
+        if Fmv < 1e-4:
+            Dmv = float("NaN")     
             
-        else: 
-            boundsupdated = ([bounds[0][0] , Dpar1 , bounds[0][2] , bounds[0][3] ],
-                      [bounds[1][0] , Dpar1, bounds[1][2] , bounds[1][3] ])   
-            params, _ = curve_fit(two_exp, bvalues, dw_data, p0=[1, Dpar1, (bounds[0][2]+bounds[1][2])/2, (bounds[0][3]+bounds[1][3])/2], bounds=boundsupdated)
-            S0 = params[0]
-            Dpar, Fmv, Dmv = params[1] , params[2] , params[3]
-            #when the fraction of a compartment equals zero (or very very small), the corresponding diffusivity is non-existing (=NaN)
-            if Fmv < 1e-4:
-                Dmv = float("NaN")     
-                
-        if S0_output:
-            return Dpar, Fmv, Dmv, S0
-        else:
-            return Dpar, Fmv, Dmv
-    except:
+    if S0_output:
+        return Dpar, Fmv, Dmv, S0
+    else:
+        return Dpar, Fmv, Dmv
+    #except:
 
-        if S0_output:
-            return 0, 0, 0, 0, 0, 0
-        else:
-            return 0, 0, 0, 0, 0
+    if S0_output:
+        return 0, 0, 0, 0, 0, 0
+    else:
+        return 0, 0, 0, 0, 0
 
 
         
