@@ -20,6 +20,12 @@ def pytest_addoption(parser):
         help="Use Rician noise, non-rician is gaussian",
     )
     parser.addoption(
+        "--usePrior",
+        default=False,
+        type=bool,
+        help="Use a prior where accepted",
+    )
+    parser.addoption(
         "--algorithmFile",
         default="tests/IVIMmodels/unit_tests/algorithms.json",
         type=str,
@@ -109,6 +115,10 @@ def fit_count(request):
 @pytest.fixture(scope="session")
 def rician_noise(request):
     return request.config.getoption("--ricianNoise")
+
+@pytest.fixture(scope="session")
+def use_prior(request):
+    return request.config.getoption("--usePrior")
 
 
 def pytest_generate_tests(metafunc):
