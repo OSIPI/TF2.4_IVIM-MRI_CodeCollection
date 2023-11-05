@@ -78,11 +78,20 @@ def save_file(request):
         # print(filename)
         # filename.unlink(missing_ok=True)
         filename = filename.as_posix()
+
+        data = data_list(request.config.getoption("--dataFile"))  # TODO: clean up this hacky way to get bvalues
+        [_, bvalues, _] = next(data)
+        bvalue_string = ["bval_" + str(bvalue) for bvalue in bvalues]
+        # bvalue_string = ["b_0.0","b_1.0","b_2.0","b_5.0","b_10.0","b_20.0","b_30.0","b_50.0","b_75.0","b_100.0","b_150.0","b_250.0","b_350.0","b_400.0","b_550.0","b_700.0","b_850.0","b_1000.0"]
+
         with open(filename, "w") as csv_file:
             writer = csv.writer(csv_file, delimiter=',')
-            writer.writerow(("Algorithm", "Region", "SNR", "index", "f", "Dp", "D", "f_fitted", "Dp_fitted", "D_fitted"))
+            writer.writerow(("Algorithm", "Region", "SNR", "index", "f", "Dp", "D", "f_fitted", "Dp_fitted", "D_fitted", *bvalue_string))
+            yield writer
             # writer.writerow(["", datetime.datetime.now()])
-    return filename
+    else:
+        yield None
+    # return filename
 
 @pytest.fixture(scope="session")
 def save_duration_file(request):
@@ -96,8 +105,11 @@ def save_duration_file(request):
         with open(filename, "w") as csv_file:
             writer = csv.writer(csv_file, delimiter=',')
             writer.writerow(("Algorithm", "Region", "SNR", "Duration [us]", "Count"))
+            yield writer
             # writer.writerow(["", datetime.datetime.now()])
-    return filename
+    else:
+        yield None
+    # return filename
 
 @pytest.fixture(scope="session")
 def rtol(request):
