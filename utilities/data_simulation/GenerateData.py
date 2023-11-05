@@ -18,7 +18,7 @@ class GenerateData:
         else:
             self._op = operator
         if rng is None:
-            self._rng = self._op
+            self._rng = self._op.random
         else:
             self._rng = rng
 
