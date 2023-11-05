@@ -1,0 +1,63 @@
+name: Algorithm Analysis
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'analysis/**'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with: 
+          use-public-rspm: true
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::plyr
+            any::dplyr
+            any::tidyverse
+            any::data.table
+            any::ggplot2
+      - name: Generate fitting data
+        run: |
+          pip install pytest
+          python -m pytest -m slow --saveFileName test_output.csv --SNR 10 30 50 100 200 --fitCount 300 --saveDurationFileName test_duration.csv
+      - name: Generate figures
+        run: Rscript --vanilla tests/IVIMmodels/unit_tests/analyze.r test_output.csv test_duration.csv
+      - name: Upload raw data
+        uses: actions/upload-artifact@v3
+        with:
+            name: Raw data
+            path: |
+              test_output.csv
+              test_duration.csv
+      - name: Upload figures
+        uses: actions/upload-artifact@v3
+        with:
+            name: Fit figures
+            path: |
+              D.pdf
+              f.pdf
+              Dp.pdf
+              D_limited.pdf
+              f_limited.pdf
+              Dp_limited.pdf
+              durations.pdf
