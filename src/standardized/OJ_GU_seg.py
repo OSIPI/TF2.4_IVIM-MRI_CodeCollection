@@ -64,8 +64,8 @@ class OJ_GU_seg(OsipiBase):
                     
         fit_results = seg(signals, bvalues, bthr)
         
-        f = fit_results['f']
-        Dstar = fit_results['Dstar']
-        D = fit_results['D']
+        f = np.squeeze(fit_results['f'])
+        Dstar = np.squeeze(fit_results['Dstar'])
+        D = np.squeeze(fit_results['D'])
         
         return f, Dstar, D
