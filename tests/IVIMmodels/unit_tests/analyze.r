@@ -25,7 +25,7 @@ plot_ivim <- function(data, fileExtension) {
     f_plot <- ggplot(data, aes(x=Algorithm)) + geom_boxplot(aes(y=f_fitted)) + geom_boxplot(color="red", aes(y=f)) + facet_grid(SNR ~ Region) + scale_x_discrete(guide = guide_axis(angle = 90)) + ylim(0, 1) + ggtitle("Perfusion fraction grid") + ylab("Perfusion fraction")
     print(f_plot)
     ggsave(paste("f", fileExtension, sep=""), plot=f_plot, width = 50, height = 50, units = "cm")
-    D_plot <- ggplot(data, aes(x=Algorithm)) + geom_boxplot(aes(y=D_fitted)) + geom_boxplot(color="red", aes(y=D)) + facet_grid(SNR ~ Region) + scale_x_discrete(guide = guide_axis(angle = 90)) + ggtitle("Diffusion grid") + ylab("Diffusion")
+    D_plot <- ggplot(data, aes(x=Algorithm)) + geom_boxplot(aes(y=D_fitted)) + geom_boxplot(color="red", aes(y=D)) + facet_grid(SNR ~ Region) + scale_x_discrete(guide = guide_axis(angle = 90)) + ylim(0, 0.005) + ggtitle("Diffusion grid") + ylab("Diffusion")
     print(D_plot)
     ggsave(paste("D", fileExtension, sep=""), plot=D_plot, width = 50, height = 50, units = "cm")
     Dp_plot <- ggplot(data, aes(x=Algorithm)) + geom_boxplot(aes(y=Dp_fitted)) + geom_boxplot(color="red", aes(y=Dp)) + facet_grid(SNR ~ Region) + scale_x_discrete(guide = guide_axis(angle = 90)) + ylim(0, 0.25) + ggtitle("Perfusion grid") + ylab("Perfusion")
@@ -43,8 +43,8 @@ plot_ivim(data_restricted, "_limited.pdf")
 data_duration <- read.csv(duration_name)
 data_duration <- data_duration %>% mutate_if(is.character, as.factor)
 data_duration$ms <- data_duration$Duration..us./data_duration$Count/1000
-ggplot(data_duration, aes(x=Algorithm, y=ms)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 90)) + ggtitle("Fit Duration") + ylab("Time (ms)")
-ggsave("durations.pdf", width = 20, height = 20, units = "cm")
+duration_plot <- ggplot(data_duration, aes(x=Algorithm, y=ms)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 90)) + ggtitle("Fit Duration") + ylab("Time (ms)")
+ggsave("durations.pdf", plot=duration_plot, width = 20, height = 20, units = "cm")
 
 
 if (runPrediction) {
