@@ -65,6 +65,7 @@ if (runPrediction) {
 ivim_decay <- function(f, D, Dp, bvalues) {
     return(f*exp(-Dp*bvalues) + (1-f)*exp(-D*bvalues))
 }
+#TODO: read bvalues from file
 bvalues <- c(0.0, 1.0, 2.0, 5.0, 10.0, 20.0, 30.0, 50.0, 75.0, 100.0, 150.0, 250.0, 350.0, 400.0, 550.0, 700.0, 850.0, 1000.0)
 
 generate_curves <- function(data, bvalues, appended_string) {
@@ -82,3 +83,13 @@ data_curves_restricted <- cbind(curves_restricted, signal_fitted=curves_restrict
 curve_plot <- ggplot(data_curves_restricted, aes(x=bvalue))  + facet_grid(Region ~ SNR) + geom_line(alpha=0.2, aes(y=signal_fitted, group=interaction(Algorithm, index), color=Algorithm)) + geom_line(aes(y=signal)) + ylim(0, 1) + ylab("Signal (a.u.)")
 print(curve_plot)
 ggsave("curve_plot.pdf", plot=curve_plot, width = 30, height = 30, units = "cm")
+
+
+data_points_restricted <- data_restricted[data_restricted$index==0,]
+data_points_restricted <- pivot_longer(data_points_restricted, starts_with("bval_"), names_to="bvalue", values_to="fitted_data", names_prefix="bval_", names_transform=list(bvalue = as.numeric))
+# data_curves_restricted_idx0 <- data_curves_restricted[data_curves_restricted$index==0,]
+data_points_restricted <- cbind(data_curves_restricted[data_curves_restricted$index==0,], fitted_data=data_points_restricted$fitted_data)
+# fitted_curves <- ggplot(data_points_restricted, aes(x=bvalue))  + facet_grid(Region ~ SNR) + geom_line(alpha=0.5, aes(y=signal_fitted, group=Algorithm, color=Algorithm)) + geom_point(aes(y=fitted_data, group=Algorithm, color=Algorithm)) + ylim(0, 1) + ylab("Signal (a.u.)")
+fitted_curves <- ggplot(data_points_restricted, aes(x=bvalue))  + facet_grid(Region ~ SNR) + geom_line(alpha=0.5, aes(y=signal_fitted, group=Algorithm, color=Algorithm)) + geom_point(aes(y=fitted_data, shape="Data")) + ylim(0, 1) + ylab("Signal (a.u.)") + guides(shape = guide_legend("Fitted Data"))
+print(fitted_curves)
+ggsave("fitted_curves.pdf", plot=fitted_curves, width = 30, height = 30, units = "cm")
