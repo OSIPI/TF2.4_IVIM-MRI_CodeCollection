@@ -37,7 +37,7 @@ data <- read.csv(output_name)
 data <- data %>% mutate_if(is.character, as.factor)
 plot_ivim(data, ".pdf")
 
-data_restricted <- data[data$Region %in% c("Liver", "spleen", "Right kydney cortex", "right kidney medulla"),]
+data_restricted <- data[data$Region %in% c("Liver", "Spleen", "Right kidney cortex", "Right kidney medulla"),]
 plot_ivim(data_restricted, "_limited.pdf")
 
 data_duration <- read.csv(duration_name)
