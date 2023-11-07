@@ -4,17 +4,23 @@ class GenerateData:
     """
     Generate exponential and linear data
     """
-    def __init__(self, operator=None):
+    def __init__(self, operator=None, rng=None):
         """
         Parameters
         ----------
         operator : numpy or torch
             Must provide mathematical operators
+        rng : random number generator
+            Must provide normal() operator
         """
         if operator is None:
             self._op = np
         else:
             self._op = operator
+        if rng is None:
+            self._rng = self._op.random
+        else:
+            self._rng = rng
 
     def ivim_signal(self, D, Dp, f, S0, bvalues, snr=None, rician_noise=False):
         """
@@ -91,9 +97,9 @@ class GenerateData:
         real_noise = self._op.zeros_like(real_signal)
         imag_noise = self._op.zeros_like(real_signal)
         if snr is not None:
-            real_noise = self._op.random.normal(0, 1 / snr, real_signal.shape)
+            real_noise = self._rng.normal(0, 1 / snr, real_signal.shape)
             if rician_noise:
-                noisy_data = self._op.sqrt(self._op.power(real_signal, 2) + self._op.power(imag_signal, 2))
+                imag_noise = self._rng.normal(0, 1 / snr, imag_signal.shape)
         noisy_data = self._op.sqrt(self._op.power(real_signal + real_noise, 2) + self._op.power(imag_signal + imag_noise, 2))
         return noisy_data
 

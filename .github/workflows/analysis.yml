@@ -61,3 +61,5 @@ jobs:
               f_limited.pdf
               Dp_limited.pdf
               durations.pdf
+              curve_plot.pdf
+              fitted_curves.pdf
