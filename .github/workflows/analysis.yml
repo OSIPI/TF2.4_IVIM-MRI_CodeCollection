@@ -14,8 +14,9 @@ jobs:
       - name: Read algorithms
         id: read_algorithms
         run: |
-          algorithms=$(cat tests/IVIMmodels/unit_tests/algorithms.json)
-          echo "algorithms=$algorithms" >> $GITHUB_STATE
+          echo "algorithms<<EOF" >> $GITHUB_OUTPUT
+          cat tests/IVIMmodels/unit_tests/algorithms.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
