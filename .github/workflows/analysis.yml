@@ -19,19 +19,17 @@ jobs:
         with:
           python-version: "3.11"
           cache: 'pip'
-      - name: Cache virtualenv
-        uses: actions/cache@v3
-        with:
-          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements.txt') }}
-          path: .venv
+      # - name: Cache virtualenv
+      #   uses: actions/cache@v3
+      #   with:
+      #     key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements.txt') }}
+      #     path: .venv
       - name: Install dependencies
         run: |
           python -m venv .venv
           source .venv/bin/activate
           python -m pip install -r requirements.txt
           python -m pip install pytest
-          echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
-          echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
       - name: Read algorithms
         id: algorithms
         run: |
@@ -61,11 +59,11 @@ jobs:
         with:
           python-version: "3.11"
           cache: 'pip'
-      - name: Cache virtualenv
-        uses: actions/cache@v3
-        with:
-          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements.txt') }}
-          path: .venv
+      # - name: Cache virtualenv
+      #   uses: actions/cache@v3
+      #   with:
+      #     key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements.txt') }}
+      #     path: .venv
       - name: Install dependencies
         run: |
           python -m venv .venv
@@ -79,7 +77,8 @@ jobs:
       - name: Upload raw data
         uses: actions/upload-artifact@v3
         with:
-            name: WorkingData
+            name: Working_Data
+            retention-days: 1
             path: |
               test_output_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv
               test_duration_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv
@@ -94,14 +93,14 @@ jobs:
           path: artifacts
       - name: Merge fitting results
         run: |
-          cat artifacts/WorkingData/test_output_*.csv > test_output.csv
+          cat artifacts/Working_Data/test_output_*.csv > test_output.csv
       - name: Merge timing results
         run: |
-          cat artifacts/WorkingData/test_duration_*.csv > test_duration.csv
+          cat artifacts/Working_Data/test_duration_*.csv > test_duration.csv
       - name: Upload merged artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: Combined Data
+          name: Data
           path: |
             test_output.csv
             test_duration.csv
@@ -127,13 +126,13 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: Raw Data
+          name: Data
       - name: Generate figures
         run: Rscript --vanilla tests/IVIMmodels/unit_tests/analyze.r test_output.csv test_duration.csv
       - name: Upload figures
         uses: actions/upload-artifact@v3
         with:
-            name: Fit Figures
+            name: Figures
             path: |
               D.pdf
               f.pdf
