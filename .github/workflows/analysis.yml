@@ -13,6 +13,26 @@ jobs:
       algorithms: ${{ steps.algorithms.outputs.algorithms }}
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Python
+        id: setup_python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: 'pip'
+      - name: Cache virtualenv
+        uses: actions/cache@v3
+        with:
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements.txt') }}
+          path: .venv
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pytest
+          echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
       - name: Read algorithms
         id: algorithms
         run: |
@@ -42,21 +62,28 @@ jobs:
         with:
           python-version: "3.11"
           cache: 'pip'
+      - name: Cache virtualenv
+        uses: actions/cache@v3
+        with:
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements.txt') }}
+          path: .venv
       - name: Install dependencies
         run: |
+          python -m venv .venv
+          source .venv/bin/activate
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install -r requirements.txt
+          python -m pip install pytest
       - name: Generate fitting data
         run: |
-          pip install pytest
-          python -m pytest -m slow --selectAlgorithm ${{ matrix.algorithm }} --saveFileName test_output.csv --SNR ${{ matrix.SNR }} --fitCount 300 --saveDurationFileName test_duration.csv
+          python -m pytest -m slow --selectAlgorithm ${{ matrix.algorithm }} --saveFileName test_output_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv --SNR ${{ matrix.SNR }} --fitCount 300 --saveDurationFileName test_duration_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv
       - name: Upload raw data
         uses: actions/upload-artifact@v3
         with:
-            name: raw_data_${{ matrix.algorithm }}_${{ matrix.SNR }}
+            name: WorkingData
             path: |
-              test_output.csv
-              test_duration.csv
+              test_output_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv
+              test_duration_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv
 
   merge:
     runs-on: ubuntu-latest
@@ -68,14 +95,14 @@ jobs:
           path: artifacts
       - name: Merge fitting results
         run: |
-          cat artifacts/raw_data_*/test_output.csv > test_output.csv
+          cat artifacts/WorkingData/test_output_*.csv > test_output.csv
       - name: Merge timing results
         run: |
-          cat artifacts/raw_data_*/test_duration.csv > test_duration.csv
+          cat artifacts/WorkingData/test_duration_*.csv > test_duration.csv
       - name: Upload merged artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: Raw Data
+          name: Combined Data
           path: |
             test_output.csv
             test_duration.csv
@@ -84,6 +111,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: merge
     steps:
+      - uses: actions/checkout@v3
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
         with: 
