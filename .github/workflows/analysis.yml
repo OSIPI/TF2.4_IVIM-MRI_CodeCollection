@@ -16,11 +16,13 @@ jobs:
       - name: Read algorithms
         id: algorithms
         run: |
-          echo "algorithms<<EOF" >> $GITHUB_OUTPUT
+          echo 'algorithms<<EOF' >> $GITHUB_OUTPUT
           cat ./tests/IVIMmodels/unit_tests/algorithms.json >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
       - name: Log algorithms
-        run: echo "${{fromJson(steps.algorithms.outputs.algorithms).algorithms}}"
+        run: |
+          echo "${{fromJson(steps.algorithms.outputs.algorithms)}}"
+          echo "${{fromJson(steps.algorithms.outputs.algorithms).algorithms}}"
       - name: Log algorithms file
         run: cat ./tests/IVIMmodels/unit_tests/algorithms.json
 
