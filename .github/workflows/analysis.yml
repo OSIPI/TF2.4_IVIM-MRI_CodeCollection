@@ -10,7 +10,7 @@ jobs:
   algorithms:
     runs-on: ubuntu-latest
     outputs: # here we use the outputs from steps, and set outputs for the job `configure`
-      config: ${{ steps.algorithms.outputs.algorithms }}
+      algorithms: ${{ steps.algorithms.outputs.algorithms }}
     steps:
       - uses: actions/checkout@v3
       - name: Read algorithms
@@ -23,8 +23,6 @@ jobs:
         run: |
           echo "${{fromJson(steps.algorithms.outputs.algorithms)}}"
           echo "${{fromJson(steps.algorithms.outputs.algorithms).algorithms}}"
-          echo "${{fromJson(steps.algorithms.outputs.algorithms.algorithms)}}"
-          echo "${{fromJson(steps.algorithms.outputs.algorithms.algorithms).algorithms}}"
       - name: Log algorithms file
         run: cat ./tests/IVIMmodels/unit_tests/algorithms.json
 
