@@ -15,7 +15,7 @@ jobs:
         id: read_algorithms
         run: |
           algorithms=$(cat tests/IVIMmodels/unit_tests/algorithms.json)
-          echo "::set-output name=algorithms::$algorithms"
+          echo "algorithms=$algorithms" >> $GITHUB_STATE
 
   build:
     runs-on: ubuntu-latest
