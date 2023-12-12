@@ -23,6 +23,8 @@ jobs:
         run: |
           echo "${{fromJson(steps.algorithms.outputs.algorithms)}}"
           echo "${{fromJson(steps.algorithms.outputs.algorithms).algorithms}}"
+          echo "${{fromJson(steps.algorithms.outputs.algorithms.algorithms)}}"
+          echo "${{fromJson(steps.algorithms.outputs.algorithms.algorithms).algorithms}}"
       - name: Log algorithms file
         run: cat ./tests/IVIMmodels/unit_tests/algorithms.json
 
