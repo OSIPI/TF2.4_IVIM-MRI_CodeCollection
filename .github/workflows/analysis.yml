@@ -52,7 +52,7 @@ jobs:
       - name: Upload raw data
         uses: actions/upload-artifact@v3
         with:
-            name: RawData/raw_data_${{ matrix.algorithm }}_${{ matrix.SNR }}
+            name: raw_data_${{ matrix.algorithm }}_${{ matrix.SNR }}
             path: |
               test_output.csv
               test_duration.csv
