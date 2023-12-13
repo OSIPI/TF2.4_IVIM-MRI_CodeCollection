@@ -93,10 +93,12 @@ jobs:
           path: artifacts
       - name: Merge fitting results
         run: |
-          cat artifacts/Working_Data/test_output_*.csv > test_output.csv
+          head -n 1 $(ls artifacts/Working_Data/test_output_*.csv | head -n 1) > test_output.csv
+          tail -q -n +2 test_output_*.csv > test_output.csv
       - name: Merge timing results
         run: |
-          cat artifacts/Working_Data/test_duration_*.csv > test_duration.csv
+          head -n 1 $(ls artifacts/Working_Data/test_duration_*.csv | head -n 1) > test_duration.csv
+          tail -q -n +2 test_duration_*.csv > test_duration.csv
       - name: Upload merged artifacts
         uses: actions/upload-artifact@v3
         with:
