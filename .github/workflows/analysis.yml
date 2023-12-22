@@ -118,6 +118,7 @@ jobs:
           use-public-rspm: true
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
+        cache: true
         with:
           packages: |
             any::plyr
@@ -157,10 +158,10 @@ jobs:
           use-public-rspm: true
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
+        cache: true
         with:
           packages: |
             any::tidyverse
-            any::stats
             any::assertr
       - name: Download artifacts
         uses: actions/download-artifact@v3
@@ -168,3 +169,10 @@ jobs:
           name: Data
       - name: Test against previous results
         run: Rscript --vanilla tests/IVIMmodels/unit_tests/compare.r test_output.csv test_reference.csv reference_output.csv test_results.csv
+      - name: Upload data
+        uses: actions/upload-artifact@v3
+        with:
+            name: Comparison
+            path: |
+              test_reference.csv
+              test_results.csv
