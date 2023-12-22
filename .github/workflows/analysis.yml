@@ -166,7 +166,7 @@ jobs:
         with:
           name: Data
       - name: Test against previous results
-        run: Rscript --vanilla tests/IVIMmodels/unit_tests/compare.r test_output.csv test_reference.csv reference_output.csv test_results.csv
+        run: Rscript --vanilla tests/IVIMmodels/unit_tests/compare.r test_output.csv test_reference.csv tests/IVIMmodels/unit_tests/reference_output.csv test_results.csv
       - name: Upload data
         uses: actions/upload-artifact@v3
         with:
