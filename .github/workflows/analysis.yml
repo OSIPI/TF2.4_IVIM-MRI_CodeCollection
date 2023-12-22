@@ -118,7 +118,6 @@ jobs:
           use-public-rspm: true
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
-        cache: true
         with:
           packages: |
             any::plyr
@@ -158,7 +157,6 @@ jobs:
           use-public-rspm: true
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
-        cache: true
         with:
           packages: |
             any::tidyverse
