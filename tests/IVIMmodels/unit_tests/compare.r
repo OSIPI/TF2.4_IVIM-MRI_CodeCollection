@@ -34,7 +34,7 @@ library(assertr)
 alpha <- 0.45  # be sensitive to changes
 
 # Define desired columns to keep
-keep_columns_reference <- c("Algorithm", "Region", "SNR", "f", "Dp", "D", "f_mu", "Dp_mu", "D_mu", "f_alpha", "Dp_alpha", "D_alpha", "f_std", "Dp_std", "D_std", "f_df", "Dp_df", "D_df")
+keep_columns_reference <- c("Algorithm", "Region", "SNR", "f", "Dp", "D", "f_mu", "Dp_mu", "D_mu", "f_t_alpha", "Dp_t_alpha", "D_t_alpha", "f_f_alpha", "Dp_f_alpha", "D_f_alpha", "f_std", "Dp_std", "D_std", "f_df", "Dp_df", "D_df")
 keep_columns_test <- c("Algorithm", "Region", "SNR", "index", "f", "Dp", "D", "f_fitted", "Dp_fitted", "D_fitted")
 
 test <- read_csv(test_file) %>%
@@ -57,10 +57,13 @@ summary_data <- grouped_data %>%
     Dp_mu = mean(Dp_fitted),
     D_mu = mean(D_fitted),
 
-    # Also insert alpha values here
-    f_alpha = alpha,
-    Dp_alpha = alpha,
-    D_alpha = alpha,
+    # Also insert default alpha values here
+    f_t_alpha = alpha,
+    Dp_t_alpha = alpha,
+    D_t_alpha = alpha,
+    f_f_alpha = alpha,
+    Dp_f_alpha = alpha,
+    D_f_alpha = alpha,
 
     # Calculate group standard deviations
     f_std = sd(f_fitted),
@@ -119,24 +122,32 @@ test_results <- reference_combined %>%
     Dp_ttest_upper = pt((Dp_mu.x - Dp_mu.y) / (Dp_std.x / sqrt(Dp_df.x + 1)), df=Dp_df.y, lower.tail=FALSE),
     D_ttest_lower = pt((D_mu.x - D_mu.y) / (D_std.x / sqrt(D_df.x + 1)), df=D_df.y, lower.tail=TRUE),
     D_ttest_upper = pt((D_mu.x - D_mu.y) / (D_std.x / sqrt(D_df.x + 1)), df=D_df.y, lower.tail=FALSE),
+
+    # alphas from reference
+    f_f_alpha = f_f_alpha.y[1],
+    Dp_f_alpha = Dp_f_alpha.y[1],
+    D_f_alpha = D_f_alpha.y[1],
+    f_t_alpha = f_t_alpha.y[1],
+    Dp_t_alpha = Dp_t_alpha.y[1],
+    D_t_alpha = D_t_alpha.y[1],
   )
 
 
 test_results <- test_results %>%
   mutate(
-    f_ftest_lower_null = f_ftest_lower >= alpha,
-    f_ftest_upper_null = f_ftest_upper >= alpha,
-    Dp_ftest_lower_null = Dp_ftest_lower >= alpha,
-    Dp_ftest_upper_null = Dp_ftest_upper >= alpha,
-    D_ftest_lower_null = D_ftest_lower >= alpha,
-    D_ftest_upper_null = D_ftest_upper >= alpha,
+    f_ftest_lower_null = f_ftest_lower >= f_f_alpha,
+    f_ftest_upper_null = f_ftest_upper >= f_f_alpha,
+    Dp_ftest_lower_null = Dp_ftest_lower >= Dp_f_alpha,
+    Dp_ftest_upper_null = Dp_ftest_upper >= Dp_f_alpha,
+    D_ftest_lower_null = D_ftest_lower >= D_f_alpha,
+    D_ftest_upper_null = D_ftest_upper >= D_f_alpha,
 
-    f_ttest_lower_null = f_ttest_lower >= alpha,
-    f_ttest_upper_null = f_ttest_upper >= alpha,
-    Dp_ttest_lower_null = Dp_ttest_lower >= alpha,
-    Dp_ttest_upper_null = Dp_ttest_upper >= alpha,
-    D_ttest_lower_null = D_ttest_lower >= alpha,
-    D_ttest_upper_null = D_ttest_upper >= alpha,
+    f_ttest_lower_null = f_ttest_lower >= f_t_alpha,
+    f_ttest_upper_null = f_ttest_upper >= f_t_alpha,
+    Dp_ttest_lower_null = Dp_ttest_lower >= Dp_t_alpha,
+    Dp_ttest_upper_null = Dp_ttest_upper >= Dp_t_alpha,
+    D_ttest_lower_null = D_ttest_lower >= D_t_alpha,
+    D_ttest_upper_null = D_ttest_upper >= D_t_alpha,
   )
 
 
