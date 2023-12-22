@@ -38,7 +38,7 @@ keep_columns_reference <- c("Algorithm", "Region", "SNR", "f", "Dp", "D", "f_mu"
 keep_columns_test <- c("Algorithm", "Region", "SNR", "index", "f", "Dp", "D", "f_fitted", "Dp_fitted", "D_fitted")
 
 test <- read_csv(test_file) %>%
-  select(keep_columns_test) %>%
+  select(all_of(keep_columns_test)) %>%
   # Convert Algorithm and Region to factors
   mutate(Algorithm = as.factor(Algorithm), Region = as.factor(Region))
 
@@ -94,7 +94,7 @@ if (nchar(reference_file) == 0) {
 
 # Read data from CSV files and select only relevant columns
 reference <- read_csv(reference_file) %>%
-  select(keep_columns_reference) %>%
+  select(all_of(keep_columns_reference)) %>%
   # Convert Algorithm and Region to factors
   mutate(Algorithm = as.factor(Algorithm), Region = as.factor(Region)) 
 
