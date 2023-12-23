@@ -155,18 +155,18 @@ test_results <- test_results %>%
 write.csv(test_results, test_result_file, row.names=TRUE)
 
 # Fail if we had failures
-test_results %>% verify(f_ftest_lower_null)
-test_results %>% verify(f_ftest_upper_null)
-test_results %>% verify(Dp_ftest_lower_null)
-test_results %>% verify(Dp_ftest_upper_null)
-test_results %>% verify(D_ftest_lower_null)
-test_results %>% verify(D_ftest_upper_null)
-test_results %>% verify(f_ttest_lower_null)
-test_results %>% verify(f_ttest_upper_null)
-test_results %>% verify(Dp_ttest_lower_null)
-test_results %>% verify(Dp_ttest_upper_null)
-test_results %>% verify(D_ttest_lower_null)
-test_results %>% verify(D_ttest_upper_null)
+test_results %>% verify(f_ftest_lower_null) %>%  summarize(n=n())
+test_results %>% verify(f_ftest_upper_null) %>%  summarize(n=n())
+test_results %>% verify(Dp_ftest_lower_null) %>%  summarize(n=n())
+test_results %>% verify(Dp_ftest_upper_null) %>%  summarize(n=n())
+test_results %>% verify(D_ftest_lower_null) %>%  summarize(n=n())
+test_results %>% verify(D_ftest_upper_null) %>%  summarize(n=n())
+test_results %>% verify(f_ttest_lower_null) %>%  summarize(n=n())
+test_results %>% verify(f_ttest_upper_null) %>%  summarize(n=n())
+test_results %>% verify(Dp_ttest_lower_null) %>%  summarize(n=n())
+test_results %>% verify(Dp_ttest_upper_null) %>%  summarize(n=n())
+test_results %>% verify(D_ttest_lower_null) %>%  summarize(n=n())
+test_results %>% verify(D_ttest_upper_null) %>%  summarize(n=n())
 
 
 
