@@ -35,9 +35,11 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
+        #super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
+        super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
         self.OGC_algorithm = fit_least_squares
-        self.initialize(bounds, initial_guess, fitS0)
+        #self.initialize(bounds, initial_guess, fitS0)
+        self.fitS0=fitS0
 
     def initialize(self, bounds, initial_guess, fitS0):
         if bounds is None:
@@ -60,6 +62,7 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
+
         if initial_guess is not None and len(initial_guess) == 4:
             self.initial_guess = initial_guess
         bvalues=np.array(bvalues)
