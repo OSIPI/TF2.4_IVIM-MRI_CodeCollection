@@ -36,7 +36,7 @@ class IAR_LU_biexp(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(IAR_LU_biexp, self).__init__(bvalues, thresholds, bounds=bounds, initial_guess=initial_guess)
+        super(IAR_LU_biexp, self).__init__(bvalues, thresholds, bounds, initial_guess)
         
         # Check the inputs
         
