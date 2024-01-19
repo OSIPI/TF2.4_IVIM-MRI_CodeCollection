@@ -22,6 +22,9 @@ def dev_test_run(model, **kwargs):
         return S0*(f*np.exp(-b*Dstar) + (1-f)*np.exp(-b*D))
 
     signals = ivim_model(bvalues)
+    data = np.array([signals, signals, signals])
+    #print(data)
+    signals = data
 
     #model = ETP_SRI_LinearFitting(thresholds=[200])
     if kwargs:
@@ -33,7 +36,7 @@ def dev_test_run(model, **kwargs):
     
 #model1 = ETP_SRI_LinearFitting(thresholds=[200])
 #model2 = IAR_LU_biexp(bounds=([0,0,0,0], [1,1,1,1]))
-model2 = IAR_LU_modified_mix()
+#model2 = IAR_LU_modified_mix()
 model2 = OGC_AmsterdamUMC_biexp()
 
 #dev_test_run(model1)
