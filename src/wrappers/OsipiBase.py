@@ -3,6 +3,7 @@ import importlib
 from scipy.stats import norm
 import pathlib
 import sys
+from tqdm import tqdm
 
 class OsipiBase:
     """The base class for OSIPI IVIM fitting"""
@@ -84,10 +85,11 @@ class OsipiBase:
         #args = [arg for arg in args if arg is not None]
 
         # Assuming the last dimension of the data is the signal values of each b-value
-        results = np.empty(data.shape[:-1], dtype=object)
-        for ijk in np.ndindex(data.shape[:-1]):
+        results = np.empty(list(data.shape[:-1])+[3]) # Create an array with the voxel dimensions + the ones required for the fit
+        for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
             args = [data[ijk], use_bvalues]
-            results[ijk] = self.ivim_fit(*args, **kwargs)
+            fit = list(self.ivim_fit(*args, **kwargs))
+            results[ijk] = fit
         
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         return results
