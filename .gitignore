@@ -2,6 +2,8 @@
 .github*
 __pycache__/
 *.nii.gz
+*.mat
+*.npy
 bvals.txt
 # Unit test / coverage reports
 .tox/
