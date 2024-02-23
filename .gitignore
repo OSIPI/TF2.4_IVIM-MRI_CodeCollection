@@ -4,6 +4,10 @@
 .github/pull_request_template.md
 __pycache__/
 *.nii.gz
+*.nii
+*.dcm
+*.mat
+*.raw
 bvals.txt
 # Unit test / coverage reports
 .tox/
