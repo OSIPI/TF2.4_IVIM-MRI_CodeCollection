@@ -1,6 +1,7 @@
 .idea*
 .github/*
-!.github/pull_request_template.md
+.github/ISSUE_TEMPLATE/
+.github/pull_request_template.md
 __pycache__/
 *.nii.gz
 bvals.txt
