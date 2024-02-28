@@ -9,6 +9,12 @@ __pycache__/
 *.mat
 *.raw
 bvals.txt
+download
+md5sums.txt
+*.gz
+*.zip
+*.tmp
+
 # Unit test / coverage reports
 .tox/
 .coverage
