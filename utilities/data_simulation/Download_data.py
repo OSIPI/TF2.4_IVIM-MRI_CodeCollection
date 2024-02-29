@@ -21,7 +21,7 @@ def download_data(force=False):
         os.makedirs(os.path.join(base_folder,'download'))
         print(f"Folder '{'download'}' created.")
         # Change to the specified folder
-        os.chdir(os.path.join(base_folder,'download'))
+    os.chdir(os.path.join(base_folder,'download'))
     subprocess.run(["zenodo_get", 'https://zenodo.org/records/10696605'])
     while not os.path.exists('OSIPI_TF24_data_phantoms.zip'):
         time.sleep(1)
