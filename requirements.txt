@@ -8,3 +8,5 @@ dipy
 matplotlib
 scienceplots
 cvxpy
+pytest
+tqdm
