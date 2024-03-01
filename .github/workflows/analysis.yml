@@ -146,6 +146,20 @@ jobs:
               durations.pdf
               curve_plot.pdf
               fitted_curves.pdf
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: Figures
+
+      - name: Create Build Directory and Move PDFs
+        run: |
+          mkdir build
+          mv *.pdf index.html build/
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          branch: gh-pages
+          folder: build
 
   compare:
     runs-on: ubuntu-latest
