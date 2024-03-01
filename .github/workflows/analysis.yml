@@ -89,7 +89,7 @@ jobs:
     needs: build
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           path: artifacts
       - name: Merge fitting results
@@ -127,7 +127,7 @@ jobs:
             any::data.table
             any::ggplot2
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: Data
       - name: Generate figures
@@ -164,7 +164,7 @@ jobs:
             any::tidyverse
             any::assertr
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: Data
       - name: Test against previous results
