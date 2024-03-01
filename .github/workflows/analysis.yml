@@ -5,6 +5,7 @@ on:
     branches:
       - 'main'
       - 'analysis/**'
+      - 'usman'
 
 jobs:
   algorithms:
