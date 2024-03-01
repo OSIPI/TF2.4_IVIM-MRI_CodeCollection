@@ -76,7 +76,7 @@ jobs:
           source .venv/bin/activate
           python -m pytest -m slow --selectAlgorithm ${{ matrix.algorithm }} --saveFileName test_output_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv --SNR ${{ matrix.SNR }} --fitCount 300 --saveDurationFileName test_duration_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv
       - name: Upload raw data
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
             name: Working_Data
             retention-days: 1
@@ -101,7 +101,7 @@ jobs:
           head -n 1 $(ls artifacts/Working_Data/test_duration_*.csv | head -n 1) > test_duration.csv
           tail -q -n +2 artifacts/Working_Data/test_duration_*.csv >> test_duration.csv
       - name: Upload merged artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: Data
           path: |
@@ -133,7 +133,7 @@ jobs:
       - name: Generate figures
         run: Rscript --vanilla tests/IVIMmodels/unit_tests/analyze.r test_output.csv test_duration.csv
       - name: Upload figures
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: always()
         with:
             name: Figures
