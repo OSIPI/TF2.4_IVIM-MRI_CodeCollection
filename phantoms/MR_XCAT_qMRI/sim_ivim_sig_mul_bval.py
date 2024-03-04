@@ -2,6 +2,7 @@ import numpy as np
 from scipy.io import loadmat
 import nibabel as nib
 import json
+from b_values import b_values
 
 ##########
 # code written by Oliver J Gurney-Champion
@@ -16,7 +17,7 @@ def phantom(bvalue, noise, TR=8000, TE=80, motion=False, rician=False, interleav
         states = [1]
     for state in states:
         # Load the .mat file
-        mat_data = loadmat('XCAT_MAT_RESP/XCAT5D_RP_' + str(state) + '_CP_1.mat')
+        mat_data = loadmat('XCAT5D_RP_' + str(state) + '_CP_1.mat')
 
         # Access the variables in the loaded .mat file
         XCAT = mat_data['IMG']
@@ -364,76 +365,81 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
     return MR, Dim, fim, Dpim, legend
 
 if __name__ == '__main__':
-    bvalue = np.array([0., 1, 2, 5, 10, 20, 30, 50, 75, 100, 150, 250, 350, 400, 550, 700, 850, 1000])
+    # bvalue = np.array([0., 1, 2, 5, 10, 20, 30, 50, 75, 100, 150, 250, 350, 400, 550, 700, 850, 1000])
     noise = 0.0005
     motion = False
     interleaved = False
-    sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=interleaved)
-    # sig = np.flip(sig,axis=0)
-    # sig = np.flip(sig,axis=1)
-    res=np.eye(4)
-    res[2]=2
 
-    voxel_selector_fraction = 0.5
-    D, f, Ds = contrast_curve_calc()
-    ignore = np.isnan(D)
-    generic_data = {}
-    for level, name in legend.items():
-        if len(ignore) > level and ignore[level]:
-            continue
-        selector = XCAT == level
-        voxels = sig[selector]
-        if len(voxels) < 1:
-            continue
-        signals = np.squeeze(voxels[int(voxels.shape[0] * voxel_selector_fraction)]).tolist()
-        generic_data[name] = {
-            'noise': noise,
-            'D': np.mean(Dim[selector], axis=0),
-            'f': np.mean(fim[selector], axis=0),
-            'Dp': np.mean(Dpim[selector], axis=0),
-            'data': signals
+    for bvalue_key, bvalue in b_values.items():
+        bvalue = np.array(bvalue)
+        sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=interleaved)
+        # sig = np.flip(sig,axis=0)
+        # sig = np.flip(sig,axis=1)
+        res=np.eye(4)
+        res[2]=2
+
+        voxel_selector_fraction = 0.5
+        D, f, Ds = contrast_curve_calc()
+        ignore = np.isnan(D)
+        generic_data = {}
+        for level, name in legend.items():
+            if len(ignore) > level and ignore[level]:
+                continue
+            selector = XCAT == level
+            voxels = sig[selector]
+            if len(voxels) < 1:
+                continue
+            signals = np.squeeze(voxels[int(voxels.shape[0] * voxel_selector_fraction)]).tolist()
+            generic_data[name] = {
+                'noise': noise,
+                'D': np.mean(Dim[selector], axis=0),
+                'f': np.mean(fim[selector], axis=0),
+                'Dp': np.mean(Dpim[selector], axis=0),
+                'data': signals
+            }
+        generic_data['config'] = {
+            'bvalues': bvalue.tolist()
         }
-    generic_data['config'] = {
-        'bvalues': bvalue.tolist()
-    }
-    with open('generic.json', 'w') as f:
-        json.dump(generic_data, f, indent=4)
+
+        b_value_identifier = bvalue_key.split("_")[2]
+        with open(f'generic_{b_value_identifier}.json', 'w') as f:
+            json.dump(generic_data, f, indent=4)
 
 
-    nifti_img = nib.Nifti1Image(sig, affine=res)  # Replace affine if necessary
-    # Save the NIfTI image to a file
-    nifti_img.header.set_data_dtype(np.float64)
-    if not motion:
-        output_file = 'output.nii.gz'  # Replace with your desired output file name
-    elif interleaved:
-        output_file = 'output_resp_int.nii.gz'  # Replace with your desired output file name
-    else:
-        output_file = 'output_resp.nii.gz'  # Replace with your desired output file name
+        nifti_img = nib.Nifti1Image(sig, affine=res)  # Replace affine if necessary
+        # Save the NIfTI image to a file
+        nifti_img.header.set_data_dtype(np.float64)
+        if not motion:
+            output_file = f'output_{b_value_identifier}.nii.gz'  # Replace with your desired output file name
+        elif interleaved:
+            output_file = f'output_resp_int_{b_value_identifier}.nii.gz'  # Replace with your desired output file name
+        else:
+            output_file = f'output_resp_{b_value_identifier}.nii.gz'  # Replace with your desired output file name
 
-    nib.save(nifti_img, output_file)
+        nib.save(nifti_img, output_file)
 
 
-    nifti_img = nib.Nifti1Image(XCAT, affine=res)  # Replace affine if necessary
-    # Save the NIfTI image to a file
-    output_file = 'output_xcat.nii.gz'  # Replace with your desired output file name
-    nib.save(nifti_img, output_file)
+        nifti_img = nib.Nifti1Image(XCAT, affine=res)  # Replace affine if necessary
+        # Save the NIfTI image to a file
+        output_file = f'output_xcat_{b_value_identifier}.nii.gz'  # Replace with your desired output file name
+        nib.save(nifti_img, output_file)
 
-    nifti_img = nib.Nifti1Image(Dim, affine=res)  # Replace affine if necessary
-    # Save the NIfTI image to a file
-    nifti_img.header.set_data_dtype(np.float64)
-    output_file = 'D.nii.gz'  # Replace with your desired output file name
-    nib.save(nifti_img, output_file)
+        nifti_img = nib.Nifti1Image(Dim, affine=res)  # Replace affine if necessary
+        # Save the NIfTI image to a file
+        nifti_img.header.set_data_dtype(np.float64)
+        output_file = f'D_{b_value_identifier}.nii.gz'  # Replace with your desired output file name
+        nib.save(nifti_img, output_file)
 
-    nifti_img = nib.Nifti1Image(fim, affine=res)  # Replace affine if necessary
-    # Save the NIfTI image to a file
-    nifti_img.header.set_data_dtype(np.float64)
-    output_file = 'f.nii.gz'  # Replace with your desired output file name
-    nib.save(nifti_img, output_file)
+        nifti_img = nib.Nifti1Image(fim, affine=res)  # Replace affine if necessary
+        # Save the NIfTI image to a file
+        nifti_img.header.set_data_dtype(np.float64)
+        output_file = f'f_{b_value_identifier}.nii.gz'  # Replace with your desired output file name
+        nib.save(nifti_img, output_file)
 
-    nifti_img = nib.Nifti1Image(Dpim, affine=res)  # Replace affine if necessary
-    # Save the NIfTI image to a file
-    nifti_img.header.set_data_dtype(np.float64)
-    output_file = 'Dp.nii.gz'  # Replace with your desired output file name
-    nib.save(nifti_img, output_file)
+        nifti_img = nib.Nifti1Image(Dpim, affine=res)  # Replace affine if necessary
+        # Save the NIfTI image to a file
+        nifti_img.header.set_data_dtype(np.float64)
+        output_file = f'Dp_{b_value_identifier}.nii.gz'  # Replace with your desired output file name
+        nib.save(nifti_img, output_file)
 
-    np.savetxt('bvals.txt', bvalue)
+        np.savetxt(f'bvals_{b_value_identifier}.txt', bvalue)

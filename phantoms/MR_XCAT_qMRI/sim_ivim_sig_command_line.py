@@ -2,6 +2,7 @@ import numpy as np
 from scipy.io import loadmat
 import nibabel as nib
 import json
+import argparse
 
 ##########
 # code written by Oliver J Gurney-Champion
@@ -103,7 +104,7 @@ def contrast_curve_calc():
     D[36] = 3e-3  # 36 artery
     D[37] = 3e-3  # 37 vein
     D[40] = 1.31e-3  # 40 asc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
-    D[41] = 1.31e-3  # 41 trans lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
+    D[41] = 1.31e-3  # 41 trans lower# If conversion fails, try splitting the input as a lis intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
     D[42] = 1.31e-3  # 42 desc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
     D[43] = 1.31e-3  # 43 small intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
     D[50] = 3e-3  # 50 pericardium
@@ -364,10 +365,23 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
     return MR, Dim, fim, Dpim, legend
 
 if __name__ == '__main__':
-    bvalue = np.array([0., 1, 2, 5, 10, 20, 30, 50, 75, 100, 150, 250, 350, 400, 550, 700, 850, 1000])
-    noise = 0.0005
-    motion = False
-    interleaved = False
+    parser = argparse.ArgumentParser(description=f"""
+    A commnadline for generating a 4D IVIM phantom as nifti file
+                                    """)
+    parser.add_argument("-b", "--bvalue", type=float,
+                        default=[0., 1, 2, 5, 10, 20, 30, 50, 75, 100, 150, 250, 350, 400, 550, 700, 850, 1000],
+                        nargs="+",
+                        help="B values (list of of numbers)")
+    parser.add_argument("-n", "--noise", type=float, default=0.0005, help="Noise")
+    parser.add_argument("-m", "--motion", action="store_true", help="Motion flag")
+    parser.add_argument("-i", "--interleaved", action="store_true", help="Interleaved flag")
+    args = parser.parse_args()
+
+    bvalue = np.array(args.bvalue)
+    noise = args.noise
+    motion = args.motion
+    interleaved = args.interleaved
+
     sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=interleaved)
     # sig = np.flip(sig,axis=0)
     # sig = np.flip(sig,axis=1)
