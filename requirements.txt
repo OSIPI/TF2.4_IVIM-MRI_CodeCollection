@@ -9,3 +9,5 @@ matplotlib
 scienceplots
 cvxpy
 zenodo-get
+pytest
+tqdm
