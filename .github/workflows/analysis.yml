@@ -22,7 +22,7 @@ jobs:
         uses: actions/cache@v3
         id: pip-cache
         with:
-          key: ${{ env.pythonLocation }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-${{ env.pythonLocation }}-pip-${{ hashFiles('**/requirements.txt') }}
           path: ${{ env.pythonLocation }}
         if: steps.pip-cache.outputs.cache-hit != 'true'
 
@@ -63,7 +63,7 @@ jobs:
         id: python-cache
         uses: actions/cache@v3
         with:
-          key: ${{ env.pythonLocation }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-${{ env.pythonLocation }}-pip-${{ hashFiles('**/requirements.txt') }}
           path: ${{ env.pythonLocation }}
 
       - name: Generate fitting data
