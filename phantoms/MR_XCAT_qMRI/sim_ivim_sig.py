@@ -4,13 +4,16 @@ import nibabel as nib
 import json
 import argparse
 import os
+from utilities.data_simulation.Download_data import download_data
+
 
 ##########
 # code written by Oliver J Gurney-Champion
 # code adapted from MAtlab code by Eric Schrauben: https://github.com/schrau24/XCAT-ERIC
 # This code generates a 4D IVIM phantom as nifti file
 
-def phantom(bvalue, noise, TR=8000, TE=80, motion=False, rician=False, interleaved=False):
+def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleaved=False):
+    download_data()
     np.random.seed(42)
     if motion:
         states = range(1,21)
@@ -18,7 +21,7 @@ def phantom(bvalue, noise, TR=8000, TE=80, motion=False, rician=False, interleav
         states = [1]
     for state in states:
         # Load the .mat file
-        mat_data = loadmat('XCAT_MAT_RESP/XCAT5D_RP_' + str(state) + '_CP_1.mat')
+        mat_data = loadmat('../../download/Phantoms/XCAT_MAT_RESP/XCAT5D_RP_' + str(state) + '_CP_1.mat')
 
         # Access the variables in the loaded .mat file
         XCAT = mat_data['IMG']

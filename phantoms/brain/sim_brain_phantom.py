@@ -4,8 +4,10 @@ import json
 import numpy as np
 import nibabel as nib
 from scipy.ndimage import zoom
+from utilities.data_simulation.Download_data import download_data
 
 if __name__ == "__main__":
+    download_data()
 
     DIFFUSIVE_REGIME = 'diffusive'
     BALLISTIC_REGIME = 'ballistic'
@@ -22,7 +24,7 @@ if __name__ == "__main__":
 
 
     # Ground truth
-    nii = nib.load(os.path.join(folder,'ground_truth','hrgt_icbm_2009a_nls_3t.nii.gz'))
+    nii = nib.load(os.path.join(os.path.split(os.path.split(folder)[0])[0],'download','Phantoms','brain','ground_truth','hrgt_icbm_2009a_nls_3t.nii.gz'))
     segmentation = np.squeeze(nii.get_fdata()[...,-1])
 
     with open(os.path.join(folder,'ground_truth',regime+'_groundtruth.json'), 'r') as f:
