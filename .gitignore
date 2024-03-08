@@ -16,3 +16,4 @@ bvals.txt
 nosetests.xml
 coverage.xml
 *.pyc
+local.env
