@@ -12,7 +12,6 @@ from utilities.data_simulation.Download_data import download_data
 # This code generates a 4D IVIM phantom as nifti file
 
 def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleaved=False):
-    download_data()
     np.random.seed(42)
     if motion:
         states = range(1,21)
@@ -412,12 +411,13 @@ if __name__ == '__main__':
     elif args.bvalue:
         bvalues = {"cmd": args.bvalue}
     else:
-        bvalues = {"original": [0., 1, 2, 5, 10, 20, 30, 50, 75, 100, 150, 250, 350, 400, 550, 700, 850, 1000]}
+        bvalues = parse_bvalues_file("b_values.json") 
 
     
     noise = args.noise
     motion = args.motion
     interleaved = args.interleaved
+    download_data()
     for key, bvalue in bvalues.items():
         bvalue = np.array(bvalue)
         sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=interleaved)
