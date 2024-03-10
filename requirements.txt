@@ -10,3 +10,4 @@ scienceplots
 cvxpy
 pytest
 tqdm
+pandas
