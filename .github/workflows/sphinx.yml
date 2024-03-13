@@ -1,0 +1,51 @@
+name: Build Documentation
+
+on:
+  push:
+    branches:
+      - 'main'
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  build:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Set up Python
+        id: setup_python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v3
+        id: pip-cache
+        with:
+          key: ${{ runner.os }}-${{ env.pythonLocation }}-pip-${{ hashFiles('**/requirements.txt') }}
+          path: ${{ env.pythonLocation }}
+        if: steps.pip-cache.outputs.cache-hit != 'true'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Build html
+        run: |
+          sphinx-apidoc -o doc src
+          cd doc/
+          make html
+
+      - name: Upload docs artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'doc/_build/html'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

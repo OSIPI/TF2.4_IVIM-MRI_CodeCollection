@@ -11,3 +11,5 @@ cvxpy
 zenodo-get
 pytest
 tqdm
+sphinx
+sphinx_rtd_theme
