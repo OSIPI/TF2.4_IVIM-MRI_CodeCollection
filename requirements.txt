@@ -11,3 +11,4 @@ cvxpy
 zenodo-get
 pytest
 tqdm
+pandas
