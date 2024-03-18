@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - 'main'
+  workflow_run:
+    workflows: ["analysis.yml"]
+    types:
+      - completed
 permissions:
   contents: read
   pages: write
