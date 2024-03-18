@@ -35,16 +35,20 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      # Action to download artifacts from a different workflow (analysis.yml)
       - name: Download figures artifact
-        uses: actions/download-artifact@v3
+        uses: dawidd6/action-download-artifact@v3
         with:
+          workflow: analysis.yml
           name: Figures
+          branch: main
 
       - name: Build html
         run: |
-          mv Figures docs/_static/
+          mkdir docs/_static
+          mv *.pdf docs/_static/
           sphinx-apidoc -o docs src
-          cd doc/
+          cd docs/
           make html
 
       - name: Upload docs artifact
