@@ -7,9 +7,10 @@ Welcome to TF2.4 IVIM MRI Code Collection's documentation!
 ==========================================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
 
+   figures
    modules
 
 Indices and tables
