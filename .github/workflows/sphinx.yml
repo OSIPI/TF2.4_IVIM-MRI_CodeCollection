@@ -35,16 +35,22 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: Download figures artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: Figures
+
       - name: Build html
         run: |
-          sphinx-apidoc -o doc src
+          mv Figures docs/_static/
+          sphinx-apidoc -o docs src
           cd doc/
           make html
 
       - name: Upload docs artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'doc/_build/html'
+          path: 'docs/_build/html'
 
       - name: Deploy to GitHub Pages
         id: deployment
