@@ -5,6 +5,7 @@ on:
     branches:
       - 'main'
       - 'analysis/**'
+      - 'test-docs'
 
 jobs:
   algorithms:
