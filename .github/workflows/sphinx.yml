@@ -1,11 +1,8 @@
-name: Build Documentation
+name: Build & Deploy Documentation
 
 on:
-  push:
-    branches:
-      - 'main'
   workflow_run:
-    workflows: ["analysis.yml"]
+    workflows: [Algorithm Analysis]
     types:
       - completed
 permissions:
