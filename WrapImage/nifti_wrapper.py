@@ -2,9 +2,12 @@ import argparse
 import json
 import os
 import nibabel as nib
+from src.wrappers.OsipiBase import OsipiBase
+from utilities.data_simulation.GenerateData import GenerateData
 import numpy as np
+import random
 
-def read_nifti_4d(input_file):
+def read_nifti_file(input_file):
     """
     For reading the 4d nifti image
     """
@@ -27,11 +30,11 @@ def read_json_file(json_file):
 
     return json_data
 
-def save_nifti_3d(data, output_file):
+def save_nifti_3d(data, output_file, **kwargs):
     """
     For saving the 3d nifti images of the output of the algorithm
     """
-    output_img = nib.Nifti1Image(data, np.eye(4))
+    output_img = nib.nifti1.Nifti1Image(data, np.eye(4), **kwargs)
     nib.save(output_img, output_file)
 
 if __name__ == "__main__":
@@ -45,7 +48,7 @@ if __name__ == "__main__":
 
     try:
         # Read the 4D NIfTI file
-        data = read_nifti_4d(args.input_file)
+        data = read_nifti_file(args.input_file)
 
         # Construct the full paths for the JSON, b-vector, and b-value files
         json_file = os.path.join(args.bids_dir, "dataset_description.json")
@@ -58,7 +61,20 @@ if __name__ == "__main__":
         bvals = read_json_file(bval_file)
 
         # Pass additional arguments to the algorithm
+        rng = np.random.RandomState(42)
+        fit = OsipiBase(algorithm=args.algorithm)
+        S0 = 1
+        gd = GenerateData(rng=rng)
+        D = data["D"]
+        f = data["f"]
+        Dp = data["Dp"]  
+        # signal = gd.ivim_signal(D, Dp, f, S0, bvals, SNR, rician_noise)
+
         # Passing the values to the selectect algorithm and saving it
+        [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals)
+        save_nifti_3d(f_fit, "f.nii.gz")
+        save_nifti_3d(Dp_fit, "dp.nii.gz")
+        save_nifti_3d(D_fit, "d.nii.gz")
 
     except Exception as e:
         print(f"Error: {e}")
