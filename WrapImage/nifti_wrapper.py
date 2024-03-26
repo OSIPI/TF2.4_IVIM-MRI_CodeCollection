@@ -38,6 +38,23 @@ def save_nifti_file(data, output_file, affine=None, **kwargs):
     output_img = nib.nifti1.Nifti1Image(data, affine , **kwargs)
     nib.save(output_img, output_file)
 
+def loop_over_first_n_minus_1_dimensions(arr):
+    """
+    Loops over the first n-1 dimensions of a numpy array.
+
+    Args:
+        arr: A numpy array.
+
+    Yields:
+        A tuple containing the indices for the current iteration and a flattened view of the remaining dimensions.
+    """
+    n = arr.ndim
+    for idx in np.ndindex(*arr.shape[:n-1]):
+        flat_view = arr[idx].flatten()
+        yield idx, flat_view
+
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Read a 4D NIfTI phantom file along with BIDS JSON, b-vector, and b-value files.")
     parser.add_argument("input_file", type=str, help="Path to the input 4D NIfTI file.")
@@ -64,13 +81,17 @@ if __name__ == "__main__":
 
         # Pass additional arguments to the algorithm
         fit = OsipiBase(algorithm=args.algorithm)
-        # signal = gd.ivim_signal(D, Dp, f, S0, bvals, SNR, rician_noise)
-
-        # Passing the values to the selectect algorithm and saving it
-        [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals)
-        save_nifti_file(f_fit, "f.nii.gz", args.affine)
-        save_nifti_file(Dp_fit, "dp.nii.gz", args.affline)
-        save_nifti_file(D_fit, "d.nii.gz", args.affline)
+        f_image = np.zeros_like(data.shape[:data.ndim-1])
+        D_image = np.zeros_like(data.shape[:data.ndim-1])
+        Dp_image = np.zeros_like(data.shape[:data.ndim-1])
+        for idx, view in loop_over_first_n_minus_1_dimensions(data):
+            [f_fit, Dp_fit, D_fit] = fit.osipi_fit(view, bvals)
+            f_image[idx]=f_fit
+            Dp_image[idx]=Dp_fit
+            D_image[idx]=D_fit
+        save_nifti_file(f_image, "f.nii.gz", args.affine)
+        save_nifti_file(Dp_image, "dp.nii.gz", args.affline)
+        save_nifti_file(D_image, "d.nii.gz", args.affline)
 
     except Exception as e:
         print(f"Error: {e}")
