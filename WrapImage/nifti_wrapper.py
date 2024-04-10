@@ -29,6 +29,39 @@ def read_json_file(json_file):
 
     return json_data
 
+def read_bval_file(bval_file):
+    """
+    For reading the bval file
+    """
+    if not os.path.exists(bval_file):
+        raise FileNotFoundError(f"File '{bval_file}' not found.")
+
+    with open(bval_file, "r") as f:
+        try:
+            bval_data = [int(val) for val in f.read().split()]
+        except ValueError as e:
+            raise ValueError(f"Error reading bval file '{bval_file}': {e}")
+
+    return bval_data
+
+def read_bvec_file(bvec_file):
+    """
+    For reading the bvec file
+    """
+    if not os.path.exists(bvec_file):
+        raise FileNotFoundError(f"File '{bvec_file}' not found.")
+
+    with open(bvec_file, "r") as f:
+        try:
+            lines = f.readlines()
+            bvec_data = []
+            for line in lines:
+                bvec_data.append([float(val) for val in line.split()])
+        except ValueError as e:
+            raise ValueError(f"Error reading bvec file '{bvec_file}': {e}")
+
+    return bvec_data
+
 def save_nifti_file(data, output_file, affine=None, **kwargs):
     """
     For saving the 3d nifti images of the output of the algorithm
@@ -58,9 +91,10 @@ def loop_over_first_n_minus_1_dimensions(arr):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Read a 4D NIfTI phantom file along with BIDS JSON, b-vector, and b-value files.")
     parser.add_argument("input_file", type=str, help="Path to the input 4D NIfTI file.")
-    parser.add_argument("bids_dir", type=str, help="Path to the BIDS directory.")
+    parser.add_argument("bvec_file", type=str, help="Path to the b-vector file.")
+    parser.add_argument("bval_file", type=str, help="Path to the b-value file.")
     parser.add_argument("--affine", type=float, nargs="+", help="Affine matrix for NIfTI image.")
-    parser.add_argument("--algorithm", type=str, choices=["algorithm1", "algorithm2"], default="algorithm1", help="Select the algorithm to use.")
+    parser.add_argument("--algorithm", type=str, choices=["algorithm1", "algorithm2"], default="OJ_GU_seg", help="Select the algorithm to use.")
     parser.add_argument("algorithm_args", nargs=argparse.REMAINDER, help="Additional arguments for the algorithm.")
 
     args = parser.parse_args()
@@ -69,15 +103,9 @@ if __name__ == "__main__":
         # Read the 4D NIfTI file
         data, _ = read_nifti_file(args.input_file)
 
-        # Construct the full paths for the JSON, b-vector, and b-value files
-        json_file = os.path.join(args.bids_dir, "dataset_description.json")
-        bvec_file = os.path.join(args.bids_dir, "bvecs.json")
-        bval_file = os.path.join(args.bids_dir, "bvals.json")
-
-        # Read the JSON, b-vector, and b-value files
-        json_data = read_json_file(json_file)
-        bvecs = read_json_file(bvec_file)
-        bvals = read_json_file(bval_file)
+        # Read the b-vector, and b-value files
+        bvecs = read_bvec_file(args.bvec_file)
+        bvals = read_bval_file(args.bval_file)
 
         # Pass additional arguments to the algorithm
         fit = OsipiBase(algorithm=args.algorithm)
