@@ -32,11 +32,12 @@ for subfolder in unique_subfolders:
         print(f"Warning: Subfolder '{subfolder}' does not exist in the source folder.")
 
 # Add column 'Tested' to the DataFrame based on a match with algorithms and wrapped column
-df['Tested'] = df.apply(lambda row: 'Yes' if any(algorithm in row['wrapped'] for algorithm in all_algorithms) else 'No', axis=1)
+df['Wrapped'] = df['Wrapped'].fillna('')
+df['Tested'] = df.apply(lambda row: 'Yes' if any(algorithm in row['Wrapped'] for algorithm in all_algorithms) else '', axis=1)
 
 # Select the desired columns
-df_selected = df[['Technique', 'subfolder', 'Authors', 'Tested', 'wrapped']]
-df_selected.columns = ['Technique', 'Subfolder', 'Contributors', 'Tested', 'wrapped']
+df_selected = df[['Technique', 'subfolder', 'Authors', 'Wrapped', 'Tested']]
+df_selected.columns = ['Technique', 'Subfolder', 'Contributors', 'Wrapped', 'Tested']
 
 # Convert the DataFrame to HTML
 html_string = df_selected.to_html(index=False)
