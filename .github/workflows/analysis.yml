@@ -18,18 +18,18 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: 'pip'
-      # - name: Cache virtualenv
-      #   uses: actions/cache@v3
-      #   with:
-      #     key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements.txt') }}
-      #     path: .venv
+      - name: Cache pip
+        uses: actions/cache@v3
+        id: pip-cache
+        with:
+          key: ${{ runner.os }}-${{ env.pythonLocation }}-pip-${{ hashFiles('**/requirements.txt') }}
+          path: ${{ env.pythonLocation }}
+        if: steps.pip-cache.outputs.cache-hit != 'true'
+
       - name: Install dependencies
         run: |
-          python -m venv .venv
-          source .venv/bin/activate
-          python -m pip install -r requirements.txt
-          python -m pip install pytest
+          pip install -r requirements.txt
+
       - name: Read algorithms
         id: algorithms
         run: |
@@ -58,21 +58,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: 'pip'
-      # - name: Cache virtualenv
-      #   uses: actions/cache@v3
-      #   with:
-      #     key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements.txt') }}
-      #     path: .venv
-      - name: Install dependencies
-        run: |
-          python -m venv .venv
-          source .venv/bin/activate
-          python -m pip install -r requirements.txt
-          python -m pip install pytest
+        if: steps.pip-cache.outputs.cache-hit != 'true'
+      - name: Restore cache
+        id: python-cache
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-${{ env.pythonLocation }}-pip-${{ hashFiles('**/requirements.txt') }}
+          path: ${{ env.pythonLocation }}
+
       - name: Generate fitting data
         run: |
-          source .venv/bin/activate
           python -m pytest -m slow --selectAlgorithm ${{ matrix.algorithm }} --saveFileName test_output_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv --SNR ${{ matrix.SNR }} --fitCount 300 --saveDurationFileName test_duration_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv
       - name: Upload raw data
         uses: actions/upload-artifact@v3
