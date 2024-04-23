@@ -36,12 +36,7 @@ def read_bval_file(bval_file):
     if not os.path.exists(bval_file):
         raise FileNotFoundError(f"File '{bval_file}' not found.")
 
-    with open(bval_file, "r") as f:
-        try:
-            bval_data = [int(val) for val in f.read().split()]
-        except ValueError as e:
-            raise ValueError(f"Error reading bval file '{bval_file}': {e}")
-
+    bval_data = np.genfromtxt(bval_file, dtype=float)
     return bval_data
 
 def read_bvec_file(bvec_file):
@@ -51,15 +46,8 @@ def read_bvec_file(bvec_file):
     if not os.path.exists(bvec_file):
         raise FileNotFoundError(f"File '{bvec_file}' not found.")
 
-    with open(bvec_file, "r") as f:
-        try:
-            lines = f.readlines()
-            bvec_data = []
-            for line in lines:
-                bvec_data.append([float(val) for val in line.split()])
-        except ValueError as e:
-            raise ValueError(f"Error reading bvec file '{bvec_file}': {e}")
-
+    bvec_data = np.genfromtxt(bvec_file)
+    bvec_data = np.transpose(bvec_data)  # Transpose the array
     return bvec_data
 
 def save_nifti_file(data, output_file, affine=None, **kwargs):
@@ -108,18 +96,32 @@ if __name__ == "__main__":
         bvals = read_bval_file(args.bval_file)
 
         # Pass additional arguments to the algorithm
+
         fit = OsipiBase(algorithm=args.algorithm)
-        f_image = np.zeros_like(data.shape[:data.ndim-1])
-        D_image = np.zeros_like(data.shape[:data.ndim-1])
-        Dp_image = np.zeros_like(data.shape[:data.ndim-1])
+        f_image = []
+        Dp_image = []
+        D_image = []
+
         for idx, view in loop_over_first_n_minus_1_dimensions(data):
             [f_fit, Dp_fit, D_fit] = fit.osipi_fit(view, bvals)
-            f_image[idx]=f_fit
-            Dp_image[idx]=Dp_fit
-            D_image[idx]=D_fit
+            f_image.append(f_fit)
+            Dp_image.append(Dp_fit)
+            D_image.append(D_fit)
+
+        # Convert lists to NumPy arrays
+        f_image = np.array(f_image)
+        Dp_image = np.array(Dp_image)
+        D_image = np.array(D_image)
+
+        # Reshape arrays if needed
+        f_image = f_image.reshape(data.shape[:data.ndim-1])
+        Dp_image = Dp_image.reshape(data.shape[:data.ndim-1])
+        D_image = D_image.reshape(data.shape[:data.ndim-1])
+
         save_nifti_file(f_image, "f.nii.gz", args.affine)
-        save_nifti_file(Dp_image, "dp.nii.gz", args.affline)
-        save_nifti_file(D_image, "d.nii.gz", args.affline)
+        save_nifti_file(Dp_image, "dp.nii.gz", args.affine)
+        save_nifti_file(D_image, "d.nii.gz", args.affine)
 
     except Exception as e:
         print(f"Error: {e}")
+
