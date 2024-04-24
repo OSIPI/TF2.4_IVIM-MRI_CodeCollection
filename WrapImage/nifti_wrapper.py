@@ -3,8 +3,9 @@ import json
 import os
 import nibabel as nib
 from src.wrappers.OsipiBase import OsipiBase
-from utilities.data_simulation.GenerateData import GenerateData
 import numpy as np
+from tqdm import tqdm
+
 
 def read_nifti_file(input_file):
     """
@@ -102,7 +103,7 @@ if __name__ == "__main__":
         Dp_image = []
         D_image = []
 
-        for idx, view in loop_over_first_n_minus_1_dimensions(data):
+        for idx, view in tqdm(loop_over_first_n_minus_1_dimensions(data), desc=f"{args.algorithm} is fitting", dynamic_ncols=True, total=702464):
             [f_fit, Dp_fit, D_fit] = fit.osipi_fit(view, bvals)
             f_image.append(f_fit)
             Dp_image.append(Dp_fit)
