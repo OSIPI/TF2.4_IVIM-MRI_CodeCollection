@@ -83,7 +83,7 @@ if __name__ == "__main__":
     parser.add_argument("bvec_file", type=str, help="Path to the b-vector file.")
     parser.add_argument("bval_file", type=str, help="Path to the b-value file.")
     parser.add_argument("--affine", type=float, nargs="+", help="Affine matrix for NIfTI image.")
-    parser.add_argument("--algorithm", type=str, choices=["algorithm1", "algorithm2"], default="OJ_GU_seg", help="Select the algorithm to use.")
+    parser.add_argument("--algorithm", type=str, default="OJ_GU_seg", help="Select the algorithm to use.")
     parser.add_argument("algorithm_args", nargs=argparse.REMAINDER, help="Additional arguments for the algorithm.")
 
     args = parser.parse_args()
@@ -103,7 +103,10 @@ if __name__ == "__main__":
         Dp_image = []
         D_image = []
 
-        for idx, view in tqdm(loop_over_first_n_minus_1_dimensions(data), desc=f"{args.algorithm} is fitting", dynamic_ncols=True, total=702464):
+        # This is necessary for the tqdm to display progress bar.
+        n = data.ndim
+        total_iteration = np.prod(data.shape[:n-1])
+        for idx, view in tqdm(loop_over_first_n_minus_1_dimensions(data), desc=f"{args.algorithm} is fitting", dynamic_ncols=True, total=total_iteration):
             [f_fit, Dp_fit, D_fit] = fit.osipi_fit(view, bvals)
             f_image.append(f_fit)
             Dp_image.append(Dp_fit)
