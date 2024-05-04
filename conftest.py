@@ -67,6 +67,20 @@ def pytest_addoption(parser):
         type=str,
         help="Saved duration results file name",
     )
+    parser.addoption(
+        "--selectAlgorithm",
+        default=[""],
+        nargs="+",
+        type=str,
+        help="Drop all algorithms except for these from the list"
+    )
+    parser.addoption(
+        "--dropAlgorithm",
+        default=[""],
+        nargs="+",
+        type=str,
+        help="Drop this algorithm from the list"
+    )
 
 
 @pytest.fixture(scope="session")
@@ -115,7 +129,6 @@ def save_duration_file(request):
 def rtol(request):
     return request.config.getoption("--rtol")
 
-
 @pytest.fixture(scope="session")
 def atol(request):
     return request.config.getoption("--atol")
@@ -137,23 +150,23 @@ def pytest_generate_tests(metafunc):
     if "SNR" in metafunc.fixturenames:
         metafunc.parametrize("SNR", metafunc.config.getoption("SNR"))
     if "ivim_algorithm" in metafunc.fixturenames:
-        algorithms = algorithm_list(metafunc.config.getoption("algorithmFile"))
+        algorithms = algorithm_list(metafunc.config.getoption("algorithmFile"), metafunc.config.getoption("selectAlgorithm"), metafunc.config.getoption("dropAlgorithm"))
         metafunc.parametrize("ivim_algorithm", algorithms)
-    if "algorithm_file" in metafunc.fixturenames:
-        metafunc.parametrize("algorithm_file", metafunc.config.getoption("algorithmFile"))
     if "ivim_data" in metafunc.fixturenames:
         data = data_list(metafunc.config.getoption("dataFile"))
         metafunc.parametrize("ivim_data", data)
-    if "data_file" in metafunc.fixturenames:
-        metafunc.parametrize("data_file", metafunc.config.getoption("dataFile"))
 
 
-def algorithm_list(filename):
+def algorithm_list(filename, selected, dropped):
     current_folder = pathlib.Path.cwd()
     algorithm_path = current_folder / filename
     with algorithm_path.open() as f:
         algorithm_information = json.load(f)
-    return algorithm_information["algorithms"]
+    algorithms = set(algorithm_information["algorithms"])
+    algorithms = algorithms - set(dropped)
+    if len(selected) > 0 and selected[0]:
+        algorithms = algorithms & set(selected)
+    return list(algorithms)
 
 def data_list(filename):
     current_folder = pathlib.Path.cwd()

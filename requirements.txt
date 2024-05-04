@@ -8,3 +8,9 @@ dipy
 matplotlib
 scienceplots
 cvxpy
+zenodo-get
+pytest
+tqdm
+pandas
+sphinx
+sphinx_rtd_theme

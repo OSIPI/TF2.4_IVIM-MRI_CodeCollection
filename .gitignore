@@ -1,8 +1,20 @@
 .idea*
-.github*
+.github/*
+.github/ISSUE_TEMPLATE/
+.github/pull_request_template.md
 __pycache__/
 *.nii.gz
+*.nii
+*.dcm
+*.mat
+*.raw
 bvals.txt
+download
+md5sums.txt
+*.gz
+*.zip
+*.tmp
+
 # Unit test / coverage reports
 .tox/
 .coverage

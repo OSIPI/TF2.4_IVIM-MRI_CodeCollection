@@ -4,9 +4,9 @@ The ISMRM Open Science Initiative for Perfusion Imaging (OSIPI) is an initiative
 
 >“promote the sharing of perfusion imaging software in order to eliminate the practice of duplicate development, improve the reproducibility of perfusion imaging research, and speed up the translation into tools for discovery science, drug development, and clinical practice”
 
-This **IVIM code collection** code library is maintained by OSIPI [Taskforce 2.4](https://www.osipi.org/task-force-2-4/) (*currently not available*) and aims to collect, test and share open-source code related to intravoxel incoherent motion (IVIM) analysis of diffusion encoded MRI data to be used in research and software development. Code contributions can include any code related IVIM analysis (denoising, motion correction, model fitting, etc.), but at an initial phase, development of tests and other features of the repository will predominantly focus on fitting algorithms. A future goal of the IVIM OSIPI task force is to develop a fully tested and harmonized code library, building upon the contributions obtained through this initiative.
+This **IVIM code collection** code library is maintained by OSIPI [Taskforce 2.4](https://www.osipi.org/task-force-2-4/) (*currently not available*) and aims to collect, test and share open-source code related to intravoxel incoherent motion (IVIM) analysis of diffusion encoded MRI data to be used in research and software development. Code contributions can include any code related IVIM analysis (denoising, motion correction, model fitting, etc.), but at an initial phase, development of tests and other features of the repository will predominantly focus on fitting algorithms. A goal of the IVIM OSIPI task force is to develop a fully tested and harmonized code library, building upon the contributions obtained through this initiative. Documentation and analysis are available on the [OSIPI TF2.4](https://osipi.github.io/TF2.4_IVIM-MRI_CodeCollection/).
 
-## How to contibute
+## How to contribute
 
 If you would like to get involve in OSIPI and work within the task force, please email the contacts listed on our website.
 
@@ -31,3 +31,5 @@ The **utils** folder contains various helpful tools.
 
 ## View Testing Reports
 [![Unit tests](https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection/actions/workflows/unit_test.yml/badge.svg?branch=main)](https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection/actions/workflows/unit_test.yml)
+[![Algorithm Analysis](https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection/actions/workflows/analysis.yml/badge.svg?branch=main)](https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection/actions/workflows/analysis.yml)
+[![Build & Deploy Documentation](https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection/actions/workflows/documentation.yml/badge.svg?branch=main)](https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection/actions/workflows/documentation.yml)
