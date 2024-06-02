@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IVIM MRI Algorithm Fitting Dashboard</title>
+  <!-- Load Plotly.js into the DOM -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+  <script src="index.js"></script>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div id="root">
+    <header>
+      <h1 class="bar-title">IVIM MRI Algorithm Fitting Dashboard</h1>
+      <hr class="divider" />
+    </header>
+    <main>
+      <div class="filter-wrapper">
+        <label for="algorithm-select">Algorithm:</label>
+        <select id="algorithm-select" class="filter-menu">
+          <!-- Options will be populated dynamically -->
+        </select>
+
+        <label for="snr-select">SNR:</label>
+        <select id="snr-select" class="filter-menu">
+          <!-- Options will be populated dynamically -->
+        </select>
+
+        <label for="type-select">Type: </label>
+        <select id="type-select" class="filter-menu">
+          <option value="D_fitted">Diffusion</option>
+          <option value="Dp_fitted">Perfusion</option>
+          <option value="f_fitted">Perfusion Fraction</option>
+        </select>
+
+        <div class="slider-container">
+          <span class="slider-label">Range:</span>
+          <button id="decrement-range" class="slider-button">-</button>
+          <input type="range" id="range-slider" class="slider" min="2" max="100" step="2" value="2">
+          <button id="increment-range" class="slider-button">+</button>
+          <span id="range-value" class="slider-value">2</span><span>x</span>
+      </div>
+      </div>
+      <div class="chart-card" id="myDiv">
+        <!-- Chart will be rendered here -->
+      </div>
+
+
+            <!-- New section for region-based plot -->
+      <div class="filter-wrapper">
+        <label for="region-select">Region:</label>
+        <select id="region-select" class="filter-menu">
+          <!-- Options will be populated dynamically -->
+        </select>
+
+        <label for="snr-region-select">SNR:</label>
+        <select id="snr-region-select" class="filter-menu">
+          <!-- Options will be populated dynamically -->
+        </select>
+
+        <label for="type-region-select">Type: </label>
+        <select id="type-region-select" class="filter-menu">
+          <option value="D_fitted">Diffusion</option>
+          <option value="Dp_fitted">Perfusion</option>
+          <option value="f_fitted">Perfusion Fraction</option>
+        </select>
+
+        <div class="slider-container">
+          <span class="slider-label">Range:</span>
+          <button id="decrement-range-region" class="slider-button">-</button>
+          <input type="range" id="range-slider-region" class="slider" min="2" max="100" step="2" value="2">
+          <button id="increment-range-region" class="slider-button">+</button>
+          <span id="range-value-region" class="slider-value">2</span><span>x</span>
+      </div>
+      </div>
+      <div class="chart-card" id="regionDiv">
+        <!-- New chart will be rendered here -->
+      </div>
+
+      
+    </main>
+  </div>
+</body>
+</html>

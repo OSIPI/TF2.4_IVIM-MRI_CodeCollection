@@ -1,66 +1,66 @@
-name: Build & Deploy Documentation
+# name: Build & Deploy Documentation
 
-on:
-  workflow_run:
-    workflows: [Algorithm Analysis]
-    types:
-      - completed
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      - name: Set up Python
-        id: setup_python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Cache pip
-        uses: actions/cache@v3
-        id: pip-cache
-        with:
-          key: ${{ runner.os }}-${{ env.pythonLocation }}-pip-${{ hashFiles('**/requirements.txt') }}
-          path: ${{ env.pythonLocation }}
-        if: steps.pip-cache.outputs.cache-hit != 'true'
+# on:
+#   workflow_run:
+#     workflows: [Algorithm Analysis]
+#     types:
+#       - completed
+# permissions:
+#   contents: read
+#   pages: write
+#   id-token: write
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - name: Setup Pages
+#         uses: actions/configure-pages@v4
+#       - name: Set up Python
+#         id: setup_python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: "3.11"
+#       - name: Cache pip
+#         uses: actions/cache@v3
+#         id: pip-cache
+#         with:
+#           key: ${{ runner.os }}-${{ env.pythonLocation }}-pip-${{ hashFiles('**/requirements.txt') }}
+#           path: ${{ env.pythonLocation }}
+#         if: steps.pip-cache.outputs.cache-hit != 'true'
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+#       - name: Install dependencies
+#         run: |
+#           pip install -r requirements.txt
 
-      # Action to download artifacts from a different workflow (analysis.yml)
-      - name: 'Download artifact'
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        uses: ./.github/actions/download-artifact
-        with:
-          name: 'Figures'
+#       # Action to download artifacts from a different workflow (analysis.yml)
+#       - name: 'Download artifact'
+#         if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#         uses: ./.github/actions/download-artifact
+#         with:
+#           name: 'Figures'
 
-      - name: Build html
-        run: |
-          mkdir docs/_static
-          mv *.pdf docs/_static/
-          sphinx-apidoc -o docs src
-          cd docs/
-          make html
+#       - name: Build html
+#         run: |
+#           mkdir docs/_static
+#           mv *.pdf docs/_static/
+#           sphinx-apidoc -o docs src
+#           cd docs/
+#           make html
 
-      - name: Upload docs artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'docs/_build/html'
+#       - name: Upload docs artifact
+#         uses: actions/upload-pages-artifact@v3
+#         with:
+#           path: 'docs/_build/html'
 
-  deploy:
-    needs: build
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+#   deploy:
+#     needs: build
+#     environment:
+#       name: github-pages
+#       url: ${{ steps.deployment.outputs.page_url }}
 
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Deploy to GitHub Pages
+#         id: deployment
+#         uses: actions/deploy-pages@v4
