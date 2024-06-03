@@ -1,4 +1,4 @@
-name: Deploy dashboard website
+name: Build & Deploy Website
 
 on:
   workflow_run:
@@ -33,8 +33,14 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      # Action to download artifacts from a different workflow (analysis.yml)
+      # Action Figures artifact
       - name: 'Download artifact'
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        uses: ./.github/actions/download-artifact
+        with:
+          name: 'Figures'
+      # Action analysis data artifact
+      - name: 'Download analysis data'
         if: ${{ github.event.workflow_run.conclusion == 'success' }}
         uses: ./.github/actions/download-artifact
         with:
@@ -44,7 +50,19 @@ jobs:
         run: |
           mv test_output.csv website/
 
-      - name: Upload website artifact
+      - name: Build documentation
+        run: |
+          mkdir docs/_static
+          mv *.pdf docs/_static/
+          sphinx-apidoc -o docs src
+          cd docs/
+          make html
+
+      - name: move data to the website folder
+        run: |
+          mv docs/_build/html website/documentation
+
+      - name: Upload docs artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'website'
