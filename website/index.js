@@ -8,6 +8,19 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedSNRRegion = '10';
     let selectedTypeRegion = 'D_fitted';
     let selectedRangeRegion = 2;
+
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const mainContent = document.getElementsByTagName('main')[0];
+    function showLoading() {
+        mainContent.classList.add('hidden');
+        loadingOverlay.classList.remove('hidden');
+    }
+
+    function hideLoading() {
+        loadingOverlay.classList.add('hidden');
+        mainContent.classList.remove('hidden')
+    }
+
     // Add event listener to algorithm select
     const algorithmSelect = document.getElementById('algorithm-select');
     algorithmSelect.addEventListener('change', function(event) {
@@ -114,12 +127,14 @@ document.addEventListener('DOMContentLoaded', function() {
             updateRangeRegion(newValue);
         }
     });
+    showLoading();
 
     Papa.parse('test_output.csv', {
         download: true,
         header: true,
         complete: results => {
             data = results;
+            hideLoading();
             populateOptions(data);
             drawBoxPlot(data, selectedAlgorithm, selectedSNR, selectedType, selectedRange);
             drawRegionBoxPlot(data, selectedRegion, selectedSNRRegion, selectedTypeRegion, selectedRangeRegion);
