@@ -1,0 +1,16 @@
+# Ignore editor and system files
+.vscode/
+.git/
+.gitignore
+*.md
+
+# Exclude development and test artifacts
+__pycache__
+conftest
+
+# Docs
+docs
+doc
+
+# Others
+
