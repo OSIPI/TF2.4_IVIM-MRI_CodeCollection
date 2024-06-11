@@ -52,8 +52,8 @@ Before running the Docker container, here are the available options for the `Doc
     ```sh
     sudo docker run -it --rm --name TF2.4_IVIM-MRI_CodeCollection \
         -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/src/app \
-        -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/app/output \
-        tf2.4_ivim-mri_codecollection brain.nii.gz brain.bvec brain.bval
+        -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/app/output \ 
+        tf2.4_ivim-mri_codecollection Downloads/brain.nii.gz Downloads/brain.bvec Downloads/brain.bval \
     ```
 
     Replace `brain.nii.gz`, `brain.bvec`, and `brain.bval` with the actual file names you want to use.
