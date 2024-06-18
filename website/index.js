@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const algorithmSelect = document.getElementById('algorithm-select');
     algorithmSelect.addEventListener('change', function(event) {
         selectedAlgorithm = event.target.value;
+        updateRange('2')
         drawBoxPlot(data, selectedAlgorithm, selectedSNR, selectedType, selectedRange);
     });
 
@@ -32,15 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const snrSelect = document.getElementById('snr-select');
     snrSelect.addEventListener('change', function(event) {
         selectedSNR = event.target.value;
+        updateRange('2')
         drawBoxPlot(data, selectedAlgorithm, selectedSNR, selectedType, selectedRange);
     });
-
-
 
     // Add event listener to type select
     const typeSelect = document.getElementById('type-select');
     typeSelect.addEventListener('change', function(event) {
         selectedType = event.target.value;
+        updateRange('2')
         drawBoxPlot(data, selectedAlgorithm, selectedSNR, selectedType, selectedRange);
     });
 
@@ -49,10 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const rangeValue = document.getElementById('range-value');
     const decrementRange = document.getElementById('decrement-range');
     const incrementRange = document.getElementById('increment-range');
-
     function updateRange(value) {
         selectedRange = value;
         rangeValue.textContent = value;
+        rangeSlider.value = value
         drawBoxPlot(data, selectedAlgorithm, selectedSNR, selectedType, selectedRange);
     }
 
@@ -70,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     incrementRange.addEventListener('click', function() {
         let newValue = parseInt(rangeSlider.value) + 2;
-        if (newValue <= 100) {
+        if (newValue <= rangeSlider.max) {
             rangeSlider.value = newValue;
             updateRange(newValue);
         }
@@ -80,53 +81,59 @@ document.addEventListener('DOMContentLoaded', function() {
     const regionSelect = document.getElementById('region-select');
     regionSelect.addEventListener('change', function(event) {
         selectedRegion = event.target.value;
-        drawRegionBoxPlot(data, selectedRegion, selectedSNR, selectedType, selectedRange);
+        updateRangeRegion('2')
+        drawRegionBoxPlot(data, selectedRegion, selectedSNRRegion, selectedTypeRegion, selectedRangeRegion);
     });
-        // Add event listener to SNR select
-        const snrRegionSelect = document.getElementById('snr-region-select');
-        snrRegionSelect.addEventListener('change', function(event) {
-            selectedSNRRegion = event.target.value;
-            drawRegionBoxPlot(data, selectedRegion, selectedSNRRegion, selectedTypeRegion, selectedRangeRegion);
-        });
-    
-        // Add event listener to type select
-        const typeRegionSelect = document.getElementById('type-region-select');
-        typeRegionSelect.addEventListener('change', function(event) {
-            selectedTypeRegion = event.target.value;
-            drawRegionBoxPlot(data, selectedRegion, selectedSNRRegion, selectedTypeRegion, selectedRangeRegion);
-        });
-    
-        // Add event listeners to range region slider and buttons
-        const rangeSliderRegion = document.getElementById('range-slider-region');
-        const rangeValueRegion = document.getElementById('range-value-region');
-        const decrementRangeRegion = document.getElementById('decrement-range-region');
-        const incrementRangeRegion = document.getElementById('increment-range-region');
 
-        function updateRangeRegion(value) {
-            selectedRangeRegion = value;
-            rangeValueRegion.textContent = value;
-            drawRegionBoxPlot(data, selectedRegion, selectedSNRRegion, selectedTypeRegion, selectedRangeRegion);
-        }
+    // Add event listener to SNR select
+    const snrRegionSelect = document.getElementById('snr-region-select');
+    snrRegionSelect.addEventListener('change', function(event) {
+        selectedSNRRegion = event.target.value;
+        updateRangeRegion('2')
+        drawRegionBoxPlot(data, selectedRegion, selectedSNRRegion, selectedTypeRegion, selectedRangeRegion);
+    });
 
-        rangeSliderRegion.addEventListener('input', function(event) {
-            updateRangeRegion(event.target.value);
-        });
+    // Add event listener to type select
+    const typeRegionSelect = document.getElementById('type-region-select');
+    typeRegionSelect.addEventListener('change', function(event) {
+        selectedTypeRegion = event.target.value;
+        updateRangeRegion('2')
+        drawRegionBoxPlot(data, selectedRegion, selectedSNRRegion, selectedTypeRegion, selectedRangeRegion);
+    });
 
-        decrementRangeRegion.addEventListener('click', function() {
-            let newValue = parseInt(rangeSliderRegion.value) - 2;
-            if (newValue >= 2) {
-                rangeSliderRegion.value = newValue;
-                updateRangeRegion(newValue);
-            }
-        });
+    // Add event listeners to range region slider and buttons
+    const rangeSliderRegion = document.getElementById('range-slider-region');
+    const rangeValueRegion = document.getElementById('range-value-region');
+    const decrementRangeRegion = document.getElementById('decrement-range-region');
+    const incrementRangeRegion = document.getElementById('increment-range-region');
 
-    incrementRangeRegion.addEventListener('click', function() {
-        let newValue = parseInt(rangeSliderRegion.value) + 2;
-        if (newValue <= 100) {
+    function updateRangeRegion(value) {
+        selectedRangeRegion = value;
+        rangeValueRegion.textContent = value;
+        rangeSliderRegion.value = value
+        drawRegionBoxPlot(data, selectedRegion, selectedSNRRegion, selectedTypeRegion, selectedRangeRegion);
+    }
+
+    rangeSliderRegion.addEventListener('input', function(event) {
+        updateRangeRegion(event.target.value);
+    });
+
+    decrementRangeRegion.addEventListener('click', function() {
+        let newValue = parseInt(rangeSliderRegion.value) - 2;
+        if (newValue >= 2) {
             rangeSliderRegion.value = newValue;
             updateRangeRegion(newValue);
         }
     });
+
+    incrementRangeRegion.addEventListener('click', function() {
+        let newValue = parseInt(rangeSliderRegion.value) + 2;
+        if (newValue <= rangeSliderRegion.max) {
+            rangeSliderRegion.value = newValue;
+            updateRangeRegion(newValue);
+        }
+    });
+
     showLoading();
 
     Papa.parse('test_output.csv', {
@@ -194,6 +201,17 @@ document.addEventListener('DOMContentLoaded', function() {
             "Dp_fitted": "Perfusion",
             "f_fitted": "Perfusion Fraction"
         };
+
+        const allD_fittedValues = jsonData
+            .filter(obj => obj.SNR === selectedSNR)
+            .map(obj => obj[selectedType]);
+
+        const maxValue = Math.max(...allD_fittedValues.map(Math.abs));
+        const groundTruthList = jsonData
+            .filter(obj => obj.SNR === selectedSNR)
+            .map(obj => obj[selectedType.slice(0, -7)]);
+        let estimatedRange = Math.abs(maxValue) / Math.min(...groundTruthList)
+        rangeSlider.max = Math.round(estimatedRange / 2) * 2        
         let plots = [];
         const regions = new Set(jsonData.map(obj => obj.Region));
         const uniqueRegionsArray = Array.from(regions);
@@ -208,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 type: 'box',
                 name: region,
                 marker: {
-                    outliercolor: 'white)',
+                    outliercolor: 'white',
                 },
                 boxpoints: 'Outliers'
             };
@@ -221,12 +239,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 x: [region],
                 y: groundTruth,
                 type: 'scatter',
+                name: region + ' ground truth',
                 mode: 'markers',
                 marker: {
                     color: 'black',
                     size: 10
                 },
-                showlegend: false
             };
             plots.push(constantPoint);
         });
@@ -245,6 +263,18 @@ document.addEventListener('DOMContentLoaded', function() {
             "Dp_fitted": "Perfusion",
             "f_fitted": "Perfusion Fraction"
         };
+
+        const allD_fittedValues = jsonData
+            .filter(obj => obj.SNR === selectedSNR)
+            .map(obj => obj[selectedType]);
+
+        const maxValue = Math.max(...allD_fittedValues.map(Math.abs));
+        const groundTruthList = jsonData
+            .filter(obj => obj.SNR === selectedSNR)
+            .map(obj => obj[selectedType.slice(0, -7)]);
+        let estimatedRange = Math.abs(maxValue) / Math.min(...groundTruthList)
+        rangeSliderRegion.max = Math.round(estimatedRange / 2) * 2        
+
         let plots = [];
         const algorithms = new Set(jsonData.map(obj => obj.Algorithm));
         const uniqueAlgorithmsArray = Array.from(algorithms);
@@ -272,12 +302,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 x: [algorithm],
                 y: groundTruth,
                 type: 'scatter',
+                name: algorithm + ' ground truth',
                 mode: 'markers',
                 marker: {
                     color: 'black',
                     size: 10
                 },
-                showlegend: false
             };
             plots.push(constantPoint);
         });
