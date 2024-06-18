@@ -48,7 +48,7 @@ jobs:
 
       - name: move data to the website folder
         run: |
-          mv test_output.csv website/
+          mv test_output.csv dashboard_website/
 
       - name: Build documentation
         run: |
@@ -60,12 +60,12 @@ jobs:
 
       - name: move data to the website folder
         run: |
-          mv docs/_build/html website/documentation
+          mv "docs/_build/html" "dashboard_website/documentation"
 
       - name: Upload docs artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'website'
+          path: 'dashboard_website'
 
   deploy:
     needs: build
