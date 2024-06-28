@@ -208,10 +208,10 @@ def seg(Y, b, bthr = 200, verbose = False):
     f = _f_from_intercept(A, S0)
 
     if Y.shape[0] == 1:
-        D = np.array(D)
-        f = np.array(f)
-        Dstar = np.array(Dstar)
-        S0 = np.array(S0)
+        D = D.item()
+        f = f.item()
+        Dstar = Dstar.item()
+        S0 = S0.item()
 
     pars = {'D': D, 'f': f, 'Dstar': Dstar, 'S0': S0}
     return pars
