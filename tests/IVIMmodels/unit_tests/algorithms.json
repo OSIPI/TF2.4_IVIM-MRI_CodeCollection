@@ -11,7 +11,8 @@
         "OGC_AmsterdamUMC_biexp_segmented",
         "OGC_AmsterdamUMC_biexp",
         "PV_MUMC_biexp",
-        "PvH_KB_NKI_IVIMfit"
+        "PvH_KB_NKI_IVIMfit",
+        "OJ_GU_seg"
     ],
     "IAR_LU_biexp": {
         "tolerances": {
