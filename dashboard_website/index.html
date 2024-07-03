@@ -40,12 +40,21 @@
         </select>
 
         <div class="slider-container">
-          <span class="slider-label">Range:</span>
+          <span class="slider-label">Upper Range:</span>
+          <span class="slider-value">0</span>
           <button id="decrement-range" class="slider-button">-</button>
-          <input type="range" id="range-slider" class="slider" min="2" max="100" step="2" value="2">
+          <input type="range" id="range-slider" class="slider" min="2" max="100" step="1" value="2">
           <button id="increment-range" class="slider-button">+</button>
-          <span id="range-value" class="slider-value">2</span><span>x</span>
+          <span id="range-value" class="slider-value">2</span>
       </div>
+      <div class="slider-container">
+        <span class="slider-label">Lower Range:</span>
+        <span class="slider-value">0</span>
+        <button id="decrement-lower-range" class="slider-button">-</button>
+        <input type="range" id="lower-range-slider" class="slider" min="2" max="100" step="2" value="2">
+        <button id="increment-lower-range" class="slider-button">+</button>
+        <span id="lower-range-value" class="slider-value">2</span>
+    </div>
       </div>
       <div class="chart-card" id="myDiv">
         <!-- Chart will be rendered here -->
@@ -72,12 +81,20 @@
         </select>
 
         <div class="slider-container">
-          <span class="slider-label">Range:</span>
+          <span class="slider-label">Upper Range:</span>
           <button id="decrement-range-region" class="slider-button">-</button>
           <input type="range" id="range-slider-region" class="slider" min="2" max="100" step="2" value="2">
           <button id="increment-range-region" class="slider-button">+</button>
-          <span id="range-value-region" class="slider-value">2</span><span>x</span>
+          <span id="range-value-region" class="slider-value">2</span>
       </div>
+    <div class="slider-container">
+      <span class="slider-label">Lower Range:</span>
+      <span class="slider-value">0</span>
+      <button id="decrement-lower-range-region" class="slider-button">-</button>
+      <input type="range" id="lower-range-slider-region" class="slider" min="2" max="100" step="2" value="2">
+      <button id="increment-lower-range-region" class="slider-button">+</button>
+      <span id="lower-range-value-region" class="slider-value">2</span>
+  </div>
       </div>
       <div class="chart-card" id="regionDiv">
         <!-- New chart will be rendered here -->
