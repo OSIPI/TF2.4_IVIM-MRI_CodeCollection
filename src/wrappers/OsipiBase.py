@@ -84,12 +84,30 @@ class OsipiBase:
         #args = [data, use_bvalues, use_initial_guess, use_bounds, use_thresholds]
         #args = [arg for arg in args if arg is not None]
 
+        # Check if there is an attribute that defines the result dictionary keys
+        if hasattr(self, "result_keys"):
+            # result_keys is a list of strings of parameter names, e.g. "S0", "f1", "f2", etc.
+            result_keys = self.result_keys
+        else:
+            # Default is ["f", "D*", "D"]
+            self.result_keys = ["f", "D*", "D"]
+        
+        results = {}
+        for key in self.result_keys:
+            results[key] = np.empty(list(data.shape[:-1]))
+
         # Assuming the last dimension of the data is the signal values of each b-value
-        results = np.empty(list(data.shape[:-1])+[3]) # Create an array with the voxel dimensions + the ones required for the fit
+        #results = np.empty(list(data.shape[:-1])+[3]) # Create an array with the voxel dimensions + the ones required for the fit
+        #for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
+            #args = [data[ijk], use_bvalues]
+            #fit = list(self.ivim_fit(*args, **kwargs))
+            #results[ijk] = fit
+
         for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
             args = [data[ijk], use_bvalues]
-            fit = list(self.ivim_fit(*args, **kwargs))
-            results[ijk] = fit
+            fit = self.ivim_fit(*args, **kwargs) # For single voxel fits, we assume this is a dict with a float value per key.
+            for key in list(fit.keys()):
+                results[key][ijk] = fit[key]
         
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         return results

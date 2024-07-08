@@ -48,9 +48,10 @@ class PV_MUMC_biexp(OsipiBase):
         
             
         fit_results = self.PV_algorithm(bvalues, signals)
+
+        results = {} 
+        results["f"] = fit_results[1]
+        results["D*"] = fit_results[2]
+        results["D"] = fit_results[0]
         
-        f = fit_results[1]
-        Dstar = fit_results[2]
-        D = fit_results[0]
-        
-        return f, Dstar, D
+        return results

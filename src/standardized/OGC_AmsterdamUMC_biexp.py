@@ -68,8 +68,9 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         bvalues=np.array(bvalues)
         fit_results = self.OGC_algorithm(bvalues, signals, p0=self.initial_guess, bounds=self.bounds, fitS0=self.fitS0)
 
-        D = fit_results[0]
-        f = fit_results[1]
-        Dstar = fit_results[2]
+        results = {}
+        results["D"] = fit_results[0]
+        results["f"] = fit_results[1]
+        results["D*"] = fit_results[2]
 
-        return f, Dstar, D
+        return results
