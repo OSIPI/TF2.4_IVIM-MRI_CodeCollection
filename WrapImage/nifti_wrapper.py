@@ -84,7 +84,7 @@ if __name__ == "__main__":
     parser.add_argument("bval_file", type=str, help="Path to the b-value file.")
     parser.add_argument("--affine", type=float, nargs="+", help="Affine matrix for NIfTI image.")
     parser.add_argument("--algorithm", type=str, default="OJ_GU_seg", help="Select the algorithm to use.")
-    parser.add_argument("algorithm_args", nargs=argparse.REMAINDER, help="Additional arguments for the algorithm.")
+    parser.add_argument("--algorithm_args", nargs=argparse.REMAINDER, help="Additional arguments for the algorithm.")
 
     args = parser.parse_args()
 
