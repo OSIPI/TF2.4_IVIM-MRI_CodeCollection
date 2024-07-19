@@ -81,10 +81,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     incrementRange.addEventListener('click', function() {
         let newValue = parseInt(rangeSlider.value) + 2;
-        if (newValue <= rangeSlider.max) {
             rangeSlider.value = newValue;
             updateRange(newValue);
-        }
     });
 
     // Add event listeners to range slider and buttons
@@ -113,10 +111,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     incrementRangeLower.addEventListener('click', function() {
         let newValue = parseInt(rangeSliderLower.value) + 2;
-        if (newValue <= rangeSliderLower.max) {
-            rangeSliderLower.value = newValue;
-            updateRangeLower(newValue);
-        }
+        rangeSliderLower.value = newValue;
+        updateRangeLower(newValue);
     });
 
     // Add event listener to region select
@@ -173,10 +169,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     incrementRangeRegion.addEventListener('click', function() {
         let newValue = parseInt(rangeSliderRegion.value) + 2;
-        if (newValue <= rangeSliderRegion.max) {
-            rangeSliderRegion.value = newValue;
-            updateRangeRegion(newValue);
-        }
+        rangeSliderRegion.value = newValue;
+        updateRangeRegion(newValue);
     });
 
     // Add event listeners to range slider and buttons for region
@@ -205,10 +199,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     incrementRangeLowerRegion.addEventListener('click', function() {
         let newValue = parseInt(rangeSliderLowerRegion.value) + 2;
-        if (newValue <= rangeSliderLowerRegion.max) {
-            rangeSliderLowerRegion.value = newValue;
-            updateRangeLowerRegion(newValue);
-        }
+        rangeSliderLowerRegion.value = newValue;
+        updateRangeLowerRegion(newValue);
     });
 
     showLoading();
@@ -283,16 +275,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const groundTruthList = jsonData
         .filter(obj => obj.SNR === selectedSNR)
         .map(obj => obj[selectedType.slice(0, -7)]);
-        let estimatedRange = Math.abs(maxValue) / Math.min(...groundTruthList)
+        let estimatedRange = Math.ceil(Math.abs(maxValue) / Math.min(...groundTruthList))
         let estimatedRangeLower = Math.abs(minValue) / Math.min(...groundTruthList)
+        currentUpperValue = (Math.min(...groundTruthList) * selectedRange).toFixed(4)
+        currentLowerValue = (-Math.min(...groundTruthList) * selectedRangeLower).toFixed(4)
         if (minValue < 0) {
-            rangeValueLower.textContent = minValue.toFixed(4)
+            rangeValueLower.textContent = currentLowerValue
+            document.getElementById('lower-slider').style.visibility = 'visible';
         }
         else {
+            document.getElementById('lower-slider').style.visibility = 'hidden';
             rangeValueLower.textContent = '0.0000'
             selectedRangeLower = 0;
         }
-        rangeValue.textContent = maxValue.toFixed(4)
+        rangeValue.textContent = currentUpperValue
         rangeSlider.max = Math.round(estimatedRange / 2) * 2    
         rangeSliderLower.max = Math.round(estimatedRangeLower / 2) * 2        
         let plots = [];
@@ -335,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
             title: `${type[selectedType]} Box Plots for ${selectedAlgorithm} algorithm with ${selectedSNR} SNR`,
             yaxis: {
                 autorange: false,
-                range: [-Math.min(...groundTruthList) * selectedRangeLower, Math.min(...groundTruthList) * selectedRange],
+                range: [currentLowerValue, currentUpperValue],
                 type: 'linear'
               }
         };
