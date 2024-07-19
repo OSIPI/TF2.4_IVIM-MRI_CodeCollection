@@ -356,8 +356,10 @@ document.addEventListener('DOMContentLoaded', function() {
         let estimatedRangeLower = Math.abs(minValue) / Math.min(...groundTruthList)
         if (minValue < 0) {
             rangeValueLowerRegion.textContent = minValue.toFixed(4)
+            document.getElementById('region-lower-slider').style.visibility = 'visible';
         }
         else {
+            document.getElementById('region-lower-slider').style.visibility = 'hidden';
             rangeValueLowerRegion.textContent = '0.0000'
             selectedRangeLowerRegion = 0;
         }
