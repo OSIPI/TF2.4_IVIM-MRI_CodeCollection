@@ -23,7 +23,7 @@ def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleav
 
         # Access the variables in the loaded .mat file
         XCAT = mat_data['IMG']
-        XCAT = XCAT[0:-1:2,0:-1:2,10:160:4]
+        XCAT = XCAT[-1:0:-2,-1:0:-2,10:160:4]
 
         D, f, Ds = contrast_curve_calc()
         S, Dim, fim, Dpim, legend = XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds)
@@ -95,15 +95,19 @@ def contrast_curve_calc():
     D[8] = 3e-3  # 8 Blood ra
     D[10] = 1.37e-3  # 8 Muscle: 10.3389/fresc.2022.910068
     D[13] = 1.5e-3  # 13 liver: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    D[14] = 3.0e-3  # 13 Galbladder
     D[17] = 1.67e-3  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
     D[18] = 1.67e-3  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
     D[20] = 1.5e-3  # 20 stomach wall: Li et al. doi: 10.3389/fonc.2022.821586
+    D[21] = 2.0e-3  # 21 stomach content
     D[22] = 1.3e-3  # 22 Pancreas (from literature)
     D[23] = 2.12e-3  # 23 right kydney cortex : van Baalen et al. Doi: jmri.25519
     D[24] = 2.09e-3  # 23 right kydney medulla : van Baalen et al. Doi: jmri.25519
     D[25] = 2.12e-3  # 23 left kydney cortex : van Baalen et al. Doi: jmri.25519
     D[26] = 2.09e-3  # 23 left kydney medulla : van Baalen et al. Doi: jmri.25519
     D[30] = 1.3e-3  # 30 spleen : Taimouri et al. Doi: 10.1118/1.4915495
+    D[34] = 4.1e-4  # 34 spinal cord :doi: 10.3389/fonc.2022.961473
+    D[35] = 0.43e-3  # 35 Bone marrow : https://pubmed.ncbi.nlm.nih.gov/30194746/
     D[36] = 3e-3  # 36 artery
     D[37] = 3e-3  # 37 vein
     D[40] = 1.31e-3  # 40 asc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
@@ -124,15 +128,19 @@ def contrast_curve_calc():
     f[8] = 1.00  # 8 Blood ra
     f[10] = 0.10  # 8 Muscle: 10.3389/fresc.2022.910068
     f[13] = 0.11  # 13 liver : Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    f[14] = 0  # 13 Gal
     f[17] = 0.32  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
     f[18] = 0.32  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
     f[20] = 0.3  # 20 stomach wall: Li et al. doi: 10.3389/fonc.2022.821586
+    f[21] = 0.0  # 20 stomach content
     f[22] = 0.15  # 22 Pancreas (from literature)
     f[23] = 0.097  # 23 right kydney cortex : van Baalen et al. Doi: jmri.25519
     f[24] = 0.158  # 23 right kydney medulla : van Baalen et al. Doi: jmri.25519
     f[25] = 0.097  # 23 left kydney cortex : van Baalen et al. Doi: jmri.25519
     f[26] = 0.158  # 23 left kydney medulla : van Baalen et al. Doi: jmri.25519
     f[30] = 0.2  # 30 spleen : Taimouri et al. Doi: 10.1118/1.4915495
+    f[34] = 0.178  # 34 spinal cord :doi: 10.3389/fonc.2022.961473
+    f[35] = 0.145  # 35 Bone marrow : https://pubmed.ncbi.nlm.nih.gov/30194746/
     f[36] = 1.0  # 36 artery
     f[37] = 1.0  # 37 vein
     f[40] = 0.69  # 40 asc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
@@ -153,15 +161,19 @@ def contrast_curve_calc():
     Ds[8] = 0.1  # 8 Blood ra
     Ds[10] = 0.0263  # 8 Muscle: 10.3389/fresc.2022.910068
     Ds[13] = 0.1  # 13 liver: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    Ds[14] = 0.1  # 14 Gal
     Ds[17] = 0.03  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
     Ds[18] = 0.03  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
     Ds[20] = 0.012  # 20 stomach wall: Li et al. doi: 10.3389/fonc.2022.821586
+    Ds[21] = 0.1  # 20 stomach content
     Ds[22] = 0.01  # 22 Pancreas (from literature)
     Ds[23] = 0.02  # 23 right kydney cortex : van Baalen et al. Doi: jmri.25519
     Ds[24] = 0.019  # 23 right kydney medulla : van Baalen et al. Doi: jmri.25519
     Ds[25] = 0.02  # 23 left kydney cortex : van Baalen et al. Doi: jmri.25519
     Ds[26] = 0.019  # 23 left kydney medulla : van Baalen et al. Doi: jmri.25519
     Ds[30] = 0.03  # 30 spleen : Taimouri et al. Doi: 10.1118/1.4915495
+    Ds[34] = 0.0289  # 34 spinal cord :doi: 10.3389/fonc.2022.961473
+    Ds[35] = 0.05  # 35 Bone marrow :
     Ds[36] = 0.1  # 36 artery
     Ds[37] = 0.1  # 37 vein
     Ds[40] = 0.029  # 40 asc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
@@ -261,7 +273,7 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
         73: 'Pancreas tumor',
     }
     ###############################################################################
-    np.random.seed(42)
+    np.random.seed(41)
     Tissue = np.zeros((74, 4))
     Tissue[1] = [1030, 40, 1471, 47]
     Tissue[2] = [1030, 40, 1471, 47]
@@ -427,7 +439,7 @@ if __name__ == '__main__':
         # sig = np.flip(sig,axis=0)
         # sig = np.flip(sig,axis=1)
         res=np.eye(4)
-        res[2]=2
+        res[2,2]=2
 
         voxel_selector_fraction = 0.5
         D, f, Ds = contrast_curve_calc()
