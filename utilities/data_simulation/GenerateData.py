@@ -4,19 +4,25 @@ class GenerateData:
     """
     Generate exponential and linear data
     """
-    def __init__(self, operator=None):
+    def __init__(self, operator=None, rng=None):
         """
         Parameters
         ----------
         operator : numpy or torch
             Must provide mathematical operators
+        rng : random number generator
+            Must provide normal() operator
         """
         if operator is None:
             self._op = np
         else:
             self._op = operator
+        if rng is None:
+            self._rng = self._op.random
+        else:
+            self._rng = rng
 
-    def ivim_signal(self, D, Dp, f, S0, bvalues, snr=None):
+    def ivim_signal(self, D, Dp, f, S0, bvalues, snr=None, rician_noise=False):
         """
         Generates IVIM (biexponential) signal
 
@@ -34,7 +40,7 @@ class GenerateData:
             The diffusion (b-values)
         """
         signal = self.multiexponential_signal([D, Dp], [1 - f, f], S0, self._op.asarray(bvalues, dtype='float64'))
-        return self.add_rician_noise(signal, snr)
+        return self.add_noise(signal, snr, rician_noise)
 
     def exponential_signal(self, D, bvalues):
         """
@@ -73,7 +79,7 @@ class GenerateData:
         signal *= S0
         return signal
 
-    def add_rician_noise(self, real_signal, snr=None, imag_signal=None):
+    def add_noise(self, real_signal, snr=None, rician_noise=True, imag_signal=None):
         """
         Adds Rician noise to a real or complex signal
 
@@ -88,12 +94,13 @@ class GenerateData:
         """
         if imag_signal is None:
             imag_signal = self._op.zeros_like(real_signal)
-        if snr is None:
-            noisy_data = self._op.sqrt(self._op.power(real_signal, 2) + self._op.power(imag_signal, 2))
-        else:
-            real_noise = self._op.random.normal(0, 1 / snr, real_signal.shape)
-            imag_noise = self._op.random.normal(0, 1 / snr, imag_signal.shape)
-            noisy_data = self._op.sqrt(self._op.power(real_signal + real_noise, 2) + self._op.power(imag_signal + imag_noise, 2))
+        real_noise = self._op.zeros_like(real_signal)
+        imag_noise = self._op.zeros_like(real_signal)
+        if snr is not None:
+            real_noise = self._rng.normal(0, 1 / snr, real_signal.shape)
+            if rician_noise:
+                imag_noise = self._rng.normal(0, 1 / snr, imag_signal.shape)
+        noisy_data = self._op.sqrt(self._op.power(real_signal + real_noise, 2) + self._op.power(imag_signal + imag_noise, 2))
         return noisy_data
 
     def linear_signal(self, D, bvalues, offset=0):

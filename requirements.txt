@@ -1,10 +1,15 @@
-numpy
+numpy<2
 scipy
 torchio
 torch
-logging
 joblib
 dipy
 matplotlib
 scienceplots
 cvxpy
+zenodo-get
+pytest
+tqdm
+pandas
+sphinx
+sphinx_rtd_theme
