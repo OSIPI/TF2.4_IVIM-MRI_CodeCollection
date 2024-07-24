@@ -205,17 +205,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     showLoading();
 
-    Papa.parse('test_output.csv', {
-        download: true,
-        header: true,
-        complete: results => {
-            data = results;
-            hideLoading();
-            populateOptions(data);
-            drawBoxPlot();
-            drawRegionBoxPlot();
-
+    fetch('test_output.csv.gz')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
+        return response.arrayBuffer();
+    })
+    .then(buffer => {
+        // Use pako to decompress the data
+        var decompressed = pako.inflate(new Uint8Array(buffer), { to: 'string' });
+        // Now use Papa Parse to parse the decompressed CSV data
+        Papa.parse(decompressed, {
+            header: true,
+            complete: results => {
+                console.log(results);
+                data = results;
+                hideLoading();
+                populateOptions(data);
+                drawBoxPlot();
+                drawRegionBoxPlot();
+            }
+        });
+    })
+    .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
     });
 
     function populateOptions(data) {
