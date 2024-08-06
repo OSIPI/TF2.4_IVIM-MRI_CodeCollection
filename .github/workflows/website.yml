@@ -47,7 +47,7 @@ jobs:
           name: 'Data'
 
       - name: 'Filter and compress results file.'
-        run: python tests/IVIMmodels/unit_tests/reduce_output_size.py
+        run: python utilities/reduce_output_size.py
 
       - name: move data to the dashboard folder
         run: |
