@@ -273,7 +273,7 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
         73: 'Pancreas tumor',
     }
     ###############################################################################
-    np.random.seed(41)
+    np.random.seed(42)
     Tissue = np.zeros((74, 4))
     Tissue[1] = [1030, 40, 1471, 47]
     Tissue[2] = [1030, 40, 1471, 47]
