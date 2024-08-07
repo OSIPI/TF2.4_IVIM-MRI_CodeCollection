@@ -22,3 +22,5 @@ md5sums.txt
 nosetests.xml
 coverage.xml
 *.pyc
+phantoms/MR_XCAT_qMRI/*.json
+phantoms/MR_XCAT_qMRI/*.txt
