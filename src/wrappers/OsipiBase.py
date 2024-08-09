@@ -3,6 +3,7 @@ import importlib
 from scipy.stats import norm
 import pathlib
 import sys
+from tqdm import tqdm
 
 class OsipiBase:
     """The base class for OSIPI IVIM fitting"""
@@ -47,7 +48,7 @@ class OsipiBase:
         pass
 
     #def osipi_fit(self, data=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, **kwargs):
-    def osipi_fit(self, data, bvalues, **kwargs):
+    def osipi_fit(self, data, bvalues=None, **kwargs):
         """Fits the data with the bvalues
         Returns [S0, f, Dstar, D]
         """
@@ -68,7 +69,6 @@ class OsipiBase:
         #kwargs["bvalues"] = use_bvalues
         
         #args = [data, use_bvalues, use_thresholds]
-        args = [data, use_bvalues]
         #if self.required_bounds or self.required_bounds_optional:
             #args.append(use_bounds)
         #if self.required_initial_guess or self.required_initial_guess_optional:
@@ -83,7 +83,13 @@ class OsipiBase:
         
         #args = [data, use_bvalues, use_initial_guess, use_bounds, use_thresholds]
         #args = [arg for arg in args if arg is not None]
-        results = self.ivim_fit(*args, **kwargs)
+
+        # Assuming the last dimension of the data is the signal values of each b-value
+        results = np.empty(list(data.shape[:-1])+[3]) # Create an array with the voxel dimensions + the ones required for the fit
+        for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
+            args = [data[ijk], use_bvalues]
+            fit = list(self.ivim_fit(*args, **kwargs))
+            results[ijk] = fit
         
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         return results

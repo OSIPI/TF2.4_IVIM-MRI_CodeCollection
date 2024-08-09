@@ -10,6 +10,8 @@ __pycache__/
 *.raw
 bvals.txt
 download
+.Introduction_to_TF24_IVIM-MRI_CodeCollection_github_and_IVIM_Analysis_using_Python.ipynb
+.ipynb_checkpoints
 md5sums.txt
 *.gz
 *.zip
