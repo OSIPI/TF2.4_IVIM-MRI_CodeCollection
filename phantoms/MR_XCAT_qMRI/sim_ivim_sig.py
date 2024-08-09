@@ -93,6 +93,7 @@ def contrast_curve_calc():
     D[6] = 3e-3  # 6 Blood RV
     D[7] = 3e-3  # 7 Blood la
     D[8] = 3e-3  # 8 Blood ra
+    D[10] = 1.37e-3  # 8 Muscle: 10.3389/fresc.2022.910068
     D[13] = 1.5e-3  # 13 liver: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
     D[17] = 1.67e-3  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
     D[18] = 1.67e-3  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
@@ -110,7 +111,7 @@ def contrast_curve_calc():
     D[42] = 1.31e-3  # 42 desc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
     D[43] = 1.31e-3  # 43 small intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
     D[50] = 3e-3  # 50 pericardium
-    D[73] = 1.8e-3  # 73 Pancreatic tumor (advanced state, from literature)
+    D[73] = 1.32e-3  # 73 Pancreatic tumor Klaassen et al. PMC7463316
 
     f = np.full(74, np.nan)
     f[1] = 0.15  # 1 Myocardium LV : Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
@@ -121,6 +122,7 @@ def contrast_curve_calc():
     f[6] = 1.00  # 6 Blood RV
     f[7] = 1.00  # 7 Blood la
     f[8] = 1.00  # 8 Blood ra
+    f[10] = 0.10  # 8 Muscle: 10.3389/fresc.2022.910068
     f[13] = 0.11  # 13 liver : Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
     f[17] = 0.32  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
     f[18] = 0.32  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
@@ -138,7 +140,7 @@ def contrast_curve_calc():
     f[42] = 0.69  # 42 desc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
     f[43] = 0.69  # 43 small intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
     f[50] = 0.07  # 50 pericardium
-    f[73] = 0.37  # 73 Pancreatic tumor (advanced state, from literature)
+    f[73] = 0.0549  # 73 Pancreatic tumor PMC7463316
 
     Ds = np.full(74, np.nan)
     Ds[1] = 0.08  # 1 Myocardium LV: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
@@ -149,6 +151,7 @@ def contrast_curve_calc():
     Ds[6] = 0.1  # 6 Blood RV
     Ds[7] = 0.1  # 7 Blood la
     Ds[8] = 0.1  # 8 Blood ra
+    Ds[10] = 0.0263  # 8 Muscle: 10.3389/fresc.2022.910068
     Ds[13] = 0.1  # 13 liver: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
     Ds[17] = 0.03  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
     Ds[18] = 0.03  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
@@ -166,7 +169,7 @@ def contrast_curve_calc():
     Ds[42] = 0.029  # 42 desc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
     Ds[43] = 0.029  # 43 small intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
     Ds[50] = 0.01  # 50 pericardium
-    Ds[73] = 0.01  # 73 Pancreatic tumor (advanced state, from literature)
+    Ds[73] = 0.094  # 73 Pancreatic tumor PMC7463316/
     # Return values
 
     return D, f, Ds
