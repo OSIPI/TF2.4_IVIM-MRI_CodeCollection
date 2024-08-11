@@ -1,0 +1,33 @@
+name: Build and Run Docker
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-run-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Build the Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t tf2.4_ivim-mri_codecollection -f Docker/Dockerfile .
+
+      # Run the Docker container
+      - name: Run Docker container
+        run: |
+          docker run -it --rm --name TF2.4_IVIM-MRI_CodeCollection \
+            -v ${{ github.workspace }}:/usr/src/app \
+            -v ${{ github.workspace }}:/usr/app/output \
+            tf2.4_ivim-mri_codecollection brain.nii.gz brain.bvec brain.bval
