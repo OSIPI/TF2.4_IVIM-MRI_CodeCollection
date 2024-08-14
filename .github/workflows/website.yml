@@ -46,9 +46,12 @@ jobs:
         with:
           name: 'Data'
 
+      - name: 'Filter and compress results file.'
+        run: python utilities/reduce_output_size.py test_output.csv test_output.csv.gz
+
       - name: move data to the dashboard folder
         run: |
-          mv test_output.csv website/dashboard
+          mv test_output.csv.gz website/dashboard
 
       - name: Build documentation
         run: |
