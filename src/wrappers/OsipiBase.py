@@ -118,6 +118,9 @@ class OsipiBase:
         Args:
             data (array): 3D (single slice) or 4D (multi slice) DWI data.
             bvalues (array, optional): The b-values of the DWI data. Defaults to None.
+
+        Returns:
+            results (dict): Dict with key each containing an array which is a parametric map.
         """
         
         try:
