@@ -112,6 +112,37 @@ class OsipiBase:
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         return results
     
+    def osipi_fit_full_volume(self, data, bvalues=None, **kwargs):
+        """Sends a full volume in one go to the fitting algorithm. The osipi_fit method only sends one voxel at a time.
+
+        Args:
+            data (array): 3D (single slice) or 4D (multi slice) DWI data.
+            bvalues (array, optional): The b-values of the DWI data. Defaults to None.
+        """
+        
+        use_bvalues = bvalues if bvalues is not None else self.bvalues
+        if use_bvalues is not None: use_bvalues = np.asarray(use_bvalues) 
+
+        # Check if there is an attribute that defines the result dictionary keys
+        if hasattr(self, "result_keys"):
+            # result_keys is a list of strings of parameter names, e.g. "S0", "f1", "f2", etc.
+            result_keys = self.result_keys
+        else:
+            # Default is ["f", "D*", "D"]
+            self.result_keys = ["f", "D*", "D"]
+
+        # Create the results dictionary
+        results = {}
+        for key in self.result_keys:
+            results[key] = np.empty(list(data.shape[:-1]))
+
+        args = [data, use_bvalues]
+        fit = self.ivim_fit(*args, **kwargs) # Assume this is a dict with an array per key representing the parametric maps
+        for key in list(fit.keys()):
+            results[key] = fit[key]
+
+        return results
+    
     def osipi_print_requirements(self):
         """
         Prints the requirements of the algorithm.
