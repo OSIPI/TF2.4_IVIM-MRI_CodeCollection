@@ -99,7 +99,7 @@ def contrast_curve_calc():
     D[17] = 1.67e-3  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
     D[18] = 1.67e-3  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
     D[20] = 1.5e-3  # 20 stomach wall: Li et al. doi: 10.3389/fonc.2022.821586
-    D[21] = 2.0e-3  # 21 stomach content
+    D[21] = 3.0e-3  # 21 stomach content
     D[22] = 1.3e-3  # 22 Pancreas (from literature)
     D[23] = 2.12e-3  # 23 right kydney cortex : van Baalen et al. Doi: jmri.25519
     D[24] = 2.09e-3  # 23 right kydney medulla : van Baalen et al. Doi: jmri.25519
@@ -165,7 +165,7 @@ def contrast_curve_calc():
     Ds[17] = 0.03  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
     Ds[18] = 0.03  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
     Ds[20] = 0.012  # 20 stomach wall: Li et al. doi: 10.3389/fonc.2022.821586
-    Ds[21] = 0.1  # 20 stomach content
+    Ds[21] = 0.0  # 20 stomach content
     Ds[22] = 0.01  # 22 Pancreas (from literature)
     Ds[23] = 0.02  # 23 right kydney cortex : van Baalen et al. Doi: jmri.25519
     Ds[24] = 0.019  # 23 right kydney medulla : van Baalen et al. Doi: jmri.25519
@@ -297,7 +297,7 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
     Tissue[19] = [1045.5, 37.3, 1201, 44]
     Tissue[20] = [981.5, 36, 1232.9, 37.20]
     #Tissue[20] = [981.5, 36, 1232.9, 37.20]
-    Tissue[21] = [0, 0, 0, 0]
+    Tissue[21] = [2500, 1250, 4000, 2000]
     Tissue[22] = [584, 46, 725, 43]
     Tissue[23] = [828, 71, 1168, 66]
     Tissue[24] = [1412, 85, 1545, 81]
