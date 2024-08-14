@@ -6,6 +6,8 @@ The ISMRM Open Science Initiative for Perfusion Imaging (OSIPI) is an initiative
 
 This **IVIM code collection** code library is maintained by OSIPI [Taskforce 2.4](https://www.osipi.org/task-force-2-4/) (*currently not available*) and aims to collect, test and share open-source code related to intravoxel incoherent motion (IVIM) analysis of diffusion encoded MRI data to be used in research and software development. Code contributions can include any code related IVIM analysis (denoising, motion correction, model fitting, etc.), but at an initial phase, development of tests and other features of the repository will predominantly focus on fitting algorithms. A goal of the IVIM OSIPI task force is to develop a fully tested and harmonized code library, building upon the contributions obtained through this initiative. Documentation and analysis are available on the [OSIPI TF2.4](https://osipi.github.io/TF2.4_IVIM-MRI_CodeCollection/).
 
+We have some useful tools and further documentation on https://osipi.github.io/TF2.4_IVIM-MRI_CodeCollection/.
+
 ## How to contribute
 
 If you would like to get involve in OSIPI and work within the task force, please email the contacts listed on our website.
