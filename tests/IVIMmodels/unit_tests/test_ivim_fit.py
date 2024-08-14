@@ -88,7 +88,7 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
         test_result['status'] = "XFAILED"
 
     test_results.append(test_result)
-    with open('plots_data.json', 'w') as f:
+    with open('test_results_report.json', 'w') as f:
             json.dump({"results": test_results, "rtol": tolerances["rtol"],
         "atol": tolerances["atol"], }, f, indent=4)
     npt.assert_allclose(data['f'], f_fit, rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
