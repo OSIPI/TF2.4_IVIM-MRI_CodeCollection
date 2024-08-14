@@ -120,28 +120,36 @@ class OsipiBase:
             bvalues (array, optional): The b-values of the DWI data. Defaults to None.
         """
         
-        use_bvalues = bvalues if bvalues is not None else self.bvalues
-        if use_bvalues is not None: use_bvalues = np.asarray(use_bvalues) 
+        try:
+            use_bvalues = bvalues if bvalues is not None else self.bvalues
+            if use_bvalues is not None: use_bvalues = np.asarray(use_bvalues) 
 
-        # Check if there is an attribute that defines the result dictionary keys
-        if hasattr(self, "result_keys"):
-            # result_keys is a list of strings of parameter names, e.g. "S0", "f1", "f2", etc.
-            result_keys = self.result_keys
-        else:
-            # Default is ["f", "D*", "D"]
-            self.result_keys = ["f", "D*", "D"]
+            # Check if there is an attribute that defines the result dictionary keys
+            if hasattr(self, "result_keys"):
+                # result_keys is a list of strings of parameter names, e.g. "S0", "f1", "f2", etc.
+                result_keys = self.result_keys
+            else:
+                # Default is ["f", "D*", "D"]
+                self.result_keys = ["f", "D*", "D"]
 
-        # Create the results dictionary
-        results = {}
-        for key in self.result_keys:
-            results[key] = np.empty(list(data.shape[:-1]))
+            # Create the results dictionary
+            results = {}
+            for key in self.result_keys:
+                results[key] = np.empty(list(data.shape[:-1]))
 
-        args = [data, use_bvalues]
-        fit = self.ivim_fit(*args, **kwargs) # Assume this is a dict with an array per key representing the parametric maps
-        for key in list(fit.keys()):
-            results[key] = fit[key]
+            args = [data, use_bvalues]
+            fit = self.ivim_fit_full_volume(*args, **kwargs) # Assume this is a dict with an array per key representing the parametric maps
+            for key in list(fit.keys()):
+                results[key] = fit[key]
 
-        return results
+            return results
+
+        except: 
+            # Check if the problem is that full volume fitting is simply not supported in the standardized implementation
+            if not hasattr(self, "ivim_fit_full_volume"): #and callable(getattr(self, "ivim_fit_full_volume")):
+                print("Full volume fitting not supported for this algorithm")
+
+            return False
     
     def osipi_print_requirements(self):
         """
