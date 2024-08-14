@@ -11,7 +11,7 @@ from utilities.data_simulation.Download_data import download_data
 # code adapted from MAtlab code by Eric Schrauben: https://github.com/schrau24/XCAT-ERIC
 # This code generates a 4D IVIM phantom as nifti file
 
-def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleaved=False):
+def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleaved=False,T1T2=True):
     np.random.seed(42)
     if motion:
         states = range(1,21)
@@ -26,7 +26,7 @@ def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleav
         XCAT = XCAT[-1:0:-2,-1:0:-2,10:160:4]
 
         D, f, Ds = contrast_curve_calc()
-        S, Dim, fim, Dpim, legend = XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds)
+        S, Dim, fim, Dpim, legend = XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds,T1T2=T1T2)
         if state == 1:
             Dim_out = Dim
             fim_out = fim
@@ -187,7 +187,7 @@ def contrast_curve_calc():
     return D, f, Ds
 
 
-def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
+def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True, T1T2=True):
     ###########################################################################################
     # This script converts XCAT tissue values to MR contrast based on the SSFP signal equation.
     # Christopher W. Roy 2018-12-04 # fetal.xcmr@gmail.com
@@ -363,7 +363,6 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
             else:
                 T1 = Tissue[iTissue, 2]
                 T2 = Tissue[iTissue, 3]
-
             if ivim_cont and not np.isnan([D[iTissue], f[iTissue], Ds[iTissue]]).any():
                 # note we are assuming blood fraction has the same T1 as tissue fraction here for simplicity. Can be changed in future.
                 Dtemp=D[iTissue]
@@ -374,8 +373,11 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
                 ftemp=np.random.rand(1)*0.5
                 Dstemp=5e-3+np.random.rand(1)*1e-1
             S0 = ivim(bvalue,Dtemp,ftemp,Dstemp)
-            if T1 > 0 or T2 > 0:
-                MR = MR + np.tile(np.expand_dims(XCAT == iTissue,3),len(S0)) * S0 * (1 - 2 * np.exp(-(TR - TE / 2) / T1) + np.exp(-TR / T1)) * np.exp(-TE / T2)
+            if T1T2:
+                if T1 > 0 or T2 > 0:
+                    MR = MR + np.tile(np.expand_dims(XCAT == iTissue,3),len(S0)) * S0 * (1 - 2 * np.exp(-(TR - TE / 2) / T1) + np.exp(-TR / T1)) * np.exp(-TE / T2)
+            else:
+                MR = MR + np.tile(np.expand_dims(XCAT == iTissue,3),len(S0)) * S0
             Dim = Dim + (XCAT == iTissue) * Dtemp
             fim = fim + (XCAT == iTissue) * ftemp
             Dpim = Dpim + (XCAT == iTissue) * Dstemp
@@ -415,6 +417,7 @@ if __name__ == '__main__':
     parser.add_argument("-n", "--noise", type=float, default=0.0005, help="Noise")
     parser.add_argument("-m", "--motion", action="store_true", help="Motion flag")
     parser.add_argument("-i", "--interleaved", action="store_true", help="Interleaved flag")
+    parser.add_argument("-u", "--T1T2", action="store_true", help="weight signal with T1T2") # note, set this to zero when generating test data for unit testing!
     args = parser.parse_args()
 
     if args.bvalues_file and args.bvalue:
@@ -432,10 +435,11 @@ if __name__ == '__main__':
     noise = args.noise
     motion = args.motion
     interleaved = args.interleaved
+    T1T2 = args.T1T2
     download_data()
     for key, bvalue in bvalues.items():
         bvalue = np.array(bvalue)
-        sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=interleaved)
+        sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=interleaved,T1T2=T1T2)
         # sig = np.flip(sig,axis=0)
         # sig = np.flip(sig,axis=1)
         res=np.eye(4)
