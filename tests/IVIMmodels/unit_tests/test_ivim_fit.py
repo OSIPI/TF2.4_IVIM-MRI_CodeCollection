@@ -7,12 +7,11 @@ import os
 import logging
 from src.wrappers.OsipiBase import OsipiBase
 from utilities.data_simulation.GenerateData import GenerateData
-
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+#run using python -m pytest from the root folder
 
-# Define a global list to hold the test results
 test_results = []
+
 
 def signal_helper(signal):
     signal = np.asarray(signal)
@@ -60,57 +59,38 @@ def data_ivim_fit_saved():
             tolerances = algorithm_dict.get("tolerances", {})
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances
 
+
 @pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances", data_ivim_fit_saved())
 def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances, request):
     global test_results
     if xfail["xfail"]:
-        logger.info(xfail["xfail"])
         mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
         request.node.add_marker(mark)
     fit = OsipiBase(algorithm=algorithm, **kwargs)
     signal, ratio = signal_helper(data["data"])
+    
     tolerances = tolerances_helper(tolerances, ratio, data["noise"])
     [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals)
-
-    # Log the results and tolerances
-    logger.info(tolerances["rtol"])
-    logger.info(tolerances["atol"])
-
     def to_list_if_needed(value):
         return value.tolist() if isinstance(value, np.ndarray) else value
-
     test_result = {
         "name": name,
         "algorithm": algorithm,
         "f_fit": to_list_if_needed(f_fit),
         "Dp_fit": to_list_if_needed(Dp_fit),
         "D_fit": to_list_if_needed(D_fit),
-        
+        "f": to_list_if_needed(data['f']),
+        "Dp": to_list_if_needed(data['Dp']),
+        "D": to_list_if_needed(data['D']),
         "status": "PASSED"
     }
+    if xfail["xfail"]:
+        test_result['status'] = "XFAILED"
 
-    try:
-        npt.assert_allclose(data['f'], f_fit, rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
-        npt.assert_allclose(data['D'], D_fit, rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
-        npt.assert_allclose(data['Dp'], Dp_fit, rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
-    except AssertionError as e:
-        test_result["status"] = "FAILED"
-        test_result["error"] = str(e)
-        test_result["actual_values"] = {
-            "f": to_list_if_needed(f_fit),
-            "D": to_list_if_needed(D_fit),
-            "Dp": to_list_if_needed(Dp_fit)
-        }
-        test_result["desired_values"] = {
-            "f": data['f'],
-            "D": data['D'],
-            "Dp": data['Dp']
-        }
-        logger.error(f"Test failed for {name} with algorithm {algorithm}: {e}")
-
-    # Append the result to the test_results list
     test_results.append(test_result)
     with open('plots_data.json', 'w') as f:
             json.dump({"results": test_results, "rtol": tolerances["rtol"],
         "atol": tolerances["atol"], }, f, indent=4)
-    logger.info(test_results)
+    npt.assert_allclose(data['f'], f_fit, rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
+    npt.assert_allclose(data['D'], D_fit, rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
+    npt.assert_allclose(data['Dp'], Dp_fit, rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
