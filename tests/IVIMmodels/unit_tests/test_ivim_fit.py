@@ -114,24 +114,31 @@ from utilities.data_simulation.GenerateData import GenerateData
 
 def signal_helper(signal):
     signal = np.asarray(signal)
-    signal = np.abs(signal)
-    signal /= signal[0]
-    ratio = 1 / signal[0]
-    return signal, ratio
+    signal = np.abs(signal) #Oliver: do we need this for unit testing? It will bias the fits by forcing positive signals.
+    signal /= signal[0] # this scales noise differenly. I have now made sure signal is produced with amplitude 1 if right flags are selected. Then  SNR is fixed. Then, this sentence may be redundant
+    #ratio = 1 / signal[0] #this is 1 per definition (See sentence above)
+    return signal
 
-def tolerances_helper(tolerances, ratio, noise):
+def tolerances_helper(tolerances, data):
+    epsilon = 0.0001
     if "dynamic_rtol" in tolerances:
         dyn_rtol = tolerances["dynamic_rtol"]
-        scale = dyn_rtol["offset"] + dyn_rtol["ratio"]*ratio + dyn_rtol["noise"]*noise + dyn_rtol["noiseCrossRatio"]*ratio*noise
-        tolerances["rtol"] = {"f": scale*dyn_rtol["f"], "D": scale*dyn_rtol["D"], "Dp": scale*dyn_rtol["Dp"]}
+        scale = dyn_rtol["offset"] + dyn_rtol["noise"]*data["noise"]
+        if dyn_rtol["scale_f"]:
+            tolerances["rtol"] = {"f": scale*dyn_rtol["f"], "D": scale*dyn_rtol["D"]/(1-data['f']+epsilon), "Dp": scale*dyn_rtol["Dp"]/(data['f']+epsilon)}
+        else:
+            tolerances["rtol"] = {"f": scale * dyn_rtol["f"], "D": scale * dyn_rtol["D"]/0.9,"Dp": scale * dyn_rtol["Dp"]/0.1}
     else:
-        tolerances["rtol"] = tolerances.get("rtol", {"f": 5, "D": 5, "Dp": 25})
+        tolerances["rtol"] = tolerances.get("rtol", {"f": 0.1, "D": 0.1, "Dp": 0.3})
     if "dynamic_atol" in tolerances:
         dyn_atol = tolerances["dynamic_atol"]
-        scale = dyn_atol["offset"] + dyn_atol["ratio"]*ratio + dyn_atol["noise"]*noise + dyn_atol["noiseCrossRatio"]*ratio*noise
-        tolerances["atol"] = {"f": scale*dyn_atol["f"], "D": scale*dyn_atol["D"], "Dp": scale*dyn_atol["Dp"]}
+        scale = dyn_atol["offset"] + dyn_atol["noise"]*data["noise"]
+        if dyn_atol["scale_f"]:
+            tolerances["atol"] = {"f": scale*dyn_atol["f"], "D": scale*dyn_atol["D"]/(1-data['f']+epsilon), "Dp": scale*dyn_atol["Dp"]/(data['f']+epsilon)}
+        else:
+            tolerances["atol"] = {"f": scale*dyn_atol["f"], "D": scale*dyn_atol["D"]/0.9, "Dp": scale*dyn_atol["Dp"]/0.1}
     else:
-        tolerances["atol"] = tolerances.get("atol", {"f": 1e-2, "D": 1e-2, "Dp": 1e-1})
+        tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 4e-2})
     return tolerances
 
 def data_ivim_fit_saved():
@@ -165,12 +172,12 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
         mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
         request.node.add_marker(mark)
     fit = OsipiBase(algorithm=algorithm, **kwargs)
-    signal, ratio = signal_helper(data["data"])
-    tolerances = tolerances_helper(tolerances, ratio, data["noise"])
+    signal = signal_helper(data["data"])
+    tolerances = tolerances_helper(tolerances, data)
     [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals)
-    npt.assert_allclose(data['f'], f_fit, rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
+    npt.assert_allclose(f_fit,data['f'], rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
     if data['f']<0.80: # we need some signal for D to be detected
-        npt.assert_allclose(data['D'], D_fit, rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
+        npt.assert_allclose(D_fit,data['D'], rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
     if data['f']>0.03: #we need some f for D* to be interpretable
-        npt.assert_allclose(data['Dp'], Dp_fit, rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
+        npt.assert_allclose(Dp_fit,data['Dp'], rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
 
