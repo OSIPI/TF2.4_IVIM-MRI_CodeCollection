@@ -10,7 +10,16 @@ from utilities.data_simulation.GenerateData import GenerateData
 logger = logging.getLogger(__name__)
 #run using python -m pytest from the root folder
 
-test_results = []
+@pytest.fixture(scope="session")
+def test_results():
+    return []
+
+@pytest.fixture(scope="session", autouse=True)
+def write_report(test_results, request):
+    def finalize():
+        with open('test_results_report.json', 'w') as f:
+            json.dump({"results": test_results}, f, indent=4)
+    request.addfinalizer(finalize)
 
 
 def signal_helper(signal):
@@ -61,8 +70,7 @@ def data_ivim_fit_saved():
 
 
 @pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances", data_ivim_fit_saved())
-def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances, request):
-    global test_results
+def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances, request, test_results):
     if xfail["xfail"]:
         mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
         request.node.add_marker(mark)
@@ -88,9 +96,7 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
         test_result['status'] = "XFAILED"
 
     test_results.append(test_result)
-    with open('test_results_report.json', 'w') as f:
-            json.dump({"results": test_results, "rtol": tolerances["rtol"],
-        "atol": tolerances["atol"], }, f, indent=4)
+
     npt.assert_allclose(data['f'], f_fit, rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
     npt.assert_allclose(data['D'], D_fit, rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
     npt.assert_allclose(data['Dp'], Dp_fit, rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
