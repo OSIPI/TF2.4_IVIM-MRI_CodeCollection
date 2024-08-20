@@ -45,9 +45,6 @@
         }
     },
     "ETP_SRI_LinearFitting": {
-        "xfail_names": {
-            "Vein": true
-        },
         "options": {
             "thresholds": [500]
         },
