@@ -1,18 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('test_results_report.json')
+    fetch('report-summary.json')
         .then(response => response.json())
         .then(data => {
-            var rtol = data['rtol']
-
-            var atol = data['atol']
-
-            function createPlot(container, parameter, rtol_value, atol_value) {
-                var reference_values = data['results'].map(d => d[parameter]); // Assuming fit values are the reference
-                var fit_values = data['results'].map(d => d[parameter + '_fit']);
+            function createPlot(container, parameter) {
+                var reference_values = data.map(d => d[parameter]);
+                var fit_values = data.map(d => d[parameter + '_fit']);
                 var errors = fit_values.map((d, i) => d - reference_values[i]);
 
-                var tolerance = reference_values.map(d => atol_value + rtol_value * d);
-                var negative_tolerance = reference_values.map(d => -(atol_value + rtol_value * d));
+                var tolerance = reference_values.map((d, i) => data[i]['atol'][parameter] + data[i]['rtol'][parameter] * d);
+                var negative_tolerance = reference_values.map((d, i) => -(data[i]['atol'][parameter] + data[i]['rtol'][parameter] * d));
 
                 var scatter_trace = {
                     x: reference_values,
@@ -51,8 +47,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 Plotly.newPlot(container, plot_data, layout);
             }
 
-            createPlot('plot_f_fit', 'f', rtol.f, atol.f);
-            createPlot('plot_Dp_fit', 'Dp', rtol.Dp, atol.Dp);
-            createPlot('plot_D_fit', 'D', rtol.D, atol.D);
+            createPlot('plot_f_fit', 'f');
+            createPlot('plot_Dp_fit', 'Dp');
+            createPlot('plot_D_fit', 'D');
         });
 });

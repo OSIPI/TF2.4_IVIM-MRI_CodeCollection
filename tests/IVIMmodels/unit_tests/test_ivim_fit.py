@@ -70,7 +70,7 @@ def data_ivim_fit_saved():
 
 
 @pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances", data_ivim_fit_saved())
-def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances, request, test_results):
+def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances, request, record_property):
     if xfail["xfail"]:
         mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
         request.node.add_marker(mark)
@@ -90,12 +90,12 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
         "f": to_list_if_needed(data['f']),
         "Dp": to_list_if_needed(data['Dp']),
         "D": to_list_if_needed(data['D']),
-        "status": "PASSED"
+        "rtol": tolerances["rtol"],
+        "atol": tolerances["atol"]
     }
-    if xfail["xfail"]:
-        test_result['status'] = "XFAILED"
 
-    test_results.append(test_result)
+
+    record_property('test_data', test_result)
 
     npt.assert_allclose(data['f'], f_fit, rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
     npt.assert_allclose(data['D'], D_fit, rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
