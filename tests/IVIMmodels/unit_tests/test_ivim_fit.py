@@ -10,18 +10,6 @@ from utilities.data_simulation.GenerateData import GenerateData
 logger = logging.getLogger(__name__)
 #run using python -m pytest from the root folder
 
-@pytest.fixture(scope="session")
-def test_results():
-    return []
-
-@pytest.fixture(scope="session", autouse=True)
-def write_report(test_results, request):
-    def finalize():
-        with open('test_results_report.json', 'w') as f:
-            json.dump({"results": test_results}, f, indent=4)
-    request.addfinalizer(finalize)
-
-
 def signal_helper(signal):
     signal = np.asarray(signal)
     signal = np.abs(signal)
