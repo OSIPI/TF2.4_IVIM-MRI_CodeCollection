@@ -3,11 +3,9 @@ import numpy.testing as npt
 import pytest
 import json
 import pathlib
-import os
-import logging
+
 from src.wrappers.OsipiBase import OsipiBase
 from utilities.data_simulation.GenerateData import GenerateData
-logger = logging.getLogger(__name__)
 #run using python -m pytest from the root folder
 
 def signal_helper(signal):

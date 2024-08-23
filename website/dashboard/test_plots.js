@@ -8,8 +8,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 var errors = fit_values.map((d, i) => d - reference_values[i]);
 
                 var tolerance = reference_values.map((d, i) => data[i]['atol'][parameter] + data[i]['rtol'][parameter] * d);
-                var negative_tolerance = reference_values.map((d, i) => -(data[i]['atol'][parameter] + data[i]['rtol'][parameter] * d));
+                var negative_tolerance = tolerance.map(t => -t);
 
+                var minRefValue = Math.min(...reference_values);
+                var maxRefValue = Math.max(...reference_values);
+                // Create a range for tolerance trace x axis.
+                var xRange = [minRefValue, maxRefValue];
                 var scatter_trace = {
                     x: reference_values,
                     y: errors,
@@ -19,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
 
                 var tolerance_trace = {
-                    x: reference_values,
+                    x: xRange,
                     y: tolerance,
                     mode: 'lines',
                     type: 'scatter',
@@ -28,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
 
                 var negative_tolerance_trace = {
-                    x: reference_values,
+                    x: xRange,
                     y: negative_tolerance,
                     mode: 'lines',
                     type: 'scatter',
