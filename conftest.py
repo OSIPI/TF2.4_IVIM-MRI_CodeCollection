@@ -2,6 +2,10 @@ import pytest
 import pathlib
 import json
 import csv
+import tempfile
+import os
+import random
+import numpy as np
 # import datetime
 
 
@@ -178,3 +182,45 @@ def data_list(filename):
     bvals = bvals['bvalues']
     for name, data in all_data.items():
         yield name, bvals, data
+
+@pytest.fixture
+def bval_bvec_info():
+    shells = [0, 10, 20, 50, 100, 200, 500, 1000]
+    # random.shuffle(shells)
+    bvals = np.concatenate((shells, random.choices(shells, k=10)), axis=0)
+
+    vecs = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1], [0.707, 0.707, 0], [0.5, 0.5, 0.5], [0, 0.707, 0.707], [0.707, 0, 0.707]]
+    for idx in range(len(vecs)):
+        if np.linalg.norm(vecs[idx]) != 0:
+            vecs[idx] = vecs[idx]/np.linalg.norm(vecs[idx])
+    bvecs = []
+    vecs_idx = 1  # the first index is needed for the true output, but not needed here
+    for idx in range(len(bvals)):
+        if bvals[idx] == 0:
+            bvecs.append(np.asarray([0, 0, 0]))
+        elif vecs_idx < len(vecs):
+            bvecs.append(vecs[vecs_idx])
+            vecs_idx += 1
+        else:
+            bvecs.append(random.choice(vecs[1:]))  # don't put a b0 in where it shouldn't be
+    print(f'raw bvals {bvals}')
+    print(f'raw bvecs {bvecs}')
+    
+
+    with tempfile.NamedTemporaryFile(mode='wt', delete=False) as fp_val, tempfile.NamedTemporaryFile(mode='wt', delete=False) as fp_vec:
+        writer = csv.writer(fp_val, delimiter=' ')
+        for bval in bvals:
+            writer.writerow((bval,))
+        fp_val.close()
+        writer = csv.writer(fp_vec, delimiter=' ')
+        for bvec in bvecs:
+            writer.writerow(bvec)
+        fp_vec.close()
+        yield (fp_val.name, np.asarray(shells), bvals, fp_vec.name, np.asarray(vecs), np.asarray(bvecs))
+        os.unlink(fp_val.name)  # use NamedTemporaryFile with delete_on_close with later python versions
+        os.path.exists(fp_val.name)
+        os.unlink(fp_vec.name)  # use NamedTemporaryFile with delete_on_close with later python versions
+        os.path.exists(fp_vec.name)
+        
+
+
