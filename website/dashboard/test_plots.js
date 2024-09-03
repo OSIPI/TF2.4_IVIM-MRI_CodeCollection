@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Create a range for tolerance trace x axis.
                 var xRange = [minRefValue, maxRefValue];
 
-                var tolerance = xRange.map((d, i) => data[reference_values.indexOf(d)]['atol'][parameter] + data[i]['rtol'][parameter] * d);
+                var tolerance = xRange.map((d) => data[reference_values.indexOf(d)]['atol'][parameter] + data[reference_values.indexOf(d)]['rtol'][parameter] * d);
                 var negative_tolerance = tolerance.map(t => -t);
 
                 var scatter_trace = {
