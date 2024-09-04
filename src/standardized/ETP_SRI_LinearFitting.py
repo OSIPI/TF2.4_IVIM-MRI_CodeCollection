@@ -64,11 +64,21 @@ class ETP_SRI_LinearFitting(OsipiBase):
             ETP_object = LinearFit()
         else:
             ETP_object = LinearFit(self.thresholds[0])
-            
+        
+        results = {}
         if linear_fit_option:
             f, Dstar = ETP_object.linear_fit(bvalues, signals)
-            return f, Dstar
+
+            results["f"] = f
+            results["D*"] = Dstar
+
+            return results
         else: 
             f, D, Dstar = ETP_object.ivim_fit(bvalues, signals)
-            return f, Dstar, D
+
+            results["f"] = f
+            results["D*"] = Dstar
+            results["D"] = D
+
+            return results
     
