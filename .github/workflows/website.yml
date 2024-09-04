@@ -49,6 +49,7 @@ jobs:
       - name: Run the test that generates the plots report.
         run: |
           pytest tests/IVIMmodels/unit_tests/test_ivim_fit.py --json-report
+          mv .report.json utilities/
           python utilities/report-summary.py .report.json report-summary.json
 
       - name: 'Filter and compress results file.'
