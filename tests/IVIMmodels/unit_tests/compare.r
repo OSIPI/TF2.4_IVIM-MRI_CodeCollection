@@ -7,6 +7,7 @@
 # 1. Save the "Comparison" file from the run on Github, OR run this file directly
 # 2. Find the file producted "test_reference.csv" on Github, or whatever the "reference_file" variable was called
 # 3. This replaces "tests/IVIMmodels/unit_tests/reference_output.csv" in the repository
+# 4. For the algorithm "IAR_LU_modified_mix", replace the "f_f_alpha, Dp_f_alpha, D_f_alpha, f_t_alpha, Dp_t_alpha, D_t_alpha" columns with "0.01,0.01,0.01,0.0,0.0,0.0"
 
 args = commandArgs(trailingOnly=TRUE)
 # Define file paths
