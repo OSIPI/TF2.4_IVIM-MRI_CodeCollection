@@ -3,6 +3,11 @@
 #Run like this:
 #Rscript --vanilla tests/IVIMmodels/unit_tests/compare.r test_output.csv test_reference.csv reference_output.csv test_results.csv
 
+# If this script fails:
+# 1. Save the "Comparison" file from the run on Github, OR run this file directly
+# 2. Find the file producted "test_reference.csv" on Github, or whatever the "reference_file" variable was called
+# 3. This replaces "tests/IVIMmodels/unit_tests/reference_output.csv" in the repository
+
 args = commandArgs(trailingOnly=TRUE)
 # Define file paths
 test_file <- "test_output.csv"
