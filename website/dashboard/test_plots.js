@@ -5,21 +5,47 @@ document.addEventListener('DOMContentLoaded', function() {
             function createPlot(container, parameter) {
                 var reference_values = data.map(d => d[parameter]);
                 var fit_values = data.map(d => d[parameter + '_fit']);
-                var errors = fit_values.map((d, i) => d - reference_values[i]);
                 var minRefValue = Math.min(...reference_values);
                 var maxRefValue = Math.max(...reference_values);
                 // Create a range for tolerance trace x axis.
                 var xRange = [minRefValue, maxRefValue];
-
-                var tolerance = xRange.map((d) => data[reference_values.indexOf(d)]['atol'][parameter] + data[reference_values.indexOf(d)]['rtol'][parameter] * d);
+                var DefaultTolerance = {
+                    "rtol": {
+                        "f": 0.05,
+                        "D": 2,
+                        "Dp": 0.5
+                    },
+                    "atol": {
+                        "f": 0.2,
+                        "D": 0.001,
+                        "Dp": 0.06
+                    }
+                }
+                var tolerance = xRange.map((d) => DefaultTolerance['atol'][parameter] + DefaultTolerance['rtol'][parameter] * d);
                 var negative_tolerance = tolerance.map(t => -t);
 
+                var errors = fit_values.map((d, i) => (d - reference_values[i]));
+
+                // Define colors for each status
+                var statusColors = {
+                    'passed': 'green',
+                    'xfailed': 'yellow',
+                    'failed': 'red'
+                };
+
+                // Assign color based on the status
+                var marker_colors = data.map(entry => statusColors[entry.status]);
+            
                 var scatter_trace = {
                     x: reference_values,
                     y: errors,
                     mode: 'markers',
                     type: 'scatter',
-                    name: parameter.toUpperCase() + ' Fit Errors'
+                    name:  `${parameter} fitting values`,
+                    text: data.map(entry => `Algorithm: ${entry.algorithm} Region: ${entry.name}`),
+                    marker: {
+                        color: marker_colors
+                    }
                 };
 
                 var tolerance_trace = {
