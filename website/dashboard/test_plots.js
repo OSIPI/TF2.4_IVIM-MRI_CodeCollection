@@ -9,18 +9,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 var maxRefValue = Math.max(...reference_values);
                 // Create a range for tolerance trace x axis.
                 var xRange = [minRefValue, maxRefValue];
-                var DefaultTolerance = {
-                    "rtol": {
-                        "f": 0.05,
-                        "D": 2,
-                        "Dp": 0.5
-                    },
-                    "atol": {
-                        "f": 0.2,
-                        "D": 0.001,
-                        "Dp": 0.06
-                    }
-                }
+                // var DefaultTolerance = {
+                //     "rtol": {
+                //         "f": 0.05,
+                //         "D": 2,
+                //         "Dp": 0.5
+                //     },
+                //     "atol": {
+                //         "f": 0.2,
+                //         "D": 0.001,
+                //         "Dp": 0.06
+                //     }
+                // }
+                var DefaultTolerance = data[1] //Majority of the dataset has this tolerance values
                 var tolerance = xRange.map((d) => DefaultTolerance['atol'][parameter] + DefaultTolerance['rtol'][parameter] * d);
                 var negative_tolerance = tolerance.map(t => -t);
 
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Define colors for each status
                 var statusColors = {
                     'passed': 'green',
-                    'xfailed': 'yellow',
+                    'xfailed': 'blue',
                     'failed': 'red'
                 };
 
@@ -51,16 +52,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 var tolerance_trace = {
                     x: xRange,
                     y: tolerance,
-                    type: 'line',
-                    line: { dash: 'dash', color: 'green' },
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: { dash: 'dash', color: 'black' },
                     name: 'Positive Tolerance'
                 };
 
                 var negative_tolerance_trace = {
                     x: xRange,
                     y: negative_tolerance,
-                    type: 'line',
-                    line: { dash: 'dash', color: 'red' },
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: { dash: 'dash', color: 'black' },
                     name: 'Negative Tolerance'
                 };
 
