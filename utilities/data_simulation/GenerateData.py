@@ -53,7 +53,7 @@ class GenerateData:
         bvalues : list or array of float
             The diffusion (b-values)
         """
-        assert D >= 0, 'D must be >= 0'
+        assert np.all(D >= 0), 'all values in D must be >= 0'
         return self._op.exp(-self._op.asarray(bvalues, dtype='float64') * D)
 
     def multiexponential_signal(self, D, F, S0, bvalues):
@@ -75,7 +75,7 @@ class GenerateData:
         assert len(D) == len(F), 'D and F must be the same length'
         signal = self._op.zeros_like(bvalues)
         for [d, f] in zip(D, F):
-            signal += f * self.exponential_signal(d, bvalues)
+            signal += f * self.exponential_signal(d[0], bvalues)
         signal *= S0
         return signal
 
@@ -116,7 +116,7 @@ class GenerateData:
         offset : float
             The signal offset
         """
-        assert D >= 0, 'D must be >= 0'
+        assert np.all(D >= 0), 'every value in D must be >= 0'
         data = -D * np.asarray(bvalues)
         return data + offset
 

@@ -56,7 +56,9 @@ def save_nifti_file(data, output_file, affine=None, **kwargs):
     For saving the 3d nifti images of the output of the algorithm
     """
     if affine is None:
-        affine = np.eye(data.ndim + 1)
+        affine = np.eye(4)
+    else:
+        affine = np.array(affine.reshape(4, 4))
     output_img = nib.nifti1.Nifti1Image(data, affine , **kwargs)
     nib.save(output_img, output_file)
 
