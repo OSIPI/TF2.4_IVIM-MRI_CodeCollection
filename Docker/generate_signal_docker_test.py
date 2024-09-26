@@ -35,8 +35,8 @@ bvals_reshaped = np.broadcast_to(bvals, shape)
 signals = gd.ivim_signal(D_in, Dp_in, f_in, S0, bvals_reshaped)
 
 # Save the generated image as a NIfTI file
-save_nifti_file(signals, "ivim_image.nii.gz")
+save_nifti_file(signals, "ivim_simulation.nii.gz")
 # Save the bval in a file
-save_bval_bvec("ivim_image.bval", [0, 50, 100, 500, 1000])
+save_bval_bvec("ivim_simulation.bval", [0, 50, 100, 500, 1000])
 # Save the bvec value 
-save_bval_bvec("ivim_signal.bvec", [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+save_bval_bvec("ivim_simulation.bvec", [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
