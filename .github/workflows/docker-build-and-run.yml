@@ -28,6 +28,13 @@ jobs:
       - name: Generate input files
         run: |
           python -m Docker.generate_signal_docker_test
+        continue-on-error: true
+
+      - name: Print script output
+        run: |
+          echo "Script execution completed"
+          ls -la
+          pwd
 
       - name: Verify input files
         run: |
