@@ -100,7 +100,7 @@
     },
     "ETP_SRI_LinearFitting": {
         "xfail_names": {
-            "Vein": true
+            "Blood RV": true
         },
         "options": {
             "thresholds": [500]

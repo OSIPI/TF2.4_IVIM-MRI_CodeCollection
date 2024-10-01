@@ -11,7 +11,7 @@ from utilities.data_simulation.Download_data import download_data
 # code adapted from MAtlab code by Eric Schrauben: https://github.com/schrau24/XCAT-ERIC
 # This code generates a 4D IVIM phantom as nifti file
 
-def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleaved=False):
+def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleaved=False,T1T2=True):
     np.random.seed(42)
     if motion:
         states = range(1,21)
@@ -23,10 +23,10 @@ def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleav
 
         # Access the variables in the loaded .mat file
         XCAT = mat_data['IMG']
-        XCAT = XCAT[0:-1:2,0:-1:2,10:160:4]
+        XCAT = XCAT[-1:0:-2,-1:0:-2,10:160:4]
 
         D, f, Ds = contrast_curve_calc()
-        S, Dim, fim, Dpim, legend = XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds)
+        S, Dim, fim, Dpim, legend = XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds,T1T2=T1T2)
         if state == 1:
             Dim_out = Dim
             fim_out = fim
@@ -95,15 +95,19 @@ def contrast_curve_calc():
     D[8] = 3e-3  # 8 Blood ra
     D[10] = 1.37e-3  # 8 Muscle: 10.3389/fresc.2022.910068
     D[13] = 1.5e-3  # 13 liver: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    D[14] = 3.0e-3  # 13 Galbladder
     D[17] = 1.67e-3  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
     D[18] = 1.67e-3  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
     D[20] = 1.5e-3  # 20 stomach wall: Li et al. doi: 10.3389/fonc.2022.821586
+    D[21] = 3.0e-3  # 21 stomach content
     D[22] = 1.3e-3  # 22 Pancreas (from literature)
     D[23] = 2.12e-3  # 23 right kydney cortex : van Baalen et al. Doi: jmri.25519
     D[24] = 2.09e-3  # 23 right kydney medulla : van Baalen et al. Doi: jmri.25519
     D[25] = 2.12e-3  # 23 left kydney cortex : van Baalen et al. Doi: jmri.25519
     D[26] = 2.09e-3  # 23 left kydney medulla : van Baalen et al. Doi: jmri.25519
     D[30] = 1.3e-3  # 30 spleen : Taimouri et al. Doi: 10.1118/1.4915495
+    D[34] = 4.1e-4  # 34 spinal cord :doi: 10.3389/fonc.2022.961473
+    D[35] = 0.43e-3  # 35 Bone marrow : https://pubmed.ncbi.nlm.nih.gov/30194746/
     D[36] = 3e-3  # 36 artery
     D[37] = 3e-3  # 37 vein
     D[40] = 1.31e-3  # 40 asc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
@@ -124,15 +128,19 @@ def contrast_curve_calc():
     f[8] = 1.00  # 8 Blood ra
     f[10] = 0.10  # 8 Muscle: 10.3389/fresc.2022.910068
     f[13] = 0.11  # 13 liver : Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    f[14] = 0  # 13 Gal
     f[17] = 0.32  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
     f[18] = 0.32  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
     f[20] = 0.3  # 20 stomach wall: Li et al. doi: 10.3389/fonc.2022.821586
+    f[21] = 0.0  # 20 stomach content
     f[22] = 0.15  # 22 Pancreas (from literature)
     f[23] = 0.097  # 23 right kydney cortex : van Baalen et al. Doi: jmri.25519
     f[24] = 0.158  # 23 right kydney medulla : van Baalen et al. Doi: jmri.25519
     f[25] = 0.097  # 23 left kydney cortex : van Baalen et al. Doi: jmri.25519
     f[26] = 0.158  # 23 left kydney medulla : van Baalen et al. Doi: jmri.25519
     f[30] = 0.2  # 30 spleen : Taimouri et al. Doi: 10.1118/1.4915495
+    f[34] = 0.178  # 34 spinal cord :doi: 10.3389/fonc.2022.961473
+    f[35] = 0.145  # 35 Bone marrow : https://pubmed.ncbi.nlm.nih.gov/30194746/
     f[36] = 1.0  # 36 artery
     f[37] = 1.0  # 37 vein
     f[40] = 0.69  # 40 asc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
@@ -153,15 +161,19 @@ def contrast_curve_calc():
     Ds[8] = 0.1  # 8 Blood ra
     Ds[10] = 0.0263  # 8 Muscle: 10.3389/fresc.2022.910068
     Ds[13] = 0.1  # 13 liver: Delattre et al. doi: 10.1097/RLI.0b013e31826ef901
+    Ds[14] = 0.1  # 14 Gal
     Ds[17] = 0.03  # 17 esophagus : Huang et al. doi: 10.1259/bjr.20170421
     Ds[18] = 0.03  # 18 esophagus cont : Huang et al. doi: 10.1259/bjr.20170421
     Ds[20] = 0.012  # 20 stomach wall: Li et al. doi: 10.3389/fonc.2022.821586
+    Ds[21] = 0.0  # 20 stomach content
     Ds[22] = 0.01  # 22 Pancreas (from literature)
     Ds[23] = 0.02  # 23 right kydney cortex : van Baalen et al. Doi: jmri.25519
     Ds[24] = 0.019  # 23 right kydney medulla : van Baalen et al. Doi: jmri.25519
     Ds[25] = 0.02  # 23 left kydney cortex : van Baalen et al. Doi: jmri.25519
     Ds[26] = 0.019  # 23 left kydney medulla : van Baalen et al. Doi: jmri.25519
     Ds[30] = 0.03  # 30 spleen : Taimouri et al. Doi: 10.1118/1.4915495
+    Ds[34] = 0.0289  # 34 spinal cord :doi: 10.3389/fonc.2022.961473
+    Ds[35] = 0.05  # 35 Bone marrow :
     Ds[36] = 0.1  # 36 artery
     Ds[37] = 0.1  # 37 vein
     Ds[40] = 0.029  # 40 asc lower intestine : Hai-Jing et al. doi: 10.1097/RCT.0000000000000926
@@ -175,7 +187,7 @@ def contrast_curve_calc():
     return D, f, Ds
 
 
-def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
+def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True, T1T2=True):
     ###########################################################################################
     # This script converts XCAT tissue values to MR contrast based on the SSFP signal equation.
     # Christopher W. Roy 2018-12-04 # fetal.xcmr@gmail.com
@@ -285,7 +297,7 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
     Tissue[19] = [1045.5, 37.3, 1201, 44]
     Tissue[20] = [981.5, 36, 1232.9, 37.20]
     #Tissue[20] = [981.5, 36, 1232.9, 37.20]
-    Tissue[21] = [0, 0, 0, 0]
+    Tissue[21] = [2500, 1250, 4000, 2000]
     Tissue[22] = [584, 46, 725, 43]
     Tissue[23] = [828, 71, 1168, 66]
     Tissue[24] = [1412, 85, 1545, 81]
@@ -351,7 +363,6 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
             else:
                 T1 = Tissue[iTissue, 2]
                 T2 = Tissue[iTissue, 3]
-
             if ivim_cont and not np.isnan([D[iTissue], f[iTissue], Ds[iTissue]]).any():
                 # note we are assuming blood fraction has the same T1 as tissue fraction here for simplicity. Can be changed in future.
                 Dtemp=D[iTissue]
@@ -362,8 +373,11 @@ def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True):
                 ftemp=np.random.rand(1)*0.5
                 Dstemp=5e-3+np.random.rand(1)*1e-1
             S0 = ivim(bvalue,Dtemp,ftemp,Dstemp)
-            if T1 > 0 or T2 > 0:
-                MR = MR + np.tile(np.expand_dims(XCAT == iTissue,3),len(S0)) * S0 * (1 - 2 * np.exp(-(TR - TE / 2) / T1) + np.exp(-TR / T1)) * np.exp(-TE / T2)
+            if T1T2:
+                if T1 > 0 or T2 > 0:
+                    MR = MR + np.tile(np.expand_dims(XCAT == iTissue,3),len(S0)) * S0 * (1 - 2 * np.exp(-(TR - TE / 2) / T1) + np.exp(-TR / T1)) * np.exp(-TE / T2)
+            else:
+                MR = MR + np.tile(np.expand_dims(XCAT == iTissue,3),len(S0)) * S0
             Dim = Dim + (XCAT == iTissue) * Dtemp
             fim = fim + (XCAT == iTissue) * ftemp
             Dpim = Dpim + (XCAT == iTissue) * Dstemp
@@ -403,6 +417,7 @@ if __name__ == '__main__':
     parser.add_argument("-n", "--noise", type=float, default=0.0005, help="Noise")
     parser.add_argument("-m", "--motion", action="store_true", help="Motion flag")
     parser.add_argument("-i", "--interleaved", action="store_true", help="Interleaved flag")
+    parser.add_argument("-u", "--T1T2", action="store_true", help="weight signal with T1T2") # note, set this to zero when generating test data for unit testing!
     args = parser.parse_args()
 
     if args.bvalues_file and args.bvalue:
@@ -420,14 +435,15 @@ if __name__ == '__main__':
     noise = args.noise
     motion = args.motion
     interleaved = args.interleaved
+    T1T2 = args.T1T2
     download_data()
     for key, bvalue in bvalues.items():
         bvalue = np.array(bvalue)
-        sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=interleaved)
+        sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=interleaved,T1T2=T1T2)
         # sig = np.flip(sig,axis=0)
         # sig = np.flip(sig,axis=1)
         res=np.eye(4)
-        res[2]=2
+        res[2,2]=2
 
         voxel_selector_fraction = 0.5
         D, f, Ds = contrast_curve_calc()
