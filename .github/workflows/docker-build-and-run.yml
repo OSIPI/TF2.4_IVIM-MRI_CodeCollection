@@ -44,17 +44,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t tf2.4_ivim-mri_codecollection -f Docker/Dockerfile .
+          docker buildx build --output type=tar,dest=tf2.4_ivim-mri_codecollection.tar -f Docker/Dockerfile .
 
-      - name: Save and compress Docker image 
+      - name: Compress Docker image 
         run: |
-          docker save tf2.4_ivim-mri_codecollection | gzip > tf2.4_ivim-mri_codecollection.tar.gz
-
-      - name: Upload Docker image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-image
-          path: tf2.4_ivim-mri_codecollection.tar.gz
+          gzip tf2.4_ivim-mri_codecollection.tar
 
       - name: Run Docker container
         run: |
@@ -72,6 +66,12 @@ jobs:
             fi
           done
           echo "All output files generated successfully"
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: tf2.4_ivim-mri_codecollection.tar.gz
 
       - name: Clean up artifacts and Docker image
         run: |
