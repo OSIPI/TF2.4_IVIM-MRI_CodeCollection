@@ -1,0 +1,39 @@
+.bar-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+}
+header {
+  padding: 1rem 2rem;
+  background-color: #072A6A;
+  color: #fff;
+}
+.divider {
+  margin: 0.5rem 0;
+  border: none;
+  border-top: 2px solid #62D58A;
+}
+.nifti-image-container {
+  position: relative;
+  width: 350px;
+  height: 350px;
+  border: 1px solid #6c757d;
+  color: white;
+  margin: 10px 10px 2rem;
+}
+
+.nifti-image-container > div[id^="nifti-image-"] {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  flex: 1;
+}
+
+
+#image-and-data-info {
+  display: flex;
+  flex-wrap: wrap;
+}
+
