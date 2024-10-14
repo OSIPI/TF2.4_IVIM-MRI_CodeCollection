@@ -89,9 +89,9 @@ function handleVoxelClick(currentVoxel) {
     const [nx, ny, nz, nt] = dims;
     let [voxelX, voxelY, voxelZ] = currentVoxel;
 
-    voxelX = Math.min(Math.max(Math.round(voxelX), 1), nx) - 1;
-    voxelY = Math.min(Math.max(ny - Math.round(voxelY), 1), ny) - 1;
-    voxelZ = Math.min(Math.max(nz - Math.round(voxelZ), 1), nz) - 1;
+    voxelX = Math.min(Math.max(Math.round(voxelX), 1), nx);
+    voxelY = Math.min(Math.max(ny - Math.round(voxelY), 1), ny);
+    voxelZ = Math.min(Math.max(nz - Math.round(voxelZ), 1), nz);
 
     const voxelValues = getVoxelValuesAcrossTime(voxelX, voxelY, voxelZ, nx, ny, nz, nt);
     updateVoxelCoordinatesDisplay(voxelX + 1, voxelY + 1, voxelZ + 1);
