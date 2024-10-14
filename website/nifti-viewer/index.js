@@ -148,8 +148,7 @@ function loadAllFileViews(file) {
 function plotVoxelData(values) {
     const trace = {
         y: values,
-        mode: 'markers',
-        type: 'bar',
+        type: 'line',
     };
     const layout = {
         title: 'Voxel Intensity Under the Cursor',
