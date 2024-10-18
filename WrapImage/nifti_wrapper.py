@@ -25,6 +25,19 @@ def loop_over_first_n_minus_1_dimensions(arr):
         yield idx, flat_view
 
 def generate_data(data, bvals, b0_indices, groups, total_iteration):
+    """
+    Generates data samples for a multiprocess fitting
+
+    Args:
+        data: The raw data to be sampled
+        bvals: The bvalues
+        b0_indices: The b0 indices in the data
+        groups: The group indices in the data
+        total_iterations: The total number of iterations to generate
+
+    Yields:
+        A tuple containing matching: data, bvalues, and b0_indices
+    """
     num_directions = groups.shape[1]
     data = data.reshape(total_iteration, -1)
     for idx in range(total_iteration):
@@ -33,6 +46,16 @@ def generate_data(data, bvals, b0_indices, groups, total_iteration):
             yield (data[idx, groups[:, dir]].flatten(), bvals[:, groups[:, dir]].ravel(), b0_indices[:, groups[:, dir]].ravel())
 
 def osipi_fit(fitfunc, data_bvals):
+    """
+    Fit the data using the provided fit function
+
+    Args:
+        fitfunc: The fit function
+        data_bvals: The tuple of data, bvals, and b0_indices
+
+    Returns:
+        The fitted values
+    """
     data, bvals, b0_indices = data_bvals
     data = normalize_series(data, b0_indices)
     # print(f'data.shape {data.shape} data {data} bvals {bvals}')
