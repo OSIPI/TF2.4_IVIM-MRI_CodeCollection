@@ -11,6 +11,7 @@
         "OGC_AmsterdamUMC_biexp_segmented",
         "OGC_AmsterdamUMC_biexp",
         "PV_MUMC_biexp",
+        "PV_MUMC_triexp",
         "PvH_KB_NKI_IVIMfit"
     ],
     "IAR_LU_biexp": {
@@ -160,6 +161,24 @@
                 "f": 1e-2,
                 "D": 1e-2,
                 "Dp": 1e-1
+            }
+        }
+    },
+    "PV_MUMC_triexp": {
+        "tolerances": {
+            "rtol": {
+                "Dpar": 5,
+                "Fint": 5,
+                "Dint": 25,
+                "Fmv": 25,
+                "Dmv": 25
+            },
+            "atol": {
+                "Dpar": 1e-2,
+                "Fint": 1e-2,
+                "Dint": 1e-1,
+                "Fmv": 1e-1,
+                "Dmv": 1e-1
             }
         }
     }

@@ -45,7 +45,6 @@ class PV_MUMC_triexp(OsipiBase):
         Returns:
             _type_: _description_
         """
-        
             
         fit_results = self.PV_algorithm(bvalues, signals)
         Dpar, Fint, Dint, Fmv, Dmv = fit_results
