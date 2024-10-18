@@ -1,4 +1,4 @@
-name: Build & Deploy Documentation
+name: Build & Deploy Website
 
 on:
   workflow_run:
@@ -33,14 +33,27 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      # Action to download artifacts from a different workflow (analysis.yml)
+      # Action Figures artifact
       - name: 'Download artifact'
         if: ${{ github.event.workflow_run.conclusion == 'success' }}
         uses: ./.github/actions/download-artifact
         with:
           name: 'Figures'
+      # Action analysis data artifact
+      - name: 'Download analysis data'
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        uses: ./.github/actions/download-artifact
+        with:
+          name: 'Data'
 
-      - name: Build html
+      - name: 'Filter and compress results file.'
+        run: python utilities/reduce_output_size.py test_output.csv test_output.csv.gz
+
+      - name: move data to the dashboard folder
+        run: |
+          mv test_output.csv.gz website/dashboard
+
+      - name: Build documentation
         run: |
           mkdir docs/_static
           mv *.pdf docs/_static/
@@ -48,10 +61,14 @@ jobs:
           cd docs/
           make html
 
+      - name: move data to the website folder
+        run: |
+          mv "docs/_build/html" "website/documentation"
+
       - name: Upload docs artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'docs/_build/html'
+          path: 'website'
 
   deploy:
     needs: build

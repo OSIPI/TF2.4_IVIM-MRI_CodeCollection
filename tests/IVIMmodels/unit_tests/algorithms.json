@@ -12,7 +12,8 @@
         "OGC_AmsterdamUMC_biexp",
         "PV_MUMC_biexp",
         "PV_MUMC_triexp",
-        "PvH_KB_NKI_IVIMfit"
+        "PvH_KB_NKI_IVIMfit",
+        "OJ_GU_seg"
     ],
     "IAR_LU_biexp": {
         "tolerances": {
@@ -100,7 +101,7 @@
     },
     "ETP_SRI_LinearFitting": {
         "xfail_names": {
-            "Vein": true
+            "Blood RV": true
         },
         "options": {
             "thresholds": [500]

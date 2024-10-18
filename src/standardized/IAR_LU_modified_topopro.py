@@ -76,8 +76,14 @@ class IAR_LU_modified_topopro(OsipiBase):
             
         fit_results = self.IAR_algorithm.fit(signals)
         
-        f = fit_results.model_params[1]
-        Dstar = fit_results.model_params[2]
-        D = fit_results.model_params[3]
+        #f = fit_results.model_params[1]
+        #Dstar = fit_results.model_params[2]
+        #D = fit_results.model_params[3]
         
-        return f, Dstar, D
+        #return f, Dstar, D
+        results = {}
+        results["f"] = fit_results.model_params[1]
+        results["D*"] = fit_results.model_params[2]
+        results["D"] = fit_results.model_params[3]
+        
+        return results

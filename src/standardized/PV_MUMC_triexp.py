@@ -21,6 +21,7 @@ class PV_MUMC_triexp(OsipiBase):
     required_bounds_optional = True # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
+    result_keys = ["Dpar", "Fint", "Dint", "Fmv", "Dmv"]
     accepted_dimensions = 1 # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
     
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
@@ -47,6 +48,11 @@ class PV_MUMC_triexp(OsipiBase):
         """
             
         fit_results = self.PV_algorithm(bvalues, signals)
-        Dpar, Fint, Dint, Fmv, Dmv = fit_results
-        
-        return Dpar, Fint, Dint, Fmv, Dmv
+        results = {}
+        results["Dpar"] = fit_results[0]
+        results["Fint"] = fit_results[1]
+        results["Dint"] = fit_results[2]
+        results["Fmv"] = fit_results[3]
+        results["Dmv"] = fit_results[4]
+
+        return results
