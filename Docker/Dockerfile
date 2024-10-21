@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 # Install build tools and necessary libraries on Alpine
 RUN apk add --no-cache \
     build-base \
-    libssl1.1 \
+    libssl3 \
     openssl-dev
 
 # Copy and install Python dependencies
