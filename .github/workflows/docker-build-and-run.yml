@@ -46,10 +46,6 @@ jobs:
         run: |
           docker build -t tf2.4_ivim-mri_codecollection -f Docker/Dockerfile .
 
-      - name: Save and compress Docker image 
-        run: |
-          docker save tf2.4_ivim-mri_codecollection | gzip > tf2.4_ivim-mri_codecollection.tar.gz
-
       - name: Run Docker container
         run: |
           docker run --rm --name TF2.4_IVIM-MRI_CodeCollection \

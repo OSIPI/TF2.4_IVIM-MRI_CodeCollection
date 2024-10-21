@@ -1,19 +1,17 @@
-FROM python:3.11-alpine
+FROM python:3.11-slim
 
 WORKDIR /usr/src/app
 
-# Install build tools and necessary libraries on Alpine
-RUN apk add --no-cache \
-    build-base \
-    libssl3 \
-    openssl-dev
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libssl-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy and install Python dependencies
 COPY ../requirements.txt ./
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
 COPY .. .
 
-# Define the entry point
 ENTRYPOINT ["python3", "-m", "WrapImage.nifti_wrapper"]
