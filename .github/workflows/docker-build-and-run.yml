@@ -83,3 +83,6 @@ jobs:
           rm -f ${{ github.workspace }}/ivim_simulation.nii.gz
           rm -f ${{ github.workspace }}/ivim_simulation.bval
           rm -f ${{ github.workspace }}/ivim_simulation.bvec
+      - name: Cleanup Docker
+        run: |
+          docker system prune -a --force
