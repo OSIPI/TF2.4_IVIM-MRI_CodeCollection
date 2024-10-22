@@ -63,12 +63,6 @@ jobs:
           done
           echo "All output files generated successfully"
 
-      - name: Upload Docker image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-image
-          path: tf2.4_ivim-mri_codecollection.tar.gz
-
       - name: Clean up artifacts and Docker image
         run: |
           docker rmi tf2.4_ivim-mri_codecollection || true
