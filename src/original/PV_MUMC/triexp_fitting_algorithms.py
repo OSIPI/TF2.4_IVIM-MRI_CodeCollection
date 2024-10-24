@@ -88,9 +88,9 @@ def fit_least_squares_tri_exp(bvalues, dw_data, IR=False, S0_output=False, fitS0
     Dpar1 = params[0]
     if IR:
         if not fitS0:
-            bounds = ([bounds[0][1] , bounds[0][2] , bounds[0][3] , bounds[0][4] , bounds[0][5] ],
+            newbounds = ([bounds[0][1] , bounds[0][2] , bounds[0][3] , bounds[0][4] , bounds[0][5] ],
                         [Dpar1          , bounds[1][2] , bounds[1][3] , bounds[1][4] , bounds[1][5] ])      
-            params, _ = curve_fit(tri_expN_noS0_IR, bvalues, dw_data, p0=[Dpar1, 0.0, (bounds[0][3]+bounds[1][3])/2, 0.05, (bounds[0][5]+bounds[1][5])/2], bounds=bounds)
+            params, _ = curve_fit(tri_expN_noS0_IR, bvalues, dw_data, p0=[Dpar1, 0.0, (bounds[0][3]+bounds[1][3])/2, 0.05, (bounds[0][5]+bounds[1][5])/2], bounds=newbounds)
             Dpar, Fint, Dint, Fmv, Dmv = params[0], params[1], params[2], params[3], params[4]
             #when the fraction of a compartment equals zero (or very very small), the corresponding diffusivity is non-existing (=NaN)
             
