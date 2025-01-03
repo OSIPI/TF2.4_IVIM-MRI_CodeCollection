@@ -63,9 +63,10 @@ class OJ_GU_seg(OsipiBase):
             bthr = self.thresholds[0]
                     
         fit_results = seg(signals, bvalues, bthr)
+
+        results = {} 
+        results["f"] = fit_results['f']
+        results["D*"] = fit_results['Dstar']
+        results["D"] = fit_results['D']
         
-        f = fit_results['f']
-        Dstar = fit_results['Dstar']
-        D = fit_results['D']
-        
-        return f, Dstar, D
+        return results
