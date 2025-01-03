@@ -61,7 +61,7 @@ class OJ_GU_seg(OsipiBase):
             bthr = 200
         else:
             bthr = self.thresholds[0]
-                    
+        signals[signals<0.00001]=0.00001
         fit_results = seg(signals, bvalues, bthr)
         
         f = fit_results['f']

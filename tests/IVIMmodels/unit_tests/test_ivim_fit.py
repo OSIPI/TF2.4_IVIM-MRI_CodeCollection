@@ -114,29 +114,22 @@ from utilities.data_simulation.GenerateData import GenerateData
 
 def signal_helper(signal):
     signal = np.asarray(signal)
-    signal = np.abs(signal) #Oliver: do we need this for unit testing? It will bias the fits by forcing positive signals.
+    #signal[signal < 0] = 0.00001
     signal /= signal[0] # this scales noise differenly. I have now made sure signal is produced with amplitude 1 if right flags are selected. Then  SNR is fixed. Then, this sentence may be redundant
-    #ratio = 1 / signal[0] #this is 1 per definition (See sentence above)
     return signal
 
 def tolerances_helper(tolerances, data):
-    epsilon = 0.0001
+    epsilon = 0.001
     if "dynamic_rtol" in tolerances:
         dyn_rtol = tolerances["dynamic_rtol"]
         scale = dyn_rtol["offset"] + dyn_rtol["noise"]*data["noise"]
-        if dyn_rtol["scale_f"]:
-            tolerances["rtol"] = {"f": scale*dyn_rtol["f"], "D": scale*dyn_rtol["D"]/(1-data['f']+epsilon), "Dp": scale*dyn_rtol["Dp"]/(data['f']+epsilon)}
-        else:
-            tolerances["rtol"] = {"f": scale * dyn_rtol["f"], "D": scale * dyn_rtol["D"]/0.9,"Dp": scale * dyn_rtol["Dp"]/0.1}
+        tolerances["rtol"] = {"f": scale*dyn_rtol["f"], "D": scale*dyn_rtol["D"]/(1-data['f']+epsilon), "Dp": scale*dyn_rtol["Dp"]/(data['f']+epsilon)}
     else:
         tolerances["rtol"] = tolerances.get("rtol", {"f": 0.1, "D": 0.1, "Dp": 0.3})
     if "dynamic_atol" in tolerances:
         dyn_atol = tolerances["dynamic_atol"]
         scale = dyn_atol["offset"] + dyn_atol["noise"]*data["noise"]
-        if dyn_atol["scale_f"]:
-            tolerances["atol"] = {"f": scale*dyn_atol["f"], "D": scale*dyn_atol["D"]/(1-data['f']+epsilon), "Dp": scale*dyn_atol["Dp"]/(data['f']+epsilon)}
-        else:
-            tolerances["atol"] = {"f": scale*dyn_atol["f"], "D": scale*dyn_atol["D"]/0.9, "Dp": scale*dyn_atol["Dp"]/0.1}
+        tolerances["atol"] = {"f": scale*dyn_atol["f"], "D": scale*dyn_atol["D"]/(1-data['f']+epsilon), "Dp": scale*dyn_atol["Dp"]/(data['f']+epsilon)}
     else:
         tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 4e-2})
     return tolerances

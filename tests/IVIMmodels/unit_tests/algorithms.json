@@ -62,7 +62,6 @@
             "dynamic_rtol": {
                 "offset": 0.001,
                 "noise": 200,
-                "scale_f": false,
                 "f": 2,
                 "D": 1,
                 "Dp": 3
@@ -70,7 +69,6 @@
             "dynamic_atol": {
                 "offset": 5e-2,
                 "noise": 10,
-                "scale_f": false,
                 "f": 1,
                 "D": 0.001,
                 "Dp": 2
