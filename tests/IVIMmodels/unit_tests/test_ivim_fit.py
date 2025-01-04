@@ -4,6 +4,7 @@ import pytest
 import json
 import pathlib
 import os
+import time
 
 from src.wrappers.OsipiBase import OsipiBase
 from utilities.data_simulation.GenerateData import GenerateData
@@ -158,19 +159,63 @@ def data_ivim_fit_saved():
             tolerances = algorithm_dict.get("tolerances", {})
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances
 
-
 @pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances", data_ivim_fit_saved())
 def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances, request):
     if xfail["xfail"]:
         mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
         request.node.add_marker(mark)
+    start_time = time.time()  # Record the start time
     fit = OsipiBase(algorithm=algorithm, **kwargs)
     signal = signal_helper(data["data"])
     tolerances = tolerances_helper(tolerances, data)
     [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals)
+    elapsed_time = time.time() - start_time  # Calculate elapsed time
     npt.assert_allclose(f_fit,data['f'], rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
     if data['f']<0.80: # we need some signal for D to be detected
         npt.assert_allclose(D_fit,data['D'], rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
     if data['f']>0.03: #we need some f for D* to be interpretable
         npt.assert_allclose(Dp_fit,data['Dp'], rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
+    assert elapsed_time < 2, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 
+def bound_input():
+    # Find the algorithms from algorithms.json
+    file = pathlib.Path(__file__)
+    algorithm_path = file.with_name('algorithms.json')
+    with algorithm_path.open() as f:
+        algorithm_information = json.load(f)
+
+    # Load generic test data generated from the included phantom: phantoms/MR_XCAT_qMRI
+    generic = file.with_name('generic.json')
+    with generic.open() as f:
+        all_data = json.load(f)
+
+    algorithms = algorithm_information["algorithms"]
+    bvals = all_data.pop('config')
+    bvals = bvals['bvalues']
+    for name, data in all_data.items():
+        for algorithm in algorithms:
+            algorithm_dict = algorithm_information.get(algorithm, {})
+            xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
+                "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
+            kwargs = algorithm_dict.get("options", {})
+            tolerances = algorithm_dict.get("tolerances", {})
+            test_bounds = algorithm_dict.get("test_bounds", {})
+            if test_bounds:
+                yield name, bvals, data, algorithm, xfail, kwargs, tolerances
+
+
+@pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances", bound_input())
+def test_bounds(name, bvals, data, algorithm, xfail, kwargs, tolerances, request):
+    bounds = ([0.0008, 0.2, 0.01, 1.1], [0.0012, 0.3, 0.02, 1.3])
+    if xfail["xfail"]:
+        mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
+        request.node.add_marker(mark)
+    # deliberately have silly bounds to see whether they are used
+    fit = OsipiBase(algorithm=algorithm, bounds=bounds, initial_guess = [0.001, 0.25, 0.015, 1.2], **kwargs)
+    signal = signal_helper(data["data"])
+    tolerances = tolerances_helper(tolerances, data)
+    [f_fit, Dp_fit, D_fit] = fit.osipi_fit(signal, bvals)
+
+    assert bounds[0][0] <= D_fit <= bounds[1][0],  f"Result {D_fit} out of bounds for data: {name}"
+    assert bounds[0][1] <= f_fit <= bounds[1][1], f"Result {f_fit} out of bounds for data: {name}"
+    assert bounds[0][2] <= Dp_fit <= bounds[1][2], f"Result {Dp_fit} out of bounds for data: {name}"
