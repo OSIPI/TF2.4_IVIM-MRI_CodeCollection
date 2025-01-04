@@ -71,14 +71,14 @@ class ETP_SRI_LinearFitting(OsipiBase):
             f, Dstar = ETP_object.linear_fit(bvalues, signals)
 
             results["f"] = f
-            results["D*"] = Dstar
+            results["Dp"] = Dstar
 
             return results
         else: 
             f, D, Dstar = ETP_object.ivim_fit(bvalues, signals)
 
             results["f"] = f
-            results["D*"] = Dstar
+            results["Dp"] = Dstar
             results["D"] = D
 
             return results

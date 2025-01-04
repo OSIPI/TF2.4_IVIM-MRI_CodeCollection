@@ -66,7 +66,7 @@ class OJ_GU_seg(OsipiBase):
 
         results = {} 
         results["f"] = fit_results['f']
-        results["D*"] = fit_results['Dstar']
+        results["Dp"] = fit_results['Dstar']
         results["D"] = fit_results['D']
         
         return results

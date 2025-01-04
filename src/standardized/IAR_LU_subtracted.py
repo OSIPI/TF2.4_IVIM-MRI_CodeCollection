@@ -83,7 +83,7 @@ class IAR_LU_subtracted(OsipiBase):
         #return f, Dstar, D
         results = {}
         results["f"] = fit_results.model_params[1]
-        results["D*"] = fit_results.model_params[2]
+        results["Dp"] = fit_results.model_params[2]
         results["D"] = fit_results.model_params[3]
         
         return results

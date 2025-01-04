@@ -72,6 +72,6 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         results = {}
         results["D"] = fit_results[0]
         results["f"] = fit_results[1]
-        results["D*"] = fit_results[2]
+        results["Dp"] = fit_results[2]
 
         return results

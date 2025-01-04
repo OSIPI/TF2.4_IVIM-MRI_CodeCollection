@@ -51,7 +51,7 @@ class PV_MUMC_biexp(OsipiBase):
 
         results = {} 
         results["f"] = fit_results[1]
-        results["D*"] = fit_results[2]
+        results["Dp"] = fit_results[2]
         results["D"] = fit_results[0]
         
         return results

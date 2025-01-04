@@ -89,8 +89,8 @@ class OsipiBase:
             # result_keys is a list of strings of parameter names, e.g. "S0", "f1", "f2", etc.
             result_keys = self.result_keys
         else:
-            # Default is ["f", "D*", "D"]
-            self.result_keys = ["f", "D*", "D"]
+            # Default is ["f", "Dp", "D"]
+            self.result_keys = ["f", "Dp", "D"]
         
         results = {}
         for key in self.result_keys:
@@ -132,8 +132,8 @@ class OsipiBase:
                 # result_keys is a list of strings of parameter names, e.g. "S0", "f1", "f2", etc.
                 result_keys = self.result_keys
             else:
-                # Default is ["f", "D*", "D"]
-                self.result_keys = ["f", "D*", "D"]
+                # Default is ["f", "Dp", "D"]
+                self.result_keys = ["f", "Dp", "D"]
 
             # Create the results dictionary
             results = {}

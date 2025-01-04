@@ -61,7 +61,7 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
     if xfail["xfail"]:
         mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
         request.node.add_marker(mark)
-    signal, ratio = signal_helper(data["data"])    
+    signal = signal_helper(data["data"])
     tolerances = tolerances_helper(tolerances, data)
     start_time = time.time()  # Record the start time
     fit = OsipiBase(algorithm=algorithm, **kwargs)
@@ -73,7 +73,7 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
         "name": name,
         "algorithm": algorithm,
         "f_fit": to_list_if_needed(fit_result['f']),
-        "Dp_fit": to_list_if_needed(fit_result['D*']),
+        "Dp_fit": to_list_if_needed(fit_result['Dp']),
         "D_fit": to_list_if_needed(fit_result['D']),
         "f": to_list_if_needed(data['f']),
         "Dp": to_list_if_needed(data['Dp']),
@@ -158,12 +158,12 @@ def test_bounds(name, bvals, data, algorithm, xfail, kwargs, tolerances, request
     # deliberately have silly bounds to see whether they are used
     fit = OsipiBase(algorithm=algorithm, bounds=bounds, initial_guess = [0.001, 0.25, 0.015, 1.2], **kwargs)
     signal = signal_helper(data["data"])
-    tolerances = tolerances_helper(tolerances, data)
-    fit_results = fit.osipi_fit(signal, bvals)
+    fit_result = fit.osipi_fit(signal, bvals)
 
     assert bounds[0][0] <= fit_result['D'] <= bounds[1][0],  f"Result {fit_result['D']} out of bounds for data: {name}"
     assert bounds[0][1] <= fit_result['f'] <= bounds[1][1], f"Result {fit_result['f']} out of bounds for data: {name}"
     assert bounds[0][2] <= fit_result['Dp'] <= bounds[1][2], f"Result {fit_result['Dp']} out of bounds for data: {name}"
-    assert bounds[0][3] <= fit_result['S0'] <= bounds[1][3], f"Result {fit_result['S0']} out of bounds for data: {name}"
+    # S0 is not returned as argument...
+    #assert bounds[0][3] <= fit_result['S0'] <= bounds[1][3], f"Result {fit_result['S0']} out of bounds for data: {name}"
 
     
