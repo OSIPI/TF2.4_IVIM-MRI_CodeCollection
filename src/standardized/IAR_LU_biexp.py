@@ -76,8 +76,41 @@ class IAR_LU_biexp(OsipiBase):
             
         fit_results = self.IAR_algorithm.fit(signals)
         
-        f = fit_results.model_params[1]
-        Dstar = fit_results.model_params[2]
-        D = fit_results.model_params[3]
+        results = {}
+        results["f"] = fit_results.model_params[1]
+        results["D*"] = fit_results.model_params[2]
+        results["D"] = fit_results.model_params[3]
         
-        return f, Dstar, D
+        return results
+
+    def ivim_fit_full_volume(self, signals, bvalues, **kwargs):
+        """Perform the IVIM fit
+
+        Args:
+            signals (array-like)
+            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
+
+        Returns:
+            _type_: _description_
+        """
+        
+        if self.IAR_algorithm is None:
+            if bvalues is None:
+                bvalues = self.bvalues
+            else:
+                bvalues = np.asarray(bvalues)
+            
+            bvec = np.zeros((bvalues.size, 3))
+            bvec[:,2] = 1
+            gtab = gradient_table(bvalues, bvec, b0_threshold=0)
+            
+            self.IAR_algorithm = IvimModelBiExp(gtab)
+            
+        fit_results = self.IAR_algorithm.fit(signals)
+        
+        results = {}
+        results["f"] = fit_results.model_params[..., 1]
+        results["D*"] = fit_results.model_params[..., 2]
+        results["D"] = fit_results.model_params[..., 3]
+        
+        return results

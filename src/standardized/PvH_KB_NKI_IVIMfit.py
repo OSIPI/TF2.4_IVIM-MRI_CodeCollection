@@ -56,8 +56,9 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
         signals = np.reshape(signals, (1, 1, 1, len(signals)))  # assuming that in this test the signals are always single voxel
         fit_results = self.NKI_algorithm(signals,bvalues)
 
-        D = fit_results[0][0,0,0]/1000
-        f = fit_results[1][0,0,0]
-        Dstar = fit_results[2][0,0,0]/1000
+        results = {}
+        results["D"] = fit_results[0][0,0,0]/1000
+        results["f"] = fit_results[1][0,0,0]
+        results["D*"] = fit_results[2][0,0,0]/1000
 
-        return f, Dstar, D
+        return results
