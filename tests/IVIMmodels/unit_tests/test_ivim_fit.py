@@ -177,6 +177,39 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
         npt.assert_allclose(Dp_fit,data['Dp'], rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
     assert elapsed_time < 2, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 
+
+def algorithms():
+    # Find the algorithms from algorithms.json
+    file = pathlib.Path(__file__)
+    algorithm_path = file.with_name('algorithms.json')
+    with algorithm_path.open() as f:
+        algorithm_information = json.load(f)
+    algorithms = algorithm_information["algorithms"]
+    for algorithm in algorithms:
+        yield algorithm
+
+@pytest.mark.parametrize("algorithm", algorithms())
+def test_default_bounds_and_initial_guesses(algorithm):
+    fit = OsipiBase(algorithm=algorithm)
+    #assert fit.bounds is not None, f"For {algorithm}, there is no default fit boundary"
+    #assert fit.initial_guess is not None, f"For {algorithm}, there is no default fit initial guess"
+    if fit.bounds is not None:
+        assert 0 <= fit.bounds[0][0] <= 0.003, f"For {algorithm}, the default lower bound of D {fit.bounds[0][0]} is unrealistic"
+        assert 0 <= fit.bounds[1][0] <= 0.01, f"For {algorithm}, the default upper bound of D {fit.bounds[1][0]} is unrealistic"
+        assert 0 <= fit.bounds[0][1] <= 1, f"For {algorithm}, the default lower bound of f {fit.bounds[0][1]} is unrealistic"
+        assert 0 <= fit.bounds[1][1] <= 1, f"For {algorithm}, the default upper bound of f {fit.bounds[1][1]} is unrealistic"
+        assert 0.003 <= fit.bounds[0][2] <= 0.05, f"For {algorithm}, the default lower bound of Ds {fit.bounds[0][2]} is unrealistic"
+        assert 0.003 <= fit.bounds[1][2] <= 0.5, f"For {algorithm}, the default upper bound of Ds {fit.bounds[1][2]} is unrealistic"
+        assert 0 <= fit.bounds[0][3] <= 1, f"For {algorithm}, the default lower bound of S {fit.bounds[0][3]} is unrealistic; note data is normaized"
+        assert 1 <= fit.bounds[1][3] <= 1000, f"For {algorithm}, the default upper bound of S {fit.bounds[1][3]} is unrealistic; note data is normaized"
+        assert fit.bounds[1][0] <= fit.bounds[0][2], f"For {algorithm}, the default upper bound of D {fit.bounds[1][0]} is higher than lower bound of D* {fit.bounds[0][2]}"
+    if fit.initial_guess is not None:
+        assert 0.0008 <= fit.initial_guess[0] <= 0.002, f"For {algorithm}, the default initial guess for D {fit.initial_guess[0]} is unrealistic"
+        assert 0 <= fit.initial_guess[1] <= 0.5, f"For {algorithm}, the default initial guess for f {fit.initial_guess[1]} is unrealistic"
+        assert 0.003 <= fit.initial_guess[2] <= 0.1, f"For {algorithm}, the default initial guess for Ds {fit.initial_guess[2]} is unrealistic"
+        assert 0.9 <= fit.initial_guess[3] <= 1.1, f"For {algorithm}, the default initial guess for S {fit.initial_guess[3]} is unrealistic; note signal is normalized"
+
+
 def bound_input():
     # Find the algorithms from algorithms.json
     file = pathlib.Path(__file__)

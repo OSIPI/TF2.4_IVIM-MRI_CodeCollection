@@ -15,22 +15,22 @@
         "OJ_GU_seg"
     ],
     "IAR_LU_biexp": {
-        "skip_bounds": true
+        "test_bounds": false
     },
     "IAR_LU_modified_mix": {
-        "skip_bounds": true
+        "test_bounds": false
     },
     "IAR_LU_modified_topopro": {
-        "skip_bounds": true
+        "test_bounds": false
     },
     "IAR_LU_segmented_2step": {
-        "skip_bounds": true
+        "test_bounds": false
     },
     "IAR_LU_segmented_3step": {
-        "skip_bounds": true
+        "test_bounds": false
     },
     "IAR_LU_subtracted": {
-        "skip_bounds": true
+        "test_bounds": false
     },
     "ETP_SRI_LinearFitting": {
         "options": {
@@ -62,10 +62,10 @@
                 "Dp": 2
             }
         },
-        "skip_bounds": true
+        "test_bounds": false
     },
     "OGC_AmsterdamUMC_biexp_segmented": {
-        "skip_bounds": true
+        "test_bounds": false
     },
     "OJ_GU_seg": {
         "test_bounds": false
