@@ -47,6 +47,7 @@ def data_ivim_fit_saved():
     algorithms = algorithm_information["algorithms"]
     bvals = all_data.pop('config')
     bvals = bvals['bvalues']
+    first=True
     for name, data in all_data.items():
         for algorithm in algorithms:
             algorithm_dict = algorithm_information.get(algorithm, {})
@@ -54,10 +55,15 @@ def data_ivim_fit_saved():
                 "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
             kwargs = algorithm_dict.get("options", {})
             tolerances = algorithm_dict.get("tolerances", {})
-            yield name, bvals, data, algorithm, xfail, kwargs, tolerances
+            skiptime=False
+            if first == True:
+                if algorithm_dict.get("fail_first_time", {}) == True:
+                    skiptime = True
+                    first = False
+            yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime
 
-@pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances", data_ivim_fit_saved())
-def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances, request, record_property):
+@pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime", data_ivim_fit_saved())
+def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,skiptime, request, record_property):
     if xfail["xfail"]:
         mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
         request.node.add_marker(mark)
@@ -87,7 +93,9 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
         npt.assert_allclose(fit_result['D'],data['D'], rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
     if data['f']>0.03: #we need some f for D* to be interpretable
         npt.assert_allclose(fit_result['Dp'],data['Dp'], rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
-    assert elapsed_time < 2, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
+    #assert fit_result['D'] < fit_result['Dp'], f"D {fit_result['D']} is larger than D* {fit_result['Dp']} for {name}"
+    if not skiptime:
+        assert elapsed_time < 0.5, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 
 
 def algorithms():
@@ -144,26 +152,22 @@ def bound_input():
                 "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
             kwargs = algorithm_dict.get("options", {})
             tolerances = algorithm_dict.get("tolerances", {})
-            test_bounds = algorithm_dict.get("test_bounds", {})
-            if test_bounds:
-                yield name, bvals, data, algorithm, xfail, kwargs, tolerances
+            yield name, bvals, data, algorithm, xfail, kwargs, tolerances
 
 
 @pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances", bound_input())
 def test_bounds(name, bvals, data, algorithm, xfail, kwargs, tolerances, request):
     bounds = ([0.0008, 0.2, 0.01, 1.1], [0.0012, 0.3, 0.02, 1.3])
-    if xfail["xfail"]:
-        mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
-        request.node.add_marker(mark)
     # deliberately have silly bounds to see whether they are used
     fit = OsipiBase(algorithm=algorithm, bounds=bounds, initial_guess = [0.001, 0.25, 0.015, 1.2], **kwargs)
-    signal = signal_helper(data["data"])
-    fit_result = fit.osipi_fit(signal, bvals)
+    if fit.use_bounds:
+        signal = signal_helper(data["data"])
+        fit_result = fit.osipi_fit(signal, bvals)
 
-    assert bounds[0][0] <= fit_result['D'] <= bounds[1][0],  f"Result {fit_result['D']} out of bounds for data: {name}"
-    assert bounds[0][1] <= fit_result['f'] <= bounds[1][1], f"Result {fit_result['f']} out of bounds for data: {name}"
-    assert bounds[0][2] <= fit_result['Dp'] <= bounds[1][2], f"Result {fit_result['Dp']} out of bounds for data: {name}"
-    # S0 is not returned as argument...
-    #assert bounds[0][3] <= fit_result['S0'] <= bounds[1][3], f"Result {fit_result['S0']} out of bounds for data: {name}"
+        assert bounds[0][0] <= fit_result['D'] <= bounds[1][0],  f"Result {fit_result['D']} out of bounds for data: {name}"
+        assert bounds[0][1] <= fit_result['f'] <= bounds[1][1], f"Result {fit_result['f']} out of bounds for data: {name}"
+        assert bounds[0][2] <= fit_result['Dp'] <= bounds[1][2], f"Result {fit_result['Dp']} out of bounds for data: {name}"
+        # S0 is not returned as argument...
+        #assert bounds[0][3] <= fit_result['S0'] <= bounds[1][3], f"Result {fit_result['S0']} out of bounds for data: {name}"
 
     

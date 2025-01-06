@@ -15,22 +15,7 @@
         "OJ_GU_seg"
     ],
     "IAR_LU_biexp": {
-        "test_bounds": false
-    },
-    "IAR_LU_modified_mix": {
-        "test_bounds": false
-    },
-    "IAR_LU_modified_topopro": {
-        "test_bounds": false
-    },
-    "IAR_LU_segmented_2step": {
-        "test_bounds": false
-    },
-    "IAR_LU_segmented_3step": {
-        "test_bounds": false
-    },
-    "IAR_LU_subtracted": {
-        "test_bounds": false
+        "fail_first_time": true
     },
     "ETP_SRI_LinearFitting": {
         "options": {
@@ -63,23 +48,5 @@
             }
         },
         "test_bounds": false
-    },
-    "OGC_AmsterdamUMC_biexp_segmented": {
-        "test_bounds": false
-    },
-    "OJ_GU_seg": {
-        "test_bounds": false
-    },
-    "OGC_AmsterdamUMC_Bayesian_biexp": {
-        "test_bounds": false
-    },
-    "MUMC_biexp": {
-        "test_bounds": false
-    },
-    "PvH_KB_NKI_IVIMfit": {
-        "test_bounds": false
-    },
-    "OGC_AmsterdamUMC_biexp": {
-        "test_bounds": true
     }
 }

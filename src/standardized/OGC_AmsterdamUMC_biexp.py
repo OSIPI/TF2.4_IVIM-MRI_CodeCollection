@@ -38,19 +38,22 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         #super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
         super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
         self.OGC_algorithm = fit_least_squares
-        #self.initialize(bounds, initial_guess, fitS0)
         self.fitS0=fitS0
+        self.initialize(bounds, initial_guess, fitS0)
 
     def initialize(self, bounds, initial_guess, fitS0):
         if bounds is None:
             self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
         else:
             self.bounds=bounds
+            self.use_bounds = True
         if initial_guess is None:
             self.initial_guess = [0.001, 0.1, 0.01, 1]
         else:
             self.initial_guess = initial_guess
+            self.use_initial_guess = True
         self.fitS0=fitS0
+
 
     def ivim_fit(self, signals, bvalues, initial_guess=None, **kwargs):
         """Perform the IVIM fit

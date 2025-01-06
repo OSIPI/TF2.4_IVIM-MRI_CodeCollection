@@ -14,7 +14,8 @@ class OsipiBase:
         self.thresholds = np.asarray(thresholds) if thresholds is not None else None
         self.bounds = np.asarray(bounds) if bounds is not None else None
         self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
-        
+        self.use_bounds = True
+        self.use_initial_guess = True
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:

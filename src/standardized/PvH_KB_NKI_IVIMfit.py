@@ -37,6 +37,10 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
         """
         super(PvH_KB_NKI_IVIMfit, self).__init__(bvalues, thresholds,bounds,initial_guess)
         self.NKI_algorithm = generate_IVIMmaps_standalone
+        if bounds is not None:
+            print('warning, bounds from wrapper are not (yet) used in this algorithm')
+        self.use_bounds = False
+        self.use_initial_guess = False
 
 
     def ivim_fit(self, signals, bvalues=None):

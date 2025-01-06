@@ -33,6 +33,10 @@ class PV_MUMC_biexp(OsipiBase):
         """
         super(PV_MUMC_biexp, self).__init__(bvalues, None, bounds, None)
         self.PV_algorithm = fit_least_squares
+        if bounds is not None:
+            print('warning, bounds from wrapper are not (yet) used in this algorithm')
+        self.use_bounds = False
+        self.use_initial_guess = False
         
     
     def ivim_fit(self, signals, bvalues=None):
