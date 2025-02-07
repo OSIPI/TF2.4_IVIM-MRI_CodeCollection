@@ -27,6 +27,11 @@ class ETP_SRI_LinearFitting(OsipiBase):
     required_initial_guess_optional = False
     accepted_dimensions = 1
     # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
+
+    # Supported inputs in the standardized class
+    supported_bounds = False
+    supported_initial_guess = False
+    supported_thresholds = True
     
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
         """
@@ -36,7 +41,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(ETP_SRI_LinearFitting, self).__init__(bvalues, thresholds, bounds, initial_guess)
+        super(ETP_SRI_LinearFitting, self).__init__(bvalues=bvalues, thresholds=thresholds, bounds=bounds, initial_guess=initial_guess)
         
         # Could be a good idea to have all the submission-specfic variable be 
         # defined with initials?
@@ -67,7 +72,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
         
         results = {}
         if linear_fit_option:
-            f, Dstar = ETP_object.linear_fit(bvalues, signals)
+            f, Dstar = ETP_object.linear_fit(bvalues, signals, self.ETP_weighting, self.ETP_stats)
 
             results["f"] = f
             results["D*"] = Dstar

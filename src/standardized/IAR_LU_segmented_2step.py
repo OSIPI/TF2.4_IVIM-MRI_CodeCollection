@@ -28,6 +28,11 @@ class IAR_LU_segmented_2step(OsipiBase):
     required_initial_guess_optional = True
     accepted_dimensions = 1 # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
     
+    # Supported inputs in the standardized class
+    supported_bounds = True
+    supported_initial_guess = True
+    supported_thresholds = True
+    
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None):
         """
             Everything this algorithm requires should be implemented here.
@@ -46,7 +51,7 @@ class IAR_LU_segmented_2step(OsipiBase):
             bvec[:,2] = 1
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
             
-            self.IAR_algorithm = IvimModelSegmented2Step(gtab)
+            self.IAR_algorithm = IvimModelSegmented2Step(gtab, bounds=self.bounds, initial_guess=self.initial_guess, b_threshold=self.thresholds)
         else:
             self.IAR_algorithm = None
         
@@ -72,8 +77,11 @@ class IAR_LU_segmented_2step(OsipiBase):
             bvec = np.zeros((bvalues.size, 3))
             bvec[:,2] = 1
             gtab = gradient_table(bvalues, bvec, b0_threshold=0)
-            
-            self.IAR_algorithm = IvimModelSegmented2Step(gtab)
+
+            if self.thresholds is None:
+                self.thresholds = 200
+
+            self.IAR_algorithm = IvimModelSegmented2Step(gtab, bounds=self.bounds, initial_guess=self.initial_guess, b_threshold=self.thresholds)
             
         fit_results = self.IAR_algorithm.fit(signals)
         

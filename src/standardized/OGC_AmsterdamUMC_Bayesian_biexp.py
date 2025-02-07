@@ -28,6 +28,11 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
     accepts_priors = True
 
+    # Supported inputs in the standardized class
+    supported_bounds = True
+    supported_initial_guess = True
+    supported_thresholds = True
+
     def __init__(self, bvalues=None, thresholds=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=True, prior_in=None):
         """
             Everything this algorithm requires should be implemented here.
@@ -39,7 +44,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             Args:
                  datain is a 2D array with values of D, f, D* (and S0) that will form the prior.
         """
-        super(OGC_AmsterdamUMC_Bayesian_biexp, self).__init__(bvalues, bounds, initial_guess) #, fitS0, prior_in)
+        super(OGC_AmsterdamUMC_Bayesian_biexp, self).__init__(bvalues=bvalues, bounds=bounds, thresholds=thresholds, initial_guess=initial_guess) #, fitS0, prior_in)
         self.OGC_algorithm = fit_bayesian
         self.initialize(bounds, initial_guess, fitS0, prior_in)
 
@@ -74,7 +79,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         if initial_guess is not None and len(initial_guess) == 4:
             self.initial_guess = initial_guess
         bvalues=np.array(bvalues)
-        fit_results = fit_segmented(bvalues, signals, bounds=self.bounds, cutoff=150, p0=self.initial_guess)
+        fit_results = fit_segmented(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds, p0=self.initial_guess)
         fit_results=fit_results+(1,)
         fit_results = self.OGC_algorithm(bvalues, signals, self.neg_log_prior, x0=fit_results, fitS0=self.fitS0)
 

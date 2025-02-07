@@ -27,6 +27,11 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
     required_initial_guess_optional = True
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
+    # Supported inputs in the standardized class
+    supported_bounds = True
+    supported_initial_guess = True
+    supported_thresholds = False
+
     def __init__(self, bvalues=None, thresholds=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=None, fitS0=False):
         """
             Everything this algorithm requires should be implemented here.
