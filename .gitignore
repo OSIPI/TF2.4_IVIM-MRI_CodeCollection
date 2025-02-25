@@ -26,3 +26,4 @@ coverage.xml
 *.pyc
 phantoms/MR_XCAT_qMRI/*.json
 phantoms/MR_XCAT_qMRI/*.txt
+utilities/invivo/results/*
