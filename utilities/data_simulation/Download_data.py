@@ -28,3 +28,6 @@ def download_data(force=False):
         # Unzip the file
         unzip_file('OSIPI_TF24_data_phantoms.zip', '.')
     os.chdir(curdir)
+
+if __name__ == "__main__":
+    download_data(force=True)
