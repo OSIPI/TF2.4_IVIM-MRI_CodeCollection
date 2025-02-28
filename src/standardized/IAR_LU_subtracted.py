@@ -37,7 +37,10 @@ class IAR_LU_subtracted(OsipiBase):
             the requirements.
         """
         super(IAR_LU_subtracted, self).__init__(bvalues, thresholds, bounds, initial_guess)
-        
+        if bounds is not None:
+            print('warning, bounds from wrapper are not (yet) used in this algorithm')
+        self.use_bounds = False
+        self.use_initial_guess = False
         # Check the inputs
         
         # Initialize the algorithm
@@ -83,7 +86,7 @@ class IAR_LU_subtracted(OsipiBase):
         #return f, Dstar, D
         results = {}
         results["f"] = fit_results.model_params[1]
-        results["D*"] = fit_results.model_params[2]
+        results["Dp"] = fit_results.model_params[2]
         results["D"] = fit_results.model_params[3]
         
         return results

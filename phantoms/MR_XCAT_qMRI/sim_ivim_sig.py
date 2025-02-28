@@ -459,9 +459,9 @@ if __name__ == '__main__':
             signals = np.squeeze(voxels[int(voxels.shape[0] * voxel_selector_fraction)]).tolist()
             generic_data[name] = {
                 'noise': noise,
-                'D': np.mean(Dim[selector], axis=0),
-                'f': np.mean(fim[selector], axis=0),
-                'Dp': np.mean(Dpim[selector], axis=0),
+                'D': np.median(Dim[selector], axis=0),
+                'f': np.median(fim[selector], axis=0),
+                'Dp': np.median(Dpim[selector], axis=0),
                 'data': signals
             }
         generic_data['config'] = {
