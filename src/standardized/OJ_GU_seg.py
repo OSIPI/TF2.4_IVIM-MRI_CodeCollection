@@ -25,6 +25,11 @@ class OJ_GU_seg(OsipiBase):
     required_initial_guess = False
     required_initial_guess_optional = False
     accepted_dimensions = 1 # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
+
+    # Supported inputs in the standardized class
+    supported_bounds = False
+    supported_initial_guess = False
+    supported_thresholds = True
     
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
         """

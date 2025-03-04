@@ -61,13 +61,13 @@ class IvimModelBiExp(ReconstModel):
     
     def set_bounds(self, bounds):
         # Use this function for fits that uses curve_fit
-        if bounds == None:
+        if bounds is None:
             self.bounds = np.array([(0, 0, 0.005, 0), (np.inf, 1, 0.1, 0.004)])
         else:
-            self.bounds = np.array([(0, *bounds[0]), (np.inf, *bounds[1])])
+            self.bounds = np.array([bounds[0], bounds[1]])
             
     def set_initial_guess(self, initial_guess):
-        if initial_guess == None:
+        if initial_guess is None:
             self.initial_guess = (1, 0.2, 0.03, 0.001)
         else:
             self.initial_guess = initial_guess

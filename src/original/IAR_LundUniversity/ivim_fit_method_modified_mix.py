@@ -78,7 +78,7 @@ class IvimModelVP(ReconstModel):
         if gtab.bvals[-1] >= 10:
             self.bvals = gtab.bvals/1000
             
-        if bounds == None:
+        if bounds is None:
             # Bounds expressed as (lower bound, upper bound) for [f, D*, D].
             self.bounds = np.array([(0, 1), (5, 100), (0, 4)])
         elif (bounds[0][1] <= 1) or rescale_units: # Realistically, if mm2/s units are used, D* bound is <= 1
