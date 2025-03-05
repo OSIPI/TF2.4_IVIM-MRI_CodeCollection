@@ -77,6 +77,7 @@ jobs:
             path: |
               test_output_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv
               test_duration_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv
+            overwrite: true
 
   merge:
     runs-on: ubuntu-latest
@@ -101,6 +102,7 @@ jobs:
           path: |
             test_output.csv
             test_duration.csv
+          overwrite: true
 
   analyze:
     runs-on: ubuntu-latest
@@ -141,6 +143,8 @@ jobs:
               durations.pdf
               curve_plot.pdf
               fitted_curves.pdf
+            overwrite: true
+
 
   compare:
     runs-on: ubuntu-latest
@@ -171,3 +175,4 @@ jobs:
             path: |
               test_reference.csv
               test_results.csv
+            overwrite: true
