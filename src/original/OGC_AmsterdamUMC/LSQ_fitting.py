@@ -134,17 +134,17 @@ def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cu
         params, _ = curve_fit(lambda b, Dt, int: int * np.exp(-b * Dt ), high_b, high_dw_data,
                               p0=(p0[0], p0[3]-p0[1]),
                               bounds=bounds1)
-        Dt, Fp = 0+params[0], 1 - params[1]
-        if Fp < bounds[0][1] : Fp = bounds[0][1]
-        if Fp > bounds[1][1] : Fp = bounds[1][1]
+        Dt, Fp = params[0], 1 - params[1]
+        if Fp < bounds[0][1] : Fp = np.float64(bounds[0][1])
+        if Fp > bounds[1][1] : Fp = np.float64(bounds[1][1])
 
         # remove the diffusion part to only keep the pseudo-diffusion
         dw_data_remaining = dw_data - (1 - Fp) * np.exp(-bvalues * Dt)
         bounds2 = (bounds[0][2], bounds[1][2])
         # fit for D*
         params, _ = curve_fit(lambda b, Dp: Fp * np.exp(-b * Dp), bvalues, dw_data_remaining, p0=(p0[2]), bounds=bounds2)
-        Dp = 0+params[0]
-        return Dt, np.float64(Fp), Dp
+        Dp = params[0]
+        return Dt, Fp, Dp
     except:
         # if fit fails, return zeros
         # print('segmented fit failed')
