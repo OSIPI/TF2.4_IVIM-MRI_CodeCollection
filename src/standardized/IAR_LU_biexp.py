@@ -27,6 +27,11 @@ class IAR_LU_biexp(OsipiBase):
     required_initial_guess = False
     required_initial_guess_optional = True
     accepted_dimensions = 1 # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
+
+    # Supported inputs in the standardized class
+    supported_bounds = True
+    supported_initial_guess = True
+    supported_thresholds = False
     
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
         """
@@ -46,7 +51,7 @@ class IAR_LU_biexp(OsipiBase):
             bvec[:,2] = 1
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
             
-            self.IAR_algorithm = IvimModelBiExp(gtab)
+            self.IAR_algorithm = IvimModelBiExp(gtab, bounds=self.bounds, initial_guess=self.initial_guess)
         else:
             self.IAR_algorithm = None
         
@@ -72,7 +77,7 @@ class IAR_LU_biexp(OsipiBase):
             bvec[:,2] = 1
             gtab = gradient_table(bvalues, bvec, b0_threshold=0)
             
-            self.IAR_algorithm = IvimModelBiExp(gtab)
+            self.IAR_algorithm = IvimModelBiExp(gtab, bounds=self.bounds, initial_guess=self.initial_guess)
             
         fit_results = self.IAR_algorithm.fit(signals)
         
@@ -104,7 +109,7 @@ class IAR_LU_biexp(OsipiBase):
             bvec[:,2] = 1
             gtab = gradient_table(bvalues, bvec, b0_threshold=0)
             
-            self.IAR_algorithm = IvimModelBiExp(gtab)
+            self.IAR_algorithm = IvimModelBiExp(gtab, bounds=self.bounds, initial_guess=self.initial_guess)
             
         fit_results = self.IAR_algorithm.fit(signals)
         
