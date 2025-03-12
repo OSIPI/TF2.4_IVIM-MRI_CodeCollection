@@ -27,7 +27,13 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
     required_initial_guess_optional = True
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
-    def __init__(self, bvalues=None, thresholds=150, bounds=None, initial_guess=None):
+
+    # Supported inputs in the standardized class
+    supported_bounds = True
+    supported_initial_guess = True
+    supported_thresholds = True
+
+    def __init__(self, bvalues=None, thresholds=150, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), initial_guess=[0.001, 0.01, 0.01,1]):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -40,21 +46,12 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         self.initialize(bounds, initial_guess, thresholds)
         
 
-    def initialize(self, bounds, initial_guess, thresholds=300):
-        if bounds is None:
-            self.bounds=([0, 0, 0.005, 0.7],[0.005, 1, 0.1, 1.3])
-        else:
-            self.bounds=bounds
-            self.use_bounds=True
-        if initial_guess is None:
-            self.initial_guess = [0.001, 0.1, 0.03, 1]
-        else:
-            self.initial_guess = initial_guess
-            self.use_initial_guess=True
-        if thresholds is None:
-            self.thresholds = 150
-        else:
-            self.thresholds = thresholds
+    def initialize(self, bounds, initial_guess, thresholds):
+        self.bounds=bounds
+        self.use_bounds=True
+        self.initial_guess = initial_guess
+        self.use_initial_guess=True
+        self.thresholds = thresholds
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit

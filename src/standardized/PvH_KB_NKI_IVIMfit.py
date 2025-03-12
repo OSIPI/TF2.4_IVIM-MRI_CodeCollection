@@ -27,6 +27,11 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
     required_initial_guess_optional =False
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
+    # Supported inputs in the standardized class
+    supported_bounds = False
+    supported_initial_guess = False
+    supported_thresholds = False
+
     def __init__(self, bvalues=None, thresholds=None,bounds=None,initial_guess=None):
         """
             Everything this algorithm requires should be implemented here.
@@ -35,7 +40,7 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(PvH_KB_NKI_IVIMfit, self).__init__(bvalues, thresholds,bounds,initial_guess)
+        super(PvH_KB_NKI_IVIMfit, self).__init__(bvalues=bvalues, thresholds=thresholds,bounds=bounds,initial_guess=initial_guess)
         self.NKI_algorithm = generate_IVIMmaps_standalone
         if bounds is not None:
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
