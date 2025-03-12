@@ -33,7 +33,7 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
     supported_initial_guess = True
     supported_thresholds = True
 
-    def __init__(self, bvalues=None, thresholds=150, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), initial_guess=[0.001, 0.01, 0.01,1]):
+    def __init__(self, bvalues=None, thresholds=150, bounds=None, initial_guess=None):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -47,12 +47,23 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         
 
     def initialize(self, bounds, initial_guess, thresholds):
-        self.bounds=bounds
-        self.use_bounds=True
-        self.initial_guess = initial_guess
-        self.use_initial_guess=True
-        self.thresholds = thresholds
-
+        if bounds is None:
+            print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
+            self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
+        else:
+            self.bounds=bounds
+        if initial_guess is None:
+            print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
+            self.initial_guess = [0.001, 0.001, 0.01, 1]
+        else:
+            self.initial_guess = initial_guess
+        self.use_initial_guess = True
+        self.use_bounds = True
+        if thresholds is None:
+            self.thresholds = 150
+            print('warning, no thresholds were defined, so default bounds are used of  150')
+        else:
+            self.thresholds = thresholds
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
 

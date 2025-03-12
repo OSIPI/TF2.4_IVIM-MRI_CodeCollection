@@ -130,6 +130,8 @@ def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cu
         high_b = bvalues[bvalues >= cutoff]
         high_dw_data = dw_data[bvalues >= cutoff]
         # correct the bounds. Note that S0 bounds determine the max and min of f
+        assert bounds[0][1] < p0[1]
+        assert bounds[1][1] > p0[1]
         bounds1 = ([bounds[0][0], 0], [bounds[1][0], 10000000000])
         params, _ = curve_fit(lambda b, Dt, int: int * np.exp(-b * Dt ), high_b, high_dw_data,
                               p0=(p0[0], p0[3]-p0[1]),
@@ -238,15 +240,15 @@ def fit_least_squares(bvalues, dw_data, S0_output=False, fitS0=True,
             # bounds are rescaled such that each parameter changes at roughly the same rate to help fitting.
             bounds2 = ([bounds[0][0] * 1000, bounds[0][1] * 10, bounds[0][2] * 10],
                       [bounds[1][0] * 1000, bounds[1][1] * 10, bounds[1][2] * 10])
-            p0=[p0[0]*1000,p0[1]*10,p0[2]*10]
-            params, _ = curve_fit(ivimN_noS0, bvalues, dw_data, p0=p0, bounds=bounds2)
+            p1=[p0[0]*1000,p0[1]*10,p0[2]*10]
+            params, _ = curve_fit(ivimN_noS0, bvalues, dw_data, p0=p1, bounds=bounds2)
             S0 = 1
         else:
             # bounds are rescaled such that each parameter changes at roughly the same rate to help fitting.
             bounds2 = ([bounds[0][0] * 1000, bounds[0][1] * 10, bounds[0][2] * 10, bounds[0][3]],
                       [bounds[1][0] * 1000, bounds[1][1] * 10, bounds[1][2] * 10, bounds[1][3]])
-            p0=[p0[0]*1000,p0[1]*10,p0[2]*10,p0[3]]
-            params, _ = curve_fit(ivimN, bvalues, dw_data, p0=p0, bounds=bounds2)
+            p1=[p0[0]*1000,p0[1]*10,p0[2]*10,p0[3]]
+            params, _ = curve_fit(ivimN, bvalues, dw_data, p0=p1, bounds=bounds2)
             S0 = params[3]
         # correct for the rescaling of parameters
         Dt, Fp, Dp = params[0] / 1000, params[1] / 10, params[2] / 10
@@ -259,10 +261,10 @@ def fit_least_squares(bvalues, dw_data, S0_output=False, fitS0=True,
         # if fit fails, then do a segmented fit instead
         # print('lsq fit failed, trying segmented')
         if S0_output:
-            Dt, Fp, Dp = fit_segmented(bvalues, dw_data, bounds=bounds)
+            Dt, Fp, Dp = fit_segmented(bvalues, dw_data, bounds=bounds,p0=p0)
             return Dt, Fp, Dp, 1
         else:
-            return fit_segmented(bvalues, dw_data, bounds=bounds)
+            return fit_segmented(bvalues, dw_data, bounds=bounds,p0=p0)
 
 
 def fit_least_squares_array_tri_exp(bvalues, dw_data, S0_output=True, fitS0=True, njobs=4,

@@ -34,7 +34,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
     supported_initial_guess = True
     supported_thresholds = True
 
-    def __init__(self, bvalues=None, thresholds=None, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=[0.001, 0.1, 0.01, 1], fitS0=True, prior_in=None):
+    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, fitS0=True, prior_in=None):
 
         """
             Everything this algorithm requires should be implemented here.
@@ -51,11 +51,20 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         self.initialize(bounds, initial_guess, fitS0, prior_in)
         self.fit_segmented=fit_segmented
 
-    def initialize(self, bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3]), initial_guess=[0.001, 0.1, 0.01, 1], fitS0=True, prior_in=None):
-        self.bounds=bounds
-        self.use_bounds = True
-        self.initial_guess = initial_guess
+    def initialize(self, bounds=None, initial_guess=None, fitS0=True, prior_in=None):
+        if bounds is None:
+            print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
+            self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
+        else:
+            self.bounds=bounds
+        if initial_guess is None:
+            print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
+            self.initial_guess = [0.001, 0.001, 0.01, 1]
+        else:
+            self.initial_guess = initial_guess
         self.use_initial_guess = True
+        self.use_bounds = True
+        self.thresholds = 150
         if prior_in is None:
             print('using a flat prior between bounds')
             self.neg_log_prior=flat_neg_log_prior([self.bounds[0][0],self.bounds[1][0]],[self.bounds[0][1],self.bounds[1][1]],[self.bounds[0][2],self.bounds[1][2]],[self.bounds[0][3],self.bounds[1][3]])
@@ -81,7 +90,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
 
         epsilon = 0.000001
         fit_results = fit_segmented(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds, p0=self.initial_guess)
-        fit_results=fit_results+(1,)
+        fit_results=np.array(fit_results+(1,))
         for i in range(4):
             if fit_results[i] < self.bounds[0][i] : fit_results[0] = self.bounds[0][i]+epsilon
             if fit_results[i] > self.bounds[1][i] : fit_results[0] = self.bounds[1][i]-epsilon
