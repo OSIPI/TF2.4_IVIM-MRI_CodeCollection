@@ -40,9 +40,9 @@ def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician
         fit_result = fit.osipi_fit(signal, bvals) #, prior_in=prior
         time_delta += datetime.datetime.now() - start_time
         if save_file is not None:
-            save_file.writerow([ivim_algorithm, name, SNR, idx, f, Dp, D, fit_result["f"], fit_result["D*"], fit_result["D"], *signal])
+            save_file.writerow([ivim_algorithm, name, SNR, idx, f, Dp, D, fit_result["f"], fit_result["Dp"], fit_result["D"], *signal])
             # save_results(save_file, ivim_algorithm, name, SNR, idx, [f, Dp, D], [f_fit, Dp_fit, D_fit])
-        npt.assert_allclose([f, Dp, D], [fit_result["f"], fit_result["D*"], fit_result["D"]], rtol, atol)
+        npt.assert_allclose([f, Dp, D], [fit_result["f"], fit_result["Dp"], fit_result["D"]], rtol, atol)
     if save_duration_file is not None:
         save_duration_file.writerow([ivim_algorithm, name, SNR, time_delta/datetime.timedelta(microseconds=1), fit_count])
         # save_duration(save_duration_file, ivim_algorithm, name, SNR, time_delta, fit_count)

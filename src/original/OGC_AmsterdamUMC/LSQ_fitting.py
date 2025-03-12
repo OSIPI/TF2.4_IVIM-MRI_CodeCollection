@@ -124,29 +124,32 @@ def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cu
     :return Dp: Fitted Dp
     :return S0: Fitted S0
     """
-    p0 = [p0[0] * 1000, p0[1] * 10, p0[2] * 10, p0[3]]
     try:
         # determine high b-values and data for D
+        dw_data=dw_data/np.mean(dw_data[bvalues==0])
         high_b = bvalues[bvalues >= cutoff]
         high_dw_data = dw_data[bvalues >= cutoff]
         # correct the bounds. Note that S0 bounds determine the max and min of f
-        bounds1 = ([bounds[0][0] * 1000., 0.7 - bounds[1][1]], [bounds[1][0] * 1000., 1.3 - bounds[0][
-            1]])  # By bounding S0 like this, we effectively insert the boundaries of f
-        # fit for S0' and D
-        params, _ = curve_fit(lambda b, Dt, int: int * np.exp(-b * Dt / 1000), high_b, high_dw_data,
-                              p0=(p0[0], p0[3]-p0[1]/10),
+        assert bounds[0][1] < p0[1]
+        assert bounds[1][1] > p0[1]
+        bounds1 = ([bounds[0][0], 0], [bounds[1][0], 10000000000])
+        params, _ = curve_fit(lambda b, Dt, int: int * np.exp(-b * Dt ), high_b, high_dw_data,
+                              p0=(p0[0], p0[3]-p0[1]),
                               bounds=bounds1)
-        Dt, Fp = params[0] / 1000, 1 - params[1]
+        Dt, Fp = params[0], 1 - params[1]
+        if Fp < bounds[0][1] : Fp = np.float64(bounds[0][1])
+        if Fp > bounds[1][1] : Fp = np.float64(bounds[1][1])
+
         # remove the diffusion part to only keep the pseudo-diffusion
         dw_data_remaining = dw_data - (1 - Fp) * np.exp(-bvalues * Dt)
-        bounds2 = (bounds[0][2]*10, bounds[1][2]*10)
+        bounds2 = (bounds[0][2], bounds[1][2])
         # fit for D*
         params, _ = curve_fit(lambda b, Dp: Fp * np.exp(-b * Dp), bvalues, dw_data_remaining, p0=(p0[2]), bounds=bounds2)
         Dp = params[0]
         return Dt, Fp, Dp
     except:
         # if fit fails, return zeros
-        # print('segnetned fit failed')
+        # print('segmented fit failed')
         return 0., 0., 0.
 
 
@@ -235,17 +238,17 @@ def fit_least_squares(bvalues, dw_data, S0_output=False, fitS0=True,
     try:
         if not fitS0:
             # bounds are rescaled such that each parameter changes at roughly the same rate to help fitting.
-            bounds = ([bounds[0][0] * 1000, bounds[0][1] * 10, bounds[0][2] * 10],
+            bounds2 = ([bounds[0][0] * 1000, bounds[0][1] * 10, bounds[0][2] * 10],
                       [bounds[1][0] * 1000, bounds[1][1] * 10, bounds[1][2] * 10])
-            p0=[p0[0]*1000,p0[1]*10,p0[2]*10]
-            params, _ = curve_fit(ivimN_noS0, bvalues, dw_data, p0=p0, bounds=bounds)
+            p1=[p0[0]*1000,p0[1]*10,p0[2]*10]
+            params, _ = curve_fit(ivimN_noS0, bvalues, dw_data, p0=p1, bounds=bounds2)
             S0 = 1
         else:
             # bounds are rescaled such that each parameter changes at roughly the same rate to help fitting.
-            bounds = ([bounds[0][0] * 1000, bounds[0][1] * 10, bounds[0][2] * 10, bounds[0][3]],
+            bounds2 = ([bounds[0][0] * 1000, bounds[0][1] * 10, bounds[0][2] * 10, bounds[0][3]],
                       [bounds[1][0] * 1000, bounds[1][1] * 10, bounds[1][2] * 10, bounds[1][3]])
-            p0=[p0[0]*1000,p0[1]*10,p0[2]*10,p0[3]]
-            params, _ = curve_fit(ivimN, bvalues, dw_data, p0=p0, bounds=bounds)
+            p1=[p0[0]*1000,p0[1]*10,p0[2]*10,p0[3]]
+            params, _ = curve_fit(ivimN, bvalues, dw_data, p0=p1, bounds=bounds2)
             S0 = params[3]
         # correct for the rescaling of parameters
         Dt, Fp, Dp = params[0] / 1000, params[1] / 10, params[2] / 10
@@ -258,10 +261,10 @@ def fit_least_squares(bvalues, dw_data, S0_output=False, fitS0=True,
         # if fit fails, then do a segmented fit instead
         # print('lsq fit failed, trying segmented')
         if S0_output:
-            Dt, Fp, Dp = fit_segmented(bvalues, dw_data, bounds=bounds)
+            Dt, Fp, Dp = fit_segmented(bvalues, dw_data, bounds=bounds,p0=p0)
             return Dt, Fp, Dp, 1
         else:
-            return fit_segmented(bvalues, dw_data)
+            return fit_segmented(bvalues, dw_data, bounds=bounds,p0=p0)
 
 
 def fit_least_squares_array_tri_exp(bvalues, dw_data, S0_output=True, fitS0=True, njobs=4,
@@ -561,19 +564,19 @@ def flat_neg_log_prior(Dt_range, Fp_range, Dp_range, S0_range=None):
             Dt, Fp, Dp = p[0], p[1], p[2]
         # make D*<D very unlikely
         if (Dp < Dt):
-            return 1e3
+            return 1e10
         else:
             # determine and return the prior for D, f and D* (and S0)
             if len(p) == 4:
-                if Dt_range[0] < Dt < Dt_range[1] and Fp_range[0] < Fp < Fp_range[1] and Dp_range[0] < Dp < Dp_range[1]: # and S0_range[0] < S0 < S0_range[1]: << not sure whether this helps. Technically it should be here
+                if Dt_range[0] < Dt < Dt_range[1] and Fp_range[0] < Fp < Fp_range[1] and Dp_range[0] < Dp < Dp_range[1] and S0_range[0] < S0 < S0_range[1]: #<< not sure whether this helps. Technically it should be here
                     return 0
                 else:
-                    return 1e3
+                    return 1e10
             else:
                 if Dt_range[0] < Dt < Dt_range[1] and Fp_range[0] < Fp < Fp_range[1] and Dp_range[0] < Dp < Dp_range[1]:
                     return 0
                 else:
-                    return 1e3
+                    return 1e10
 
     return neg_log_prior
 
@@ -638,7 +641,7 @@ def fit_bayesian_array(bvalues, dw_data, paramslsq, arg):
     return Dt_pred, Fp_pred, Dp_pred, S0_pred
 
 
-def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05, 1], fitS0=True):
+def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05, 1], fitS0=True, bounds=([0,0,0,0],[0.005,1.5,2,2.5])):
     '''
     This is an implementation of the Bayesian IVIM fit. It returns the Maximum a posterior probability.
     The fit is taken from Barbieri et al. which was initially introduced in http://arxiv.org/10.1002/mrm.25765 and
@@ -655,7 +658,7 @@ def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05, 1], fitS
     '''
     try:
         # define fit bounds
-        bounds = [(0, 0.005), (0, 1.5), (0, 2), (0, 2.5)]
+        bounds = [(bounds[0][0], bounds[1][0]), (bounds[0][1], bounds[1][1]), (bounds[0][2], bounds[1][2]), (bounds[0][3], bounds[1][3])]
         # Find the Maximum a posterior probability (MAP) by minimising the negative log of the posterior
         if fitS0:
             params = minimize(neg_log_posterior, x0=x0, args=(bvalues, dw_data, neg_log_prior), bounds=bounds)
