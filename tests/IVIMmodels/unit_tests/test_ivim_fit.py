@@ -3,13 +3,8 @@ import numpy.testing as npt
 import pytest
 import json
 import pathlib
-import os
 import time
-
-from exceptiongroup import catch
-
 from src.wrappers.OsipiBase import OsipiBase
-from utilities.data_simulation.GenerateData import GenerateData
 #run using python -m pytest from the root folder
 
 def signal_helper(signal):
