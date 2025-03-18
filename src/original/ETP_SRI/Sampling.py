@@ -1,6 +1,5 @@
 import numpy as np
 import emcee
-import tqdm
 import corner
 from scipy.stats import rice, norm, uniform
 from matplotlib import pyplot as plt
@@ -9,7 +8,7 @@ from utilities.data_simulation.GenerateData import GenerateData
 
 class MCMC:
     """
-    Performs sampling of exponential data
+    Performs sampling of exponential data using MCMC
     """
     def __init__(self,
                  data,
@@ -26,6 +25,28 @@ class MCMC:
         """
         Parameters
         ----------
+        data : array_like
+            The data to be fitted
+        b : array_like
+            The b-values for the data
+        data_scale : float, optional
+            The scale of the data, by default 1e-5
+        parameter_scale : tuple, optional
+            The scale of the parameters, by default (1e-7, 1e-11, 1e-9)
+        bounds : tuple, optional
+            The bounds for the parameters, by default ((0, 1), (0, 1), (0, 1))
+        priors : tuple, optional
+            The priors for the parameters, by default None
+        gaussian_noise : bool, optional
+            Whether the noise is gaussian, by default False
+        nwalkers : int, optional
+            The number of walkers, by default 16
+        nsteps : int, optional
+            The number of steps, by default 10000
+        burn_in : int, optional
+            The burn in, by default 2000
+        progress : bool, optional
+            Whether to show progress, by default True
 
         """
         self.data = np.atleast_2d(np.asarray(data))
@@ -68,60 +89,38 @@ class MCMC:
     
     def biexp_loglike_gauss(self, f, D, D_star):
         expected = self.signal(f, D, D_star)
-        # check this!
-        # print(f'likelihood {norm.logpdf(self.data, loc=expected/self.data_scale, scale=self.data_scale)}')
         return np.sum(norm.logpdf(self.data, loc=expected, scale=self.data_scale), 1)
-    
-    # def biexp_loglike_gauss_full(self, f, D, D_star):
-    #     expected = self.signal(f, D, D_star)
-    #     print(f'expected {expected}')
-    #     print(f'data {self.data}')
-    #     return norm.logpdf(self.data, loc=expected, scale=self.data_scale)
     
     def biexp_loglike_rice(self, f, D, D_star):
         expected = self.signal(f, D, D_star)
-        # print(f'expected {expected}')
         return np.sum(rice.logpdf(self.data, b=expected/self.data_scale, scale=self.data_scale), 1)
     
     def posterior(self, params):
         params = np.atleast_2d(params)
         total = self.bounds_prior(params)
-        # print(f'bounds params {total}')
         neginf = np.isneginf(total)
-        # print(f'neginf {neginf}')
         f = params[~neginf, 0]
         D = params[~neginf, 1]
         D_star = params[~neginf, 2]
         prior = self.prior(params[~neginf, :])
-        # print(f'prior {prior}')
         likelihood = self.likelihood(f, D, D_star)
-        # print(f'likelihood {likelihood}')
         total[~neginf] += prior + likelihood
         return total
         
     def sample(self, initial_pos):
-        # f = initial_pos[0]
-        # D = initial_pos[1]
-        # D_star = initial_pos[2]
-        # print(f'initial pos likelihood {self.biexp_loglike_gauss_full(f, D, D_star)}')
-        print(f'initial pos likelihood {self.posterior(initial_pos)}')
+        # print(f'initial pos likelihood {self.posterior(initial_pos)}')
         sampler = emcee.EnsembleSampler(self.nwalkers, 3, self.posterior, vectorize=True)
         pos = initial_pos + self.parameter_scale * np.random.randn(self.nwalkers, self.ndim)
-        # print(f'pos {pos}')
-        # print(f'nsteps {self.nsteps}')
         sampler.run_mcmc(pos, self.nsteps, progress=True)
         self.chain = sampler.get_chain(discard=self.burn_in, flat=True)
         self.means = np.mean(self.chain, 0)
         self.stds = np.std(self.chain, 0)
-        print(f'final pos likelihood {self.posterior(self.means)}')
-        # print(f'final pos likelihood {self.biexp_loglike_gauss_full(self.means[0], self.means[1], self.means[2])}')
-        # print(f'chain {self.chain}')
+        # print(f'final pos likelihood {self.posterior(self.means)}')
         return self.means, self.stds
     
     def plot(self, truths=None, labels=('f', 'D', 'D*'), overplot=None):
         if truths is None:
             truths = self.means
-        # print(f'chain size {self.chain.shape}')
         fig = corner.corner(self.chain, labels=labels, truths=truths)
         fig.suptitle("Sampling of the IVIM data", fontsize=16)
         if overplot is not None:
