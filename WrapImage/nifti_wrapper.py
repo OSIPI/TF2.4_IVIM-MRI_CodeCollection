@@ -109,10 +109,10 @@ if __name__ == "__main__":
         n = data.ndim
         total_iteration = np.prod(data.shape[:n-1])
         for idx, view in tqdm(loop_over_first_n_minus_1_dimensions(data), desc=f"{args.algorithm} is fitting", dynamic_ncols=True, total=total_iteration):
-            [f_fit, Dp_fit, D_fit] = fit.osipi_fit(view, bvals)
-            f_image.append(f_fit)
-            Dp_image.append(Dp_fit)
-            D_image.append(D_fit)
+            fit_result = fit.osipi_fit(view, bvals)
+            f_image.append(fit_result["f"])
+            Dp_image.append(fit_result["Dp"])
+            D_image.append(fit_result["D"])
 
         # Convert lists to NumPy arrays
         f_image = np.array(f_image)

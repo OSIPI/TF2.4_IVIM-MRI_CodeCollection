@@ -25,6 +25,11 @@ class OJ_GU_seg(OsipiBase):
     required_initial_guess = False
     required_initial_guess_optional = False
     accepted_dimensions = 1 # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
+
+    # Supported inputs in the standardized class
+    supported_bounds = False
+    supported_initial_guess = False
+    supported_thresholds = True
     
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
         """
@@ -35,7 +40,10 @@ class OJ_GU_seg(OsipiBase):
             the requirements.
         """
         super(OJ_GU_seg, self).__init__(bvalues, thresholds, bounds, initial_guess)
-        
+        if bounds is not None:
+            print('warning, bounds from wrapper are not (yet) used in this algorithm')
+        self.use_bounds = False
+        self.use_initial_guess = False
         # Check the inputs
         
         # Initialize the algorithm
@@ -61,11 +69,12 @@ class OJ_GU_seg(OsipiBase):
             bthr = 200
         else:
             bthr = self.thresholds[0]
-                    
+        signals[signals<0.00001]=0.00001
         fit_results = seg(signals, bvalues, bthr)
+
+        results = {} 
+        results["f"] = fit_results['f']
+        results["Dp"] = fit_results['Dstar']
+        results["D"] = fit_results['D']
         
-        f = fit_results['f']
-        Dstar = fit_results['Dstar']
-        D = fit_results['D']
-        
-        return f, Dstar, D
+        return results

@@ -27,6 +27,11 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
     required_initial_guess_optional =False
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
+    # Supported inputs in the standardized class
+    supported_bounds = False
+    supported_initial_guess = False
+    supported_thresholds = False
+
     def __init__(self, bvalues=None, thresholds=None,bounds=None,initial_guess=None):
         """
             Everything this algorithm requires should be implemented here.
@@ -35,8 +40,12 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(PvH_KB_NKI_IVIMfit, self).__init__(bvalues, thresholds,bounds,initial_guess)
+        super(PvH_KB_NKI_IVIMfit, self).__init__(bvalues=bvalues, thresholds=thresholds,bounds=bounds,initial_guess=initial_guess)
         self.NKI_algorithm = generate_IVIMmaps_standalone
+        if bounds is not None:
+            print('warning, bounds from wrapper are not (yet) used in this algorithm')
+        self.use_bounds = False
+        self.use_initial_guess = False
 
 
     def ivim_fit(self, signals, bvalues=None):
@@ -52,11 +61,13 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
         #bvalues = np.array(bvalues)
         bvalues = bvalues.tolist() #NKI code expects a list instead of nparray
         # reshape signal as the NKI code expects a 4D array
+        signals[signals<0.00001]=0.00001
         signals = np.reshape(signals, (1, 1, 1, len(signals)))  # assuming that in this test the signals are always single voxel
         fit_results = self.NKI_algorithm(signals,bvalues)
 
-        D = fit_results[0][0,0,0]/1000
-        f = fit_results[1][0,0,0]
-        Dstar = fit_results[2][0,0,0]/1000
+        results = {}
+        results["D"] = fit_results[0][0,0,0]/1000
+        results["f"] = fit_results[1][0,0,0]
+        results["Dp"] = fit_results[2][0,0,0]/1000
 
-        return f, Dstar, D
+        return results

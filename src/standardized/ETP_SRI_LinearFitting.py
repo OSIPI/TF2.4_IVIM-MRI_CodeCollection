@@ -27,6 +27,11 @@ class ETP_SRI_LinearFitting(OsipiBase):
     required_initial_guess_optional = False
     accepted_dimensions = 1
     # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
+
+    # Supported inputs in the standardized class
+    supported_bounds = False
+    supported_initial_guess = False
+    supported_thresholds = True
     
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
         """
@@ -36,8 +41,13 @@ class ETP_SRI_LinearFitting(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
+
         super(ETP_SRI_LinearFitting, self).__init__(bvalues, thresholds, bounds, initial_guess)
-        
+        if bounds is not None:
+            print('warning, bounds from wrapper are not (yet) used in this algorithm')
+        self.use_bounds = False
+        self.use_initial_guess = False
+
         # Could be a good idea to have all the submission-specfic variable be 
         # defined with initials?
         self.ETP_weighting = weighting
@@ -57,6 +67,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
         Returns:
             _type_: _description_
         """
+        signals[signals<0.0000001]=0.0000001
         if bvalues is None:
             bvalues = self.bvalues
         
@@ -64,11 +75,21 @@ class ETP_SRI_LinearFitting(OsipiBase):
             ETP_object = LinearFit()
         else:
             ETP_object = LinearFit(self.thresholds[0])
-            
+        
+        results = {}
         if linear_fit_option:
-            f, Dstar = ETP_object.linear_fit(bvalues, signals)
-            return f, Dstar
+            f, Dstar = ETP_object.linear_fit(bvalues, signals, self.ETP_weighting, self.ETP_stats)
+
+            results["f"] = f
+            results["Dp"] = Dstar
+
+            return results
         else: 
             f, D, Dstar = ETP_object.ivim_fit(bvalues, signals)
-            return f, Dstar, D
+
+            results["f"] = f
+            results["Dp"] = Dstar
+            results["D"] = D
+
+            return results
     

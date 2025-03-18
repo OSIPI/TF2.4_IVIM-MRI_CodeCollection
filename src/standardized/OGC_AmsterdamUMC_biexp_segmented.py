@@ -27,7 +27,13 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
     required_initial_guess_optional = True
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
-    def __init__(self, bvalues=None, thresholds=150, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), initial_guess=[0.001, 0.01, 0.01,1]):
+
+    # Supported inputs in the standardized class
+    supported_bounds = True
+    supported_initial_guess = True
+    supported_thresholds = True
+
+    def __init__(self, bvalues=None, thresholds=150, bounds=None, initial_guess=None):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -40,21 +46,25 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         self.initialize(bounds, initial_guess, thresholds)
         
 
-    def initialize(self, bounds, initial_guess, thresholds=300):
+    def initialize(self, bounds, initial_guess, thresholds):
         if bounds is None:
-            self.bounds=([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3])
+            print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
+            self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
         else:
             self.bounds=bounds
         if initial_guess is None:
-            self.initial_guess = [0.001, 0.1, 0.03, 1]
+            print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
+            self.initial_guess = [0.001, 0.001, 0.01, 1]
         else:
             self.initial_guess = initial_guess
+        self.use_initial_guess = True
+        self.use_bounds = True
         if thresholds is None:
             self.thresholds = 150
+            print('warning, no thresholds were defined, so default bounds are used of  150')
         else:
             self.thresholds = thresholds
-
-    def ivim_fit(self, signals, bvalues, initial_guess=None, **kwargs):
+    def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
 
         Args:
@@ -64,13 +74,13 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         Returns:
             _type_: _description_
         """
-        if initial_guess is not None and len(initial_guess) == 4:
-            self.initial_guess = initial_guess
+
         bvalues=np.array(bvalues)
         fit_results = self.OGC_algorithm(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds, p0=self.initial_guess)
 
-        D = fit_results[0]
-        f = fit_results[1]
-        Dstar = fit_results[2]
+        results = {}
+        results["D"] = fit_results[0]
+        results["f"] = fit_results[1]
+        results["Dp"] = fit_results[2]
 
-        return f, Dstar, D
+        return results

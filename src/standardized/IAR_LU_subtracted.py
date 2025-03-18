@@ -28,6 +28,11 @@ class IAR_LU_subtracted(OsipiBase):
     required_initial_guess_optional = True
     accepted_dimensions = 1 # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
     
+    # Supported inputs in the standardized class
+    supported_bounds = True
+    supported_initial_guess = True
+    supported_thresholds = False
+    
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None):
         """
             Everything this algorithm requires should be implemented here.
@@ -37,7 +42,10 @@ class IAR_LU_subtracted(OsipiBase):
             the requirements.
         """
         super(IAR_LU_subtracted, self).__init__(bvalues, thresholds, bounds, initial_guess)
-        
+        if bounds is not None:
+            print('warning, bounds from wrapper are not (yet) used in this algorithm')
+        self.use_bounds = False
+        self.use_initial_guess = False
         # Check the inputs
         
         # Initialize the algorithm
@@ -46,7 +54,7 @@ class IAR_LU_subtracted(OsipiBase):
             bvec[:,2] = 1
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
             
-            self.IAR_algorithm = IvimModelSubtracted(gtab)
+            self.IAR_algorithm = IvimModelSubtracted(gtab, bounds=self.bounds, initial_guess=self.initial_guess)
         else:
             self.IAR_algorithm = None
         
@@ -72,12 +80,18 @@ class IAR_LU_subtracted(OsipiBase):
             bvec[:,2] = 1
             gtab = gradient_table(bvalues, bvec, b0_threshold=0)
             
-            self.IAR_algorithm = IvimModelSubtracted(gtab)
+            self.IAR_algorithm = IvimModelSubtracted(gtab, bounds=self.bounds, initial_guess=self.initial_guess)
             
         fit_results = self.IAR_algorithm.fit(signals)
         
-        f = fit_results.model_params[1]
-        Dstar = fit_results.model_params[2]
-        D = fit_results.model_params[3]
+        #f = fit_results.model_params[1]
+        #Dstar = fit_results.model_params[2]
+        #D = fit_results.model_params[3]
         
-        return f, Dstar, D
+        #return f, Dstar, D
+        results = {}
+        results["f"] = fit_results.model_params[1]
+        results["Dp"] = fit_results.model_params[2]
+        results["D"] = fit_results.model_params[3]
+        
+        return results

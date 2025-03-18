@@ -14,7 +14,8 @@ class OsipiBase:
         self.thresholds = np.asarray(thresholds) if thresholds is not None else None
         self.bounds = np.asarray(bounds) if bounds is not None else None
         self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
-        
+        self.use_bounds = True
+        self.use_initial_guess = True
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
@@ -84,15 +85,75 @@ class OsipiBase:
         #args = [data, use_bvalues, use_initial_guess, use_bounds, use_thresholds]
         #args = [arg for arg in args if arg is not None]
 
+        # Check if there is an attribute that defines the result dictionary keys
+        if hasattr(self, "result_keys"):
+            # result_keys is a list of strings of parameter names, e.g. "S0", "f1", "f2", etc.
+            result_keys = self.result_keys
+        else:
+            # Default is ["f", "Dp", "D"]
+            self.result_keys = ["f", "Dp", "D"]
+        
+        results = {}
+        for key in self.result_keys:
+            results[key] = np.empty(list(data.shape[:-1]))
+
         # Assuming the last dimension of the data is the signal values of each b-value
-        results = np.empty(list(data.shape[:-1])+[3]) # Create an array with the voxel dimensions + the ones required for the fit
+        #results = np.empty(list(data.shape[:-1])+[3]) # Create an array with the voxel dimensions + the ones required for the fit
+        #for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
+            #args = [data[ijk], use_bvalues]
+            #fit = list(self.ivim_fit(*args, **kwargs))
+            #results[ijk] = fit
+
         for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
             args = [data[ijk], use_bvalues]
-            fit = list(self.ivim_fit(*args, **kwargs))
-            results[ijk] = fit
+            fit = self.ivim_fit(*args, **kwargs) # For single voxel fits, we assume this is a dict with a float value per key.
+            for key in list(fit.keys()):
+                results[key][ijk] = fit[key]
         
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         return results
+    
+    def osipi_fit_full_volume(self, data, bvalues=None, **kwargs):
+        """Sends a full volume in one go to the fitting algorithm. The osipi_fit method only sends one voxel at a time.
+
+        Args:
+            data (array): 3D (single slice) or 4D (multi slice) DWI data.
+            bvalues (array, optional): The b-values of the DWI data. Defaults to None.
+
+        Returns:
+            results (dict): Dict with key each containing an array which is a parametric map.
+        """
+        
+        try:
+            use_bvalues = bvalues if bvalues is not None else self.bvalues
+            if use_bvalues is not None: use_bvalues = np.asarray(use_bvalues) 
+
+            # Check if there is an attribute that defines the result dictionary keys
+            if hasattr(self, "result_keys"):
+                # result_keys is a list of strings of parameter names, e.g. "S0", "f1", "f2", etc.
+                result_keys = self.result_keys
+            else:
+                # Default is ["f", "Dp", "D"]
+                self.result_keys = ["f", "Dp", "D"]
+
+            # Create the results dictionary
+            results = {}
+            for key in self.result_keys:
+                results[key] = np.empty(list(data.shape[:-1]))
+
+            args = [data, use_bvalues]
+            fit = self.ivim_fit_full_volume(*args, **kwargs) # Assume this is a dict with an array per key representing the parametric maps
+            for key in list(fit.keys()):
+                results[key] = fit[key]
+
+            return results
+
+        except: 
+            # Check if the problem is that full volume fitting is simply not supported in the standardized implementation
+            if not hasattr(self, "ivim_fit_full_volume"): #and callable(getattr(self, "ivim_fit_full_volume")):
+                print("Full volume fitting not supported for this algorithm")
+
+            return False
     
     def osipi_print_requirements(self):
         """
