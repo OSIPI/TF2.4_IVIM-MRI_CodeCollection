@@ -52,7 +52,11 @@ class OsipiBase:
         """Fits the data with the bvalues
         Returns [S0, f, Dstar, D]
         """
-        
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
+
         # We should first check whether the attributes in the __init__ are not None
         # Then check if they are input here, if they are, these should overwrite the attributes
         use_bvalues = bvalues if bvalues is not None else self.bvalues
@@ -122,6 +126,11 @@ class OsipiBase:
         Returns:
             results (dict): Dict with key each containing an array which is a parametric map.
         """
+
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
         
         try:
             use_bvalues = bvalues if bvalues is not None else self.bvalues
