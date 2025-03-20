@@ -42,6 +42,10 @@ class OJ_GU_seg(OsipiBase):
         super(OJ_GU_seg, self).__init__(bvalues, thresholds, bounds, initial_guess)
         
         # Check the inputs
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
         
         # Initialize the algorithm
         
@@ -56,6 +60,11 @@ class OJ_GU_seg(OsipiBase):
         Returns:
             _type_: _description_
         """
+
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
         
         if bvalues is None:
             bvalues = self.bvalues

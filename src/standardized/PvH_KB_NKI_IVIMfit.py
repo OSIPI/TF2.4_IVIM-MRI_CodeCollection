@@ -19,8 +19,7 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
 
     # Algorithm requirements
     required_bvalues = 4
-    required_thresholds = [0,
-                           0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
+    required_thresholds = [0,0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
     required_bounds = False
     required_bounds_optional = False  # Bounds may not be required but are optional
     required_initial_guess = False
@@ -41,6 +40,10 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
             the requirements.
         """
         super(PvH_KB_NKI_IVIMfit, self).__init__(bvalues=bvalues, thresholds=thresholds,bounds=bounds,initial_guess=initial_guess)
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
         self.NKI_algorithm = generate_IVIMmaps_standalone
 
 
@@ -54,6 +57,10 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
         Returns:
             _type_: _description_
         """
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
         #bvalues = np.array(bvalues)
         bvalues = bvalues.tolist() #NKI code expects a list instead of nparray
         # reshape signal as the NKI code expects a 4D array

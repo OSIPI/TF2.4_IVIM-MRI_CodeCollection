@@ -42,6 +42,10 @@ class ETP_SRI_LinearFitting(OsipiBase):
             the requirements.
         """
         super(ETP_SRI_LinearFitting, self).__init__(bvalues=bvalues, thresholds=thresholds, bounds=bounds, initial_guess=initial_guess)
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
         
         # Could be a good idea to have all the submission-specfic variable be 
         # defined with initials?
@@ -49,8 +53,8 @@ class ETP_SRI_LinearFitting(OsipiBase):
         self.ETP_stats = stats
         
         # Check the inputs
-        
     
+
     def ivim_fit(self, signals, bvalues=None, linear_fit_option=False, **kwargs):
         """Perform the IVIM fit
 
@@ -62,6 +66,11 @@ class ETP_SRI_LinearFitting(OsipiBase):
         Returns:
             _type_: _description_
         """
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
+
         if bvalues is None:
             bvalues = self.bvalues
         

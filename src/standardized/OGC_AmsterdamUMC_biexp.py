@@ -19,8 +19,7 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
 
     # Algorithm requirements
     required_bvalues = 4
-    required_thresholds = [0,
-                           0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
+    required_thresholds = [0,0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
     required_bounds = False
     required_bounds_optional = True  # Bounds may not be required but are optional
     required_initial_guess = False
@@ -42,6 +41,10 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         """
         #super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
         super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
         self.OGC_algorithm = fit_least_squares
         #self.initialize(bounds, initial_guess, fitS0)
         self.fitS0=fitS0
@@ -67,6 +70,10 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
 
         if initial_guess is not None and len(initial_guess) == 4:
             self.initial_guess = initial_guess

@@ -44,6 +44,10 @@ class IAR_LU_segmented_2step(OsipiBase):
         super(IAR_LU_segmented_2step, self).__init__(bvalues, thresholds, bounds, initial_guess)
         
         # Check the inputs
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
         
         # Initialize the algorithm
         if self.bvalues is not None:
@@ -67,6 +71,11 @@ class IAR_LU_segmented_2step(OsipiBase):
             _type_: _description_
         """
         print(thresholds)
+
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
         
         if self.IAR_algorithm is None:
             if bvalues is None:

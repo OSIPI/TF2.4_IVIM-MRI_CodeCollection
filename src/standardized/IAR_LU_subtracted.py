@@ -44,6 +44,10 @@ class IAR_LU_subtracted(OsipiBase):
         super(IAR_LU_subtracted, self).__init__(bvalues, thresholds, bounds, initial_guess)
         
         # Check the inputs
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
         
         # Initialize the algorithm
         if self.bvalues is not None:
@@ -66,6 +70,11 @@ class IAR_LU_subtracted(OsipiBase):
         Returns:
             _type_: _description_
         """
+        
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
         
         if self.IAR_algorithm is None:
             if bvalues is None:

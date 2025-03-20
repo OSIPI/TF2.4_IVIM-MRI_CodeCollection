@@ -41,6 +41,10 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
             the requirements.
         """
         super(OGC_AmsterdamUMC_biexp_segmented, self).__init__(bvalues, thresholds, bounds, initial_guess)
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
         self.OGC_algorithm = fit_segmented
         self.initialize(bounds, initial_guess, thresholds)
         
@@ -69,6 +73,11 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         Returns:
             _type_: _description_
         """
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
+        
         if initial_guess is not None and len(initial_guess) == 4:
             self.initial_guess = initial_guess
         bvalues=np.array(bvalues)

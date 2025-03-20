@@ -216,16 +216,14 @@ class OsipiBase:
         (True, True, False, False, False, False)
         """
         
-        #return (False,) * 6
-        return True
+        return getattr(self, 'accepted_dimensions', (1, 3))
 
     def osipi_accepts_dimension(self, dim):
         """Query if the selection dimension is fittable"""
         
-        #accepted = self.accepted_dimensions()
-        #if dim < 0 or dim > len(accepted):
-            #return False
-        #return accepted[dim]
+        min_dim, max_dim = self.osipi_accepted_dimensions()
+        if not (min_dim <= dim <= max_dim):
+            raise ValueError(f"Dimension {dim}D not supported. Requires {min_dim}-{max_dim}D spatial data")
         return True
     
     def osipi_check_required_bvalues(self):
