@@ -41,7 +41,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-
+        super(ETP_SRI_LinearFitting, self).__init__(bvalues=bvalues, thresholds=thresholds, bounds=bounds, initial_guess=initial_guess)
         super(ETP_SRI_LinearFitting, self).__init__(bvalues, thresholds, bounds, initial_guess)
         if bounds is not None:
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
@@ -54,8 +54,12 @@ class ETP_SRI_LinearFitting(OsipiBase):
         self.ETP_stats = stats
         
         # Check the inputs
-        
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
     
+
     def ivim_fit(self, signals, bvalues=None, linear_fit_option=False, **kwargs):
         """Perform the IVIM fit
 
@@ -67,6 +71,11 @@ class ETP_SRI_LinearFitting(OsipiBase):
         Returns:
             _type_: _description_
         """
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
+
         signals[signals<0.0000001]=0.0000001
         if bvalues is None:
             bvalues = self.bvalues
