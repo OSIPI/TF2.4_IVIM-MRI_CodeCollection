@@ -40,7 +40,10 @@ class OJ_GU_seg(OsipiBase):
             the requirements.
         """
         super(OJ_GU_seg, self).__init__(bvalues, thresholds, bounds, initial_guess)
-        
+        if bounds is not None:
+            print('warning, bounds from wrapper are not (yet) used in this algorithm')
+        self.use_bounds = False
+        self.use_initial_guess = False
         # Check the inputs
         self.osipi_check_required_bvalues()
         self.osipi_check_required_thresholds()
@@ -75,12 +78,12 @@ class OJ_GU_seg(OsipiBase):
             bthr = 200
         else:
             bthr = self.thresholds[0]
-                    
+        signals[signals<0.00001]=0.00001
         fit_results = seg(signals, bvalues, bthr)
 
         results = {} 
         results["f"] = fit_results['f']
-        results["D*"] = fit_results['Dstar']
+        results["Dp"] = fit_results['Dstar']
         results["D"] = fit_results['D']
         
         return results

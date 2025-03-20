@@ -45,6 +45,10 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
         self.osipi_check_required_bounds()
         self.osipi_check_required_initial_guess()
         self.NKI_algorithm = generate_IVIMmaps_standalone
+        if bounds is not None:
+            print('warning, bounds from wrapper are not (yet) used in this algorithm')
+        self.use_bounds = False
+        self.use_initial_guess = False
 
 
     def ivim_fit(self, signals, bvalues=None):
@@ -64,12 +68,13 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
         #bvalues = np.array(bvalues)
         bvalues = bvalues.tolist() #NKI code expects a list instead of nparray
         # reshape signal as the NKI code expects a 4D array
+        signals[signals<0.00001]=0.00001
         signals = np.reshape(signals, (1, 1, 1, len(signals)))  # assuming that in this test the signals are always single voxel
         fit_results = self.NKI_algorithm(signals,bvalues)
 
         results = {}
         results["D"] = fit_results[0][0,0,0]/1000
         results["f"] = fit_results[1][0,0,0]
-        results["D*"] = fit_results[2][0,0,0]/1000
+        results["Dp"] = fit_results[2][0,0,0]/1000
 
         return results

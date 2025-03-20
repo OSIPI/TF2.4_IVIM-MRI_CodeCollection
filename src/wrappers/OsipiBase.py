@@ -14,7 +14,8 @@ class OsipiBase:
         self.thresholds = np.asarray(thresholds) if thresholds is not None else None
         self.bounds = np.asarray(bounds) if bounds is not None else None
         self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
-        
+        self.use_bounds = True
+        self.use_initial_guess = True
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
@@ -93,8 +94,8 @@ class OsipiBase:
             # result_keys is a list of strings of parameter names, e.g. "S0", "f1", "f2", etc.
             result_keys = self.result_keys
         else:
-            # Default is ["f", "D*", "D"]
-            self.result_keys = ["f", "D*", "D"]
+            # Default is ["f", "Dp", "D"]
+            self.result_keys = ["f", "Dp", "D"]
         
         results = {}
         for key in self.result_keys:
@@ -141,8 +142,8 @@ class OsipiBase:
                 # result_keys is a list of strings of parameter names, e.g. "S0", "f1", "f2", etc.
                 result_keys = self.result_keys
             else:
-                # Default is ["f", "D*", "D"]
-                self.result_keys = ["f", "D*", "D"]
+                # Default is ["f", "Dp", "D"]
+                self.result_keys = ["f", "Dp", "D"]
 
             # Create the results dictionary
             results = {}

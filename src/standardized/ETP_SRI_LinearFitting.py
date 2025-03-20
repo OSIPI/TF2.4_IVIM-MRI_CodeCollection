@@ -42,17 +42,22 @@ class ETP_SRI_LinearFitting(OsipiBase):
             the requirements.
         """
         super(ETP_SRI_LinearFitting, self).__init__(bvalues=bvalues, thresholds=thresholds, bounds=bounds, initial_guess=initial_guess)
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
-        
+        super(ETP_SRI_LinearFitting, self).__init__(bvalues, thresholds, bounds, initial_guess)
+        if bounds is not None:
+            print('warning, bounds from wrapper are not (yet) used in this algorithm')
+        self.use_bounds = False
+        self.use_initial_guess = False
+
         # Could be a good idea to have all the submission-specfic variable be 
         # defined with initials?
         self.ETP_weighting = weighting
         self.ETP_stats = stats
         
         # Check the inputs
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
     
 
     def ivim_fit(self, signals, bvalues=None, linear_fit_option=False, **kwargs):
@@ -71,6 +76,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
         self.osipi_check_required_bounds()
         self.osipi_check_required_initial_guess()
 
+        signals[signals<0.0000001]=0.0000001
         if bvalues is None:
             bvalues = self.bvalues
         
@@ -84,14 +90,14 @@ class ETP_SRI_LinearFitting(OsipiBase):
             f, Dstar = ETP_object.linear_fit(bvalues, signals, self.ETP_weighting, self.ETP_stats)
 
             results["f"] = f
-            results["D*"] = Dstar
+            results["Dp"] = Dstar
 
             return results
         else: 
             f, D, Dstar = ETP_object.ivim_fit(bvalues, signals)
 
             results["f"] = f
-            results["D*"] = Dstar
+            results["Dp"] = Dstar
             results["D"] = D
 
             return results
