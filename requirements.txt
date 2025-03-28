@@ -15,3 +15,5 @@ pandas
 sphinx
 sphinx_rtd_theme
 pytest-json-report
+emcee
+corner
