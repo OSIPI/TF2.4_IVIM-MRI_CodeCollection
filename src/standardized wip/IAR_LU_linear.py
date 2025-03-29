@@ -38,8 +38,6 @@ class IAR_LU_linear(OsipiBase):
         """
         super(IAR_LU_linear, self).__init__(bvalues, thresholds, bounds, initial_guess)
         
-        # Check the inputs
-        
         # Initialize the algorithm
         if self.bvalues is not None:
             bvec = np.zeros((self.bvalues.size, 3))
