@@ -46,11 +46,6 @@ class IAR_LU_segmented_2step(OsipiBase):
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
         self.use_bounds = False
         self.use_initial_guess = False
-        # Check the inputs
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
         
         # Initialize the algorithm
         if self.bvalues is not None:
@@ -75,10 +70,6 @@ class IAR_LU_segmented_2step(OsipiBase):
         """
         print(thresholds)
 
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
         
         if self.IAR_algorithm is None:
             if bvalues is None:

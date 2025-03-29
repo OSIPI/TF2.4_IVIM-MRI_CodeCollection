@@ -37,10 +37,6 @@ class PV_MUMC_biexp(OsipiBase):
             the requirements.
         """
         super(PV_MUMC_biexp, self).__init__(bvalues=bvalues, thresholds=thresholds, bounds=bounds, initial_guess=initial_guess)
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
         self.PV_algorithm = fit_least_squares
         if bounds is not None:
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
@@ -58,11 +54,6 @@ class PV_MUMC_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
-        
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
         
         if self.thresholds is None:
             self.thresholds = 200

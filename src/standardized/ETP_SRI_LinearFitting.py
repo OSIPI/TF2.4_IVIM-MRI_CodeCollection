@@ -52,12 +52,6 @@ class ETP_SRI_LinearFitting(OsipiBase):
         # defined with initials?
         self.ETP_weighting = weighting
         self.ETP_stats = stats
-        
-        # Check the inputs
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
     
 
     def ivim_fit(self, signals, bvalues=None, linear_fit_option=False, **kwargs):
@@ -71,10 +65,6 @@ class ETP_SRI_LinearFitting(OsipiBase):
         Returns:
             _type_: _description_
         """
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
 
         signals[signals<0.0000001]=0.0000001
         if bvalues is None:

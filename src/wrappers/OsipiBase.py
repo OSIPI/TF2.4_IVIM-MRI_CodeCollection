@@ -16,6 +16,10 @@ class OsipiBase:
         self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
         self.use_bounds = True
         self.use_initial_guess = True
+
+        # Validate the inputs
+        self.osipi_validate_inputs()
+        
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
@@ -53,10 +57,7 @@ class OsipiBase:
         """Fits the data with the bvalues
         Returns [S0, f, Dstar, D]
         """
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
+        self.osipi_validate_inputs()
 
         # We should first check whether the attributes in the __init__ are not None
         # Then check if they are input here, if they are, these should overwrite the attributes
@@ -128,10 +129,7 @@ class OsipiBase:
             results (dict): Dict with key each containing an array which is a parametric map.
         """
 
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
+        self.osipi_validate_inputs()
         
         try:
             use_bvalues = bvalues if bvalues is not None else self.bvalues
@@ -210,6 +208,14 @@ class OsipiBase:
                 else:
                     print(f"Initial guess required: {self.required_initial_guess} and is not optional")
 
+    def osipi_validate_inputs(self):
+        """Validates the inputs of the algorithm."""
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
+        self.osipi_accepts_dimension(self.data.ndim)
+
     def osipi_accepted_dimensions(self):
         """The array of accepted dimensions
         e.g.
@@ -244,7 +250,7 @@ class OsipiBase:
         if self.thresholds is None:
             raise ValueError("thresholds are not provided")
         if len(self.thresholds) < self.required_thresholds[0] and len(self.thresholds) > self.required_thresholds[1]:
-            raise ValueError(f"Thresholds should be between {self.required_thresholds[0]} and {self.required_thresholds[1]}")
+            raise ValueError(f"Thresholds should be between {self.required_thresholds[0]} and {self.required_thresholds[1]} but {len(self.thresholds)} were provided")
         return True
         
     def osipi_check_required_bounds(self):

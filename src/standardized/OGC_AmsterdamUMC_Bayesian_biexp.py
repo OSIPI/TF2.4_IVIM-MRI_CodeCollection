@@ -46,10 +46,6 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
                  datain is a 2D array with values of D, f, D* (and S0) that will form the prior.
         """
         super(OGC_AmsterdamUMC_Bayesian_biexp, self).__init__(bvalues=bvalues, bounds=bounds, thresholds=thresholds, initial_guess=initial_guess) #, fitS0, prior_in)
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
         self.OGC_algorithm = fit_bayesian
         self.initialize(bounds, initial_guess, fitS0, prior_in)
         self.fit_segmented=fit_segmented
@@ -89,10 +85,6 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
         
         if initial_guess is not None and len(initial_guess) == 4:
             self.initial_guess = initial_guess
@@ -110,5 +102,6 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         results["D"] = fit_results[0]
         results["f"] = fit_results[1]
         results["Dp"] = fit_results[2]
+        results["S0"] = fit_results[3]
 
         return results

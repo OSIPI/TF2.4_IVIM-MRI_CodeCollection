@@ -42,10 +42,6 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         """
         #super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
         super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
         self.OGC_algorithm = fit_least_squares
         self.fitS0=fitS0
         self.initialize(bounds, initial_guess, fitS0)
@@ -76,10 +72,6 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
-        self.osipi_check_required_bvalues()
-        self.osipi_check_required_thresholds()
-        self.osipi_check_required_bounds()
-        self.osipi_check_required_initial_guess()
 
         bvalues=np.array(bvalues)
         fit_results = self.OGC_algorithm(bvalues, signals, p0=self.initial_guess, bounds=self.bounds, fitS0=self.fitS0)
@@ -88,5 +80,6 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         results["D"] = fit_results[0]
         results["f"] = fit_results[1]
         results["Dp"] = fit_results[2]
+        results["S0"] = fit_results[3]
 
         return results
