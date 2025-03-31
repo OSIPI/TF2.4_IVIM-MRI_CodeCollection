@@ -41,7 +41,6 @@ class ETP_SRI_LinearFitting(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(ETP_SRI_LinearFitting, self).__init__(bvalues=bvalues, thresholds=thresholds, bounds=bounds, initial_guess=initial_guess)
         super(ETP_SRI_LinearFitting, self).__init__(bvalues, thresholds, bounds, initial_guess)
         if bounds is not None:
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
