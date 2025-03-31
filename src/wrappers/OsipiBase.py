@@ -18,7 +18,14 @@ class OsipiBase:
         self.use_initial_guess = True
 
         # Validate the inputs
-        self.osipi_validate_inputs()
+        if self.bvalues is not None:
+            self.osipi_check_required_bvalues()
+        if self.thresholds is not None:
+            self.osipi_check_required_thresholds()
+        if self.bounds is not None:
+            self.osipi_check_required_bounds()
+        if self.initial_guess is not None:
+            self.osipi_check_required_initial_guess()
         
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
