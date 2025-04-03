@@ -217,11 +217,11 @@ class OsipiBase:
 
     def osipi_validate_inputs(self):
         """Validates the inputs of the algorithm."""
+        self.osipi_accepts_dimension(self.data.ndim)
         self.osipi_check_required_bvalues()
         self.osipi_check_required_thresholds()
         self.osipi_check_required_bounds()
         self.osipi_check_required_initial_guess()
-        self.osipi_accepts_dimension(self.data.ndim)
 
     def osipi_accepted_dimensions(self):
         """The array of accepted dimensions
@@ -238,7 +238,6 @@ class OsipiBase:
         min_dim, max_dim = self.osipi_accepted_dimensions()
         if not (min_dim <= dim <= max_dim):
             raise ValueError(f"Dimension {dim}D not supported. Requires {min_dim}-{max_dim}D spatial data")
-        return True
     
     def osipi_check_required_bvalues(self):
         """Checks if the input bvalues fulfil the algorithm requirements"""
@@ -248,7 +247,6 @@ class OsipiBase:
             raise ValueError("bvalues are not provided")
         if len(self.bvalues) < self.required_bvalues:
             raise ValueError(f"Atleast {self.required_bvalues} are required, but only {len(self.bvalues)} were provided")
-        return True
         
     def osipi_check_required_thresholds(self):
         """Checks if the number of input thresholds fulfil the algorithm requirements"""
@@ -258,19 +256,16 @@ class OsipiBase:
             raise ValueError("thresholds are not provided")
         if len(self.thresholds) < self.required_thresholds[0] and len(self.thresholds) > self.required_thresholds[1]:
             raise ValueError(f"Thresholds should be between {self.required_thresholds[0]} and {self.required_thresholds[1]} but {len(self.thresholds)} were provided")
-        return True
         
     def osipi_check_required_bounds(self):
         """Checks if input bounds fulfil the algorithm requirements"""
         if self.required_bounds is False and self.bounds is None:
             raise ValueError("bounds are required but not provided")
-        return True
 
     def osipi_check_required_initial_guess(self):
         """Checks if input initial guess fulfil the algorithm requirements"""
         if self.required_initial_guess is False and self.initial_guess is None:
             raise ValueError("initial_guess are required but not provided")
-        return True
 
     def osipi_author():
         """Author identification"""
