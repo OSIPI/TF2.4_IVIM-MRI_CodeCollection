@@ -16,6 +16,17 @@ class OsipiBase:
         self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
         self.use_bounds = True
         self.use_initial_guess = True
+
+        # Validate the inputs
+        if self.bvalues is not None:
+            self.osipi_check_required_bvalues()
+        if self.thresholds is not None:
+            self.osipi_check_required_thresholds()
+        if self.bounds is not None:
+            self.osipi_check_required_bounds()
+        if self.initial_guess is not None:
+            self.osipi_check_required_initial_guess()
+        
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
@@ -53,7 +64,8 @@ class OsipiBase:
         """Fits the data with the bvalues
         Returns [S0, f, Dstar, D]
         """
-        
+        self.osipi_validate_inputs()
+
         # We should first check whether the attributes in the __init__ are not None
         # Then check if they are input here, if they are, these should overwrite the attributes
         use_bvalues = bvalues if bvalues is not None else self.bvalues
@@ -123,6 +135,8 @@ class OsipiBase:
         Returns:
             results (dict): Dict with key each containing an array which is a parametric map.
         """
+
+        self.osipi_validate_inputs()
         
         try:
             use_bvalues = bvalues if bvalues is not None else self.bvalues
@@ -201,6 +215,14 @@ class OsipiBase:
                 else:
                     print(f"Initial guess required: {self.required_initial_guess} and is not optional")
 
+    def osipi_validate_inputs(self):
+        """Validates the inputs of the algorithm."""
+        self.osipi_accepts_dimension(self.data.ndim)
+        self.osipi_check_required_bvalues()
+        self.osipi_check_required_thresholds()
+        self.osipi_check_required_bounds()
+        self.osipi_check_required_initial_guess()
+
     def osipi_accepted_dimensions(self):
         """The array of accepted dimensions
         e.g.
@@ -208,61 +230,42 @@ class OsipiBase:
         (True, True, False, False, False, False)
         """
         
-        #return (False,) * 6
-        return True
+        return getattr(self, 'accepted_dimensions', (1, 3))
 
     def osipi_accepts_dimension(self, dim):
         """Query if the selection dimension is fittable"""
         
-        #accepted = self.accepted_dimensions()
-        #if dim < 0 or dim > len(accepted):
-            #return False
-        #return accepted[dim]
-        return True
+        min_dim, max_dim = self.osipi_accepted_dimensions()
+        if not (min_dim <= dim <= max_dim):
+            raise ValueError(f"Dimension {dim}D not supported. Requires {min_dim}-{max_dim}D spatial data")
     
     def osipi_check_required_bvalues(self):
         """Checks if the input bvalues fulfil the algorithm requirements"""
-        
-        #if self.bvalues.size < self.required_bvalues:
-            #print("Conformance error: Number of b-values.")
-            #return False
-        #else: 
-            #return True
-        return True
+        if not hasattr(self, "required_bvalues"):
+            raise AttributeError("required_bvalues not defined for this algorithm")
+        if self.bvalues is None:
+            raise ValueError("bvalues are not provided")
+        if len(self.bvalues) < self.required_bvalues:
+            raise ValueError(f"Atleast {self.required_bvalues} are required, but only {len(self.bvalues)} were provided")
         
     def osipi_check_required_thresholds(self):
         """Checks if the number of input thresholds fulfil the algorithm requirements"""
-        
-        #if (len(self.thresholds) < self.required_thresholds[0]) or (len(self.thresholds) > self.required_thresholds[1]):
-            #print("Conformance error: Number of thresholds.")
-            #return False
-        #else: 
-            #return True
-        return True
+        if not hasattr(self, "required_thresholds"):
+            raise AttributeError("required_thresholds is not defined for this algorithm")
+        if self.thresholds is None:
+            raise ValueError("thresholds are not provided")
+        if len(self.thresholds) < self.required_thresholds[0] and len(self.thresholds) > self.required_thresholds[1]:
+            raise ValueError(f"Thresholds should be between {self.required_thresholds[0]} and {self.required_thresholds[1]} but {len(self.thresholds)} were provided")
         
     def osipi_check_required_bounds(self):
         """Checks if input bounds fulfil the algorithm requirements"""
-        #if self.required_bounds is True and self.bounds is None:
-            #print("Conformance error: Bounds.")
-            #return False
-        #else:
-            #return True
-        return True
+        if self.required_bounds is False and self.bounds is None:
+            raise ValueError("bounds are required but not provided")
 
     def osipi_check_required_initial_guess(self):
         """Checks if input initial guess fulfil the algorithm requirements"""
-        
-        #if self.required_initial_guess is True and self.initial_guess is None:
-            #print("Conformance error: Initial guess")
-            #return False
-        #else:
-            #return True
-        return True
-
-    
-    def osipi_check_required_bvalues():
-        """Minimum number of b-values required"""
-        pass
+        if self.required_initial_guess is False and self.initial_guess is None:
+            raise ValueError("initial_guess are required but not provided")
 
     def osipi_author():
         """Author identification"""
