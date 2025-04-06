@@ -95,15 +95,18 @@ class ETP_SRI_MCMC(OsipiBase):
 
         return {'means': means, 'stds': stds}
     
-    def plot(self, truths=None, labels=('f', 'D', 'D*'), overplot=None):
+    def plot(self, **kwargs):
         """Plot the results of the MCMC fit
 
         Args:
             truths (array-like, optional): True values. Defaults to None.
             labels (tuple, optional): Labels for the parameters. Defaults to ('f', 'D', 'D*').
             overplot (array-like, optional): Overplot the true values. Defaults to None.
+            title (str, optional): Title of the plot. Defaults to 'MCMC Fit'.
+            show (bool, optional): Show the plot. Defaults to True.
+            save_path (str, optional): Path to save the plot. Defaults to None.
         """
         if self.MCMC is None:
             raise ValueError('No MCMC fit has been performed. Fit the data first.')
-        self.MCMC.plot(truths, labels, overplot)
+        return self.MCMC.plot(**kwargs)
     

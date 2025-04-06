@@ -118,12 +118,18 @@ class MCMC:
         # print(f'final pos likelihood {self.posterior(self.means)}')
         return self.means, self.stds
     
-    def plot(self, truths=None, labels=('f', 'D', 'D*'), overplot=None):
+    def plot(self, truths=None, labels=('f', 'D', 'D*'), overplot=None, title='Sampling of the IVIM data'): #, show=True, save_path=None, close=False):
         if truths is None:
             truths = self.means
         fig = corner.corner(self.chain, labels=labels, truths=truths)
-        fig.suptitle("Sampling of the IVIM data", fontsize=16)
+        fig.suptitle(title, fontsize=16)
         if overplot is not None:
             corner.overplot_lines(fig, overplot, color='r')
-        plt.show()
+        return fig
+        # if save_path is not None:
+        #     fig.savefig(save_path)
+        # if show:
+        #     fig.show()
+        # if close:
+        #     plt.close(fig)
     

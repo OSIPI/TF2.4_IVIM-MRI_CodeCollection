@@ -8,6 +8,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
+import nibabel as nib
+
 #from src.standardized.ETP_SRI_LinearFitting import ETP_SRI_LinearFitting
 
 # from src.standardized.IAR_LU_biexp import IAR_LU_biexp
@@ -19,12 +21,12 @@ from pathlib import Path
 #from src.standardized.PvH_KB_NKI_IVIMfit import PvH_KB_NKI_IVIMfit
 #from src.standardized.PV_MUMC_biexp import PV_MUMC_biexp
 
-from src.original.ETP_SRI.Sampling import MCMC
+# from src.original.ETP_SRI.Sampling import MCMC
 from src.standardized.ETP_SRI_MCMC import ETP_SRI_MCMC
 
 from src.standardized.OGC_AmsterdamUMC_biexp import OGC_AmsterdamUMC_biexp
 
-
+# /Users/e29007/Stanford/sherlock/sub-3900670/dwi/sub-3900670_dir-AP_desc-denoise_dwi.nii.gz
 ## Simple test code... 
 # Used to just do a test run of an algorithm during development
 def dev_test_run(model, **kwargs):
@@ -90,14 +92,7 @@ def dev_test_run(model, **kwargs):
 
     mcmc.plot(overplot=truth)
 
-    
-#model1 = ETP_SRI_LinearFitting(thresholds=[200])
-#model2 = IAR_LU_biexp(bounds=([0,0,0,0], [1,1,1,1]))
-#model2 = IAR_LU_modified_mix()
-model2 = OGC_AmsterdamUMC_biexp()
 
-#dev_test_run(model1)
-dev_test_run(model2)
 
 
 def run_sampling():
@@ -109,3 +104,12 @@ def run_sampling():
     signals = ivim_model(bvalues)
 
     
+if __name__ == "__main__":
+
+    #model1 = ETP_SRI_LinearFitting(thresholds=[200])
+    #model2 = IAR_LU_biexp(bounds=([0,0,0,0], [1,1,1,1]))
+    #model2 = IAR_LU_modified_mix()
+    model2 = OGC_AmsterdamUMC_biexp()
+
+    #dev_test_run(model1)
+    dev_test_run(model2)
