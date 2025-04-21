@@ -2,7 +2,6 @@ import argparse
 import json
 import os
 from pathlib import Path
-from WrapImage.inquire_dicom2niix import dicom_to_niix
 import nibabel as nib
 from src.wrappers.OsipiBase import OsipiBase
 import numpy as np
