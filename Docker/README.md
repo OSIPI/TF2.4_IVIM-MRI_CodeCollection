@@ -44,6 +44,10 @@ Before running the Docker container, here are the available options for the `Doc
     ```sh
     sudo docker build -t tf2.4_ivim-mri_codecollection -f Docker/Dockerfile .
     ```
+    OR (If you need to convert your data from DICOM TO NIfTI images)
+    ```sh
+    sudo docker build -t tf2.4_ivim-mri_codecollection -f Docker/dicom2nifti/Dockerfile .
+    ```
 
 ## Running the Docker Container
 
@@ -58,7 +62,7 @@ Before running the Docker container, here are the available options for the `Doc
 
     Replace `brain.nii.gz`, `brain.bvec`, and `brain.bval` with the actual file names you want to use.
 
-### Reading in DICOM images
+## Running the Docker container for reading in DICOM Images
 
 1. you can run the same Docker container using the `docker run` command. This command runs the Docker image with the specified input files:
 
@@ -66,10 +70,10 @@ Before running the Docker container, here are the available options for the `Doc
     sudo docker run -it --rm --name TF2.4_IVIM-MRI_CodeCollection \
         -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/src/app \
         -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/app/output \ 
-        tf2.4_ivim-mri_codecollection Downloads/dicom_folder
+        tf2.4_ivim-mri_codecollection
     ```
 
-    Replace `dicom_folder` with the actual directory (containing DICOM Images) you want to use.
+   Then answer the prompts for inquiring information of DICOM Images in your terminal.
 
 [Note that NIfTI and DICOM encode space differently](https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage#Spatial_Coordinates)
 
