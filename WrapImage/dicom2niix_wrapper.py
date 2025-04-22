@@ -49,7 +49,7 @@ def prompt_output_directory(input_dir):
         return os.path.abspath(os.path.join(input_dir, answer.strip("./")))
 
 
-def dicom_to_niix(vol_dir: Path, out_dir: Path, merge_2d: bool = False, series_num: int = -1, is_single_file: bool = False):
+def dicom_to_niix(vol_dir: Path, out_dir: Path, merge_2d: bool = False, series_num: int = -2, is_single_file: bool = False):
     """
     For converting DICOM images to a (compresssed) 4d nifti image
     """
@@ -66,7 +66,7 @@ def dicom_to_niix(vol_dir: Path, out_dir: Path, merge_2d: bool = False, series_n
         # https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage
         # for further configuration for general usage see page above
     ]
-    if series_num >= 0:
+    if series_num >= -1:
         cmd.extend(["-n", str(series_num)])
     cmd.append(str(vol_dir)) # input directory
 
@@ -195,7 +195,7 @@ def run_cli(input_path: str, output_path: str, **kwargs):
     out_dir = Path(output_path)
 
     merge_2d = kwargs.get("merge_2d", False)
-    series_num = kwargs.get("series_number", -1)
+    series_num = kwargs.get("series_number", -2)
     single_file = kwargs.get("single_file", False)
 
     print(f" Converting:\n → Input: {vol_dir}\n → Output: {out_dir}")
@@ -220,7 +220,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DICOM to NIfTI converter with optional IVIM processing")
     parser.add_argument("input", nargs="?", help="Path to input DICOM directory")
     parser.add_argument("output", nargs="?", help="Path to output directory for NIfTI files")
-    parser.add_argument("-n", "--series-number", type=int, default=-1, help="Only convert this series number (-n <num>)")
+    parser.add_argument("-n", "--series-number", type=int, default=-2, help="Only convert this series number (-n <num>)")
     parser.add_argument("-m", "--merge-2d", action="store_true", help="Merge 2D slices (-m y)")
     parser.add_argument("-s", "--single-file", action="store_true", help="Enable single file mode (-s y)")
     parser.add_argument("-pu", "--prompt-user", action="store_true", help="Run in interactive mode")
