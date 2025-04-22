@@ -27,7 +27,7 @@ This project is designed to run the `nifti_wrapper` script using a Docker contai
 
 Before running the Docker container, here are the available options for the `Docker image` script:
 
-- `input_file`: Path to the input 4D NIfTI file or dicom files 4D images.
+- `input_file`: Path to the input 4D NIfTI file.
 - `bvec_file`: Path to the b-vector file.
 - `bval_file`: Path to the b-value file.
 - `--affine`: Affine matrix for NIfTI image (optional).
