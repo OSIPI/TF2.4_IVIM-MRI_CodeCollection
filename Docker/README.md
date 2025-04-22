@@ -13,9 +13,12 @@ This project is designed to run the `nifti_wrapper` script using a Docker contai
 │
 ├── Docker/
 │   └── Dockerfile
+│       └── dicom2nifti/
+│           └── Dockerfile
 │
 ├── WrapImage/
 │   └── nifti_wrapper.py
+│   └── dicom2niix_wrapper.py
 │
 └── requirements.txt
 ```
@@ -64,16 +67,25 @@ Before running the Docker container, here are the available options for the `Doc
 
 ## Running the Docker container for reading in DICOM Images
 
-1. you can run the same Docker container using the `docker run` command. This command runs the Docker image with the specified input files:
+- You can run the dicom2nifti Docker container using the `docker run` command. This command runs the Docker image with the specified input files:
 
     ```sh
     sudo docker run -it --rm --name TF2.4_IVIM-MRI_CodeCollection \
         -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/src/app \
-        -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/app/output \ 
-        tf2.4_ivim-mri_codecollection
+        -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/app/output \
+        tf2.4_ivim-mri_codecollection \
+        /usr/src/app/dicom_folder /usr/app/output
     ```
 
-   Then answer the prompts for inquiring information of DICOM Images in your terminal.
+- You can also run the command in an interactive mode if you want to convert multiple folders of data and run them consecutively.
+
+    ```sh
+    python ./WrapImage/dicom2niix_wrapper.py --prompt-user
+    ```
+
+   It then prompts for inquiring information of DICOM Images in your terminal.
+
+   The interactive version of this script is not suited for use in container.
 
 [Note that NIfTI and DICOM encode space differently](https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage#Spatial_Coordinates)
 
