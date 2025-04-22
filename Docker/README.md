@@ -65,6 +65,8 @@ Before running the Docker container, here are the available options for the `Doc
 
     Replace `brain.nii.gz`, `brain.bvec`, and `brain.bval` with the actual file names you want to use.
 
+
+
 ## Running the Docker container for reading in DICOM Images
 
 - You can run the dicom2nifti Docker container using the `docker run` command. This command runs the Docker image with the specified input files:
@@ -77,15 +79,28 @@ Before running the Docker container, here are the available options for the `Doc
         /usr/src/app/dicom_folder /usr/app/output
     ```
 
-- You can also run the command in an interactive mode if you want to convert multiple folders of data and run them consecutively.
+- You can run the dicom2niix_wrapper.py script either directly or from inside a Docker container (non-interactive only). Here are the available options:
 
-    ```sh
-    python ./WrapImage/dicom2niix_wrapper.py --prompt-user
-    ```
+#### Required (CLI Mode Only)
+input: Path to the input DICOM directory.
 
-   It then prompts for inquiring information of DICOM Images in your terminal.
+output: Path to the output directory for the converted NIfTI files.
 
-   The interactive version of this script is not suited for use in container.
+#### Optional Flags
+-n, --series-number:
+Convert only the specified DICOM series number.
+Example: --series-number 5
+
+-m, --merge-2d:
+Merge 2D slices into a 3D or 4D volume if supported.
+Example: --merge-2d
+
+-s, --single-file:
+Use single file mode (convert only one series per folder).
+Example: --single-file
+
+-pu, --prompt-user:
+Run the tool in interactive mode. This launches a terminal-based wizard where you can select DICOM folders and configure conversion interactively.
 
 [Note that NIfTI and DICOM encode space differently](https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage#Spatial_Coordinates)
 

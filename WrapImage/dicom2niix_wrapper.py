@@ -47,33 +47,45 @@ def prompt_output_directory(input_dir):
         return os.path.abspath(os.path.join(input_dir, answer.strip("./")))
 
 
-def dicom_to_niix(vol_dir: Path, out_dir: Path, merge_2d: bool = False):
+def dicom_to_niix(vol_dir: Path, out_dir: Path, merge_2d: bool = False, series_num: int = -1, is_single_file: bool = False):
     """
     For converting DICOM images to a (compresssed) 4d nifti image
     """
+
     os.makedirs(out_dir, exist_ok=True)
 
+    cmd = [
+        "dcm2niix",
+        "-f", "%s_%p", # dcm2niix attempts to provide a sensible file naming scheme
+        "-o", out_dir, # output directory
+        "-z", "y", #specifying compressed nii.gz file
+        "-m", "y" if merge_2d else "n",  # Add merge option
+        "-s", "y" if is_single_file else "n",
+        # https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage
+        # for further configuration for general usage see page above
+    ]
+    if series_num >= 0:
+        cmd.extend(["-n", str(series_num)])
+    cmd.append(str(vol_dir)) # input directory
+
     try:
-        res = subprocess.run(
-            [
-                "dcm2niix",
-                "-f", "%s_%p", # dcm2niix attempts to provide a sensible file naming scheme
-                "-o", out_dir, # output directory
-                "-z", "y", #specifying compressed nii.gz file
-                "-m", "y" if merge_2d else "n",  # Add merge option
-                # https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage
-                # for further configuration for general usage see page above
-                vol_dir # input directory
-            ],
-            capture_output=True,
-            text=True,
-            check=True
-        )
+        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
         
         nifti_files = list(Path(out_dir).glob("*.nii.gz"))
-        if len(nifti_files) != 1:
-            raise RuntimeError("Only one NIfTI (.nii.gz) should be in this output directory.")
 
+        if (is_single_file or merge_2d or series_num >= 0):
+            if len(nifti_files) != 1:
+                raise RuntimeError(
+                    f"Expected a single .nii.gz output due to flags "
+                    f"{'-s' if is_single_file else ''} "
+                    f"{'-m' if merge_2d else ''} "
+                    f"{f'-n {series_num}' if series_num >= 0 else ''}, "
+                    f"but found {len(nifti_files)} files."
+                )
+        else:
+            if len(nifti_files) < 1:
+                raise RuntimeError("No NIfTI (.nii.gz) files were generated.")
+            
         bval_files = list(out_dir.glob("*.bval"))
         bvec_files = list(out_dir.glob("*.bvec"))
         bval_path = str(bval_files[0]) if bval_files else None
@@ -106,10 +118,19 @@ def run_interactive():
         if not add_more:
             break
 
+    series_num = inquirer.prompt([
+        inquirer.Text("series", message="🔢 Enter series number to convert (-n <num>) [Leave blank for all]", default="")
+    ])["series"]
+    series_num = int(series_num) if series_num.isdigit() else -1
+
     merge_answer = inquirer.prompt([
         inquirer.Confirm("merge", message="🧩 Merge 2D slices into a single NIfTI (-m y)?", default=True)
     ])
     merge_2d = merge_answer["merge"]
+
+    single_file = inquirer.prompt([
+        inquirer.Confirm("single", message="📦 Force single file output (-s y)?", default=False)
+    ])["single"]
 
     for in_dir, out_dir in zip(input_dirs, output_dirs):
         vol_dir = Path(in_dir)
@@ -117,18 +138,22 @@ def run_interactive():
 
         print(f"Converting:\n → Input: {vol_dir}\n → Output: {out_path}")
         try:
-            nifti, bval, bvec = dicom_to_niix(vol_dir, out_path, merge_2d)
-            print(f"✅ Created: {nifti}")
+            nifti, bval, bvec = dicom_to_niix(vol_dir, out_path, merge_2d, series_num, single_file)
+            print(f" Conversion succeeded: {nifti}")
         except RuntimeError as err:
             print(f"❌ Conversion failed: {err}")
 
-def run_cli(input_path: str, output_path: str):
+def run_cli(input_path: str, output_path: str, **kwargs):
     vol_dir = Path(input_path)
     out_dir = Path(output_path)
 
+    merge_2d = kwargs.get("merge_2d", False)
+    series_num = kwargs.get("series_number", -1)
+    single_file = kwargs.get("single_file", False)
+
     print(f" Converting:\n → Input: {vol_dir}\n → Output: {out_dir}")
     try:
-        nifti, bval, bvec = dicom_to_niix(vol_dir, out_dir, merge_2d=False)
+        nifti, bval, bvec = dicom_to_niix(vol_dir, out_dir, merge_2d, series_num, single_file)
         print(f" Created NIfTI: {nifti}")
 
         if bval and bvec:
@@ -148,14 +173,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DICOM to NIfTI converter with optional IVIM processing")
     parser.add_argument("input", nargs="?", help="Path to input DICOM directory")
     parser.add_argument("output", nargs="?", help="Path to output directory for NIfTI files")
+    parser.add_argument("-n", "--series-number", type=int, default=-1, help="Only convert this series number (-n <num>)")
+    parser.add_argument("-m", "--merge-2d", action="store_true", help="Merge 2D slices (-m y)")
+    parser.add_argument("-s", "--single-file", action="store_true", help="Enable single file mode (-s y)")
     parser.add_argument("-pu", "--prompt-user", action="store_true", help="Run in interactive mode")
+
 
     args = parser.parse_args()
 
     if args.prompt_user:
         run_interactive()
     elif args.input and args.output:
-        run_cli(args.input, args.output)
+        run_cli(args.input, args.output, **vars(args))
     else:
         print("❗ You must provide input and output paths OR use --prompt-user for interactive mode.")
         parser.print_help()
