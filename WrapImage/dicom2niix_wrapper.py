@@ -1,6 +1,8 @@
 import argparse
+import io
 import os
 from pathlib import Path
+import selectors
 import subprocess
 import sys
 import inquirer
@@ -69,7 +71,10 @@ def dicom_to_niix(vol_dir: Path, out_dir: Path, merge_2d: bool = False, series_n
     cmd.append(str(vol_dir)) # input directory
 
     try:
-        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        success, output = capture_subprocess_output(cmd)
+        print(output)
+        if not success:
+            raise RuntimeError(f"dcm2niix failed: {output}")
         
         nifti_files = list(Path(out_dir).glob("*.nii.gz"))
 
@@ -98,6 +103,48 @@ def dicom_to_niix(vol_dir: Path, out_dir: Path, merge_2d: bool = False, series_n
 
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"dcm2niix failed: {e.stderr}")
+    
+
+def capture_subprocess_output(subprocess_args):
+    process = subprocess.Popen(
+        subprocess_args,
+        bufsize=1, # output is line buffered
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True # for line buffering
+    )
+
+    buf = io.StringIO() # callback for output
+    def handle_output(stream, mask):
+        line = stream.readline()
+        buf.write(line)
+        sys.stdout.write(line)
+
+    selector = selectors.DefaultSelector()               # register callback 
+    selector.register(process.stdout, selectors.EVENT_READ, handle_output) # for 'read' event from subprocess stdout stream
+
+    while process.poll() is None:
+        events = selector.select()
+        for key, mask in events:
+            callback = key.data
+            callback(key.fileobj, mask)
+
+    # ensure all remaining output is processed
+    while True:
+        line = process.stdout.readline()
+        if not line:
+            break
+        buf.write(line)
+        sys.stdout.write(line)
+
+    return_code = process.wait()
+    selector.close()
+
+    success = (return_code == 0)
+    output = buf.getvalue()
+    buf.close()
+
+    return success, output
 
 def run_interactive():
 
@@ -177,7 +224,6 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--merge-2d", action="store_true", help="Merge 2D slices (-m y)")
     parser.add_argument("-s", "--single-file", action="store_true", help="Enable single file mode (-s y)")
     parser.add_argument("-pu", "--prompt-user", action="store_true", help="Run in interactive mode")
-
 
     args = parser.parse_args()
 
