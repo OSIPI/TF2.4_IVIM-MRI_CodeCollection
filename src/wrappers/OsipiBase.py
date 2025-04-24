@@ -64,6 +64,7 @@ class OsipiBase:
         """Fits the data with the bvalues
         Returns [S0, f, Dstar, D]
         """
+        self.data = np.asarray(data)
         self.osipi_validate_inputs()
 
         # We should first check whether the attributes in the __init__ are not None
