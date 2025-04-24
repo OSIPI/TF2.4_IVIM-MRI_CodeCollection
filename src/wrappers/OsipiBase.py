@@ -137,6 +137,7 @@ class OsipiBase:
             results (dict): Dict with key each containing an array which is a parametric map.
         """
 
+        self.data = np.asarray(data)
         self.osipi_validate_inputs()
         
         try:
