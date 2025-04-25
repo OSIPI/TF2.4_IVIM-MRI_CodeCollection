@@ -79,6 +79,17 @@ Before running the Docker container, here are the available options for the `Doc
 
 - You can run the dicom2niix_wrapper.py script either directly or from inside a Docker container (non-interactive only). Here are the available options:
 
+## Options
+Before running the Docker container, here are the available options for the `Docker image` script:
+
+- `input`: Path to the input DICOM directory. Some scanners store images in nested subfolders, so a single session might be stored in the folders "/usr/subj22/111", "/usr/subj22/112" and "/usr/subj22/123". In this case you should simply provide the parent directly ("/usr/subj22") and dcm2niix will recursively search the sub directories and organize all your images for you.
+- `output`: Path to the output directory for the converted NIfTI files and sidecar BIDS JSON.
+- ` -m, --merge-2d`: Merge 2D slices into a 3D or 4D NIfTI image regardless of study time, echo, coil, orientation, etc. Depending on your vendor, you may want to keep images segmented based on these attributes or merge/combine them.
+- ` -s, --single-file`: Use single file mode (convert only one series per folder). For example, if the input path "~/dir/001.dcm" will only convert the file 001.dcm.
+- ` -pu, --prompt-user`: Run the tool in interactive mode. This launches a terminal-based wizard where you can select DICOM folders and configure conversion interactively.
+
+
+
 ### Example usage
 
 ```sh
@@ -104,29 +115,6 @@ sudo docker run -it --rm --name TF2.4_IVIM-MRI_CodeCollection \
     tf2.4_ivim-mri_codecollection \
     /usr/src/app/dicom_file -o /usr/app/output -s
 ```
-
-#### Required parameters
-
-input: Path to the input DICOM directory. Some scanners store images in nested subfolders, so a single session might be stored in the folders "/usr/subj22/111", "/usr/subj22/112" and "/usr/subj22/123". In this case you should simply provide the parent directly ("/usr/subj22") and dcm2niix will recursively search the sub directories and organize all your images for you.
-
-output: Path to the output directory for the converted NIfTI files.
-
-#### Optional Flags
-
-#### -m, --merge-2d
-
-Merge 2D slices into a 3D or 4D NIfTI image regardless of study time, echo, coil, orientation, etc.
-Depending on your vendor, you may want to keep images segmented based on these attributes or merge/combine them.
-
-#### -s, --single-file
-
-Use single file mode (convert only one series per folder).
-
-For example, if the input path "~/dir/001.dcm" will only convert the file 001.dcm.
-
-#### -pu, --prompt-user
-
-Run the tool in interactive mode. This launches a terminal-based wizard where you can select DICOM folders and configure conversion interactively.
 
 [Note that NIfTI and DICOM encode space differently](https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage#Spatial_Coordinates)
 
