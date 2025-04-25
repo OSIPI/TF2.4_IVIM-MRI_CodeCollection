@@ -1,0 +1,46 @@
+[project]
+name = "TF2.4_IVIM-MRI-CodeCollection"
+version = "0.1.0"
+description = "IVIM MRI signal simulation and DICOM/NIfTI processing tools"
+authors = [{ name="Jackson Hardee", email="jphardee@gmail.com" }]
+requires-python = ">=3.11"
+readme = "README.md"
+license = {text = "MIT"}
+dependencies = [
+    "numpy<2",
+    "nibabel",
+    "inquirer",
+    "scipy",
+    "torchio",
+    "torch",
+    "joblib",
+    "dipy",
+    "matplotlib",
+    "scienceplots",
+    "cvxpy",
+    "zenodo-get",
+    "tqdm",
+    "pandas",
+    "itk",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-json-report",
+]
+docs = [
+    "sphinx",
+    "sphinx_rtd_theme",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["src", "utilities", "WrapImage"]
+
+[tool.setuptools.package-dir]
+"" = "."
+

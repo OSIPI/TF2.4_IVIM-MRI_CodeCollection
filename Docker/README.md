@@ -65,8 +65,6 @@ Before running the Docker container, here are the available options for the `Doc
 
     Replace `brain.nii.gz`, `brain.bvec`, and `brain.bval` with the actual file names you want to use.
 
-
-
 ## Running the Docker container for reading in DICOM Images
 
 - You can run the dicom2nifti Docker container using the `docker run` command. This command runs the Docker image with the specified input files:
@@ -76,53 +74,48 @@ Before running the Docker container, here are the available options for the `Doc
         -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/src/app \
         -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/app/output \
         tf2.4_ivim-mri_codecollection \
-        /usr/src/app/dicom_folder /usr/app/output
+        /usr/src/app/dicom_folder
     ```
 
 - You can run the dicom2niix_wrapper.py script either directly or from inside a Docker container (non-interactive only). Here are the available options:
 
-##### example usage:
+### Example usage
 
-    ```sh
-    sudo docker run -it --rm --name TF2.4_IVIM-MRI_CodeCollection \
-        -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/src/app \
-        -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/app/output \
-        tf2.4_ivim-mri_codecollection \
-        /usr/src/app/dicom_folder /usr/app/output -n -1
-    ```
+```sh
+sudo docker run -it --rm --name TF2.4_IVIM-MRI_CodeCollection \
+    -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/src/app \
+    -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/app/output \
+    tf2.4_ivim-mri_codecollection \
+    /usr/src/app/dicom_folder -o /usr/app/output
+```
 
-    ```sh
-    sudo docker run -it --rm --name TF2.4_IVIM-MRI_CodeCollection \
-        -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/src/app \
-        -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/app/output \
-        tf2.4_ivim-mri_codecollection \
-        /usr/src/app/dicom_folder /usr/app/output -m
-    ```
+```sh
+sudo docker run -it --rm --name TF2.4_IVIM-MRI_CodeCollection \
+    -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/src/app \
+    -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/app/output \
+    tf2.4_ivim-mri_codecollection \
+    /usr/src/app/dicom_folder -o /usr/app/output -m
+```
 
-    ```sh
-    sudo docker run -it --rm --name TF2.4_IVIM-MRI_CodeCollection \
-        -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/src/app \
-        -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/app/output \
-        tf2.4_ivim-mri_codecollection \
-        /usr/src/app/dicom_file /usr/app/output -s
-    ```
+```sh
+sudo docker run -it --rm --name TF2.4_IVIM-MRI_CodeCollection \
+    -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/src/app \
+    -v ~/TF2.4_IVIM-MRI_CodeCollection:/usr/app/output \
+    tf2.4_ivim-mri_codecollection \
+    /usr/src/app/dicom_file -o /usr/app/output -s
+```
 
 #### Required parameters
 
-input: Path to the input DICOM directory.
+input: Path to the input DICOM directory. Some scanners store images in nested subfolders, so a single session might be stored in the folders "/usr/subj22/111", "/usr/subj22/112" and "/usr/subj22/123". In this case you should simply provide the parent directly ("/usr/subj22") and dcm2niix will recursively search the sub directories and organize all your images for you.
 
 output: Path to the output directory for the converted NIfTI files.
 
 #### Optional Flags
 
-#### -n, --series-number
-
-Convert only the specified DICOM series number.
-A special feature of this option is unleashed when you provide a negative series number ("-n -1"): in this case the software will report the series numbers available in the input folder, but will convert nothing.
-
 #### -m, --merge-2d
 
-Merge 2D slices into a 3D or 4D NIfTI image regardless of study time, echo, coil, orientation, etc. 
+Merge 2D slices into a 3D or 4D NIfTI image regardless of study time, echo, coil, orientation, etc.
 Depending on your vendor, you may want to keep images segmented based on these attributes or merge/combine them.
 
 #### -s, --single-file
@@ -143,4 +136,9 @@ Run the tool in interactive mode. This launches a terminal-based wizard where yo
 
 #### It is strongly recommend that users check validate the b-vector directions for their hardware and sequence as [described in a dedicated document](https://www.nitrc.org/docman/?group_id=880)
 
+![DICOM2NiFTI](dicom2nifti/DICOM2NiFTI.png)
+
+#### Output of NIFTI and DICOM objects generated from signal generation test
+
+- NIfTI follows the Talairach/MNI coordinate system where the X value increases as we move toward the participant's right, the Y increases as we move anteriorly. In contrast, for bipeds DICOM specifies the the X increases as we more toward the participant's left, while the Y increases as we move posteriorly. Both agree that the Z coordinate increases as we move superiorly. 
 ---
