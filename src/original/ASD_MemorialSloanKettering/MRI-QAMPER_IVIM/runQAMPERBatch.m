@@ -91,8 +91,9 @@ if DWIstruct.runDWI
     dwi_series_num = '' ; %getSeriesNum(dwifile);
     
     roifile = DWIstruct.files{2};
-    copyfile(roifile,dwipath);
+    
     if ~isempty(roifile)
+    copyfile(roifile,dwipath);
         roinii = nii_load(roifile);
         ROI = roinii.img;
     else
