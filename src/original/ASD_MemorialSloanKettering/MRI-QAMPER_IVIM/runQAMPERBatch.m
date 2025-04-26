@@ -90,21 +90,21 @@ if DWIstruct.runDWI
     
     dwi_series_num = '' ; %getSeriesNum(dwifile);
     
-    roifile = DWIstruct.files{2}; copyfile(roifile,dwipath);
-    roinii = nii_load(roifile);
-    ROI = roinii.img;
+    roifile = DWIstruct.files{2};
+    copyfile(roifile,dwipath);
+    if ~isempty(roifile)
+        roinii = nii_load(roifile);
+        ROI = roinii.img;
+    else
+        ROI = ones(size(dwi_img(:,:,:,1)));
+    end
     
-    roi_series_num = ''; %getSeriesNum(roifile);
+    roi_series_num = '';
     
     roiType = DWIstruct.roiType; %getROIType(roifile);
-    [~,fname,~] = fileparts(dwifile); [~,fname,~] = fileparts(fname);
+    [~,fname,~] = fileparts(dwifile); 
+    [~,fname,~] = fileparts(fname);
     save_prefix = [dwipath filesep fname];
-%     save_prefix = [dwipath filesep dwi_series_num '-' roi_series_num '-' roiType];
-%     
-%     if bval_arr(end) == 0
-%         [bval_arr,dwi_img] = bvalZeroOrderFix(bval_arr,dwi_img);
-%     end
-
     [bval_arr,dwi_img] = bvalOrderFix(bval_arr,dwi_img);
     
     if isfield(DWIstruct,'avgRepeatBvals')
