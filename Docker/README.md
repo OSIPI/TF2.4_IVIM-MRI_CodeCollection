@@ -4,11 +4,11 @@ This project is designed to run the `nifti_wrapper` script using a Docker contai
 
 ## Prerequisites
 
-- Docker must be installed on your system. 
+- Docker must be installed on your system.
 
 ## Directory Structure
 
-```
+``` sh
 ~/TF2.4_IVIM-MRI_CodeCollection/
 │
 ├── Docker/
@@ -47,7 +47,9 @@ Before running the Docker container, here are the available options for the `Doc
     ```sh
     sudo docker build -t tf2.4_ivim-mri_codecollection -f Docker/Dockerfile .
     ```
+
     OR (If you need to convert your data from DICOM TO NIfTI images)
+
     ```sh
     sudo docker build -t tf2.4_ivim-mri_codecollection -f Docker/dicom2nifti/Dockerfile .
     ```
@@ -136,9 +138,6 @@ Run the tool in interactive mode. This launches a terminal-based wizard where yo
 
 #### It is strongly recommend that users check validate the b-vector directions for their hardware and sequence as [described in a dedicated document](https://www.nitrc.org/docman/?group_id=880)
 
-![DICOM2NiFTI](dicom2nifti/DICOM2NiFTI.png)
+- NIfTI follows the Talairach/MNI coordinate system where the X value increases as we move toward the participant's right, the Y increases as we move anteriorly. In contrast, for bipeds DICOM specifies the the X increases as we more toward the participant's left, while the Y increases as we move posteriorly. Both agree that the Z coordinate increases as we move superiorly.
 
-#### Output of NIFTI and DICOM objects generated from signal generation test
-
-- NIfTI follows the Talairach/MNI coordinate system where the X value increases as we move toward the participant's right, the Y increases as we move anteriorly. In contrast, for bipeds DICOM specifies the the X increases as we more toward the participant's left, while the Y increases as we move posteriorly. Both agree that the Z coordinate increases as we move superiorly. 
 ---

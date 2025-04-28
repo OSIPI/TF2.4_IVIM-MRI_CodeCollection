@@ -1,9 +1,13 @@
+import datetime
+import os
 from pathlib import Path
+import sys
+import uuid
 import numpy as np
 import nibabel as nib
+import itk
 from utilities.data_simulation.GenerateData import GenerateData
 from WrapImage.nifti_wrapper import save_nifti_file
-from WrapImage.dicom2niix_wrapper import save_dicom_objects
 
 def save_bval_bvec(filename, values):
     if filename.endswith('.bval'):
@@ -17,6 +21,8 @@ def save_bval_bvec(filename, values):
 
     with open(filename, 'w') as file:
         file.write(values_string)
+
+
 
 # Set random seed for reproducibility
 np.random.seed(42)
@@ -35,13 +41,6 @@ bvals_reshaped = np.broadcast_to(bvals, shape)
 # Generate IVIM signal
 signals = gd.ivim_signal(D_in, Dp_in, f_in, S0, bvals_reshaped)
 
-
-# Generate 4D signal by stacking volumes for each bval
-signals_4d = np.stack([
-    gd.ivim_signal(D_in, Dp_in, f_in, S0, np.full(shape, bval))
-    for bval in bvals
-], axis=-1)
-
 # Save the generated image as a NIfTI file
 save_nifti_file(signals, "ivim_simulation.nii.gz")
 # Save the bval in a file
@@ -49,14 +48,64 @@ save_bval_bvec("ivim_simulation.bval", [0, 50, 100, 500, 1000])
 # Save the bvec value 
 save_bval_bvec("ivim_simulation.bvec", [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
-bvecs = [[1, 0, 0]] * len(bvals)  # Assuming all x-direction
 
-save_dicom_objects(
-    volume_4d=signals_4d,
-    bvals=bvals.tolist(),
-    bvecs=bvecs,
-    out_dir=Path("ivim_simulation_dicom"),
-    f_vals=f_in,
-    D_vals=D_in,
-    Dp_vals=Dp_in
-)
+def save_dicom_files():
+    os.makedirs("ivim_simulation", exist_ok=True)
+    InputImageType = itk.Image[itk.D, 3] 
+    ReaderType = itk.ImageFileReader[InputImageType]
+    NiftiImageIOType = itk.NiftiImageIO.New()
+
+
+    reader = ReaderType.New()
+    reader.SetImageIO(NiftiImageIOType)
+    reader.SetFileName("ivim_simulation.nii.gz")
+
+    try:
+        reader.Update()
+    except Exception as e:
+        print(f"Error occured while reading NIfTI in ivim_simulation: {e}")
+        sys.exit(1)
+
+    OutputPixelType = itk.SS
+    # The casting filter output image type will be 3D with the new pixel type
+    CastedImageType = itk.Image[OutputPixelType, 3]
+    CastFilterType = itk.CastImageFilter[InputImageType, CastedImageType]
+    caster = CastFilterType.New()
+    caster.SetInput(reader.GetOutput())
+    caster.Update()
+
+
+    OutputImageType = itk.Image[OutputPixelType, 2]
+    FileWriterType = itk.ImageSeriesWriter[CastedImageType, OutputImageType]
+    GDCMImageIOType = itk.GDCMImageIO.New()
+    writer = FileWriterType.New()
+    size = reader.GetOutput().GetLargestPossibleRegion().GetSize()
+    fnames = itk.NumericSeriesFileNames.New()
+    num_slices = size[2]
+
+    fnames.SetStartIndex(0)
+    fnames.SetEndIndex(num_slices - 1)  # Iterate over the Z dimension (slices)
+    fnames.SetIncrementIndex(1)
+    fnames.SetSeriesFormat(os.path.join("ivim_simulation", f"ivim_simulation_%04d.dcm"))
+
+    # meta_dict = itk.MetaDataDictionary()
+    # include correct headers here to be tuned for Vendor
+    # GDCMImageIOType.SetMetaDataDictionary(meta_dict)
+    # GDCMImageIOType.KeepOriginalUIDOn()
+    writer.SetInput(caster.GetOutput())
+    writer.SetImageIO(GDCMImageIOType)
+    writer.SetFileNames(fnames.GetFileNames())
+    try:
+        writer.Write()
+    except Exception as e:
+        print(f"Error occurred while writing DICOMs in ivim simulation: {e}")
+        sys.exit(1)
+
+args = sys.argv[1:]
+if "--dicom" in args:
+    save_dicom_files()
+    # Save the bval in a file
+    save_bval_bvec(os.path.join("ivim_simulation","ivim_simulation.bval"), [0, 50, 100, 500, 1000])
+    # Save the bvec value 
+    save_bval_bvec(os.path.join("ivim_simulation","ivim_simulation.bvec"), [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+    # read the generated nii file to dicom files
