@@ -1,7 +1,7 @@
 [project]
 name = "TF2.4_IVIM-MRI-CodeCollection"
 version = "0.1.0"
-description = "IVIM MRI signal simulation and DICOM/NIfTI processing tools"
+description = "IVIM MRI signal processing and NIfTI/DICOM processing tools"
 requires-python = ">=3.9"
 readme = "README.md"
 license = {text = "Apache 2"}
