@@ -26,7 +26,7 @@ class IAR_LU_linear(OsipiBase):
     required_bounds_optional = True # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
-    accepted_dimensions = 1 # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
+    accepted_dimensions = (1,1) #(min dimension, max dimension)
     
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
         """
