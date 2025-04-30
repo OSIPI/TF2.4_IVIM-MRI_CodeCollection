@@ -103,9 +103,9 @@ def save_dicom_files():
 
 args = sys.argv[1:]
 if "--dicom" in args:
+    # read the generated nii file to dicom files
     save_dicom_files()
     # Save the bval in a file
     save_bval_bvec(os.path.join("ivim_simulation","ivim_simulation.bval"), [0, 50, 100, 500, 1000])
     # Save the bvec value 
     save_bval_bvec(os.path.join("ivim_simulation","ivim_simulation.bvec"), [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
-    # read the generated nii file to dicom files
