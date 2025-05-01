@@ -235,11 +235,14 @@ class OsipiBase:
         return getattr(self, 'accepted_dimensions', (1, 3))
 
     def osipi_accepts_dimension(self, dim):
-        """Query if the selection dimension is fittable"""
-        
+        """Check if the spatial dimensions (excluding b-values) are supported."""
+        spatial_dim = dim - 1  # Exclude last axis (b-values)
         min_dim, max_dim = self.osipi_accepted_dimensions()
-        if not (min_dim <= dim <= max_dim):
-            raise ValueError(f"Dimension {dim}D not supported. Requires {min_dim}-{max_dim}D spatial data")
+        if not (min_dim <= spatial_dim <= max_dim):
+            raise ValueError(
+                f"Spatial dimensions {spatial_dim}D not supported. "
+                f"Requires {min_dim}-{max_dim}D."
+            )
     
     def osipi_check_required_bvalues(self):
         """Checks if the input bvalues fulfil the algorithm requirements"""
