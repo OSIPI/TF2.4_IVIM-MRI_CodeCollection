@@ -98,9 +98,10 @@ jobs:
 
       - name: Verify input files
         run: |
+          IVIM_SIM_DIR = "${{ github.workspace }}/ivim_simulation"
           for file in ivim_simulation_0000.dcm, ivim_simulation_0001.dcm, ivim_simulation_0002.dcm ivim_simulation_0003.dcm ivim_simulation_0004.dcm; do
-            if [ ! -f "${{ github.workspace }}/ivim_simulation/$file" ]; then
-              echo "Error: $file not found"
+            if [ ! -f "$IVIM_SIM_DIR/$file" ]; then
+              echo "Error: $IVIM_SIM_DIR/$file not found"
               exit 1
             fi
           done

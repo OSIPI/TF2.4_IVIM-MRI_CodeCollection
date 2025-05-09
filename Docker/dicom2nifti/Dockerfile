@@ -33,10 +33,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=build /usr/local/bin/dcm2niix /usr/local/bin/dcm2niix
 
-COPY ../../requirements.txt ./
-
-RUN pip install --no-cache-dir -r requirements.txt
-
 COPY ../.. .
+
+RUN pip install --no-cache-dir .
 
 ENTRYPOINT ["python3", "-m", "WrapImage.dicom2niix_wrapper"]
