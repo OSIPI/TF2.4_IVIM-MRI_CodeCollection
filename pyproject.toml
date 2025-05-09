@@ -19,13 +19,13 @@ dependencies = [
     "zenodo-get",
     "tqdm",
     "pandas",
-    "itk",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest",
     "pytest-json-report",
+    "itk",
 ]
 docs = [
     "sphinx",
