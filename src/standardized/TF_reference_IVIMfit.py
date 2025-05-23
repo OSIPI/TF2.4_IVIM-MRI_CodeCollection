@@ -54,7 +54,7 @@ class TF_reference_IVIMfit(OsipiBase):
         self.use_bounds = True
         if thresholds is None:
             self.thresholds = 200
-            print('warning, no thresholds were defined, so default bounds are used of  522')
+            print('warning, no thresholds were defined, so default threshold of 200 is used')
         else:
             self.thresholds = thresholds
 
