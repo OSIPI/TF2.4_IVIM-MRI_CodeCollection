@@ -16,6 +16,11 @@ md5sums.txt
 *.gz
 *.zip
 *.tmp
+*.asv
+src/original/ASD_MemorialSloanKettering/MRI-QAMPER_IVIM/test_data
+src/original/ASD_MemorialSloanKettering/MRI-QAMPER_IVIM/output_files
+
+
 
 # Unit test / coverage reports
 .tox/

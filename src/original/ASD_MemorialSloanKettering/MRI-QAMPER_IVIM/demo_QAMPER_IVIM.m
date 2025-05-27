@@ -9,9 +9,9 @@
 %       bval_file: b-value information (txt file)
 %       roi_nii: single-volume mask ROI image (NIfTI)
 
-
-qamper_path = 'path:\to\MRI-QAMPER_IVIM'; %path where the MRI-QAMPER folder is located
-addpath(genpath(qamper_path));
+%%% add quamper to main path
+%qamper_path = 'path:\to\MRI-QAMPER_IVIM'; %path where the MRI-QAMPER folder is located
+%addpath(genpath(qamper_path));
 
 % Uncomment below and substitute the names of your files
 % img_nii = '702-D2019_10_08.nii';
