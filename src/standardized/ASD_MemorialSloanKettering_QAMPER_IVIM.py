@@ -44,17 +44,17 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         #super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
         super(ASD_MemorialSloanKettering_QAMPER_IVIM, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
         self.initialize(bounds, initial_guess)
+        self.eng=matlab.engine.start_matlab()
+
 
     def algorithm(self,dwi_arr, bval_arr, LB0, UB0, x0in):
-        eng = matlab.engine.start_matlab()
         dwi_arr = matlab.double(dwi_arr.tolist())
         bval_arr = matlab.double(bval_arr.tolist())
         LB0 = matlab.double(LB0.tolist())
         UB0 = matlab.double(UB0.tolist())
         x0in = matlab.double(x0in.tolist())
-        f_arr, D_arr, Dx_arr, s0_arr, fitted_dwi_arr, RSS, rms_val, chi, AIC, BIC, R_sq = eng.IVIM_standard_bcin(
+        f_arr, D_arr, Dx_arr, s0_arr, fitted_dwi_arr, RSS, rms_val, chi, AIC, BIC, R_sq = self.eng.IVIM_standard_bcin(
             dwi_arr, bval_arr, 0.0, LB0, UB0, x0in, False, 0, 0)
-        eng.quit()
         return D_arr, f_arr, Dx_arr, s0_arr
 
     def initialize(self, bounds, initial_guess):
@@ -95,3 +95,23 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         results["Dp"] = fit_results[2]
 
         return results
+
+
+    def __del__(self):
+        if hasattr(self, "eng") and self.eng:
+            try:
+                self.eng.quit()
+            except Exception as e:
+                print(f"Warning: Failed to quit MATLAB engine cleanly: {e}")
+
+
+    def __enter__(self):
+        return self
+
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if hasattr(self, "eng") and self.eng:
+            try:
+                self.eng.quit()
+            except Exception as e:
+                print(f"Warning: Failed to quit MATLAB engine cleanly: {e}")
