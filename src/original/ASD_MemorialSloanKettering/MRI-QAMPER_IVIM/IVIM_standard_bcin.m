@@ -7,7 +7,6 @@ if size(bval_arr,2) < size(bval_arr,1)
 end
 
 numVoxels = size(dwi_arr,2);
-print(numVoxels)
 numBvals = length(bval_arr);
 
 f_lb = 0;

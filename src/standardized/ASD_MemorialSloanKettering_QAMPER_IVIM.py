@@ -53,9 +53,10 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         LB0 = matlab.double(LB0.tolist())
         UB0 = matlab.double(UB0.tolist())
         x0in = matlab.double(x0in.tolist())
-        f_arr, D_arr, Dx_arr, s0_arr, fitted_dwi_arr, RSS, rms_val, chi, AIC, BIC, R_sq = self.eng.IVIM_standard_bcin(
-            dwi_arr, bval_arr, 0.0, LB0, UB0, x0in, False, 0, 0)
-        return D_arr, f_arr, Dx_arr, s0_arr
+        results = self.eng.IVIM_standard_bcin(
+            dwi_arr, bval_arr, 0.0, LB0, UB0, x0in, False, 0, 0,nargout=11)
+        (f_arr, D_arr, Dx_arr, s0_arr, fitted_dwi_arr, RSS, rms_val, chi, AIC, BIC, R_sq) = results
+        return D_arr/1000, f_arr, Dx_arr/1000, s0_arr
 
     def initialize(self, bounds, initial_guess):
         if bounds is None:
@@ -87,7 +88,7 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         LB = np.array(self.bounds[0])
         UB = np.array(self.bounds[1])
 
-        fit_results = self.algorithm(np.array(signals), bvalues, LB, UB, np.array(self.initial_guess))
+        fit_results = self.algorithm(np.array(signals)[:,np.newaxis], bvalues, LB, UB, np.array(self.initial_guess))
 
         results = {}
         results["D"] = fit_results[0]
