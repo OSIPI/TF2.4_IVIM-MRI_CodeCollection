@@ -1,5 +1,6 @@
 {
     "algorithms": [
+        "ASD_MemorialSloanKettering_QAMPER_IVIM",
         "ETP_SRI_LinearFitting",
         "IAR_LU_biexp",
         "IAR_LU_modified_mix",
