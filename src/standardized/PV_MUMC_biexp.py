@@ -21,7 +21,7 @@ class PV_MUMC_biexp(OsipiBase):
     required_bounds_optional = True # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
-    accepted_dimensions = 1 # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
+    accepted_dimensions = (1,1) #(min dimension, max dimension)
 
     # Supported inputs in the standardized class
     supported_bounds = True

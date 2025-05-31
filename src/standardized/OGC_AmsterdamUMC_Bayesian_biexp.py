@@ -19,13 +19,12 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
 
     # Algorithm requirements
     required_bvalues = 4
-    required_thresholds = [0,
-                           0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
+    required_thresholds = [0,0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
     required_bounds = False
     required_bounds_optional = True  # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
-    accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
+    accepted_dimensions = (1,1) #(min dimension, max dimension)
     accepts_priors = True
 
 
@@ -86,6 +85,9 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
+        
+        if initial_guess is not None and len(initial_guess) == 4:
+            self.initial_guess = initial_guess
         bvalues=np.array(bvalues)
 
         epsilon = 0.000001
@@ -100,5 +102,6 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         results["D"] = fit_results[0]
         results["f"] = fit_results[1]
         results["Dp"] = fit_results[2]
+        results["S0"] = fit_results[3]
 
         return results

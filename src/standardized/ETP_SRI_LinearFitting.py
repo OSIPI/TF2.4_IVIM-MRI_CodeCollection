@@ -25,8 +25,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
     required_bounds_optional = True # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = False
-    accepted_dimensions = 1
-    # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
+    accepted_dimensions = (1,1) #(min dimension, max dimension)
 
     # Supported inputs in the standardized class
     supported_bounds = False
@@ -41,7 +40,6 @@ class ETP_SRI_LinearFitting(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-
         super(ETP_SRI_LinearFitting, self).__init__(bvalues, thresholds, bounds, initial_guess)
         if bounds is not None:
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
@@ -52,10 +50,8 @@ class ETP_SRI_LinearFitting(OsipiBase):
         # defined with initials?
         self.ETP_weighting = weighting
         self.ETP_stats = stats
-        
-        # Check the inputs
-        
     
+
     def ivim_fit(self, signals, bvalues=None, linear_fit_option=False, **kwargs):
         """Perform the IVIM fit
 
@@ -67,6 +63,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
         Returns:
             _type_: _description_
         """
+
         signals[signals<0.0000001]=0.0000001
         if bvalues is None:
             bvalues = self.bvalues

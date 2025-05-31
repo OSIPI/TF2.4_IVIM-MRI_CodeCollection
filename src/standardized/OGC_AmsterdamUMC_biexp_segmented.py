@@ -19,13 +19,12 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
 
     # Algorithm requirements
     required_bvalues = 4
-    required_thresholds = [1,
-                           1]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
+    required_thresholds = [1,1]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
     required_bounds = False
     required_bounds_optional = True  # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
-    accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
+    accepted_dimensions = (1,1) #(min dimension, max dimension)
 
 
     # Supported inputs in the standardized class
@@ -74,7 +73,9 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         Returns:
             _type_: _description_
         """
-
+        
+        if self.initial_guess is not None and len(self.initial_guess) == 4:
+            self.initial_guess = self.initial_guess
         bvalues=np.array(bvalues)
         fit_results = self.OGC_algorithm(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds, p0=self.initial_guess)
 
@@ -82,5 +83,6 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         results["D"] = fit_results[0]
         results["f"] = fit_results[1]
         results["Dp"] = fit_results[2]
+        results["S0"] = fit_results[3]
 
         return results
