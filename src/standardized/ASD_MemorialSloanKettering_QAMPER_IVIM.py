@@ -33,7 +33,7 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
     supported_initial_guess = True
     supported_thresholds = False
 
-    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None):
+    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None,eng=None):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -44,7 +44,14 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         #super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
         super(ASD_MemorialSloanKettering_QAMPER_IVIM, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
         self.initialize(bounds, initial_guess)
-        self.eng=matlab.engine.start_matlab()
+        if eng is None:
+            print('initiating matlab; this may take some time. For repeated testing one could use the optional input eng as an already initiated matlab engine')
+            self.eng=matlab.engine.start_matlab()
+            self.keep_alive=False
+        else:
+            self.eng = eng
+            self.keep_alive=True
+
 
 
     def algorithm(self,dwi_arr, bval_arr, LB0, UB0, x0in):
@@ -61,12 +68,12 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
     def initialize(self, bounds, initial_guess):
         if bounds is None:
             print('warning, no bounds were defined, so algorithm-specific default bounds are used')
-            self.bounds=([1e-6, 0, 1e-6, 0],[0.003, 1.0, 5e-2, 5])
+            self.bounds=([1e-6, 0, 0.004, 0],[0.003, 1.0, 0.2, 5])
         else:
             self.bounds=bounds
         if initial_guess is None:
             print('warning, no initial guesses were defined, so algorithm-specific default initial guess is used')
-            self.initial_guess = [0.001, 0.001, 0.2, 1]
+            self.initial_guess = [0.001, 0.2, 0.01, 1]
         else:
             self.initial_guess = initial_guess
             self.use_initial_guess = True
@@ -85,10 +92,10 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         """
 
         bvalues=np.array(bvalues)
-        LB = np.array(self.bounds[0])
-        UB = np.array(self.bounds[1])
+        LB = np.array(self.bounds[0])[[1,0,2,3]]
+        UB = np.array(self.bounds[1])[[1,0,2,3]]
 
-        fit_results = self.algorithm(np.array(signals)[:,np.newaxis], bvalues, LB, UB, np.array(self.initial_guess))
+        fit_results = self.algorithm(np.array(signals)[:,np.newaxis], bvalues, LB, UB, np.array(self.initial_guess)[[1,0,2,3]])
 
         results = {}
         results["D"] = fit_results[0]
@@ -99,11 +106,12 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
 
 
     def __del__(self):
-        if hasattr(self, "eng") and self.eng:
-            try:
-                self.eng.quit()
-            except Exception as e:
-                print(f"Warning: Failed to quit MATLAB engine cleanly: {e}")
+        if not self.keep_alive:
+            if hasattr(self, "eng") and self.eng:
+                try:
+                    self.eng.quit()
+                except Exception as e:
+                    print(f"Warning: Failed to quit MATLAB engine cleanly: {e}")
 
 
     def __enter__(self):
@@ -111,8 +119,9 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
 
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if hasattr(self, "eng") and self.eng:
-            try:
-                self.eng.quit()
-            except Exception as e:
-                print(f"Warning: Failed to quit MATLAB engine cleanly: {e}")
+        if not self.keep_alive:
+            if hasattr(self, "eng") and self.eng:
+                try:
+                    self.eng.quit()
+                except Exception as e:
+                    print(f"Warning: Failed to quit MATLAB engine cleanly: {e}")

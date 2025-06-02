@@ -6,6 +6,9 @@ import pathlib
 import time
 from src.wrappers.OsipiBase import OsipiBase
 #run using python -m pytest from the root folder
+import matlab.engine
+
+eng=matlab.engine.start_matlab()
 
 def signal_helper(signal):
     signal = np.asarray(signal)
@@ -44,9 +47,9 @@ def data_ivim_fit_saved():
     algorithms = algorithm_information["algorithms"]
     bvals = all_data.pop('config')
     bvals = bvals['bvalues']
-    first=True
-    for name, data in all_data.items():
-        for algorithm in algorithms:
+    for algorithm in algorithms:
+        first = True
+        for name, data in all_data.items():
             algorithm_dict = algorithm_information.get(algorithm, {})
             xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
                 "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
@@ -56,7 +59,9 @@ def data_ivim_fit_saved():
             if first == True:
                 if algorithm_dict.get("fail_first_time", {}) == True:
                     skiptime = True
-                    first = False
+                    first = False # this will only work for 1 algorithm... If two algorithms use fail_first_time, the second will not see it is the first time.
+            if algorithm_dict.get("requieres_matlab", {}) == True:
+                kwargs={**kwargs,'eng': eng}
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime
 
 @pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime", data_ivim_fit_saved())

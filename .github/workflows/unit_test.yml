@@ -34,8 +34,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
-      - name: Run build
-        uses: matlab-actions/run-build@v2
+        with:
+          release: R2025a 
+      - name: Install MATLAB Engine for Python
+        run: |
+          python -m pip install matlabengine==25.1.2
       - name: Test with pytest
         run: |
           pip install pytest pytest-cov
