@@ -33,6 +33,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Set environment variables for MATLAB Engine
+	if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
         run: |
           if [[ "${{ runner.os }}" == "macOS" ]]; then
             echo "DYLD_LIBRARY_PATH=/Users/runner/hostedtoolcache/MATLAB/2025.1.999/arm64/MATLAB.app/bin/maca64:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
