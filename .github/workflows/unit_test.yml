@@ -32,6 +32,15 @@ jobs:
           pip install -r requirements.txt
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Set environment variables for MATLAB Engine
+        run: |
+          if [[ "${{ runner.os }}" == "macOS" ]]; then
+            echo "DYLD_LIBRARY_PATH=/Applications/MATLAB_R2025a.app/bin/maci64:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
+          elif [[ "${{ runner.os }}" == "Linux" ]]; then
+            echo "LD_LIBRARY_PATH=/usr/local/MATLAB/R2025a/bin/glnxa64:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+          elif [[ "${{ runner.os }}" == "Windows" ]]; then
+            echo "C:\Program Files\MATLAB\R2025a\bin\win64" >> $GITHUB_PATH
+          fi
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
         with:
@@ -39,6 +48,7 @@ jobs:
       - name: Install MATLAB Engine for Python
         run: |
           python -m pip install matlabengine==25.1.2
+
       - name: Test with pytest
         run: |
           pip install pytest pytest-cov

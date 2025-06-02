@@ -108,11 +108,15 @@ def algorithms():
         algorithm_information = json.load(f)
     algorithms = algorithm_information["algorithms"]
     for algorithm in algorithms:
-        yield algorithm
+        algorithm_dict = algorithm_information.get(algorithm, {})
+        args={}
+        if algorithm_dict.get("requieres_matlab", {}) == True:
+            args['eng'] = eng
+        yield algorithm, args
 
-@pytest.mark.parametrize("algorithm", algorithms())
-def test_default_bounds_and_initial_guesses(algorithm):
-    fit = OsipiBase(algorithm=algorithm)
+@pytest.mark.parametrize("algorithm, args", algorithms())
+def test_default_bounds_and_initial_guesses(algorithm, args):
+    fit = OsipiBase(algorithm=algorithm,**args)
     #assert fit.bounds is not None, f"For {algorithm}, there is no default fit boundary"
     #assert fit.initial_guess is not None, f"For {algorithm}, there is no default fit initial guess"
     if fit.use_bounds:
@@ -154,6 +158,8 @@ def bound_input():
                 "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
             kwargs = algorithm_dict.get("options", {})
             tolerances = algorithm_dict.get("tolerances", {})
+            if algorithm_dict.get("requieres_matlab", {}) == True:
+                kwargs={**kwargs,'eng': eng}
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances
 
 
