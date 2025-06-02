@@ -35,11 +35,9 @@ jobs:
       - name: Set environment variables for MATLAB Engine
         run: |
           if [[ "${{ runner.os }}" == "macOS" ]]; then
-            echo "DYLD_LIBRARY_PATH=/Applications/MATLAB_R2025a.app/bin/maci64:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
+            echo "DYLD_LIBRARY_PATH=/Users/runner/hostedtoolcache/MATLAB/2025.1.999/arm64/MATLAB.app/bin/maca64:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
           elif [[ "${{ runner.os }}" == "Linux" ]]; then
-            echo "LD_LIBRARY_PATH=/usr/local/MATLAB/R2025a/bin/glnxa64:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-          elif [[ "${{ runner.os }}" == "Windows" ]]; then
-            echo "C:\Program Files\MATLAB\R2025a\bin\win64" >> $GITHUB_PATH
+            echo "LD_LIBRARY_PATH=/opt/hostedtoolcache/MATLAB/2025.1.999/x64/bin/glnxa64:$LD_LIBRARY_PATH" >> $GITHUB_ENV
           fi
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
