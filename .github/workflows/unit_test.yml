@@ -1,8 +1,8 @@
 name: Unit tests
 on: [push, pull_request]
+
 jobs:
   build:
-
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     strategy:
@@ -13,34 +13,40 @@ jobs:
         exclude:
           - os: windows-latest
             python-version: "3.13"
-        # Windows chokes on py3.13: https://github.com/numpy/numpy/issues/27894
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-      # You can test your matrix by printing the current Python version
+
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-       - name: Set env var for MATLAB on macOS
-         if: runner.os == 'macOS'
-         run: echo "DYLD_LIBRARY_PATH=/Users/runner/hostedtoolcache/MATLAB/2025.1.999/arm64/MATLAB.app/bin/maca64:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
-       - name: Set env var for MATLAB on Linux
-         if: runner.os == 'Linux'
-         run: echo "LD_LIBRARY_PATH=/opt/hostedtoolcache/MATLAB/2025.1.999/x64/bin/glnxa64:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
+      - name: Set env var for MATLAB on macOS
+        if: runner.os == 'macOS'
+        run: echo "DYLD_LIBRARY_PATH=/Users/runner/hostedtoolcache/MATLAB/2025.1.999/arm64/MATLAB.app/bin/maca64:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
+
+      - name: Set env var for MATLAB on Linux
+        if: runner.os == 'Linux'
+        run: echo "LD_LIBRARY_PATH=/opt/hostedtoolcache/MATLAB/2025.1.999/x64/bin/glnxa64:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
         with:
           release: R2025a 
+
       - name: Install MATLAB Engine for Python
-        run: |
-          python -m pip install matlabengine==25.1.2
+        run: python -m pip install matlabengine==25.1.2
+
       - name: Test with pytest
         run: |
           pip install pytest pytest-cov
