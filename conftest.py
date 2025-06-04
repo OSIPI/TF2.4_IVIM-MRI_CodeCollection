@@ -4,7 +4,6 @@ import json
 import csv
 # import datetime
 
-
 def pytest_addoption(parser):
     parser.addoption(
         "--SNR",
@@ -81,6 +80,22 @@ def pytest_addoption(parser):
         type=str,
         help="Drop this algorithm from the list"
     )
+    parser.addoption(
+        "--with-matlab",
+        action="store_true",
+        default=False,
+        help="Run MATLAB-dependent tests"
+    )
+
+eng = None
+
+def pytest_configure(config):
+    global eng
+    if config.getoption("--with-matlab"):
+        import matlab.engine
+        print("Starting MATLAB engine...")
+        eng = matlab.engine.start_matlab()
+        print("MATLAB engine started.")
 
 
 @pytest.fixture(scope="session")

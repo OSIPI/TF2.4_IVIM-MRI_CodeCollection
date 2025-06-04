@@ -5,22 +5,8 @@ import json
 import pathlib
 import time
 from src.wrappers.OsipiBase import OsipiBase
+from conftest import eng
 #run using python -m pytest from the root folder
-
-
-eng = None
-
-def pytest_addoption(parser):
-    parser.addoption(
-        "--with-matlab", action="store_true", default=False, help="Run MATLAB-dependent tests"
-    )
-
-@pytest.hookimpl
-def pytest_configure(config):
-    global eng
-    if config.getoption("--with-matlab"):
-        import matlab.engine
-        eng = matlab.engine.start_matlab()
 
 
 def signal_helper(signal):
@@ -72,7 +58,7 @@ def data_ivim_fit_saved():
             if first == True:
                 if algorithm_dict.get("fail_first_time", {}) == True:
                     skiptime = True
-                    first = False # this will only work for 1 algorithm... If two algorithms use fail_first_time, the second will not see it is the first time.
+                    first = False
             if algorithm_dict.get("requieres_matlab", {}) == True:
                 if eng is None:
                     continue
@@ -130,7 +116,7 @@ def algorithmlist():
             if eng is None:
                 continue
             else:
-                kwargs = {**kwargs, 'eng': eng}
+                args = {**args, 'eng': eng}
         yield algorithm, args
 
 @pytest.mark.parametrize("algorithm, args", algorithmlist())
