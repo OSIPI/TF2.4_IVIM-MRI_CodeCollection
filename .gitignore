@@ -20,7 +20,9 @@ md5sums.txt
 src/original/ASD_MemorialSloanKettering/MRI-QAMPER_IVIM/test_data
 src/original/ASD_MemorialSloanKettering/MRI-QAMPER_IVIM/output_files
 tests/IVIMmodels/unit_tests/*.log
-
+junit/*
+ivim_simulation.bval
+ivim_simulation.bvec
 
 # Unit test / coverage reports
 .tox/
