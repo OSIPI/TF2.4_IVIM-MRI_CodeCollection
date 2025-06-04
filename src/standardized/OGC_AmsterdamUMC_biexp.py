@@ -55,7 +55,7 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
             self.bounds=bounds
         if initial_guess is None:
             print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
-            self.initial_guess = [0.001, 0.001, 0.01, 1]
+            self.initial_guess = [0.001, 0.1, 0.01, 1]
         else:
             self.initial_guess = initial_guess
             self.use_initial_guess = True

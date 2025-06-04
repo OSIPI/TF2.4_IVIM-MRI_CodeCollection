@@ -5,7 +5,9 @@ import json
 import pathlib
 import time
 from src.wrappers.OsipiBase import OsipiBase
+from conftest import eng
 #run using python -m pytest from the root folder
+
 
 def signal_helper(signal):
     signal = np.asarray(signal)
@@ -44,9 +46,9 @@ def data_ivim_fit_saved():
     algorithms = algorithm_information["algorithms"]
     bvals = all_data.pop('config')
     bvals = bvals['bvalues']
-    first=True
-    for name, data in all_data.items():
-        for algorithm in algorithms:
+    for algorithm in algorithms:
+        first = True
+        for name, data in all_data.items():
             algorithm_dict = algorithm_information.get(algorithm, {})
             xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
                 "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
@@ -57,6 +59,11 @@ def data_ivim_fit_saved():
                 if algorithm_dict.get("fail_first_time", {}) == True:
                     skiptime = True
                     first = False
+            if algorithm_dict.get("requieres_matlab", {}) == True:
+                if eng is None:
+                    continue
+                else:
+                    kwargs={**kwargs,'eng': eng}
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime
 
 @pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime", data_ivim_fit_saved())
@@ -95,7 +102,7 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
         assert elapsed_time < 0.5, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 
 
-def algorithms():
+def algorithmlist():
     # Find the algorithms from algorithms.json
     file = pathlib.Path(__file__)
     algorithm_path = file.with_name('algorithms.json')
@@ -103,11 +110,18 @@ def algorithms():
         algorithm_information = json.load(f)
     algorithms = algorithm_information["algorithms"]
     for algorithm in algorithms:
-        yield algorithm
+        algorithm_dict = algorithm_information.get(algorithm, {})
+        args={}
+        if algorithm_dict.get("requieres_matlab", {}) == True:
+            if eng is None:
+                continue
+            else:
+                args = {**args, 'eng': eng}
+        yield algorithm, args
 
-@pytest.mark.parametrize("algorithm", algorithms())
-def test_default_bounds_and_initial_guesses(algorithm):
-    fit = OsipiBase(algorithm=algorithm)
+@pytest.mark.parametrize("algorithm, args", algorithmlist())
+def test_default_bounds_and_initial_guesses(algorithm, args):
+    fit = OsipiBase(algorithm=algorithm,**args)
     #assert fit.bounds is not None, f"For {algorithm}, there is no default fit boundary"
     #assert fit.initial_guess is not None, f"For {algorithm}, there is no default fit initial guess"
     if fit.use_bounds:
@@ -149,6 +163,11 @@ def bound_input():
                 "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
             kwargs = algorithm_dict.get("options", {})
             tolerances = algorithm_dict.get("tolerances", {})
+            if algorithm_dict.get("requieres_matlab", {}) == True:
+                if eng is None:
+                    continue
+                else:
+                    kwargs = {**kwargs, 'eng': eng}
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances
 
 

@@ -4,7 +4,6 @@ import json
 import csv
 # import datetime
 
-
 def pytest_addoption(parser):
     parser.addoption(
         "--SNR",
@@ -81,6 +80,22 @@ def pytest_addoption(parser):
         type=str,
         help="Drop this algorithm from the list"
     )
+    parser.addoption(
+        "--withmatlab",
+        action="store_true",
+        default=False,
+        help="Run MATLAB-dependent tests"
+    )
+
+eng = None
+
+def pytest_configure(config):
+    global eng
+    if config.getoption("--withmatlab"):
+        import matlab.engine
+        print("Starting MATLAB engine...")
+        eng = matlab.engine.start_matlab()
+        print("MATLAB engine started.")
 
 
 @pytest.fixture(scope="session")
@@ -163,6 +178,11 @@ def algorithm_list(filename, selected, dropped):
     with algorithm_path.open() as f:
         algorithm_information = json.load(f)
     algorithms = set(algorithm_information["algorithms"])
+    for algorithm in algorithms:
+        algorithm_dict = algorithm_information.get(algorithm, {})
+        if algorithm_dict.get("requieres_matlab", {}) == True:
+            if eng is None:
+                algorithms = algorithms - set(algorithm)
     algorithms = algorithms - set(dropped)
     if len(selected) > 0 and selected[0]:
         algorithms = algorithms & set(selected)
