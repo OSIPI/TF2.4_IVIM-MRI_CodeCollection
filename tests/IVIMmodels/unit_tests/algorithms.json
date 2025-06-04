@@ -17,7 +17,6 @@
     ],
     "ASD_MemorialSloanKettering_QAMPER_IVIM": {
         "requieres_matlab": true,
-        "fail_first_time": true
     },
     "IAR_LU_biexp": {
         "fail_first_time": true
