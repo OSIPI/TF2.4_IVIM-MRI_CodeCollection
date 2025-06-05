@@ -85,11 +85,11 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
         "atol": tolerances["atol"]
     }
     record_property('test_data', test_result)
-    npt.assert_allclose(fit_result['f'],data['f'], rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
+    npt.assert_allclose(data['f'], fit_result['f'], rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
     if data['f']<0.80: # we need some signal for D to be detected
-        npt.assert_allclose(fit_result['D'],data['D'], rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
+        npt.assert_allclose(data['D'], fit_result['D'], rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
     if data['f']>0.03: #we need some f for D* to be interpretable
-        npt.assert_allclose(fit_result['Dp'],data['Dp'], rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
+        npt.assert_allclose(data['Dp'], fit_result['Dp'], rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
     #assert fit_result['D'] < fit_result['Dp'], f"D {fit_result['D']} is larger than D* {fit_result['Dp']} for {name}"
     if not skiptime:
         assert elapsed_time < 0.5, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel

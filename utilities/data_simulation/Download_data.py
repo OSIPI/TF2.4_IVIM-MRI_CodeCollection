@@ -12,15 +12,19 @@ def unzip_file(zip_file_path, extracted_folder_path):
             zip_ref.extract(file_info, extracted_folder_path)
 
 
-def download_data(force=False):
+def download_data(force=False,folder=None):
     # Check if the folder exists, and create it if not
     curdir=os.getcwd()
-    base_folder = os.path.abspath(os.path.dirname(__file__))
-    base_folder = os.path.split(os.path.split(base_folder)[0])[0]
-    if not os.path.exists(os.path.join(base_folder,'download')):
-        os.makedirs(os.path.join(base_folder,'download'))
-        print(f"Folder '{'download'}' created.")
-        # Change to the specified folder
+    if folder is None:
+        base_folder = os.path.abspath(os.path.dirname(__file__))
+        base_folder = os.path.split(os.path.split(base_folder)[0])[0]
+        if not os.path.exists(os.path.join(base_folder,'download')):
+            os.makedirs(os.path.join(base_folder,'download'))
+            print(f"Folder '{'download'}' created.")
+        download_folder = os.path.join(base_folder,'download')
+    else:
+        download_folder = folder
+    # Change to the specified folder        
     os.chdir(os.path.join(base_folder,'download'))
     subprocess.check_call(["zenodo_get", 'https://zenodo.org/records/14605039'])
     # Open the zip file

@@ -268,7 +268,7 @@ class OsipiBase:
         """Author identification"""
         return ''
     
-    def osipi_simple_bias_and_RMSE_test(self, SNR, bvalues, f, Dstar, D, noise_realizations=100):
+    def osipi_simple_bias_and_RMSE_test(self, SNR, bvalues, f, Dstar, D, noise_realizations=100, print_results=True):
         # Generate signal
         bvalues = np.asarray(bvalues)
         signals = f*np.exp(-bvalues*Dstar) + (1-f)*np.exp(-bvalues*D)
@@ -282,7 +282,10 @@ class OsipiBase:
             noised_signal = np.array([norm.rvs(signal, sigma) for signal in signals])
             
             # Perform fit with the noised signal
-            f_estimates[i], Dstar_estimates[i], D_estimates[i] = self.ivim_fit(noised_signal, bvalues)
+            fit = self.osipi_fit(noised_signal, bvalues)
+            f_estimates[i] = fit['f']
+            Dstar_estimates[i] = fit['D*']
+            D_estimates[i] = fit['D']
             
         # Calculate bias
         f_bias = np.mean(f_estimates) - f
@@ -293,9 +296,13 @@ class OsipiBase:
         f_RMSE = np.sqrt(np.var(f_estimates) + f_bias**2)
         Dstar_RMSE = np.sqrt(np.var(Dstar_estimates) + Dstar_bias**2)
         D_RMSE = np.sqrt(np.var(D_estimates) + D_bias**2)
-            
-        print(f"f bias:\t{f_bias}\nf RMSE:\t{f_RMSE}")
-        print(f"Dstar bias:\t{Dstar_bias}\nDstar RMSE:\t{Dstar_RMSE}")
-        print(f"D bias:\t{D_bias}\nD RMSE:\t{D_RMSE}")
-            
-    
+
+        if print_results:
+            print()
+            print(f"\tBias\t\tRMSE")
+            print(f"f\t{f_bias:.3}\t\t{f_RMSE:.3}")
+            print(f"D*\t{Dstar_bias:.3}\t\t{Dstar_RMSE:.3}")
+            print(f"D\t{D_bias:.3}\t{D_RMSE:.3}")
+            print()
+        else:
+            return {'f':f_bias,'Dstar':Dstar_bias,'D':D_bias}, {'f':f_RMSE,'Dstar':Dstar_RMSE,'D':D_RMSE}
