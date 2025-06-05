@@ -25,7 +25,7 @@ def download_data(force=False,folder=None):
     else:
         download_folder = folder
     # Change to the specified folder        
-    os.chdir(os.path.join(base_folder,'download'))
+    os.chdir(download_folder)
     subprocess.check_call(["zenodo_get", 'https://zenodo.org/records/14605039'])
     # Open the zip file
     if force or not os.path.exists('Data'):

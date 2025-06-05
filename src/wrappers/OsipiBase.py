@@ -284,7 +284,7 @@ class OsipiBase:
             # Perform fit with the noised signal
             fit = self.osipi_fit(noised_signal, bvalues)
             f_estimates[i] = fit['f']
-            Dstar_estimates[i] = fit['D*']
+            Dstar_estimates[i] = fit['Dp']
             D_estimates[i] = fit['D']
             
         # Calculate bias
