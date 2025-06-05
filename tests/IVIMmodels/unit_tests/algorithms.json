@@ -12,7 +12,8 @@
         "OGC_AmsterdamUMC_biexp",
         "PV_MUMC_biexp",
         "PvH_KB_NKI_IVIMfit",
-        "OJ_GU_seg"
+        "OJ_GU_seg",
+        "TF_reference_IVIMfit"
     ],
     "IAR_LU_biexp": {
         "fail_first_time": true
