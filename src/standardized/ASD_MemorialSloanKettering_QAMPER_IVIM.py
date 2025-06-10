@@ -2,6 +2,7 @@ from src.wrappers.OsipiBase import OsipiBase
 import numpy as np
 import matlab.engine
 
+
 class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
     """
     Bi-exponential fitting algorithm by Oliver Gurney-Champion, Amsterdam UMC
@@ -27,13 +28,12 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
     required_initial_guess_optional = True
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
-
     # Supported inputs in the standardized class
     supported_bounds = True
     supported_initial_guess = True
     supported_thresholds = False
 
-    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None,eng=None):
+    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, eng=None):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -51,8 +51,6 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         else:
             self.eng = eng
             self.keep_alive=True
-
-
 
     def algorithm(self,dwi_arr, bval_arr, LB0, UB0, x0in):
         dwi_arr = matlab.double(dwi_arr.tolist())
@@ -104,8 +102,7 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
 
         return results
 
-
-    def __del__(self):
+    def clean(self):
         if not self.keep_alive:
             if hasattr(self, "eng") and self.eng:
                 try:
@@ -113,15 +110,11 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
                 except Exception as e:
                     print(f"Warning: Failed to quit MATLAB engine cleanly: {e}")
 
+    def __del__(self):
+        self.clean()
 
     def __enter__(self):
         return self
 
-
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if not self.keep_alive:
-            if hasattr(self, "eng") and self.eng:
-                try:
-                    self.eng.quit()
-                except Exception as e:
-                    print(f"Warning: Failed to quit MATLAB engine cleanly: {e}")
+        self.clean()

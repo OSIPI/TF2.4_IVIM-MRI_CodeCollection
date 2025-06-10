@@ -16,7 +16,7 @@
         "OJ_GU_seg"
     ],
     "ASD_MemorialSloanKettering_QAMPER_IVIM": {
-        "requieres_matlab": true
+        "requires_matlab": true
     },
     "IAR_LU_biexp": {
         "fail_first_time": true

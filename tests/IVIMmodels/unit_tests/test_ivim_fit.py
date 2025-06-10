@@ -5,7 +5,6 @@ import json
 import pathlib
 import time
 from src.wrappers.OsipiBase import OsipiBase
-from conftest import eng
 #run using python -m pytest from the root folder
 
 
@@ -31,50 +30,24 @@ def tolerances_helper(tolerances, data):
         tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 4e-2})
     return tolerances
 
-def data_ivim_fit_saved():
-    # Find the algorithms from algorithms.json
-    file = pathlib.Path(__file__)
-    algorithm_path = file.with_name('algorithms.json')
-    with algorithm_path.open() as f:
-        algorithm_information = json.load(f)
-
-    # Load generic test data generated from the included phantom: phantoms/MR_XCAT_qMRI
-    generic = file.with_name('generic.json')
-    with generic.open() as f:
-        all_data = json.load(f)
-
-    algorithms = algorithm_information["algorithms"]
-    bvals = all_data.pop('config')
-    bvals = bvals['bvalues']
-    for algorithm in algorithms:
-        first = True
-        for name, data in all_data.items():
-            algorithm_dict = algorithm_information.get(algorithm, {})
-            xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
-                "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
-            kwargs = algorithm_dict.get("options", {})
-            tolerances = algorithm_dict.get("tolerances", {})
-            skiptime=False
-            if first == True:
-                if algorithm_dict.get("fail_first_time", {}) == True:
-                    skiptime = True
-                    first = False
-            if algorithm_dict.get("requieres_matlab", {}) == True:
-                if eng is None:
-                    continue
-                else:
-                    kwargs={**kwargs,'eng': eng}
-            yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime
-
-@pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime", data_ivim_fit_saved())
-def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,skiptime, request, record_property):
+def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
+    name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab = data_ivim_fit_saved
+    max_time = 0.5
+    if requires_matlab:
+        max_time = 2
+        if eng is None:
+            print('test is here')
+            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+        else:
+            print('test is not here')
+            kwargs = {**kwargs, 'eng': eng}
     if xfail["xfail"]:
         mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
         request.node.add_marker(mark)
     signal = signal_helper(data["data"])
     tolerances = tolerances_helper(tolerances, data)
-    start_time = time.time()  # Record the start time
     fit = OsipiBase(algorithm=algorithm,  **kwargs)
+    start_time = time.time()  # Record the start time
     fit_result = fit.osipi_fit(signal, bvals)
     elapsed_time = time.time() - start_time  # Calculate elapsed time
     def to_list_if_needed(value):
@@ -99,29 +72,18 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
         npt.assert_allclose(fit_result['Dp'],data['Dp'], rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
     #assert fit_result['D'] < fit_result['Dp'], f"D {fit_result['D']} is larger than D* {fit_result['Dp']} for {name}"
     if not skiptime:
-        assert elapsed_time < 0.5, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
+        assert elapsed_time < max_time, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 
-
-def algorithmlist():
-    # Find the algorithms from algorithms.json
-    file = pathlib.Path(__file__)
-    algorithm_path = file.with_name('algorithms.json')
-    with algorithm_path.open() as f:
-        algorithm_information = json.load(f)
-    algorithms = algorithm_information["algorithms"]
-    for algorithm in algorithms:
-        algorithm_dict = algorithm_information.get(algorithm, {})
-        args={}
-        if algorithm_dict.get("requieres_matlab", {}) == True:
-            if eng is None:
-                continue
-            else:
-                args = {**args, 'eng': eng}
-        yield algorithm, args
-
-@pytest.mark.parametrize("algorithm, args", algorithmlist())
-def test_default_bounds_and_initial_guesses(algorithm, args):
-    fit = OsipiBase(algorithm=algorithm,**args)
+def test_default_bounds_and_initial_guesses(algorithmlist,eng):
+    algorithm, requires_matlab = algorithmlist
+    if requires_matlab:
+        if eng is None:
+            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+        else:
+            kwargs = {'eng': eng}
+    else:
+        kwargs={}
+    fit = OsipiBase(algorithm=algorithm,**kwargs)
     #assert fit.bounds is not None, f"For {algorithm}, there is no default fit boundary"
     #assert fit.initial_guess is not None, f"For {algorithm}, there is no default fit initial guess"
     if fit.use_bounds:
@@ -141,38 +103,13 @@ def test_default_bounds_and_initial_guesses(algorithm, args):
         assert 0.9 <= fit.initial_guess[3] <= 1.1, f"For {algorithm}, the default initial guess for S {fit.initial_guess[3]} is unrealistic; note signal is normalized"
 
 
-def bound_input():
-    # Find the algorithms from algorithms.json
-    file = pathlib.Path(__file__)
-    algorithm_path = file.with_name('algorithms.json')
-    with algorithm_path.open() as f:
-        algorithm_information = json.load(f)
-
-    # Load generic test data generated from the included phantom: phantoms/MR_XCAT_qMRI
-    generic = file.with_name('generic.json')
-    with generic.open() as f:
-        all_data = json.load(f)
-
-    algorithms = algorithm_information["algorithms"]
-    bvals = all_data.pop('config')
-    bvals = bvals['bvalues']
-    for name, data in all_data.items():
-        for algorithm in algorithms:
-            algorithm_dict = algorithm_information.get(algorithm, {})
-            xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
-                "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
-            kwargs = algorithm_dict.get("options", {})
-            tolerances = algorithm_dict.get("tolerances", {})
-            if algorithm_dict.get("requieres_matlab", {}) == True:
-                if eng is None:
-                    continue
-                else:
-                    kwargs = {**kwargs, 'eng': eng}
-            yield name, bvals, data, algorithm, xfail, kwargs, tolerances
-
-
-@pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances", bound_input())
-def test_bounds(name, bvals, data, algorithm, xfail, kwargs, tolerances, request):
+def test_bounds(bound_input, eng):
+    name, bvals, data, algorithm, xfail, kwargs, tolerances, requires_matlab = bound_input
+    if requires_matlab:
+        if eng is None:
+            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+        else:
+            kwargs = {**kwargs, 'eng': eng}
     bounds = ([0.0008, 0.2, 0.01, 1.1], [0.0012, 0.3, 0.02, 1.3])
     # deliberately have silly bounds to see whether they are used
     fit = OsipiBase(algorithm=algorithm, bounds=bounds, initial_guess = [0.001, 0.25, 0.015, 1.2], **kwargs)
