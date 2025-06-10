@@ -15,6 +15,7 @@ from utilities.data_simulation.GenerateData import GenerateData
 #e.g. pytest -m slow tests/IVIMmodels/unit_tests/test_ivim_synthetic.py  --saveFileName test_output.csv --SNR 10 50 100 200 --fitCount 20
 @pytest.mark.slow
 def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician_noise, save_file, save_duration_file, use_prior):
+    algorithm, _ = ivim_algorithm
     # assert save_file == "test"
     rng = np.random.RandomState(42)
     # random.seed(42)
@@ -24,7 +25,7 @@ def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician
     D = data["D"]
     f = data["f"]
     Dp = data["Dp"]
-    fit = OsipiBase(algorithm=ivim_algorithm)
+    fit = OsipiBase(algorithm=algorithm)
     # here is a prior
     if use_prior and hasattr(fit, "accepts_priors") and fit.accepts_priors:
         prior = [rng.normal(D, D/3, 10), rng.normal(f, f/3, 10), rng.normal(Dp, Dp/3, 10), rng.normal(1, 1/3, 10)]
@@ -40,11 +41,11 @@ def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician
         fit_result = fit.osipi_fit(signal, bvals) #, prior_in=prior
         time_delta += datetime.datetime.now() - start_time
         if save_file is not None:
-            save_file.writerow([ivim_algorithm, name, SNR, idx, f, Dp, D, fit_result["f"], fit_result["Dp"], fit_result["D"], *signal])
+            save_file.writerow([algorithm, name, SNR, idx, f, Dp, D, fit_result["f"], fit_result["Dp"], fit_result["D"], *signal])
             # save_results(save_file, ivim_algorithm, name, SNR, idx, [f, Dp, D], [f_fit, Dp_fit, D_fit])
         npt.assert_allclose([f, Dp, D], [fit_result["f"], fit_result["Dp"], fit_result["D"]], rtol, atol)
     if save_duration_file is not None:
-        save_duration_file.writerow([ivim_algorithm, name, SNR, time_delta/datetime.timedelta(microseconds=1), fit_count])
+        save_duration_file.writerow([algorithm, name, SNR, time_delta/datetime.timedelta(microseconds=1), fit_count])
         # save_duration(save_duration_file, ivim_algorithm, name, SNR, time_delta, fit_count)
 
 

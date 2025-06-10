@@ -166,7 +166,15 @@ def algorithm_list(filename, selected, dropped):
     algorithms = algorithms - set(dropped)
     if len(selected) > 0 and selected[0]:
         algorithms = algorithms & set(selected)
-    return list(algorithms)
+    options = []
+    for algorithm in algorithms:
+        if algorithm in algorithm_information:
+            option = algorithm_information[algorithm]
+        else:
+            option = {}
+        options.append(option)
+    for algorithm, option in zip(list(algorithms), options):
+        yield algorithm, option
 
 def data_list(filename):
     current_folder = pathlib.Path.cwd()

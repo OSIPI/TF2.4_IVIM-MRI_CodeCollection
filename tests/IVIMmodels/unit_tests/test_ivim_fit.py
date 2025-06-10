@@ -59,15 +59,16 @@ def data_ivim_fit_saved():
                     first = False
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime
 
-@pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime", data_ivim_fit_saved())
-def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,skiptime, request, record_property):
-    if xfail["xfail"]:
-        mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
-        request.node.add_marker(mark)
+#@pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime", data_ivim_fit_saved())
+#def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,skiptime, request, record_property):
+def test_ivim_fit_saved(ivim_algorithm, ivim_data, record_property):
+    algorithm, options = ivim_algorithm
+    name, bvals, data = ivim_data
+
     signal = signal_helper(data["data"])
-    tolerances = tolerances_helper(tolerances, data)
+    tolerances = tolerances_helper(options.get("tolerances", {}), data)
     start_time = time.time()  # Record the start time
-    fit = OsipiBase(algorithm=algorithm,  **kwargs)
+    fit = OsipiBase(algorithm=algorithm)
     fit_result = fit.osipi_fit(signal, bvals)
     elapsed_time = time.time() - start_time  # Calculate elapsed time
     def to_list_if_needed(value):
@@ -91,8 +92,9 @@ def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,
     if data['f']>0.03: #we need some f for D* to be interpretable
         npt.assert_allclose(data['Dp'], fit_result['Dp'], rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
     #assert fit_result['D'] < fit_result['Dp'], f"D {fit_result['D']} is larger than D* {fit_result['Dp']} for {name}"
+    skiptime = False
     if not skiptime:
-        assert elapsed_time < 0.5, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
+        assert elapsed_time < 0.5, f"Algorithm {algorithm} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 
 
 def algorithms():
