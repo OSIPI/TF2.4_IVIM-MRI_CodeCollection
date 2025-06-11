@@ -215,14 +215,11 @@ def data_ivim_fit_saved(datafile, algorithmFile):
             kwargs = algorithm_dict.get("options", {})
             tolerances = algorithm_dict.get("tolerances", {})
             skiptime=False
-            if first == True:
-                if algorithm_dict.get("fail_first_time", {}) == True:
+            if first:
+                if algorithm_dict.get("fail_first_time", False):
                     skiptime = True
                     first = False
-            if algorithm_dict.get("requires_matlab", False) == True:
-                requires_matlab = True
-            else:
-                requires_matlab = False
+            requires_matlab = algorithm_dict.get("requires_matlab", False)
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab
 
 def algorithmlist(algorithmFile):
@@ -235,10 +232,7 @@ def algorithmlist(algorithmFile):
     algorithms = algorithm_information["algorithms"]
     for algorithm in algorithms:
         algorithm_dict = algorithm_information.get(algorithm, {})
-        if algorithm_dict.get("requires_matlab", False) == True:
-            requires_matlab = True
-        else:
-            requires_matlab = False
+        requires_matlab = algorithm_dict.get("requires_matlab", False)
         yield algorithm, requires_matlab
 
 def bound_input(datafile,algorithmFile):
@@ -261,8 +255,5 @@ def bound_input(datafile,algorithmFile):
                 "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
             kwargs = algorithm_dict.get("options", {})
             tolerances = algorithm_dict.get("tolerances", {})
-            if algorithm_dict.get("requires_matlab", False) == True:
-                requires_matlab = True
-            else:
-                requires_matlab = False
+            requires_matlab = algorithm_dict.get("requires_matlab", False)
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances, requires_matlab

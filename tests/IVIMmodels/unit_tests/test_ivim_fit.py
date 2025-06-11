@@ -36,10 +36,8 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
     if requires_matlab:
         max_time = 2
         if eng is None:
-            print('test is here')
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
         else:
-            print('test is not here')
             kwargs = {**kwargs, 'eng': eng}
     if xfail["xfail"]:
         mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])

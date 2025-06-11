@@ -17,9 +17,8 @@ from utilities.data_simulation.GenerateData import GenerateData
 def test_generated(algorithmlist, skip_list, ivim_data, SNR, rtol, atol, fit_count, rician_noise, save_file, save_duration_file, use_prior):
     # assert save_file == "test"
     ivim_algorithm, requires_matlab = algorithmlist
-    if requires_matlab:
-        if eng is None:
-            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+    if requires_matlab and eng is None:
+        pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
     rng = np.random.RandomState(42)
     # random.seed(42)
     S0 = 1
