@@ -34,4 +34,4 @@ jobs:
         run: |
           pip install pytest pytest-cov
           python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
-          python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html --dataFile tests/IVIMmodels/unit_tests/generic_brain.json
+          python -m pytest --doctest-modules --junitxml=junit/test-results-brain.xml --cov=. --cov-report=xml --cov-report=html --dataFile tests/IVIMmodels/unit_tests/generic_brain.json
