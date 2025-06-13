@@ -105,7 +105,12 @@ class OsipiBase:
             #results[ijk] = fit
 
         for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
-            args = [data[ijk], use_bvalues]
+            # Normalize array
+            single_voxel_data = data[ijk]
+            single_voxel_data_s0 = single_voxel_data[0]
+            single_voxel_data_normalized = single_voxel_data/single_voxel_data_s0
+            
+            args = [single_voxel_data_normalized, use_bvalues]
             fit = self.ivim_fit(*args, **kwargs) # For single voxel fits, we assume this is a dict with a float value per key.
             for key in list(fit.keys()):
                 results[key][ijk] = fit[key]
@@ -141,7 +146,11 @@ class OsipiBase:
             for key in self.result_keys:
                 results[key] = np.empty(list(data.shape[:-1]))
 
-            args = [data, use_bvalues]
+            normalization_factors = np.array([data[..., 0] for i in range(data.shape[-1])])
+            normalization_factors = np.moveaxis(normalization_factors, 0, -1)
+            data_normalized = data/normalization_factors
+
+            args = [data_normalized, use_bvalues]
             fit = self.ivim_fit_full_volume(*args, **kwargs) # Assume this is a dict with an array per key representing the parametric maps
             for key in list(fit.keys()):
                 results[key] = fit[key]
