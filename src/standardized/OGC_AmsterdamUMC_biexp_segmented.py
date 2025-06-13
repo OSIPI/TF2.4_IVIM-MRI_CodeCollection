@@ -25,13 +25,14 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
     required_bounds_optional = True  # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
-    accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
 
     # Supported inputs in the standardized class
     supported_bounds = True
     supported_initial_guess = True
     supported_thresholds = True
+    supported_dimensions = 1
+    supported_priors = False
 
     def __init__(self, bvalues=None, thresholds=150, bounds=None, initial_guess=None):
         """
