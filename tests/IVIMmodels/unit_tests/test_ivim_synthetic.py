@@ -26,7 +26,7 @@ def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician
     Dp = data["Dp"]
     fit = OsipiBase(algorithm=ivim_algorithm)
     # here is a prior
-    if use_prior and hasattr(fit, "accepts_priors") and fit.accepts_priors:
+    if use_prior and hasattr(fit, "supported_priors") and fit.supported_priors:
         prior = [rng.normal(D, D/3, 10), rng.normal(f, f/3, 10), rng.normal(Dp, Dp/3, 10), rng.normal(1, 1/3, 10)]
         # prior = [np.repeat(D, 10)+np.random.normal(0,D/3,np.shape(np.repeat(D, 10))), np.repeat(f, 10)+np.random.normal(0,f/3,np.shape(np.repeat(D, 10))), np.repeat(Dp, 10)+np.random.normal(0,Dp/3,np.shape(np.repeat(D, 10))),np.repeat(np.ones_like(Dp), 10)+np.random.normal(0,1/3,np.shape(np.repeat(D, 10)))]  # D, f, D*
         fit.initialize(prior_in=prior)
