@@ -1,5 +1,6 @@
 {
     "algorithms": [
+        "ASD_MemorialSloanKettering_QAMPER_IVIM",
         "ETP_SRI_LinearFitting",
         "IAR_LU_biexp",
         "IAR_LU_modified_mix",
@@ -14,6 +15,9 @@
         "PvH_KB_NKI_IVIMfit",
         "OJ_GU_seg"
     ],
+    "ASD_MemorialSloanKettering_QAMPER_IVIM": {
+        "requires_matlab": true
+    },
     "IAR_LU_biexp": {
         "fail_first_time": true
     },

@@ -14,8 +14,11 @@ from utilities.data_simulation.GenerateData import GenerateData
 #run using pytest <path_to_this_file> --saveFileName test_output.txt --SNR 50 100 200
 #e.g. pytest -m slow tests/IVIMmodels/unit_tests/test_ivim_synthetic.py  --saveFileName test_output.csv --SNR 10 50 100 200 --fitCount 20
 @pytest.mark.slow
-def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician_noise, save_file, save_duration_file, use_prior):
+def test_generated(algorithmlist, skip_list, ivim_data, SNR, rtol, atol, fit_count, rician_noise, save_file, save_duration_file, use_prior):
     # assert save_file == "test"
+    ivim_algorithm, requires_matlab = algorithmlist
+    if requires_matlab and eng is None:
+        pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
     rng = np.random.RandomState(42)
     # random.seed(42)
     S0 = 1
