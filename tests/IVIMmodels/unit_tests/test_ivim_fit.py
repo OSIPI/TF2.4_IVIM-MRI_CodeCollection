@@ -1,8 +1,6 @@
 import numpy as np
 import numpy.testing as npt
 import pytest
-import json
-import pathlib
 import time
 from src.wrappers.OsipiBase import OsipiBase
 #run using python -m pytest from the root folder
