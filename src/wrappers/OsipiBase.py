@@ -103,12 +103,14 @@ class OsipiBase:
             #args = [data[ijk], use_bvalues]
             #fit = list(self.ivim_fit(*args, **kwargs))
             #results[ijk] = fit
+        minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
+        b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
 
         for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
             # Normalize array
             single_voxel_data = data[ijk]
-            single_voxel_data_s0 = single_voxel_data[0]
-            single_voxel_data_normalized = single_voxel_data/single_voxel_data_s0
+            single_voxel_data_normalization_factor = np.mean(single_voxel_data[b0_indices])
+            single_voxel_data_normalized = single_voxel_data/single_voxel_data_normalization_factor
             
             args = [single_voxel_data_normalized, use_bvalues]
             fit = self.ivim_fit(*args, **kwargs) # For single voxel fits, we assume this is a dict with a float value per key.
