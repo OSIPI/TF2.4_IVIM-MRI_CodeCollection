@@ -146,7 +146,7 @@ class OsipiBase:
             for key in self.result_keys:
                 results[key] = np.empty(list(data.shape[:-1]))
 
-            b0_indices = np.where(bvalues == 0)[0]
+            b0_indices = np.where(use_bvalues == 0)[0]
             b0_mean = np.mean(data[..., b0_indices], axis=-1)
 
             normalization_factors = np.array([b0_mean for i in range(data.shape[-1])])
