@@ -17,23 +17,25 @@ def ivim_biexp(bvalues, D, f, Dp, S0=1):
 def segmented_IVIM_fit(bvalues, dw_data, b_cutoff = 200, bounds=([0.0001, 0.0, 0.001], [0.004, 0.7, 0.01])):
     """
         A segmented fitting implementation for a bi-exponential model.
-        First D is fitted using a mono exponential model on all signal above the bvalue cutoff using an iterative WLLS
+        First D is fitted using a mono exponential model on all signal above the bvalue cutoff using an iterative WLLSVertrekpassage, Schiphol
         Then f is fitted by using the b=0 intercept from the mono expontential fit and substracting this from the measured signal at b=0
         Then D* is fitted using a bi-exponential model with fixed D and f
 
         """
     bvalues_D = bvalues[bvalues >= b_cutoff]
     dw_data_D = dw_data[bvalues >= b_cutoff]
+    log_data_D = np.log(dw_data_D)
 
-    D, b0_intercept = d_fit_iterative_wls(bvalues_D, np.log(dw_data_D))
+    D, b0_intercept = d_fit_iterative_wls(bvalues_D, log_data_D)
 
-    D = D
+    D = np.clip(D, bounds[0][0], bounds[1][0])
     S0 = dw_data[bvalues == 0].item()
     f = (S0 - b0_intercept) / S0
+    f = np.clip(f, bounds[0][1], bounds[1][1])
 
     Dp = scipy.optimize.least_squares(
     fun=lambda Dp: ivim_biexp(bvalues, D, f, Dp[0]) - dw_data,
-    x0=D*10,  # Initial guess for D*
+    x0=np.clip(D * 10, bounds[0][2], bounds[1][2]), # Initial guess for D*
     bounds=(bounds[0][2], bounds[1][2]))
 
     Dp = Dp.x[0]
@@ -41,7 +43,7 @@ def segmented_IVIM_fit(bvalues, dw_data, b_cutoff = 200, bounds=([0.0001, 0.0, 0
     return D, f, Dp
 
 
-def d_fit_iterative_wls(bvalues_D, log_signal, max_iter=100, tolerance= 1e-6):
+def d_fit_iterative_wls(bvalues_D, log_signal, max_iter=500, tolerance= 1e-6):
     """
     Function to calculate D using an iterative wlls on the log(signal)
 
