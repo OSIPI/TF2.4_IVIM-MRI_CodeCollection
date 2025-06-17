@@ -1,5 +1,8 @@
 {
     "algorithms": [
+        "TCML_TechnionIIT_lsqlm",
+        "TCML_TechnionIIT_lsqtrf",
+        "TCML_TechnionIIT_SLS",
         "ASD_MemorialSloanKettering_QAMPER_IVIM",
         "ETP_SRI_LinearFitting",
         "IAR_LU_biexp",

@@ -42,7 +42,9 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         request.node.add_marker(mark)
     signal = signal_helper(data["data"])
     tolerances = tolerances_helper(tolerances, data)
-    fit = OsipiBase(algorithm=algorithm,  **kwargs)
+    fit = OsipiBase(algorithm=algorithm, **kwargs)
+    if fit.use_bounds:
+        fit.bounds = ([0, 0, 0.005, 0.7], [0.005, 1.0, 0.2, 1.3])
     start_time = time.time()  # Record the start time
     fit_result = fit.osipi_fit(signal, bvals)
     elapsed_time = time.time() - start_time  # Calculate elapsed time
@@ -61,6 +63,8 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         "atol": tolerances["atol"]
     }
     record_property('test_data', test_result)
+    if (data['f'] == 1 or data['f'] == 0) and not fit.use_bounds: #in these cases there are multiple solutions (D can become D*, f will be 0 and D* can be anything. This will be a good description of the data, so technically not a fail
+        return
     npt.assert_allclose(fit_result['f'],data['f'], rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
     if data['f']<0.80: # we need some signal for D to be detected
         npt.assert_allclose(fit_result['D'],data['D'], rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])

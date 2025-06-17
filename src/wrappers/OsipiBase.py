@@ -299,3 +299,10 @@ class OsipiBase:
         print(f"D bias:\t{D_bias}\nD RMSE:\t{D_RMSE}")
             
     
+    def D_and_Ds_swap(self,results):
+        if results['D']>results['Dp']:
+            D=results['Dp']
+            results['Dp']=results['D']
+            results['D']=D
+            results['f']=1-results['f']
+        return results
