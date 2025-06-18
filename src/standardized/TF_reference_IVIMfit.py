@@ -73,6 +73,11 @@ class TF_reference_IVIMfit(OsipiBase):
         #bvalues = np.array(bvalues)
         bvalues = np.array(bvalues)
 
+        if np.any(signals < 0):
+            signals = np.clip(signals,0.01, None)
+            print('warning, negative values in signal: values clipped to 0.01')
+
+
         fit_results = self.TF_reference_algorithm(bvalues,signals,b_cutoff=self.thresholds, bounds=self.bounds)
 
         results = {}
