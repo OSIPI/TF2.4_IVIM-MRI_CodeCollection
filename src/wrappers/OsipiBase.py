@@ -106,7 +106,7 @@ class OsipiBase:
 
         for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
             args = [data[ijk], use_bvalues]
-            fit = self.ivim_fit(*args, **kwargs) # For single voxel fits, we assume this is a dict with a float value per key.
+            fit = self.D_and_Ds_swap(self.ivim_fit(*args, **kwargs)) # For single voxel fits, we assume this is a dict with a float value per key.
             for key in list(fit.keys()):
                 results[key][ijk] = fit[key]
         
@@ -282,7 +282,7 @@ class OsipiBase:
             noised_signal = np.array([norm.rvs(signal, sigma) for signal in signals])
             
             # Perform fit with the noised signal
-            f_estimates[i], Dstar_estimates[i], D_estimates[i] = self.ivim_fit(noised_signal, bvalues)
+            f_estimates[i], Dstar_estimates[i], D_estimates[i] = self.D_and_Ds_swap(self.ivim_fit(noised_signal, bvalues))
             
         # Calculate bias
         f_bias = np.mean(f_estimates) - f

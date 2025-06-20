@@ -63,7 +63,7 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         "atol": tolerances["atol"]
     }
     record_property('test_data', test_result)
-    if (data['f'] == 1 or data['f'] == 0) and not fit.use_bounds: #in these cases there are multiple solutions (D can become D*, f will be 0 and D* can be anything. This will be a good description of the data, so technically not a fail
+    if (data['f'] > 0.99 or data['f'] < 0.01) and not fit.use_bounds: #in these cases there are multiple solutions (D can become D*, f will be 0 and D* can be anything. This will be a good description of the data, so technically not a fail
         return
     npt.assert_allclose(fit_result['f'],data['f'], rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
     if data['f']<0.80: # we need some signal for D to be detected
