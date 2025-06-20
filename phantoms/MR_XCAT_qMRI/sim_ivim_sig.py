@@ -6,8 +6,6 @@ import argparse
 import os
 
 import sys
-sys.path.append('C:/TF_IVIM_OSIPI/TF2.4_IVIM-MRI_CodeCollection')
-
 from utilities.data_simulation.Download_data import download_data
 
 ##########
@@ -23,7 +21,7 @@ def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleav
         states = [1]
     for state in states:
         # Load the .mat file
-        mat_data = loadmat('download/Phantoms/XCAT_MAT_RESP/XCAT5D_RP_' + str(state) + '_CP_1.mat')
+        mat_data = loadmat('../../download/Phantoms/XCAT_MAT_RESP/XCAT5D_RP_' + str(state) + '_CP_1.mat')
 
         # Access the variables in the loaded .mat file
         XCAT = mat_data['IMG']
@@ -433,7 +431,7 @@ if __name__ == '__main__':
     elif args.bvalue:
         bvalues = {"cmd": args.bvalue}
     else:
-        bvalues = parse_bvalues_file("phantoms\\MR_XCAT_qMRI\\b_values.json")
+        bvalues = parse_bvalues_file("b_values.json")
 
     
     noise = args.noise
