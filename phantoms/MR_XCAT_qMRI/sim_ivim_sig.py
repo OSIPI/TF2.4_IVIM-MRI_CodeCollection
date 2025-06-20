@@ -4,8 +4,6 @@ import nibabel as nib
 import json
 import argparse
 import os
-
-import sys
 from utilities.data_simulation.Download_data import download_data
 
 ##########
