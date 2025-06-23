@@ -71,7 +71,7 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         assert elapsed_time < max_time, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 
 def test_default_bounds_and_initial_guesses(algorithmlist,eng):
-    algorithm, requires_matlab = algorithmlist
+    algorithm, requires_matlab, deep_learning = algorithmlist
     if requires_matlab:
         if eng is None:
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
@@ -79,6 +79,8 @@ def test_default_bounds_and_initial_guesses(algorithmlist,eng):
             kwargs = {'eng': eng}
     else:
         kwargs={}
+    if deep_learning:
+        pytest.skip(reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
     fit = OsipiBase(algorithm=algorithm,**kwargs)
     #assert fit.bounds is not None, f"For {algorithm}, there is no default fit boundary"
     #assert fit.initial_guess is not None, f"For {algorithm}, there is no default fit initial guess"

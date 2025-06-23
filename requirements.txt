@@ -16,3 +16,4 @@ sphinx
 sphinx_rtd_theme
 pytest-json-report
 ivimnet
+super_ivim_dc
