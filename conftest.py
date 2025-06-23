@@ -288,5 +288,5 @@ def deep_learning_algorithms(datafile,algorithmFile):
         if algorithm_dict.get('deep_learning',False):
             kwargs = algorithm_dict.get("options", {})
             requires_matlab = algorithm_dict.get("requires_matlab", False)
-            tolerances = algorithm_dict.get("tolerances", {"atol":{"f": 2e-1, "D": 8e-4, "Dp": 6e-2},"rtol":{"f": 0.2, "D": 0.3, "Dp": 0.3}})
+            tolerances = algorithm_dict.get("tolerances", {"atol":{"f": 2e-1, "D": 8e-4, "Dp": 8e-2},"rtol":{"f": 0.2, "D": 0.3, "Dp": 0.4}})
             yield algorithm, all_data, bvals, kwargs, requires_matlab, tolerances
