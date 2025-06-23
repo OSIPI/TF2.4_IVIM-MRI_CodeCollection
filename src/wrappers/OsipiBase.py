@@ -107,15 +107,26 @@ class OsipiBase:
             #args = [data[ijk], use_bvalues]
             #fit = list(self.ivim_fit(*args, **kwargs))
             #results[ijk] = fit
+        minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
+        b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
+
         if not self.deep_learning:
-            for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
-                args = [data[ijk], use_bvalues]
-                fit = self.ivim_fit(*args, **kwargs) # For single voxel fits, we assume this is a dict with a float value per key.
-                for key in list(fit.keys()):
-                    results[key][ijk] = fit[key]
+          for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
+              # Normalize array
+              single_voxel_data = data[ijk]
+              single_voxel_data_normalization_factor = np.mean(single_voxel_data[b0_indices])
+              single_voxel_data_normalized = single_voxel_data/single_voxel_data_normalization_factor
+
+              args = [single_voxel_data_normalized, use_bvalues]
+              fit = self.ivim_fit(*args, **kwargs) # For single voxel fits, we assume this is a dict with a float value per key.
+              for key in list(fit.keys()):
+                  results[key][ijk] = fit[key]
         else:
-            args = [data, use_bvalues]
-            results = self.ivim_fit(*args,**kwargs)  # For single voxel fits, we assume this is a dict with a float value per key.
+          # Note that I am probably high-jacking the wrong part of the code as DL works best for 2D arrays (b-values vs signal decays).
+          # normalizing of signal still needs implementing for DL. 
+          args = [data, use_bvalues]
+          results = self.ivim_fit(*args,**kwargs)  # For single voxel fits, we assume this is a dict with a float value per key.
+
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         return results
     
@@ -147,7 +158,15 @@ class OsipiBase:
             for key in self.result_keys:
                 results[key] = np.empty(list(data.shape[:-1]))
 
-            args = [data, use_bvalues]
+            minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
+            b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
+            b0_mean = np.mean(data[..., b0_indices], axis=-1)
+
+            normalization_factors = np.array([b0_mean for i in range(data.shape[-1])])
+            normalization_factors = np.moveaxis(normalization_factors, 0, -1)
+            data_normalized = data/normalization_factors
+
+            args = [data_normalized, use_bvalues]
             fit = self.ivim_fit_full_volume(*args, **kwargs) # Assume this is a dict with an array per key representing the parametric maps
             for key in list(fit.keys()):
                 results[key] = fit[key]
