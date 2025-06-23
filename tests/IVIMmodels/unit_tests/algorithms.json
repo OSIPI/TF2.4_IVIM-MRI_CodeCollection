@@ -14,13 +14,9 @@
         "PV_MUMC_biexp",
         "PvH_KB_NKI_IVIMfit",
         "OJ_GU_seg",
-        "IVIM_NEToptim",
-        "Super_IVIM_DC"
+        "IVIM_NEToptim"
     ],
     "IVIM_NEToptim": {
-        "deep_learning": true
-    },
-    "Super_IVIM_DC": {
         "deep_learning": true
     },
     "ASD_MemorialSloanKettering_QAMPER_IVIM": {

@@ -110,31 +110,26 @@ class OsipiBase:
         minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
         b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
 
-        if not self.deep_learning:
-          for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
-              # Normalize array
-              single_voxel_data = data[ijk]
-              single_voxel_data_normalization_factor = np.mean(single_voxel_data[b0_indices])
-              single_voxel_data_normalized = single_voxel_data/single_voxel_data_normalization_factor
+        for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
+            # Normalize array
+            single_voxel_data = data[ijk]
+            single_voxel_data_normalization_factor = np.mean(single_voxel_data[b0_indices])
+            single_voxel_data_normalized = single_voxel_data/single_voxel_data_normalization_factor
 
-              args = [single_voxel_data_normalized, use_bvalues]
-              fit = self.ivim_fit(*args, **kwargs) # For single voxel fits, we assume this is a dict with a float value per key.
-              for key in list(fit.keys()):
-                  results[key][ijk] = fit[key]
-        else:
-          # Note that I am probably high-jacking the wrong part of the code as DL works best for 2D arrays (b-values vs signal decays).
-          # normalizing of signal still needs implementing for DL. 
-          args = [data, use_bvalues]
-          results = self.ivim_fit(*args,**kwargs)  # For single voxel fits, we assume this is a dict with a float value per key.
+            args = [single_voxel_data_normalized, use_bvalues]
+            fit = self.ivim_fit(*args, **kwargs) # For single voxel fits, we assume this is a dict with a float value per key.
+            for key in list(fit.keys()):
+                results[key][ijk] = fit[key]
 
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         return results
-    
+
+
     def osipi_fit_full_volume(self, data, bvalues=None, **kwargs):
         """Sends a full volume in one go to the fitting algorithm. The osipi_fit method only sends one voxel at a time.
 
         Args:
-            data (array): 3D (single slice) or 4D (multi slice) DWI data.
+            data (array): 2D (data x b-values), 3D (single slice) or 4D (multi slice) DWI data, with last dimension the b-value dimension.
             bvalues (array, optional): The b-values of the DWI data. Defaults to None.
 
         Returns:
@@ -179,7 +174,20 @@ class OsipiBase:
                 print("Full volume fitting not supported for this algorithm")
 
             return False
-    
+
+
+    def osipi_reshape_to_voxelwise(self, data):
+        """
+        reshapes multi-D input (spatial dims, bvvalue) data to 2D voxel-wise array
+        Args:
+            data (array): mulit-D array (data x b-values)
+        Returns:
+            out (array): 2D array (voxel x b-value)
+        """
+        B = data.shape[-1]
+        voxels = int(np.prod(data.shape[:-1]))  # e.g., X*Y*Z
+        return data.reshape(voxels, B)
+
     def osipi_print_requirements(self):
         """
         Prints the requirements of the algorithm.
@@ -285,11 +293,11 @@ class OsipiBase:
         return True
 
     
-    def osipi_check_required_bvalues():
+    def osipi_check_required_bvalues(self):
         """Minimum number of b-values required"""
         pass
 
-    def osipi_author():
+    def osipi_author(self):
         """Author identification"""
         return ''
     
@@ -323,7 +331,7 @@ class OsipiBase:
         print(f"Dstar bias:\t{Dstar_bias}\nDstar RMSE:\t{Dstar_RMSE}")
         print(f"D bias:\t{D_bias}\nD RMSE:\t{D_RMSE}")
 
-    def training_data(self, bvalues, data=None, SNR=(5,1000), n=1000000,Drange=(0.0005,0.0034),frange=(0,1),Dprange=(0.005,0.1),rician_noise=False):
+    def osipi_training_data(self, bvalues, data=None, SNR=(5,1000), n=1000000,Drange=(0.0005,0.0034),frange=(0,1),Dprange=(0.005,0.1),rician_noise=False):
         rng = np.random.RandomState(42)
         if data is None:
             gen = GenerateData(rng=rng)

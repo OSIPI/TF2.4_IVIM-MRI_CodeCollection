@@ -60,7 +60,7 @@ class IVIM_NEToptim(OsipiBase):
             if SNR is None:
                 warnings.warn('No SNR indicated. Data simulated with SNR = (5-1000)')
                 SNR = (5, 1000)
-            self.training_data(self.bvalues,n=1000000,SNR=SNR)
+            self.osipi_training_data(self.bvalues,n=1000000,SNR=SNR)
         self.arg=Arg()
         if bounds is not None:
             self.arg.net_pars.cons_min = bounds[0]  # Dt, Fp, Ds, S0
@@ -77,7 +77,7 @@ class IVIM_NEToptim(OsipiBase):
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
+            bvalues (array-like): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
@@ -85,6 +85,29 @@ class IVIM_NEToptim(OsipiBase):
         if not np.array_equal(bvalues, self.bvalues):
             raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
 
+        paramsNN = deep.predict_IVIM(signals, self.bvalues, self.net, self.arg)
+
+        results = {}
+        results["D"] = paramsNN[0]
+        results["f"] = paramsNN[1]
+        results["Dp"] = paramsNN[2]
+
+        return results
+
+
+    def ivim_fit_full_volume(self, signals, bvalues, **kwargs):
+        """Perform the IVIM fit
+
+        Args:
+            signals (array-like)
+            bvalues (array-like): b-values for the signals. If None, self.bvalues will be used. Default is None.
+
+        Returns:
+            _type_: _description_
+        """
+        if not np.array_equal(bvalues, self.bvalues):
+            raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
+        signals = self.osipi_reshape_to_voxelwise(signals)
         paramsNN = deep.predict_IVIM(signals, self.bvalues, self.net, self.arg)
 
         results = {}

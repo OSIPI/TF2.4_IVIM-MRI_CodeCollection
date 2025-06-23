@@ -163,7 +163,7 @@ def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
 
     array_2d = np.array([dat["data"] for _, dat in data.items()])
     start_time = time.time()
-    fit_result = fit.osipi_fit(array_2d, bvals)
+    fit_result = fit.osipi_fit_full_volume(array_2d, bvals)
     elapsed_time = time.time() - start_time
 
     errors = []  # Collect all assertion errors

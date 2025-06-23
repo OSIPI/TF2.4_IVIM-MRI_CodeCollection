@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.OGC_AmsterdamUMC.LSQ_fitting import flat_neg_log_prior, fit_bayesian, empirical_neg_log_prior, fit_segmented
+from src.original.OGC_AmsterdamUMC.LSQ_fitting import flat_neg_log_prior, fit_bayesian, empirical_neg_log_prior, fit_segmented, fit_bayesian_array, fit_segmented_array
 import numpy as np
 
 class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
@@ -34,7 +34,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
     supported_dimensions = 1
     supported_priors = True
 
-    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, fitS0=True, prior_in=None):
+    def __init__(self, bvalues=None, thresholds=150, bounds=None, initial_guess=None, fitS0=True, prior_in=None):
 
         """
             Everything this algorithm requires should be implemented here.
@@ -44,14 +44,21 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             the requirements.
 
             Args:
-                 datain is a 2D array with values of D, f, D* (and S0) that will form the prior.
+                 datain (Array): is a 2D array with values of D, f, D* (and S
+                 ) that will form the prior.
+                 thresholds (Bolean, optional): a bolean indicating what threshold is used
+                 prior_in (array, optional): 2D array of D, f, D* and (optionally) S0 values which form the prior
+
         """
         super(OGC_AmsterdamUMC_Bayesian_biexp, self).__init__(bvalues=bvalues, bounds=bounds, thresholds=thresholds, initial_guess=initial_guess) #, fitS0, prior_in)
         self.OGC_algorithm = fit_bayesian
-        self.initialize(bounds, initial_guess, fitS0, prior_in)
+        self.OGC_algorithm_array = fit_bayesian_array
+        self.initialize(bounds, initial_guess, fitS0, prior_in, thresholds)
         self.fit_segmented=fit_segmented
 
-    def initialize(self, bounds=None, initial_guess=None, fitS0=True, prior_in=None):
+    def initialize(self, bounds=None, initial_guess=None, fitS0=True, prior_in=None, thresholds=None):
+
+
         if bounds is None:
             print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
             self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
@@ -64,7 +71,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             self.initial_guess = initial_guess
         self.use_initial_guess = True
         self.use_bounds = True
-        self.thresholds = 150
+        self.thresholds = thresholds
         if prior_in is None:
             print('using a flat prior between bounds')
             self.neg_log_prior=flat_neg_log_prior([self.bounds[0][0],self.bounds[1][0]],[self.bounds[0][1],self.bounds[1][1]],[self.bounds[0][2],self.bounds[1][2]],[self.bounds[0][3],self.bounds[1][3]])
@@ -95,6 +102,33 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             if fit_results[i] < self.bounds[0][i] : fit_results[0] = self.bounds[0][i]+epsilon
             if fit_results[i] > self.bounds[1][i] : fit_results[0] = self.bounds[1][i]-epsilon
         fit_results = self.OGC_algorithm(bvalues, signals, self.neg_log_prior, x0=fit_results, fitS0=self.fitS0, bounds=self.bounds)
+
+        results = {}
+        results["D"] = fit_results[0]
+        results["f"] = fit_results[1]
+        results["Dp"] = fit_results[2]
+
+        return results
+
+    def ivim_fit_full_volume(self, signals, bvalues, initial_guess=None, **kwargs):
+        """Perform the IVIM fit
+
+        Args:
+            signals (array-like)
+            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
+
+        Returns:
+            _type_: _description_
+        """
+        bvalues=np.array(bvalues)
+
+        epsilon = 0.000001
+        fit_results = fit_segmented_array(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds, p0=self.initial_guess)
+        fit_results=np.array(fit_results+(1,))
+        for i in range(4):
+            if fit_results[i] < self.bounds[0][i] : fit_results[0] = self.bounds[0][i]+epsilon
+            if fit_results[i] > self.bounds[1][i] : fit_results[0] = self.bounds[1][i]-epsilon
+        fit_results = self.OGC_algorithm_array(bvalues, signals, self.neg_log_prior, x0=fit_results, fitS0=self.fitS0, bounds=self.bounds)
 
         results = {}
         results["D"] = fit_results[0]

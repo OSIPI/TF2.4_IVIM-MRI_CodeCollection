@@ -108,3 +108,30 @@ class Super_IVIM_DC(OsipiBase):
         results["Dp"] = Dp
 
         return results
+
+
+    def test_deep_learning_algorithms(self, signals, bvalues, **kwargs):
+        """Perform the IVIM fit
+
+        Args:
+            signals (array-like)
+            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
+
+        Returns:
+            results: a dictionary containing "d", "f", and "Dp".
+        """
+        if not np.array_equal(bvalues, self.bvalues):
+            raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
+
+        Dp, Dt, f, S0_superivimdc = infer_from_signal(
+            signal=signals,
+            bvalues=self.bvalues,
+            model_path=f"{self.working_dir}/{self.super_ivim_dc_filename}.pt",
+        )
+
+        results = {}
+        results["D"] = Dt
+        results["f"] = f
+        results["Dp"] = Dp
+
+        return results
