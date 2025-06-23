@@ -38,6 +38,12 @@ def pytest_addoption(parser):
         help="Default data file name",
     )
     parser.addoption(
+        "--dataFileDL",
+        default="tests/IVIMmodels/unit_tests/generic_DL.json",
+        type=str,
+        help="Default data file name",
+    )
+    parser.addoption(
         "--saveFileName",
         default="",
         type=str,
@@ -179,6 +185,10 @@ def pytest_generate_tests(metafunc):
     if "bound_input" in metafunc.fixturenames:
         args = bound_input(metafunc.config.getoption("dataFile"),metafunc.config.getoption("algorithmFile"))
         metafunc.parametrize("bound_input", args)
+    if "deep_learning_algorithms" in metafunc.fixturenames:
+        args = deep_learning_algorithms(metafunc.config.getoption("dataFileDL"),metafunc.config.getoption("algorithmFile"))
+        metafunc.parametrize("deep_learning_algorithms", args)
+
 
 
 def data_list(filename):
@@ -210,17 +220,18 @@ def data_ivim_fit_saved(datafile, algorithmFile):
         first = True
         for name, data in all_data.items():
             algorithm_dict = algorithm_information.get(algorithm, {})
-            xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
-                "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
-            kwargs = algorithm_dict.get("options", {})
-            tolerances = algorithm_dict.get("tolerances", {})
-            skiptime=False
-            if first:
-                if algorithm_dict.get("fail_first_time", False):
-                    skiptime = True
-                    first = False
-            requires_matlab = algorithm_dict.get("requires_matlab", False)
-            yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab
+            if not algorithm_dict.get('deep_learning',False):
+                xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
+                    "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
+                kwargs = algorithm_dict.get("options", {})
+                tolerances = algorithm_dict.get("tolerances", {})
+                skiptime=False
+                if first:
+                    if algorithm_dict.get("fail_first_time", False):
+                        skiptime = True
+                        first = False
+                requires_matlab = algorithm_dict.get("requires_matlab", False)
+                yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab
 
 def algorithmlist(algorithmFile):
     # Find the algorithms from algorithms.json
@@ -232,8 +243,9 @@ def algorithmlist(algorithmFile):
     algorithms = algorithm_information["algorithms"]
     for algorithm in algorithms:
         algorithm_dict = algorithm_information.get(algorithm, {})
-        requires_matlab = algorithm_dict.get("requires_matlab", False)
-        yield algorithm, requires_matlab
+        if not algorithm_dict.get('deep_learning', False):
+            requires_matlab = algorithm_dict.get("requires_matlab", False)
+            yield algorithm, requires_matlab
 
 def bound_input(datafile,algorithmFile):
     # Find the algorithms from algorithms.json
@@ -251,9 +263,31 @@ def bound_input(datafile,algorithmFile):
     for name, data in all_data.items():
         for algorithm in algorithms:
             algorithm_dict = algorithm_information.get(algorithm, {})
-            xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
-                "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
+            if not algorithm_dict.get('deep_learning',False):
+                xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
+                    "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
+                kwargs = algorithm_dict.get("options", {})
+                tolerances = algorithm_dict.get("tolerances", {})
+                requires_matlab = algorithm_dict.get("requires_matlab", False)
+                yield name, bvals, data, algorithm, xfail, kwargs, tolerances, requires_matlab
+
+def deep_learning_algorithms(datafile,algorithmFile):
+    # Find the algorithms from algorithms.json
+    current_folder = pathlib.Path.cwd()
+    algorithm_path = current_folder / algorithmFile
+    with algorithm_path.open() as f:
+        algorithm_information = json.load(f)
+    # Load generic test data generated from the included phantom: phantoms/MR_XCAT_qMRI
+    generic = current_folder / datafile
+    with generic.open() as f:
+        all_data = json.load(f)
+    algorithms = algorithm_information["algorithms"]
+    bvals = all_data.pop('config')
+    bvals = bvals['bvalues']
+    for algorithm in algorithms:
+        algorithm_dict = algorithm_information.get(algorithm, {})
+        if algorithm_dict.get('deep_learning',False):
             kwargs = algorithm_dict.get("options", {})
-            tolerances = algorithm_dict.get("tolerances", {})
             requires_matlab = algorithm_dict.get("requires_matlab", False)
-            yield name, bvals, data, algorithm, xfail, kwargs, tolerances, requires_matlab
+            tolerances = algorithm_dict.get("tolerances", {"atol":{"f": 2e-1, "D": 8e-4, "Dp": 6e-2},"rtol":{"f": 0.2, "D": 0.3, "Dp": 0.3}})
+            yield algorithm, all_data, bvals, kwargs, requires_matlab, tolerances

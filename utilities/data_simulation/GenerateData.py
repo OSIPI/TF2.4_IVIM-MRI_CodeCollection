@@ -145,3 +145,30 @@ class GenerateData:
         signal *= S0
         signal += offset
         return signal
+
+    def simulate_training_data(self, bvalues, SNR = (5,100), n = 1000000, Drange = (0.0005,0.0034), frange = (0,1), Dprange = (0.005,0.1), rician_noise = False):
+        test = self._rng.uniform(0, 1, (n, 1))
+        D = Drange[0] + (test * (Drange[1] - Drange[0]))
+        test = self._rng.uniform(0, 1, (n, 1))
+        f = frange[0] + (test * (frange[1] - frange[0]))
+        test = self._rng.uniform(0, 1, (n, 1))
+        Dp = Dprange[0] + (test * (Dprange[1] - Dprange[0]))
+        data_sim = np.zeros([len(D), len(bvalues)])
+        bvalues = np.array(bvalues)
+        if type(SNR) == tuple:
+            test = self._rng.uniform(0, 1, (n, 1))
+            SNR = np.exp(np.log(SNR[1]) + (test * (np.log(SNR[0]) - np.log(SNR[1]))))
+            addnoise = True
+        elif SNR == 0:
+            addnoise = False
+        else:
+            SNR = SNR * np.ones_like(Dp)
+            addnoise = True
+        # loop over array to fill with simulated IVIM data
+        for aa in range(len(D)):
+            data_sim[aa, :] = self.ivim_signal(D[aa][0], Dp[aa][0], f[aa][0], 1, bvalues, snr=SNR[aa], rician_noise=rician_noise)
+        # if SNR is set to zero, don't add noise
+        S0_noisy = np.mean(data_sim[:, bvalues == 0], axis=1)
+        data_sim = data_sim / S0_noisy[:, None]
+        return data_sim, D, f, Dp
+
