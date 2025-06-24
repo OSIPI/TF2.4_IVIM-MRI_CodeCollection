@@ -1,11 +1,11 @@
 import argparse
 import json
 import os
+from pathlib import Path
 import nibabel as nib
 from src.wrappers.OsipiBase import OsipiBase
 import numpy as np
 from tqdm import tqdm
-
 
 def read_nifti_file(input_file):
     """
@@ -81,9 +81,9 @@ def loop_over_first_n_minus_1_dimensions(arr):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Read a 4D NIfTI phantom file along with BIDS JSON, b-vector, and b-value files.")
-    parser.add_argument("input_file", type=str, help="Path to the input 4D NIfTI file.")
-    parser.add_argument("bvec_file", type=str, help="Path to the b-vector file.")
-    parser.add_argument("bval_file", type=str, help="Path to the b-value file.")
+    parser.add_argument("input_file", type=Path, help="Path to the input 4D NIfTI file")
+    parser.add_argument("bvec_file", type=Path, help="Path to the b-vector file.")
+    parser.add_argument("bval_file", type=Path, help="Path to the b-value file.")
     parser.add_argument("--affine", type=float, nargs="+", help="Affine matrix for NIfTI image.")
     parser.add_argument("--algorithm", type=str, default="OJ_GU_seg", help="Select the algorithm to use.")
     parser.add_argument("--algorithm_args", nargs=argparse.REMAINDER, help="Additional arguments for the algorithm.")
