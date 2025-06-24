@@ -20,7 +20,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
     # Algorithm requirements
     required_bvalues = 4
     required_thresholds = [0,
-                           0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
+                           1]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
     required_bounds = False
     required_bounds_optional = True  # Bounds may not be required but are optional
     required_initial_guess = False
@@ -34,7 +34,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
     supported_dimensions = 1
     supported_priors = True
 
-    def __init__(self, bvalues=None, thresholds=150, bounds=None, initial_guess=None, fitS0=True, prior_in=None):
+    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, fitS0=True, prior_in=None):
 
         """
             Everything this algorithm requires should be implemented here.
@@ -71,6 +71,9 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             self.initial_guess = initial_guess
         self.use_initial_guess = True
         self.use_bounds = True
+        if thresholds is None:
+            print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
+            thresholds = 150
         self.thresholds = thresholds
         if prior_in is None:
             print('using a flat prior between bounds')
