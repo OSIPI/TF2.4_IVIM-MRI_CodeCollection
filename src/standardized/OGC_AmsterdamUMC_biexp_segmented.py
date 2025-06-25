@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_segmented
+from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_segmented, fit_segmented_array
 import numpy as np
 
 class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
@@ -44,6 +44,7 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         """
         super(OGC_AmsterdamUMC_biexp_segmented, self).__init__(bvalues, thresholds, bounds, initial_guess)
         self.OGC_algorithm = fit_segmented
+        self.OGC_algorithm_array = fit_segmented_array
         self.initialize(bounds, initial_guess, thresholds)
         
 
@@ -65,6 +66,7 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
             print('warning, no thresholds were defined, so default bounds are used of  150')
         else:
             self.thresholds = thresholds
+
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
 
@@ -78,6 +80,29 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
 
         bvalues=np.array(bvalues)
         fit_results = self.OGC_algorithm(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds, p0=self.initial_guess)
+
+        results = {}
+        results["D"] = fit_results[0]
+        results["f"] = fit_results[1]
+        results["Dp"] = fit_results[2]
+
+        return results
+
+
+    def ivim_fit_full_volume(self, signals, bvalues, **kwargs):
+        """Perform the IVIM fit
+
+        Args:
+            signals (array-like)
+            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
+
+        Returns:
+            _type_: _description_
+        """
+        signals = self.osipi_reshape_to_voxelwise(signals)
+
+        bvalues=np.array(bvalues)
+        fit_results = self.OGC_algorithm_array(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds, p0=self.initial_guess)
 
         results = {}
         results["D"] = fit_results[0]
