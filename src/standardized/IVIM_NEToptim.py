@@ -107,7 +107,7 @@ class IVIM_NEToptim(OsipiBase):
         """
         if not np.array_equal(bvalues, self.bvalues):
             raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
-        signals = self.osipi_reshape_to_voxelwise(signals)
+        signals = self.reshape_to_voxelwise(signals)
         paramsNN = deep.predict_IVIM(signals, self.bvalues, self.net, self.arg)
 
         results = {}
@@ -116,6 +116,18 @@ class IVIM_NEToptim(OsipiBase):
         results["Dp"] = paramsNN[2]
 
         return results
+
+    def reshape_to_voxelwise(self, data):
+        """
+        reshapes multi-D input (spatial dims, bvvalue) data to 2D voxel-wise array
+        Args:
+            data (array): mulit-D array (data x b-values)
+        Returns:
+            out (array): 2D array (voxel x b-value)
+        """
+        B = data.shape[-1]
+        voxels = int(np.prod(data.shape[:-1]))  # e.g., X*Y*Z
+        return data.reshape(voxels, B)
 
 class NetArgs:
     def __init__(self):

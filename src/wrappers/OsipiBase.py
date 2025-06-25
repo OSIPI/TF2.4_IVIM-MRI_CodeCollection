@@ -176,18 +176,6 @@ class OsipiBase:
             return False
 
 
-    def osipi_reshape_to_voxelwise(self, data):
-        """
-        reshapes multi-D input (spatial dims, bvvalue) data to 2D voxel-wise array
-        Args:
-            data (array): mulit-D array (data x b-values)
-        Returns:
-            out (array): 2D array (voxel x b-value)
-        """
-        B = data.shape[-1]
-        voxels = int(np.prod(data.shape[:-1]))  # e.g., X*Y*Z
-        return data.reshape(voxels, B)
-
     def osipi_print_requirements(self):
         """
         Prints the requirements of the algorithm.
