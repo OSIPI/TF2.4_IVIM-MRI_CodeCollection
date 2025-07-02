@@ -43,9 +43,11 @@ def segmented_IVIM_fit(bvalues, dw_data, b_cutoff = 200, bounds=([0.0001, 0.0, 0
     return D, f, Dp
 
 
-def d_fit_iterative_wls(bvalues_D, log_signal, max_iter=500, tolerance= 1e-6):
+def d_fit_iterative_wls(bvalues_D, log_signal, max_iter=50):
     """
     Function to calculate D using an iterative wlls on the log(signal)
+    weights for the wlls are initialized from the predicted signal of a lls as described in
+    http://dx.doi.org/10.1016/j.neuroimage.2013.05.028 equation (7)
 
     Parameters:
     log_signal: the log() of the signal above the threshold for segmented fitting
@@ -54,25 +56,23 @@ def d_fit_iterative_wls(bvalues_D, log_signal, max_iter=500, tolerance= 1e-6):
 
     max_iter: the maximum number of iterations for WLS
 
-    tolerance: the tolerance for early stopping of the WLS
     """
 
-    bvals = sm.add_constant(bvalues_D)
-    weights = np.ones_like(log_signal)
+    bvals = sm.add_constant(-bvalues_D)
+    # First do a LLS to initialize the weights
+    beta_lls = np.linalg.lstsq(bvals, log_signal, rcond=None)[0]
+    # initialize the weights based on the predicted signals W=diag(exp(2*X*Beta_lls))
+    init_weights = np.exp(2*bvals@beta_lls)
+    weights = init_weights
 
     for i in range(max_iter):
         # Weighted linear regression
         model = sm.WLS(log_signal, bvals, weights=weights)
         results = model.fit()
-        signal_pred = results.predict(bvals)
-        residuals = log_signal - signal_pred
-        new_weights = 1 / np.maximum(residuals ** 2, 1e-10)
-
-        if np.linalg.norm(new_weights - weights) < tolerance:
-            break
+        # The weights for the next iteration are based on the predicted signal of this iteration
+        new_weights = np.exp(2*bvals@results.params)
         weights = new_weights
 
-    ln_b0_intercept, D_neg  = results.params
+    ln_b0_intercept, D  = results.params
     b0_intercept = np.exp(ln_b0_intercept)
-    D = -D_neg
     return D, b0_intercept
