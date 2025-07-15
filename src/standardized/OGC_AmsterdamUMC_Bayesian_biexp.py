@@ -123,6 +123,8 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
+        signals = self.reshape_to_voxelwise(signals)
+
         bvalues=np.array(bvalues)
 
         epsilon = 0.000001
@@ -139,3 +141,17 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         results["Dp"] = fit_results[2]
 
         return results
+
+
+
+    def reshape_to_voxelwise(self, data):
+        """
+        reshapes multi-D input (spatial dims, bvvalue) data to 2D voxel-wise array
+        Args:
+            data (array): mulit-D array (data x b-values)
+        Returns:
+            out (array): 2D array (voxel x b-value)
+        """
+        B = data.shape[-1]
+        voxels = int(np.prod(data.shape[:-1]))  # e.g., X*Y*Z
+        return data.reshape(voxels, B)
