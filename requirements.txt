@@ -1,5 +1,5 @@
 numpy<2
-super-ivim-dc
+super-ivim-dc>1.0.0
 nibabel
 scipy
 torchio
