@@ -8,7 +8,7 @@ joblib
 dipy
 matplotlib
 scienceplots
-cvxpy
+cvxpy==1.6.1
 zenodo-get
 pytest
 tqdm

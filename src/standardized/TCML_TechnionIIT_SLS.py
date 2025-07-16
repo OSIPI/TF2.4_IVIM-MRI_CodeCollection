@@ -21,14 +21,14 @@ class TCML_TechnionIIT_SLS(OsipiBase):
     required_bvalues = 4
     required_thresholds = [0,0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
     required_bounds = False
-    required_bounds_optional = True  # Bounds may not be required but are optional
+    required_bounds_optional = False  # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
 
     # Supported inputs in the standardized class
-    supported_bounds = True
+    supported_bounds = False
     supported_initial_guess = True
     supported_thresholds = True
 
@@ -47,9 +47,10 @@ class TCML_TechnionIIT_SLS(OsipiBase):
 
     def initialize(self, bounds, initial_guess, fitS0,thresholds):
         if bounds is None:
-            print('warning, no bounds were defined, so default bounds are used of ([0.0003, 0.001, 0.009, 0],[0.008, 0.5,0.04, 3])')
+            print('warning, only D* is bounded between 0.001 and 0.5)')
             self.bounds = ([0.0003, 0.001, 0.009, 0],[0.008, 0.5,0.04, 3])
         else:
+            print('warning, although bounds are given, only D* is bounded)')
             bounds=bounds
             self.bounds = bounds
         if initial_guess is None:
