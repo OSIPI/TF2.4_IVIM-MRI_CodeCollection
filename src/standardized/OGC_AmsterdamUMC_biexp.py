@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_least_squares
+from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_least_squares, fit_least_squares_array
 import numpy as np
 
 class OGC_AmsterdamUMC_biexp(OsipiBase):
@@ -45,6 +45,7 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         #super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
         super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
         self.OGC_algorithm = fit_least_squares
+        self.OGC_algorithm_array = fit_least_squares_array
         self.fitS0=fitS0
         self.initialize(bounds, initial_guess, fitS0)
 
@@ -77,6 +78,27 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
 
         bvalues=np.array(bvalues)
         fit_results = self.OGC_algorithm(bvalues, signals, p0=self.initial_guess, bounds=self.bounds, fitS0=self.fitS0)
+
+        results = {}
+        results["D"] = fit_results[0]
+        results["f"] = fit_results[1]
+        results["Dp"] = fit_results[2]
+
+        return results
+
+    def ivim_fit_full_volume(self, signals, bvalues, **kwargs):
+        """Perform the IVIM fit
+
+        Args:
+            signals (array-like)
+            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
+
+        Returns:
+            _type_: _description_
+        """
+
+        bvalues=np.array(bvalues)
+        fit_results = self.OGC_algorithm_array(bvalues, signals, p0=self.initial_guess, bounds=self.bounds, fitS0=self.fitS0)
 
         results = {}
         results["D"] = fit_results[0]
