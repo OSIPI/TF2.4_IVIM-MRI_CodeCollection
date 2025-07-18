@@ -1,4 +1,4 @@
-numpy<2
+numpy
 super-ivim-dc>1.0.0
 nibabel
 scipy
@@ -8,7 +8,7 @@ joblib
 dipy
 matplotlib
 scienceplots
-cvxpy==1.6.1
+cvxpy
 zenodo-get
 pytest
 tqdm
