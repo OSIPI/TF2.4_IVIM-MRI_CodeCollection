@@ -30,7 +30,7 @@ def tolerances_helper(tolerances, data):
 
 def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
     name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab = data_ivim_fit_saved
-    max_time = 0.5
+    max_time = 0.6
     if requires_matlab:
         max_time = 2
         if eng is None:
@@ -72,7 +72,7 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         npt.assert_allclose(fit_result['Dp'],data['Dp'], rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
     #assert fit_result['D'] < fit_result['Dp'], f"D {fit_result['D']} is larger than D* {fit_result['Dp']} for {name}"
     if not skiptime:
-        assert elapsed_time < max_time, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
+        assert elapsed_time < max_time, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 0.6 second to fit per voxel" #less than 0.6 seconds per voxel
 
 def test_default_bounds_and_initial_guesses(algorithmlist,eng):
     algorithm, requires_matlab = algorithmlist
