@@ -12,6 +12,7 @@ from src.standardized.IAR_LU_modified_mix import IAR_LU_modified_mix
 #from src.standardized.PvH_KB_NKI_IVIMfit import PvH_KB_NKI_IVIMfit
 #from src.standardized.PV_MUMC_biexp import PV_MUMC_biexp
 from src.standardized.OGC_AmsterdamUMC_biexp import OGC_AmsterdamUMC_biexp
+from src.standardized.TF_reference_IVIMfit import TF_reference_IVIMfit
 
 ## Simple test code... 
 # Used to just do a test run of an algorithm during development
