@@ -3,6 +3,7 @@ import numpy as np
 import IVIMNET.deep as deep
 import torch
 import warnings
+from utilities.data_simulation.GenerateData import GenerateData
 
 class IVIM_NEToptim(OsipiBase):
     """
@@ -60,7 +61,7 @@ class IVIM_NEToptim(OsipiBase):
             if SNR is None:
                 warnings.warn('No SNR indicated. Data simulated with SNR = (5-1000)')
                 SNR = (5, 1000)
-            self.osipi_training_data(self.bvalues,n=1000000,SNR=SNR)
+            self.training_data(self.bvalues,n=1000000,SNR=SNR)
         self.arg=Arg()
         if bounds is not None:
             self.arg.net_pars.cons_min = bounds[0]  # Dt, Fp, Ds, S0
@@ -95,7 +96,7 @@ class IVIM_NEToptim(OsipiBase):
         return results
 
 
-    def ivim_fit_full_volume(self, signals, bvalues, **kwargs):
+    def ivim_fit_full_volume(self, signals, bvalues, retrain_on_input_data=False, **kwargs):
         """Perform the IVIM fit
 
         Args:
@@ -107,7 +108,10 @@ class IVIM_NEToptim(OsipiBase):
         """
         if not np.array_equal(bvalues, self.bvalues):
             raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
+
         signals = self.reshape_to_voxelwise(signals)
+        if retrain_on_input_data:
+            self.net = deep.learn_IVIM(signals, self.bvalues, self.arg, net=self.net)
         paramsNN = deep.predict_IVIM(signals, self.bvalues, self.net, self.arg)
 
         results = {}
@@ -128,6 +132,17 @@ class IVIM_NEToptim(OsipiBase):
         B = data.shape[-1]
         voxels = int(np.prod(data.shape[:-1]))  # e.g., X*Y*Z
         return data.reshape(voxels, B)
+
+
+    def training_data(self, bvalues, data=None, SNR=(5,1000), n=1000000,Drange=(0.0005,0.0034),frange=(0,1),Dprange=(0.005,0.1),rician_noise=False):
+        rng = np.random.RandomState(42)
+        if data is None:
+            gen = GenerateData(rng=rng)
+            data, D, f, Dp = gen.simulate_training_data(bvalues, SNR=SNR, n=n,Drange=Drange,frange=frange,Dprange=Dprange,rician_noise=rician_noise)
+            if self.supervised:
+                self.train_data = {'data':data,'D':D,'f':f,'Dp':Dp}
+            else:
+                self.train_data = {'data': data}
 
 class NetArgs:
     def __init__(self):

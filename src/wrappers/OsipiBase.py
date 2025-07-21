@@ -4,7 +4,6 @@ from scipy.stats import norm
 import pathlib
 import sys
 from tqdm import tqdm
-from utilities.data_simulation.GenerateData import GenerateData
 
 
 class OsipiBase:
@@ -318,15 +317,4 @@ class OsipiBase:
         print(f"f bias:\t{f_bias}\nf RMSE:\t{f_RMSE}")
         print(f"Dstar bias:\t{Dstar_bias}\nDstar RMSE:\t{Dstar_RMSE}")
         print(f"D bias:\t{D_bias}\nD RMSE:\t{D_RMSE}")
-
-    def osipi_training_data(self, bvalues, data=None, SNR=(5,1000), n=1000000,Drange=(0.0005,0.0034),frange=(0,1),Dprange=(0.005,0.1),rician_noise=False):
-        rng = np.random.RandomState(42)
-        if data is None:
-            gen = GenerateData(rng=rng)
-            data, D, f, Dp = gen.simulate_training_data(bvalues, SNR=SNR, n=n,Drange=Drange,frange=frange,Dprange=Dprange,rician_noise=rician_noise)
-            if self.supervised:
-                self.train_data = {'data':data,'D':D,'f':f,'Dp':Dp}
-            else:
-                self.train_data = {'data': data}
-
 
