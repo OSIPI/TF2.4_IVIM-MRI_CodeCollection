@@ -5,7 +5,7 @@ import matlab.engine
 
 class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
     """
-    Bi-exponential fitting algorithm by Oliver Gurney-Champion, Amsterdam UMC
+    Bi-exponential fitting algorithm by Eve LoCastro and Amita Shukla-Dave, Memorial Sloan Kettering
     """
 
     # I'm thinking that we define default attributes for each submission like this

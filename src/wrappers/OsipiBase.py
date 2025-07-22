@@ -117,6 +117,7 @@ class OsipiBase:
 
             args = [single_voxel_data_normalized, use_bvalues]
             fit = self.ivim_fit(*args, **kwargs) # For single voxel fits, we assume this is a dict with a float value per key.
+            fit = self.D_and_Ds_swap(self.ivim_fit(*args, **kwargs)) # For single voxel fits, we assume this is a dict with a float value per key.
             for key in list(fit.keys()):
                 results[key][ijk] = fit[key]
 
@@ -302,7 +303,7 @@ class OsipiBase:
             noised_signal = np.array([norm.rvs(signal, sigma) for signal in signals])
             
             # Perform fit with the noised signal
-            f_estimates[i], Dstar_estimates[i], D_estimates[i] = self.ivim_fit(noised_signal, bvalues)
+            f_estimates[i], Dstar_estimates[i], D_estimates[i] = self.D_and_Ds_swap(self.ivim_fit(noised_signal, bvalues))
             
         # Calculate bias
         f_bias = np.mean(f_estimates) - f
@@ -318,3 +319,11 @@ class OsipiBase:
         print(f"Dstar bias:\t{Dstar_bias}\nDstar RMSE:\t{Dstar_RMSE}")
         print(f"D bias:\t{D_bias}\nD RMSE:\t{D_RMSE}")
 
+    
+    def D_and_Ds_swap(self,results):
+        if results['D']>results['Dp']:
+            D=results['Dp']
+            results['Dp']=results['D']
+            results['D']=D
+            results['f']=1-results['f']
+        return results
