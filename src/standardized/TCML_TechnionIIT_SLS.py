@@ -86,7 +86,7 @@ class TCML_TechnionIIT_SLS(OsipiBase):
         initial_guess = initial_guess[[0, 2, 1, 3]]
 
 
-        fit_results = self.fit_least_squares(1 ,np.array(signals)[:,np.newaxis],bvalues, bounds,initial_guess,self.thresholds)
+        fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, bounds,initial_guess,self.thresholds)
 
         results = {}
         results["D"] = fit_results[0]
