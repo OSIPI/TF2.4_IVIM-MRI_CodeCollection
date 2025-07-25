@@ -5,6 +5,7 @@ import json
 import argparse
 import os
 from utilities.data_simulation.Download_data import download_data
+import pathlib
 
 ##########
 # code written by Oliver J Gurney-Champion
@@ -19,7 +20,10 @@ def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleav
         states = [1]
     for state in states:
         # Load the .mat file
-        mat_data = loadmat('../../download/Phantoms/XCAT_MAT_RESP/XCAT5D_RP_' + str(state) + '_CP_1.mat')
+        project_root = pathlib.Path(__file__).resolve().parent.parent
+        filename = f'XCAT5D_RP_{state}_CP_1.mat'
+        mat_path = project_root / '..' /'download' / 'Phantoms' / 'XCAT_MAT_RESP' / filename
+        mat_data = loadmat(mat_path)
 
         # Access the variables in the loaded .mat file
         XCAT = mat_data['IMG']

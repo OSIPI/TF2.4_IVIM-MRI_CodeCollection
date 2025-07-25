@@ -3,7 +3,8 @@ import pathlib
 import json
 import csv
 # import datetime
-
+import numpy as np
+from phantoms.MR_XCAT_qMRI.sim_ivim_sig import phantom
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -257,3 +258,35 @@ def bound_input(datafile,algorithmFile):
             tolerances = algorithm_dict.get("tolerances", {})
             requires_matlab = algorithm_dict.get("requires_matlab", False)
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances, requires_matlab
+
+
+@pytest.fixture(scope="session")
+def threeddata(request):
+    current_folder = pathlib.Path.cwd()
+    datafile = request.config.getoption("dataFile")
+    generic = current_folder / datafile
+    with generic.open() as f:
+        all_data = json.load(f)
+    bvals = all_data.pop('config')
+    bvals = np.array(bvals['bvalues'])
+    sig, _, Dim, fim, Dpim, _=phantom(bvals, 1000, TR=3000, TE=40, motion=False, rician=False, interleaved=False, T1T2=True)
+    return sig[8::,8::,4::,:], Dim[8::,8::,4::], fim[8::,8::,4::], Dpim[8::,8::,4::], bvals
+
+
+'''''@pytest.fixture
+def pardat(request):
+    datafile = request.config.getoption("dataFile")
+    current_folder = pathlib.Path.cwd()
+    generic = current_folder / datafile
+    with generic.open() as f:
+        all_data = json.load(f)
+    bvals = all_data.pop('config')['bvalues']
+
+    data_list = []
+    for name, data in all_data.items():
+        signal = np.asarray(data["data"])
+        signal /= signal[0]
+        data_list.append(signal)
+
+    big_array = np.stack(data_list, axis=0)
+    return big_array, bvals'''''

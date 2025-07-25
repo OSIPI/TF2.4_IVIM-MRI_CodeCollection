@@ -4,6 +4,7 @@ from scipy.stats import norm
 import pathlib
 import sys
 from tqdm import tqdm
+from joblib import Parallel, delayed
 
 class OsipiBase:
     """The base class for OSIPI IVIM fitting"""
@@ -49,7 +50,7 @@ class OsipiBase:
         pass
 
     #def osipi_fit(self, data=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, **kwargs):
-    def osipi_fit(self, data, bvalues=None, **kwargs):
+    def osipi_fit(self, data, bvalues=None, njobs=8, **kwargs):
         """Fits the data with the bvalues
         Returns [S0, f, Dstar, D]
         """
@@ -60,7 +61,6 @@ class OsipiBase:
         #use_thresholds = thresholds if self.thresholds is None else self.thresholds
         #use_bounds = bounds if self.bounds is None else self.bounds
         #use_initial_guess = initial_guess if self.initial_guess is None else self.initial_guess
-
 
         # Make sure we don't make arrays of None's
         if use_bvalues is not None: use_bvalues = np.asarray(use_bvalues) 
@@ -105,19 +105,48 @@ class OsipiBase:
             #results[ijk] = fit
         minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
         b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
+        if np.shape(data.shape)[0] == 1:
+            njobs=1
+        if data.shape[0] < njobs:
+            njobs = 1
+        if njobs > 1:
+            # Flatten the indices first
+            all_indices = list(np.ndindex(data.shape[:-1]))
 
-        for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
-            # Normalize array
-            single_voxel_data = data[ijk]
-            single_voxel_data_normalization_factor = np.mean(single_voxel_data[b0_indices])
-            single_voxel_data_normalized = single_voxel_data/single_voxel_data_normalization_factor
-            
-            args = [single_voxel_data_normalized, use_bvalues]
-            fit = self.ivim_fit(*args, **kwargs) # For single voxel fits, we assume this is a dict with a float value per key.
-            fit = self.D_and_Ds_swap(self.ivim_fit(*args, **kwargs)) # For single voxel fits, we assume this is a dict with a float value per key.
-            for key in list(fit.keys()):
-                results[key][ijk] = fit[key]
-        
+            # Define parallel function
+            def parfun(ijk):
+                single_voxel_data = data[ijk]
+                normalization_factor = np.mean(single_voxel_data[b0_indices])
+                normalized_data = single_voxel_data / normalization_factor
+
+                fit = self.ivim_fit(normalized_data, use_bvalues, **kwargs)
+                fit = self.D_and_Ds_swap(fit)
+                return ijk, fit
+
+            # Run in parallel
+            results_list = Parallel(n_jobs=njobs)(
+                delayed(parfun)(ijk) for ijk in tqdm(all_indices, total=len(all_indices))
+            )
+
+            # Initialize result arrays if not already done
+            # Example: results = {key: np.zeros(data.shape[:-1]) for key in expected_keys}
+
+            # Populate results after parallel loop
+            for ijk, fit in results_list:
+                for key in fit:
+                    results[key][ijk] = fit[key]
+        else:
+            for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
+                # Normalize array
+                single_voxel_data = data[ijk]
+                single_voxel_data_normalization_factor = np.mean(single_voxel_data[b0_indices])
+                single_voxel_data_normalized = single_voxel_data/single_voxel_data_normalization_factor
+
+                args = [single_voxel_data_normalized, use_bvalues]
+                fit = self.D_and_Ds_swap(self.ivim_fit(*args, **kwargs)) # For single voxel fits, we assume this is a dict with a float value per key.
+                for key in list(fit.keys()):
+                    results[key][ijk] = fit[key]
+
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         return results
     

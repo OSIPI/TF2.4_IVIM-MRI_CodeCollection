@@ -151,8 +151,45 @@ def test_bounds(bound_input, eng):
             assert passDp, f"Fit still passes when initial guess Ds is out of fit bounds; potentially initial guesses not respected for: {name}" '''
 
 
+def test_parallel(algorithmlist,eng,threeddata):
+    algorithm, requires_matlab = algorithmlist
+    data, Dim, fim, Dpim, bvals = threeddata
+    if requires_matlab:
+        if eng is None:
+            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+        else:
+            kwargs = {'eng': eng}
+    else:
+        kwargs={}
+    fit = OsipiBase(algorithm=algorithm,**kwargs)
+
+    start_time = time.time()  # Record the start time
+    fit_result = fit.osipi_fit(data, bvals,njobs=8)
+    elapsed_time1= time.time() - start_time  # Calculate elapsed time
+
+    start_time = time.time()  # Record the start time
+    fit_result = fit.osipi_fit(data, bvals,njobs=1)
+    elapsed_time2 = time.time() - start_time  # Calculate elapsed time
+
+    assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
+    assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
+    assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
+    assert elapsed_time1*2 < elapsed_time2
 
 
-
-
-    
+def test_volume(algorithmlist,eng, threeddata):
+    algorithm, requires_matlab = algorithmlist
+    data, Dim, fim, Dpim, bvals = threeddata
+    if requires_matlab:
+        if eng is None:
+            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+        else:
+            kwargs = {'eng': eng}
+    else:
+        kwargs={}
+    fit = OsipiBase(algorithm=algorithm,**kwargs)
+    if hasattr(fit, 'x') and callable(getattr(fit, 'x')):
+        fit_result = fit.osipi_fit_full_volume(threeddata, bvals)
+    assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
+    assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
+    assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
