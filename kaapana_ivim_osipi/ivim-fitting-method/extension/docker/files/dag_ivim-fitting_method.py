@@ -7,47 +7,6 @@ from ivimfitting_method.MyIvimFittingOperator import MyIvimFittingOperator
 from kaapana.operators.MinioOperator import MinioOperator
 from kaapana.operators.LocalWorkflowCleanerOperator import LocalWorkflowCleanerOperator
 
-# # Define the UI form shown in Kaapana UI
-# ui_forms = {
-#     "workflow_form": {
-#         "type": "object",
-#         "properties": {
-#             "input_file": {
-#                 "type": "string",
-#                 "title": "Input 4D NIfTI file path",
-#                 "description": "Full path to input NIfTI file"
-#             },
-#             "bvec_file": {
-#                 "type": "string",
-#                 "title": "bvec file path",
-#                 "description": "Full path to b-vector file"
-#             },
-#             "bval_file": {
-#                 "type": "string",
-#                 "title": "bval file path",
-#                 "description": "Full path to b-value file"
-#             },
-#             "algorithm": {
-#                 "type": "string",
-#                 "title": "Algorithm (optional)",
-#                 "description": "Algorithm name to use (default: OJ_GU_seg)"
-#             },
-#             "affine": {
-#                 "type": "string",
-#                 "title": "Affine matrix path (optional)",
-#                 "description": "Path to affine matrix, if applicable"
-#             },
-#             "algorithm_args": {
-#                 "type": "string",
-#                 "title": "Extra algorithm args (optional)",
-#                 "description": "Space-separated extra arguments"
-#             }
-#         },
-#         # Mark only these fields as required
-#         "required": ["input_file", "bvec_file", "bval_file"]
-#     }
-# }
-
 ui_forms = {
     "workflow_form": {
         "type": "object",
@@ -101,7 +60,7 @@ put_output_to_minio = MinioOperator(
     minio_prefix="uploads",
     action="put",
     none_batch_input_operators=[ivim_fitting_task],
-    whitelisted_file_extensions=(".nii.gz"),
+    whitelisted_file_extensions=(".nii.gz",),
 )
 
 clean = LocalWorkflowCleanerOperator(dag=dag, clean_workflow_dir=True)

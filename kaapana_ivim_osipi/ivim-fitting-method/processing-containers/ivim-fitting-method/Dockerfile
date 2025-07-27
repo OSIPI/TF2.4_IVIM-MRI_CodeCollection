@@ -21,4 +21,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY TF2.4_IVIM-MRI_CodeCollection/ .
 
-ENTRYPOINT ["python3", "-m", "WrapImage.nifti_wrapper_kaapana"]
+ENTRYPOINT ["python3", "-u", "-m", "WrapImage.nifti_wrapper_kaapana"]
