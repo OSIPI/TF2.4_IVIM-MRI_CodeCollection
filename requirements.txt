@@ -1,6 +1,8 @@
 numpy
 super-ivim-dc>1.0.0
 nibabel
+inquirer
+itk
 scipy
 torchio
 torch
