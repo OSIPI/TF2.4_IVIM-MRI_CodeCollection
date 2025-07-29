@@ -14,7 +14,7 @@
         "PV_MUMC_biexp",
         "PvH_KB_NKI_IVIMfit",
         "OJ_GU_seg",
-        "TF_reference_IVIMfit"
+        "TF_reference_IVIMfit",
         "IVIM_NEToptim"
     ],
     "IVIM_NEToptim": {
