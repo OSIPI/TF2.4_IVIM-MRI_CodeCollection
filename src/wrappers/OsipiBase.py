@@ -98,13 +98,15 @@ class OsipiBase:
             results[key] = np.empty(list(data.shape[:-1]))
 
         # Assuming the last dimension of the data is the signal values of each b-value
-        #results = np.empty(list(data.shape[:-1])+[3]) # Create an array with the voxel dimensions + the ones required for the fit
+        # results = np.empty(list(data.shape[:-1])+[3]) # Create an array with the voxel dimensions + the ones required for the fit
         #for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
             #args = [data[ijk], use_bvalues]
             #fit = list(self.ivim_fit(*args, **kwargs))
             #results[ijk] = fit
         minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
         b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
+        normalization_factor = np.mean(data[..., b0_indices],axis=3)
+        data = data / np.repeat(normalization_factor[...,np.newaxis],np.shape(data)[-1],-1)
         if np.shape(data.shape)[0] == 1:
             njobs=1
         if data.shape[0] < njobs:
@@ -112,16 +114,18 @@ class OsipiBase:
         if njobs > 1:
             # Flatten the indices first
             all_indices = list(np.ndindex(data.shape[:-1]))
-
+            #np.save('data.npy', data)
+            #data = np.load('data.npy', mmap_mode='r')
             # Define parallel function
             def parfun(ijk):
                 single_voxel_data = data[ijk]
-                normalization_factor = np.mean(single_voxel_data[b0_indices])
-                normalized_data = single_voxel_data / normalization_factor
-
-                fit = self.ivim_fit(normalized_data, use_bvalues, **kwargs)
-                fit = self.D_and_Ds_swap(fit)
+                if not np.isnan(single_voxel_data[0]):
+                    fit = self.ivim_fit(single_voxel_data, use_bvalues, **kwargs)
+                    fit = self.D_and_Ds_swap(fit)
+                else:
+                    fit={'D':0,'f':0,'Dp':0}
                 return ijk, fit
+
 
             # Run in parallel
             results_list = Parallel(n_jobs=njobs)(
@@ -139,11 +143,11 @@ class OsipiBase:
             for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
                 # Normalize array
                 single_voxel_data = data[ijk]
-                single_voxel_data_normalization_factor = np.mean(single_voxel_data[b0_indices])
-                single_voxel_data_normalized = single_voxel_data/single_voxel_data_normalization_factor
-
-                args = [single_voxel_data_normalized, use_bvalues]
-                fit = self.D_and_Ds_swap(self.ivim_fit(*args, **kwargs)) # For single voxel fits, we assume this is a dict with a float value per key.
+                if not np.isnan(single_voxel_data[0]):
+                    args = [single_voxel_data, use_bvalues]
+                    fit = self.D_and_Ds_swap(self.ivim_fit(*args, **kwargs)) # For single voxel fits, we assume this is a dict with a float value per key.
+                else:
+                    fit={'D':0,'f':0,'Dp':0}
                 for key in list(fit.keys()):
                     results[key][ijk] = fit[key]
 

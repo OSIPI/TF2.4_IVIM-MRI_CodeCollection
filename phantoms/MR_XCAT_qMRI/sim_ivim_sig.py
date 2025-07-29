@@ -30,7 +30,7 @@ def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleav
         XCAT = XCAT[-1:0:-2,-1:0:-2,10:160:4]
 
         D, f, Ds = contrast_curve_calc()
-        S, Dim, fim, Dpim, legend = XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds,T1T2=T1T2)
+        S, Dim, fim, Dpim, legend = XCAT_to_MR_IVIM(XCAT, TR, TE, bvalue, D, f, Ds,T1T2=T1T2)
         if state == 1:
             Dim_out = Dim
             fim_out = fim
@@ -191,7 +191,7 @@ def contrast_curve_calc():
     return D, f, Ds
 
 
-def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True, T1T2=True):
+def XCAT_to_MR_IVIM(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True, T1T2=True):
     ###########################################################################################
     # This script converts XCAT tissue values to MR contrast based on the SSFP signal equation.
     # Christopher W. Roy 2018-12-04 # fetal.xcmr@gmail.com

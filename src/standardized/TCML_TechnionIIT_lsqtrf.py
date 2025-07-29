@@ -4,7 +4,7 @@ import numpy as np
 
 class TCML_TechnionIIT_lsqtrf(OsipiBase):
     """
-    TCML_TechnionIIT_lsqlm fitting algorithm by Moti Freiman and Noam Korngut, TechnionIIT
+    TCML_TechnionIIT_lsqlm fitting algorithm by Angeleene Ang, Moti Freiman and Noam Korngut, TechnionIIT
     """
 
     # I'm thinking that we define default attributes for each submission like this
@@ -12,7 +12,7 @@ class TCML_TechnionIIT_lsqtrf(OsipiBase):
     # the user inputs fulfil the requirements
 
     # Some basic stuff that identifies the algorithm
-    id_author = "Moti Freiman and Noam Korngut, TechnIIT"
+    id_author = "Angeleene Ang, Moti Freiman and Noam Korngut, TechnIIT"
     id_algorithm_type = "Bi-exponential fit, Trust Region Reflective algorithm"
     id_return_parameters = "f, D*, D, S0"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"

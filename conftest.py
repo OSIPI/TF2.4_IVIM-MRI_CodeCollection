@@ -269,8 +269,8 @@ def threeddata(request):
         all_data = json.load(f)
     bvals = all_data.pop('config')
     bvals = np.array(bvals['bvalues'])
-    sig, _, Dim, fim, Dpim, _=phantom(bvals, 1000, TR=3000, TE=40, motion=False, rician=False, interleaved=False, T1T2=True)
-    return sig[8::,8::,4::,:], Dim[8::,8::,4::], fim[8::,8::,4::], Dpim[8::,8::,4::], bvals
+    sig, _, Dim, fim, Dpim, _=phantom(bvals, 1/1000, TR=3000, TE=40, motion=False, rician=False, interleaved=False, T1T2=True)
+    return sig[16::,16::,8::,:], Dim[16::,16::,8::], fim[16::,16::,8::], Dpim[16::,16::,8::], bvals
 
 
 '''''@pytest.fixture

@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.OGC_AmsterdamUMC.LSQ_fitting import flat_neg_log_prior, fit_bayesian, empirical_neg_log_prior, fit_segmented
+from src.original.OGC_AmsterdamUMC.LSQ_fitting import flat_neg_log_prior, fit_bayesian, empirical_neg_log_prior, fit_segmented, fit_bayesian_array, fit_segmented_array
 import numpy as np
 
 class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
@@ -102,3 +102,61 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         results["Dp"] = fit_results[2]
 
         return results
+
+
+    def ivim_fit_full_volume(self, signals, bvalues, initial_guess=None, **kwargs):
+        """Perform the IVIM fit
+        Args:
+            signals (array-like)
+            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
+        Returns:
+            _type_: _description_
+        """
+        shape=np.shape(signals)
+        signals = self.reshape_to_voxelwise(signals)
+
+        # Get index of b=0
+        b0_index = np.where(bvalues == 0)[0][0]
+        # Mask of voxels where signal at b=0 >= 0.5
+        valid_mask = signals[:, b0_index] >= 0.5
+        # Select only valid voxels for fitting
+        signals = signals[valid_mask]
+
+        bvalues=np.array(bvalues)
+
+        epsilon = 0.000001
+        fit_results = fit_segmented_array(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds, p0=self.initial_guess)
+        fit_results=np.array(fit_results+(1,))
+        for i in range(4):
+            if fit_results[i] < self.bounds[0][i] : fit_results[0] = self.bounds[0][i]+epsilon
+            if fit_results[i] > self.bounds[1][i] : fit_results[0] = self.bounds[1][i]-epsilon
+        fit_results = self.OGC_algorithm_array(bvalues, signals, self.neg_log_prior, x0=fit_results, fitS0=self.fitS0, bounds=self.bounds)
+
+        D=np.zeros(shape[0]*shape[1]*shape[2])
+        D[valid_mask]=fit_results[0]
+        D=D.reshape(shape[0],shape[1],shape[2])
+        f=np.zeros(shape[0]*shape[1]*shape[2])
+        f[valid_mask]=fit_results[0]
+        f=D.reshape(shape[0],shape[1],shape[2])
+        Dp=np.zeros(shape[0]*shape[1]*shape[2])
+        Dp[valid_mask]=fit_results[0]
+        Dp=D.reshape(shape[0],shape[1],shape[2])
+        results = {}
+        results["D"] = D
+        results["f"] = f
+        results["Dp"] = Dp
+
+        return results
+
+
+    def reshape_to_voxelwise(self, data):
+        """
+        reshapes multi-D input (spatial dims, bvvalue) data to 2D voxel-wise array
+        Args:
+            data (array): mulit-D array (data x b-values)
+        Returns:
+            out (array): 2D array (voxel x b-value)
+        """
+        B = data.shape[-1]
+        voxels = int(np.prod(data.shape[:-1]))  # e.g., X*Y*Z
+        return data.reshape(voxels, B)

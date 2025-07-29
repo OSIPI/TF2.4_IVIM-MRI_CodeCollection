@@ -154,6 +154,13 @@ def test_bounds(bound_input, eng):
 def test_parallel(algorithmlist,eng,threeddata):
     algorithm, requires_matlab = algorithmlist
     data, Dim, fim, Dpim, bvals = threeddata
+    # Get index of b=0
+    b0_index = np.where(bvals == 0)[0][0]
+    data[data < 0] = 0
+    # Mask of voxels where signal at b=0 >= 0.5
+    invalid_mask = data[:, :, :, b0_index] < 0.01
+    data[invalid_mask,:] = np.nan
+    print('testing over ' + str(np.sum(~invalid_mask)) + ' voxels')
     if requires_matlab:
         if eng is None:
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
@@ -164,7 +171,7 @@ def test_parallel(algorithmlist,eng,threeddata):
     fit = OsipiBase(algorithm=algorithm,**kwargs)
 
     start_time = time.time()  # Record the start time
-    fit_result = fit.osipi_fit(data, bvals,njobs=8)
+    fit_result = fit.osipi_fit(data, bvals,njobs=4)
     elapsed_time1= time.time() - start_time  # Calculate elapsed time
 
     start_time = time.time()  # Record the start time
@@ -180,6 +187,13 @@ def test_parallel(algorithmlist,eng,threeddata):
 def test_volume(algorithmlist,eng, threeddata):
     algorithm, requires_matlab = algorithmlist
     data, Dim, fim, Dpim, bvals = threeddata
+    # Get index of b=0
+    b0_index = np.where(bvals == 0.)[0][0]
+    data[data < 0] = 0
+    # Mask of voxels where signal at b=0 >= 0.5
+    invalid_mask = data[:, :, :, b0_index] < 0.01
+    data[invalid_mask,:] = np.nan
+
     if requires_matlab:
         if eng is None:
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
@@ -188,8 +202,10 @@ def test_volume(algorithmlist,eng, threeddata):
     else:
         kwargs={}
     fit = OsipiBase(algorithm=algorithm,**kwargs)
-    if hasattr(fit, 'x') and callable(getattr(fit, 'x')):
-        fit_result = fit.osipi_fit_full_volume(threeddata, bvals)
-    assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
-    assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
-    assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
+    if hasattr(fit, 'ivim_fit_full_volume') and callable(getattr(fit, 'ivim_fit_full_volume')):
+        fit_result = fit.osipi_fit_full_volume(data, bvals)
+        assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
+        assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
+        assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
+    else:
+        pytest.skip(reason="Wrapper has no ivim_fit_full_volume option")
