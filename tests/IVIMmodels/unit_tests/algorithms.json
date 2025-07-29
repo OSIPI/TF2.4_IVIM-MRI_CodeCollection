@@ -1,7 +1,5 @@
 {
     "algorithms": [
-        "TCML_TechnionIIT_lsqlm",
-        "TCML_TechnionIIT_lsqtrf",
         "ASD_MemorialSloanKettering_QAMPER_IVIM",
         "ETP_SRI_LinearFitting",
         "IAR_LU_biexp",
@@ -17,7 +15,11 @@
         "PvH_KB_NKI_IVIMfit",
         "OJ_GU_seg",
         "TF_reference_IVIMfit"
+        "IVIM_NEToptim"
     ],
+    "IVIM_NEToptim": {
+        "deep_learning": true
+    },
     "ASD_MemorialSloanKettering_QAMPER_IVIM": {
         "requires_matlab": true
     },

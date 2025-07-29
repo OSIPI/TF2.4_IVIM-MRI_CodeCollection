@@ -71,7 +71,7 @@ class TCML_TechnionIIT_lsqlm(OsipiBase):
         bvalues=np.array(bvalues)
         initial_guess = np.array(self.initial_guess)
         initial_guess = initial_guess[[0, 2, 1, 3]]
-        fit_results = self.fit_least_squares(1 ,bvalues, np.array(signals)[:,np.newaxis], initial_guess)
+        fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], initial_guess)
 
         results = {}
         results["D"] = fit_results[0]
