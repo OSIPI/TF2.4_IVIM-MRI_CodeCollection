@@ -160,7 +160,7 @@ def test_parallel(algorithmlist,eng,threeddata):
     # Mask of voxels where signal at b=0 >= 0.5
     invalid_mask = data[:, :, :, b0_index] < 0.01
     data[invalid_mask,:] = np.nan
-    print('testing over ' + str(np.sum(~invalid_mask)) + ' voxels')
+    print('testing ' + str(np.sum(~invalid_mask)) + ' voxels of a matrix size ' + str(np.shape(data)))
     if requires_matlab:
         if eng is None:
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
