@@ -270,7 +270,7 @@ def threeddata(request):
     bvals = all_data.pop('config')
     bvals = np.array(bvals['bvalues'])
     sig, _, Dim, fim, Dpim, _=phantom(bvals, 1/1000, TR=3000, TE=40, motion=False, rician=False, interleaved=False, T1T2=True)
-    return sig[16::,16::,8::,:], Dim[16::,16::,8::], fim[16::,16::,8::], Dpim[16::,16::,8::], bvals
+    return sig[64::,64::,12::,:], Dim[64::,64::,12::], fim[64::,64::,12::], Dpim[64::,64::,12::], bvals
 
 
 '''''@pytest.fixture

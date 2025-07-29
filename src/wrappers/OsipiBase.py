@@ -105,7 +105,7 @@ class OsipiBase:
             #results[ijk] = fit
         minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
         b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
-        normalization_factor = np.mean(data[..., b0_indices],axis=3)
+        normalization_factor = np.mean(data[..., b0_indices],axis=-1)
         data = data / np.repeat(normalization_factor[...,np.newaxis],np.shape(data)[-1],-1)
         if np.shape(data.shape)[0] == 1:
             njobs=1
@@ -184,13 +184,10 @@ class OsipiBase:
 
             minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
             b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
-            b0_mean = np.mean(data[..., b0_indices], axis=-1)
+            normalization_factor = np.mean(data[..., b0_indices], axis=-1)
+            data = data / np.repeat(normalization_factor[..., np.newaxis], np.shape(data)[-1], -1)
 
-            normalization_factors = np.array([b0_mean for i in range(data.shape[-1])])
-            normalization_factors = np.moveaxis(normalization_factors, 0, -1)
-            data_normalized = data/normalization_factors
-
-            args = [data_normalized, use_bvalues]
+            args = [data, use_bvalues]
             fit = self.ivim_fit_full_volume(*args, **kwargs) # Assume this is a dict with an array per key representing the parametric maps
             for key in list(fit.keys()):
                 results[key] = fit[key]
