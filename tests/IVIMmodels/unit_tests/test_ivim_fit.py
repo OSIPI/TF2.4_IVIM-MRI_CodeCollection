@@ -171,12 +171,12 @@ def test_parallel(algorithmlist,eng,threeddata):
     fit = OsipiBase(algorithm=algorithm,**kwargs)
 
     start_time = time.time()  # Record the start time
-    fit_result = fit.osipi_fit(data, bvals,njobs=4)
-    elapsed_time1= time.time() - start_time  # Calculate elapsed time
-
-    start_time = time.time()  # Record the start time
     fit_result = fit.osipi_fit(data, bvals,njobs=1)
     elapsed_time2 = time.time() - start_time  # Calculate elapsed time
+
+    start_time = time.time()  # Record the start time
+    fit_result = fit.osipi_fit(data, bvals,njobs=4)
+    elapsed_time1= time.time() - start_time  # Calculate elapsed time
 
     assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
     assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
