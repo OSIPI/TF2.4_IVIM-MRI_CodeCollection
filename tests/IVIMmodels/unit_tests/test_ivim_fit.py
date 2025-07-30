@@ -76,7 +76,7 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         assert elapsed_time < max_time, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 
 def test_default_bounds_and_initial_guesses(algorithmlist,eng):
-    algorithm, requires_matlab = algorithmlist
+    algorithm, requires_matlab, deep_learning = algorithmlist
     if requires_matlab:
         if eng is None:
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
@@ -84,6 +84,8 @@ def test_default_bounds_and_initial_guesses(algorithmlist,eng):
             kwargs = {'eng': eng}
     else:
         kwargs={}
+    if deep_learning:
+        pytest.skip(reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
     fit = OsipiBase(algorithm=algorithm,**kwargs)
     #assert fit.bounds is not None, f"For {algorithm}, there is no default fit boundary"
     #assert fit.initial_guess is not None, f"For {algorithm}, there is no default fit initial guess"
@@ -180,6 +182,7 @@ def test_volume(algorithmlist,eng, threeddata):
     else:
         pytest.skip(reason="Wrapper has no ivim_fit_full_volume option")
 
+
 def test_parallel(algorithmlist,eng,threeddata):
     algorithm, requires_matlab = algorithmlist
     data, Dim, fim, Dpim, bvals = threeddata
@@ -218,3 +221,57 @@ def test_parallel(algorithmlist,eng,threeddata):
     assert elapsed_time1*2 < elapsed_time2
 
 
+def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
+    algorithm, data, bvals, kwargs, requires_matlab, tolerances = deep_learning_algorithms
+
+    if requires_matlab:
+        if eng is None:
+            pytest.skip("Running without matlab; if Matlab is available please run pytest --withmatlab")
+        else:
+            kwargs = {**kwargs, 'eng': eng}
+
+    tolerances = tolerances_helper(tolerances, data)
+    fit = OsipiBase(bvalues=bvals, algorithm=algorithm, **kwargs)
+
+    array_2d = np.array([dat["data"] for _, dat in data.items()])
+    start_time = time.time()
+    fit_result = fit.osipi_fit_full_volume(array_2d, bvals)
+    elapsed_time = time.time() - start_time
+
+    errors = []  # Collect all assertion errors
+
+    def to_list_if_needed(value):
+        return value.tolist() if isinstance(value, np.ndarray) else value
+
+    for i, (name, dat) in enumerate(data.items()):
+        try:
+            record_property('test_data', {
+                "name": name,
+                "algorithm": algorithm,
+                "f_fit": to_list_if_needed(fit_result['f'][i]),
+                "Dp_fit": to_list_if_needed(fit_result['Dp'][i]),
+                "D_fit": to_list_if_needed(fit_result['D'][i]),
+                "f": to_list_if_needed(dat['f']),
+                "Dp": to_list_if_needed(dat['Dp']),
+                "D": to_list_if_needed(dat['D']),
+                "rtol": tolerances["rtol"],
+                "atol": tolerances["atol"]
+            })
+
+            npt.assert_allclose(fit_result['f'][i], dat['f'],
+                                rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
+
+            if dat['f'] < 0.80:
+                npt.assert_allclose(fit_result['D'][i], dat['D'],
+                                    rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
+
+            if dat['f'] > 0.03:
+                npt.assert_allclose(fit_result['Dp'][i], dat['Dp'],
+                                    rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
+
+        except AssertionError as e:
+            errors.append(f"{name + ' ' + algorithm+ ' D=' + str(dat['D']) + ' Dp=' + str(dat['Dp']) + ' f=' + str(dat['f'])}: {e}")
+
+    if errors:
+        all_errors = "\n".join(errors)
+        raise AssertionError(f"Some tests failed:\n{all_errors}")

@@ -6,6 +6,7 @@ import sys
 from tqdm import tqdm
 from joblib import Parallel, delayed
 
+
 class OsipiBase:
     """The base class for OSIPI IVIM fitting"""
     
@@ -17,6 +18,8 @@ class OsipiBase:
         self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
         self.use_bounds = True
         self.use_initial_guess = True
+        self.deep_learning = False
+        self.supervised = False
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
@@ -150,15 +153,15 @@ class OsipiBase:
                     fit={'D':0,'f':0,'Dp':0}
                 for key in list(fit.keys()):
                     results[key][ijk] = fit[key]
-
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         return results
-    
+
+
     def osipi_fit_full_volume(self, data, bvalues=None, **kwargs):
         """Sends a full volume in one go to the fitting algorithm. The osipi_fit method only sends one voxel at a time.
 
         Args:
-            data (array): 3D (single slice) or 4D (multi slice) DWI data.
+            data (array): 2D (data x b-values), 3D (single slice) or 4D (multi slice) DWI data, with last dimension the b-value dimension.
             bvalues (array, optional): The b-values of the DWI data. Defaults to None.
 
         Returns:
@@ -195,7 +198,8 @@ class OsipiBase:
                 print("Full volume fitting not supported for this algorithm")
 
             return False
-    
+
+
     def osipi_print_requirements(self):
         """
         Prints the requirements of the algorithm.
@@ -301,11 +305,11 @@ class OsipiBase:
         return True
 
     
-    def osipi_check_required_bvalues():
+    def osipi_check_required_bvalues(self):
         """Minimum number of b-values required"""
         pass
 
-    def osipi_author():
+    def osipi_author(self):
         """Author identification"""
         return ''
     
@@ -338,7 +342,7 @@ class OsipiBase:
         print(f"f bias:\t{f_bias}\nf RMSE:\t{f_RMSE}")
         print(f"Dstar bias:\t{Dstar_bias}\nDstar RMSE:\t{Dstar_RMSE}")
         print(f"D bias:\t{D_bias}\nD RMSE:\t{D_RMSE}")
-            
+
     
     def D_and_Ds_swap(self,results):
         if results['D']>results['Dp']:

@@ -20,7 +20,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
     # Algorithm requirements
     required_bvalues = 4
     required_thresholds = [0,
-                           0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
+                           1]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
     required_bounds = False
     required_bounds_optional = True  # Bounds may not be required but are optional
     required_initial_guess = False
@@ -44,16 +44,21 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             the requirements.
 
             Args:
-                 datain is a 2D array with values of D, f, D* (and S0) that will form the prior.
+                 datain (Array): is a 2D array with values of D, f, D* (and S
+                 ) that will form the prior.
+                 thresholds (Bolean, optional): a bolean indicating what threshold is used
+                 prior_in (array, optional): 2D array of D, f, D* and (optionally) S0 values which form the prior
+
         """
         super(OGC_AmsterdamUMC_Bayesian_biexp, self).__init__(bvalues=bvalues, bounds=bounds, thresholds=thresholds, initial_guess=initial_guess) #, fitS0, prior_in)
         self.OGC_algorithm = fit_bayesian
         self.OGC_algorithm_array = fit_bayesian_array
-
-        self.initialize(bounds, initial_guess, fitS0, prior_in)
+        self.initialize(bounds, initial_guess, fitS0, prior_in, thresholds)
         self.fit_segmented=fit_segmented
 
-    def initialize(self, bounds=None, initial_guess=None, fitS0=True, prior_in=None):
+    def initialize(self, bounds=None, initial_guess=None, fitS0=True, prior_in=None, thresholds=None):
+
+
         if bounds is None:
             print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
             self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
@@ -66,7 +71,10 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             self.initial_guess = initial_guess
         self.use_initial_guess = True
         self.use_bounds = True
-        self.thresholds = 150
+        if thresholds is None:
+            print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
+            thresholds = 150
+        self.thresholds = thresholds
         if prior_in is None:
             print('using a flat prior between bounds')
             self.neg_log_prior=flat_neg_log_prior([self.bounds[0][0],self.bounds[1][0]],[self.bounds[0][1],self.bounds[1][1]],[self.bounds[0][2],self.bounds[1][2]],[self.bounds[0][3],self.bounds[1][3]])
@@ -104,7 +112,6 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         results["Dp"] = fit_results[2]
 
         return results
-
 
     def ivim_fit_full_volume(self, signals, bvalues, njobs=4, **kwargs):
         """Perform the IVIM fit
@@ -158,7 +165,6 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         results["D"] = D
         results["f"] = f
         results["Dp"] = Dp
-
         return results
 
 
