@@ -13,6 +13,7 @@ import pathlib
 # This code generates a 4D IVIM phantom as nifti file
 
 def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleaved=False,T1T2=True):
+    download_data()
     np.random.seed(42)
     if motion:
         states = range(1,21)
@@ -440,7 +441,6 @@ if __name__ == '__main__':
     motion = args.motion
     interleaved = args.interleaved
     T1T2 = args.T1T2
-    download_data()
     for key, bvalue in bvalues.items():
         bvalue = np.array(bvalue)
         sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=interleaved,T1T2=T1T2)
