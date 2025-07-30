@@ -24,6 +24,7 @@ tests/IVIMmodels/unit_tests/*.log
 junit/*
 ivim_simulation.bval
 ivim_simulation.bvec
+*.pt
 
 # Unit test / coverage reports
 .tox/
@@ -34,3 +35,4 @@ coverage.xml
 *.pyc
 phantoms/MR_XCAT_qMRI/*.json
 phantoms/MR_XCAT_qMRI/*.txt
+tests/IVIMmodels/unit_tests/models
