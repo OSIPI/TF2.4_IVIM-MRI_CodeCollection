@@ -60,7 +60,7 @@ class TCML_TechnionIIT_lsq_sls_trf(OsipiBase):
             self.thresholds = thresholds
         self.fitS0=fitS0
         self.use_bounds = False
-        self.initial_guess = False
+        self.use_initial_guess = False
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit

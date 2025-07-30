@@ -60,7 +60,7 @@ class TCML_TechnionIIT_SLS(OsipiBase):
             print('warning, no thresholds were defined, so default bounds are used of  150')
         else:
             self.thresholds = thresholds
-        self.initial_guess = False
+        self.use_initial_guess = False
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
