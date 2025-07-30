@@ -47,6 +47,13 @@ class TCML_TechnionIIT_lsq_sls_lm(OsipiBase):
         self.initialize(bounds, fitS0,thresholds)
 
     def initialize(self, bounds, fitS0,thresholds):
+        if bounds is None:
+            print(
+                'warning, no bounds were defined, so default bounds are used of ([0.0003, 0.001, 0.009, 0],[0.008, 0.5,0.04, 3])')
+            self.bounds = ([0.0003, 0.001, 0.009, 0], [0.008, 0.5, 0.04, 3])
+        else:
+            bounds = bounds
+            self.bounds = bounds
         if thresholds is None:
             self.thresholds = 150
             print('warning, no thresholds were defined, so default bounds are used of  150')
@@ -54,6 +61,7 @@ class TCML_TechnionIIT_lsq_sls_lm(OsipiBase):
             self.thresholds = thresholds
         self.fitS0=fitS0
         self.use_bounds = False
+        self.initial_guess = False
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
@@ -65,13 +73,18 @@ class TCML_TechnionIIT_lsq_sls_lm(OsipiBase):
         Returns:
             _type_: _description_
         """
-
+        signals[signals<0]=0
         bvalues=np.array(bvalues)
-        fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], min_bval_high=self.thresholds)
+        fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, self.bounds, min_bval_high=self.thresholds)
 
         results = {}
-        results["D"] = fit_results[0]
-        results["f"] = fit_results[2]
-        results["Dp"] = fit_results[1]
+        if fit_results[0].size > 0:
+            results["D"] = fit_results[0]
+            results["f"] = fit_results[2]
+            results["Dp"] = fit_results[1]
+        else:
+            results["D"] = 0
+            results["f"] = 0
+            results["Dp"] = 0
 
         return results

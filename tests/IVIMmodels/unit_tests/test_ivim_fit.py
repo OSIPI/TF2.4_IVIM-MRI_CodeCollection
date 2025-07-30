@@ -3,6 +3,7 @@ import numpy.testing as npt
 import pytest
 import time
 from src.wrappers.OsipiBase import OsipiBase
+from joblib import Parallel, delayed
 #run using python -m pytest from the root folder
 
 
@@ -150,40 +151,6 @@ def test_bounds(bound_input, eng):
             assert passf, f"Fit still passes when initial guess f is out of fit bounds; potentially initial guesses not respected for: {name}"
             assert passDp, f"Fit still passes when initial guess Ds is out of fit bounds; potentially initial guesses not respected for: {name}" '''
 
-
-def test_parallel(algorithmlist,eng,threeddata):
-    algorithm, requires_matlab = algorithmlist
-    data, Dim, fim, Dpim, bvals = threeddata
-    # Get index of b=0
-    b0_index = np.where(bvals == 0)[0][0]
-    data[data < 0] = 0
-    # Mask of voxels where signal at b=0 >= 0.5
-    invalid_mask = data[:, :, :, b0_index] < 0.01
-    data[invalid_mask,:] = np.nan
-    print('testing ' + str(np.sum(~invalid_mask)) + ' voxels of a matrix size ' + str(np.shape(data)))
-    if requires_matlab:
-        if eng is None:
-            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
-        else:
-            kwargs = {'eng': eng}
-    else:
-        kwargs={}
-    fit = OsipiBase(algorithm=algorithm,**kwargs)
-
-    start_time = time.time()  # Record the start time
-    fit_result = fit.osipi_fit(data, bvals,njobs=1)
-    elapsed_time2 = time.time() - start_time  # Calculate elapsed time
-
-    start_time = time.time()  # Record the start time
-    fit_result = fit.osipi_fit(data, bvals,njobs=4)
-    elapsed_time1= time.time() - start_time  # Calculate elapsed time
-
-    assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
-    assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
-    assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
-    assert elapsed_time1*2 < elapsed_time2
-
-
 def test_volume(algorithmlist,eng, threeddata):
     algorithm, requires_matlab = algorithmlist
     data, Dim, fim, Dpim, bvals = threeddata
@@ -207,5 +174,47 @@ def test_volume(algorithmlist,eng, threeddata):
         assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
         assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
         assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
+        # check if right variable is in right place
+        assert np.nanmean(fit_result['D']) < np.nanmean(fit_result['Dp'])
+        assert np.nanmean(fit_result['Dp']) < np.nanmean(fit_result['f'])
     else:
         pytest.skip(reason="Wrapper has no ivim_fit_full_volume option")
+
+def test_parallel(algorithmlist,eng,threeddata):
+    algorithm, requires_matlab = algorithmlist
+    data, Dim, fim, Dpim, bvals = threeddata
+    # Get index of b=0
+    b0_index = np.where(bvals == 0)[0][0]
+    data[data < 0] = 0
+    # Mask of voxels where signal at b=0 >= 0.5
+    invalid_mask = data[:, :, :, b0_index] < 0.01
+    data[invalid_mask,:] = np.nan
+    print('testing ' + str(np.sum(~invalid_mask)) + ' voxels of a matrix size ' + str(np.shape(data)))
+    if requires_matlab:
+        if eng is None:
+            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+        else:
+            kwargs = {'eng': eng}
+    else:
+        kwargs={}
+    fit = OsipiBase(algorithm=algorithm,**kwargs)
+
+    def dummy_task(x):
+        return x
+
+    start_time = time.time()  # Record the start time
+    fit_result = fit.osipi_fit(data, bvals,njobs=1)
+    elapsed_time2 = time.time() - start_time  # Calculate elapsed time
+    Parallel(n_jobs=4)(delayed(dummy_task)(i) for i in range(8))
+    start_time = time.time()  # Record the start time
+    fit_result2 = fit.osipi_fit(data, bvals,njobs=4)
+    elapsed_time1= time.time() - start_time  # Calculate elapsed time
+    assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
+    assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
+    assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
+    assert np.allclose(fit_result['D'], fit_result2['D'], atol=1e-6), "Results differ between parallel and serial"
+    assert np.allclose(fit_result['f'], fit_result2['f'], atol=1e-6), "Results differ between parallel and serial"
+    assert np.allclose(fit_result['Dp'], fit_result2['Dp'], atol=1e-6), "Results differ between parallel and serial"
+    assert elapsed_time1*2 < elapsed_time2
+
+

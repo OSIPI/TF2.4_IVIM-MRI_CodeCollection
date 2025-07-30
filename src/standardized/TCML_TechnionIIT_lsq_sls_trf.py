@@ -59,7 +59,8 @@ class TCML_TechnionIIT_lsq_sls_trf(OsipiBase):
         else:
             self.thresholds = thresholds
         self.fitS0=fitS0
-        self.use_bounds = True
+        self.use_bounds = False
+        self.initial_guess = False
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
@@ -71,11 +72,11 @@ class TCML_TechnionIIT_lsq_sls_trf(OsipiBase):
         Returns:
             _type_: _description_
         """
-
+        signals[signals<0]=0
         bvalues=np.array(bvalues)
         bounds=np.array(self.bounds)
         bounds=[bounds[0][[0, 2, 1, 3]], bounds[1][[0, 2, 1, 3]]]
-        fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], bounds,min_bval_high=self.thresholds)
+        fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, bounds,min_bval_high=self.thresholds)
 
         results = {}
         results["D"] = fit_results[0]

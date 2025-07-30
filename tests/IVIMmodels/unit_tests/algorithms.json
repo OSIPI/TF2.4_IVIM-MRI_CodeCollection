@@ -2,6 +2,9 @@
     "algorithms": [
         "TCML_TechnionIIT_lsqlm",
         "TCML_TechnionIIT_lsqtrf",
+        "TCML_TechnionIIT_lsq_sls_lm",
+        "TCML_TechnionIIT_SLS",
+        "TCML_TechnionIIT_lsq_sls_trf",
         "ASD_MemorialSloanKettering_QAMPER_IVIM",
         "ETP_SRI_LinearFitting",
         "IAR_LU_biexp",

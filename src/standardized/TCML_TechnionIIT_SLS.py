@@ -21,14 +21,14 @@ class TCML_TechnionIIT_SLS(OsipiBase):
     required_bvalues = 4
     required_thresholds = [0,1]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
     required_bounds = False
-    required_bounds_optional = False  # Bounds may not be required but are optional
+    required_bounds_optional = True  # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = False
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
 
     # Supported inputs in the standardized class
-    supported_bounds = False
+    supported_bounds = True
     supported_initial_guess = False
     supported_thresholds = True
 
@@ -54,12 +54,13 @@ class TCML_TechnionIIT_SLS(OsipiBase):
             bounds=bounds
             self.bounds = bounds
         self.fitS0=fitS0
-        self.use_bounds = True
+        self.use_bounds = False
         if thresholds is None:
             self.thresholds = 150
             print('warning, no thresholds were defined, so default bounds are used of  150')
         else:
             self.thresholds = thresholds
+        self.initial_guess = False
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
@@ -75,8 +76,9 @@ class TCML_TechnionIIT_SLS(OsipiBase):
         bvalues=np.array(bvalues)
         bounds=np.array(self.bounds)
         bounds=[bounds[0][[0, 2, 1, 3]], bounds[1][[0, 2, 1, 3]]]
+        signals[signals<0]=0
 
-        fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, bounds, min_bval_high=thresholds)
+        fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, bounds, min_bval_high=self.thresholds)
 
         results = {}
         results["D"] = fit_results[0]

@@ -118,7 +118,7 @@ class OsipiBase:
             #data = np.load('data.npy', mmap_mode='r')
             # Define parallel function
             def parfun(ijk):
-                single_voxel_data = data[ijk]
+                single_voxel_data = np.array(data[ijk], copy=True)
                 if not np.isnan(single_voxel_data[0]):
                     fit = self.ivim_fit(single_voxel_data, use_bvalues, **kwargs)
                     fit = self.D_and_Ds_swap(fit)
@@ -181,12 +181,7 @@ class OsipiBase:
             results = {}
             for key in self.result_keys:
                 results[key] = np.empty(list(data.shape[:-1]))
-
-            minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
-            b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
-            normalization_factor = np.mean(data[..., b0_indices], axis=-1)
-            data = data / np.repeat(normalization_factor[..., np.newaxis], np.shape(data)[-1], -1)
-
+            # no normalisation as volume algorithms may not want normalized signals...
             args = [data, use_bvalues]
             fit = self.ivim_fit_full_volume(*args, **kwargs) # Assume this is a dict with an array per key representing the parametric maps
             for key in list(fit.keys()):
