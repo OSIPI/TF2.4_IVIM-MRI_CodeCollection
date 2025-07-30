@@ -154,7 +154,7 @@ def test_bounds(bound_input, eng):
             assert passDp, f"Fit still passes when initial guess Ds is out of fit bounds; potentially initial guesses not respected for: {name}" '''
 
 def test_volume(algorithmlist,eng, threeddata):
-    algorithm, requires_matlab = algorithmlist
+    algorithm, requires_matlab, deep_learning = algorithmlist
     data, Dim, fim, Dpim, bvals = threeddata
     # Get index of b=0
     b0_index = np.where(bvals == 0.)[0][0]
@@ -184,7 +184,7 @@ def test_volume(algorithmlist,eng, threeddata):
 
 
 def test_parallel(algorithmlist,eng,threeddata):
-    algorithm, requires_matlab = algorithmlist
+    algorithm, requires_matlab, deep_learning = algorithmlist
     data, Dim, fim, Dpim, bvals = threeddata
     # Get index of b=0
     b0_index = np.where(bvals == 0)[0][0]
