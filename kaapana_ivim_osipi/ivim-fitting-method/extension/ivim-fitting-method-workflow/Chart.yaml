@@ -1,0 +1,15 @@
+---
+apiVersion: v2
+description: Workflow for IVIM model fitting using standardized pipelines and test data in Kaapana.
+deprecated: False
+appVersion: "0.4.0"
+name: ivim-fitting-method-workflow
+version: "0.5.0"
+type: application
+keywords:
+  - ivimworkflow
+  - ivimkaapana
+maintainers:
+  - name: IVIM Team
+    email: o.j.gurney-champion@amsterdamumc.nl
+    url: https://osipi.ismrm.org/task-forces/task-force-2-4/
