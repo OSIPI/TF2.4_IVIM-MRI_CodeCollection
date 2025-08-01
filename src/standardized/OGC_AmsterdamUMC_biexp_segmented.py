@@ -87,3 +87,43 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         results["Dp"] = fit_results[2]
 
         return results
+
+
+    def ivim_fit_full_volume(self, signals, bvalues, njobs=4, **kwargs):
+        """Perform the IVIM fit
+        Args:
+            signals (array-like)
+            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
+        Returns:
+            _type_: _description_
+        """
+        # normalize signals
+        # Get index of b=0
+        shape=np.shape(signals)
+
+        b0_index = np.where(bvalues == 0)[0][0]
+        # Mask of voxels where signal at b=0 >= 0.5
+        valid_mask = signals[..., b0_index] >= 0.01
+        # Select only valid voxels for fitting
+        signals = signals[valid_mask]
+
+        minimum_bvalue = np.min(bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
+        b0_indices = np.where(bvalues == minimum_bvalue)[0]
+        normalization_factor = np.mean(signals[..., b0_indices],axis=-1)
+        signals = signals / np.repeat(normalization_factor[...,np.newaxis],np.shape(signals)[-1],-1)
+
+        bvalues=np.array(bvalues)
+
+        fit_results = np.array(fit_segmented_array(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds, p0=self.initial_guess))
+
+        D=np.zeros(shape[0:-1])
+        D[valid_mask]=fit_results[0]
+        f=np.zeros(shape[0:-1])
+        f[valid_mask]=fit_results[1]
+        Dp=np.zeros(shape[0:-1])
+        Dp[valid_mask]=fit_results[2]
+        results = {}
+        results["D"] = D
+        results["f"] = f
+        results["Dp"] = Dp
+        return results

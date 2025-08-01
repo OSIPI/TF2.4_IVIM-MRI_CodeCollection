@@ -172,7 +172,10 @@ def test_volume(algorithmlist,eng, threeddata):
         kwargs={}
     fit = OsipiBase(algorithm=algorithm,**kwargs)
     if hasattr(fit, 'ivim_fit_full_volume') and callable(getattr(fit, 'ivim_fit_full_volume')):
+        start_time = time.time()  # Record the start time
         fit_result = fit.osipi_fit_full_volume(data, bvals)
+        elapsed_time2 = time.time() - start_time  # Calculate elapsed time
+        print('time elaapsed is '+str(elapsed_time2))
         assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
         assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
         assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
@@ -208,17 +211,18 @@ def test_parallel(algorithmlist,eng,threeddata):
     start_time = time.time()  # Record the start time
     fit_result = fit.osipi_fit(data, bvals,njobs=1)
     elapsed_time2 = time.time() - start_time  # Calculate elapsed time
-    Parallel(n_jobs=4)(delayed(dummy_task)(i) for i in range(8))
+    Parallel(n_jobs=2)(delayed(dummy_task)(i) for i in range(8)) #github actions only supports 2 cores
     start_time = time.time()  # Record the start time
-    fit_result2 = fit.osipi_fit(data, bvals,njobs=4)
+    fit_result2 = fit.osipi_fit(data, bvals,njobs=2)
     elapsed_time1= time.time() - start_time  # Calculate elapsed time
+    print('singular took '+str(elapsed_time2)+' seconds, and parallel took '+str(elapsed_time1)+' seconds')
     assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
     assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
     assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
     assert np.allclose(fit_result['D'], fit_result2['D'], atol=1e-6), "Results differ between parallel and serial"
     assert np.allclose(fit_result['f'], fit_result2['f'], atol=1e-6), "Results differ between parallel and serial"
     assert np.allclose(fit_result['Dp'], fit_result2['Dp'], atol=1e-6), "Results differ between parallel and serial"
-    assert elapsed_time1*2 < elapsed_time2
+    assert elapsed_time1*1.4 < elapsed_time2
 
 
 def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
