@@ -76,10 +76,10 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         assert elapsed_time < max_time, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 
 def test_default_bounds_and_initial_guesses(algorithmlist,eng):
-    algorithm, requires_matlab, kwargs = algorithmlist
+    algorithm, kwargs = algorithmlist
     if kwargs.get("deep_learning", False):
         pytest.skip(reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
-    if requires_matlab:
+    if kwargs.get("requires_matlab", False):
         if eng is None:
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
         else:
@@ -154,7 +154,7 @@ def test_bounds(bound_input, eng):
             assert passDp, f"Fit still passes when initial guess Ds is out of fit bounds; potentially initial guesses not respected for: {name}" '''
 
 def test_volume(algorithmlist,eng, threeddata):
-    algorithm, requires_matlab, kwargs = algorithmlist
+    algorithm, kwargs = algorithmlist
     if kwargs.get("deep_learning", False):
         pytest.skip(reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
     data, Dim, fim, Dpim, bvals = threeddata
@@ -165,7 +165,7 @@ def test_volume(algorithmlist,eng, threeddata):
     invalid_mask = data[:, :, :, b0_index] < 0.01
     data[invalid_mask,:] = np.nan
 
-    if requires_matlab:
+    if kwargs.get("requires_matlab", False):
         if eng is None:
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
         else:
@@ -189,7 +189,7 @@ def test_volume(algorithmlist,eng, threeddata):
 
 
 def test_parallel(algorithmlist,eng,threeddata):
-    algorithm, requires_matlab, kwargs = algorithmlist
+    algorithm, kwargs = algorithmlist
     if kwargs.get("deep_learning", False):
         pytest.skip(
             reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
@@ -201,7 +201,7 @@ def test_parallel(algorithmlist,eng,threeddata):
     invalid_mask = data[:, :, :, b0_index] < 0.01
     data[invalid_mask,:] = np.nan
     print('testing ' + str(np.sum(~invalid_mask)) + ' voxels of a matrix size ' + str(np.shape(data)))
-    if requires_matlab:
+    if kwargs.get("requires_matlab", False):
         if eng is None:
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
         else:
