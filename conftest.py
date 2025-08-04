@@ -245,7 +245,8 @@ def algorithmlist(algorithmFile):
     for algorithm in algorithms:
         algorithm_dict = algorithm_information.get(algorithm, {})
         requires_matlab = algorithm_dict.get("requires_matlab", False)
-        yield algorithm, requires_matlab, algorithm_dict.get('deep_learning', False)
+        kwargs = algorithm_dict.get("options", {})
+        yield algorithm, requires_matlab, kwargs
 
 def bound_input(datafile,algorithmFile):
     # Find the algorithms from algorithms.json

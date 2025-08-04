@@ -20,6 +20,7 @@ class OsipiBase:
         self.use_initial_guess = True
         self.deep_learning = False
         self.supervised = False
+        self.stochastic = False
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
@@ -132,7 +133,7 @@ class OsipiBase:
 
             # Run in parallel
             results_list = Parallel(n_jobs=njobs)(
-                delayed(parfun)(ijk) for ijk in tqdm(all_indices, total=len(all_indices))
+                delayed(parfun)(ijk) for ijk in tqdm(all_indices, total=len(all_indices), mininterval=60) # updates every minute
             )
 
             # Initialize result arrays if not already done
@@ -143,7 +144,7 @@ class OsipiBase:
                 for key in fit:
                     results[key][ijk] = fit[key]
         else:
-            for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
+            for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1]), mininterval=60):
                 # Normalize array
                 single_voxel_data = data[ijk]
                 if not np.isnan(single_voxel_data[0]):

@@ -34,6 +34,7 @@ class IAR_LU_modified_mix(OsipiBase):
     supported_dimensions = 1
     supported_priors = False
 
+
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
         """
             Everything this algorithm requires should be implemented here.
@@ -47,6 +48,10 @@ class IAR_LU_modified_mix(OsipiBase):
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
         self.use_bounds = False
         self.use_initial_guess = False
+
+        # Additional options
+        self.stochastic = True
+
         # Check the inputs
         
         # Initialize the algorithm

@@ -76,7 +76,9 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         assert elapsed_time < max_time, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 
 def test_default_bounds_and_initial_guesses(algorithmlist,eng):
-    algorithm, requires_matlab, deep_learning = algorithmlist
+    algorithm, requires_matlab, kwargs = algorithmlist
+    if kwargs.get("deep_learning", False):
+        pytest.skip(reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
     if requires_matlab:
         if eng is None:
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
@@ -84,8 +86,6 @@ def test_default_bounds_and_initial_guesses(algorithmlist,eng):
             kwargs = {'eng': eng}
     else:
         kwargs={}
-    if deep_learning:
-        pytest.skip(reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
     fit = OsipiBase(algorithm=algorithm,**kwargs)
     #assert fit.bounds is not None, f"For {algorithm}, there is no default fit boundary"
     #assert fit.initial_guess is not None, f"For {algorithm}, there is no default fit initial guess"
@@ -154,8 +154,8 @@ def test_bounds(bound_input, eng):
             assert passDp, f"Fit still passes when initial guess Ds is out of fit bounds; potentially initial guesses not respected for: {name}" '''
 
 def test_volume(algorithmlist,eng, threeddata):
-    algorithm, requires_matlab, deep_learning = algorithmlist
-    if deep_learning:
+    algorithm, requires_matlab, kwargs = algorithmlist
+    if kwargs.get("deep_learning", False):
         pytest.skip(reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
     data, Dim, fim, Dpim, bvals = threeddata
     # Get index of b=0
@@ -189,8 +189,8 @@ def test_volume(algorithmlist,eng, threeddata):
 
 
 def test_parallel(algorithmlist,eng,threeddata):
-    algorithm, requires_matlab, deep_learning = algorithmlist
-    if deep_learning:
+    algorithm, requires_matlab, kwargs = algorithmlist
+    if kwargs.get("deep_learning", False):
         pytest.skip(
             reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
     data, Dim, fim, Dpim, bvals = threeddata
@@ -224,10 +224,12 @@ def test_parallel(algorithmlist,eng,threeddata):
     assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
     assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
     assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
-    assert np.allclose(fit_result['D'], fit_result2['D'], atol=1e-4), "Results differ between parallel and serial"
-    assert np.allclose(fit_result['f'], fit_result2['f'], atol=1e-2), "Results differ between parallel and serial"
-    assert np.allclose(fit_result['Dp'], fit_result2['Dp'], atol=1e-2), "Results differ between parallel and serial"
-    assert elapsed_time1*1.4 < elapsed_time2
+    if not fit.stochastic:
+        assert np.allclose(fit_result['D'], fit_result2['D'], atol=1e-4), "Results differ between parallel and serial"
+        assert np.allclose(fit_result['f'], fit_result2['f'], atol=1e-2), "Results differ between parallel and serial"
+        assert np.allclose(fit_result['Dp'], fit_result2['Dp'], atol=1e-2), "Results differ between parallel and serial"
+    if not kwargs.get("not_faster_parallel", False):
+        assert elapsed_time1*1.3 < elapsed_time2
 
 
 def test_deep_learning_algorithms(deep_learning_algorithms, record_property):

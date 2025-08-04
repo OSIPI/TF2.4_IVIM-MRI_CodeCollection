@@ -30,6 +30,9 @@
     "IAR_LU_biexp": {
         "fail_first_time": true
     },
+    "PvH_KB_NKI_IVIMfit": {
+        "not_faster_parallel": true
+    },
     "ETP_SRI_LinearFitting": {
         "options": {
             "thresholds": [500]

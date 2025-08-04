@@ -62,6 +62,10 @@ class Super_IVIM_DC(OsipiBase):
         self.use_bounds = False
         self.deep_learning = True
         self.supervised = True
+
+        # Additional options
+        self.stochastic = True
+
         modeldir = Path(working_dir)  # Ensure it's a Path object
         modeldir = modeldir / "models"
         modeldir.mkdir(parents=True, exist_ok=True)
