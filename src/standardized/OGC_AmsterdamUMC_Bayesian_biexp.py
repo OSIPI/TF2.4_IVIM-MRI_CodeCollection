@@ -80,7 +80,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             self.neg_log_prior=flat_neg_log_prior([self.bounds[0][0],self.bounds[1][0]],[self.bounds[0][1],self.bounds[1][1]],[self.bounds[0][2],self.bounds[1][2]],[self.bounds[0][3],self.bounds[1][3]])
         else:
             print('warning, bounds are not used, as a prior is used instead')
-            if len(prior_in) is 4:
+            if len(prior_in) == 4:
                 self.neg_log_prior = empirical_neg_log_prior(prior_in[0], prior_in[1], prior_in[2],prior_in[3])
             else:
                 self.neg_log_prior = empirical_neg_log_prior(prior_in[0], prior_in[1], prior_in[2])
