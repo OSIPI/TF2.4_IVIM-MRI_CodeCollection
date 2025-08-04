@@ -169,6 +169,13 @@ def rician_noise(request):
 def use_prior(request):
     return request.config.getoption("--usePrior")
 
+@pytest.fixture(scope="session")
+def selectAlgorithm(request):
+    return request.config.getoption("--selectAlgorithm")
+
+@pytest.fixture(scope="session")
+def dropAlgorithm(request):
+    return request.config.getoption("--dropAlgorithm")
 
 def pytest_generate_tests(metafunc):
     if "SNR" in metafunc.fixturenames:
@@ -177,18 +184,17 @@ def pytest_generate_tests(metafunc):
         data = data_list(metafunc.config.getoption("dataFile"))
         metafunc.parametrize("ivim_data", data)
     if "data_ivim_fit_saved" in  metafunc.fixturenames:
-        args = data_ivim_fit_saved(metafunc.config.getoption("dataFile"),metafunc.config.getoption("algorithmFile"))
+        args = data_ivim_fit_saved(metafunc.config.getoption("dataFile"),metafunc.config.getoption("algorithmFile"),metafunc.config.getoption("dropAlgorithm"),metafunc.config.getoption("selectAlgorithm"))
         metafunc.parametrize("data_ivim_fit_saved", args)
     if "algorithmlist" in metafunc.fixturenames:
-        args = algorithmlist(metafunc.config.getoption("algorithmFile"))
+        args = algorithmlist(metafunc.config.getoption("algorithmFile"),metafunc.config.getoption("dropAlgorithm"),metafunc.config.getoption("selectAlgorithm"))
         metafunc.parametrize("algorithmlist", args)
     if "bound_input" in metafunc.fixturenames:
-        args = bound_input(metafunc.config.getoption("dataFile"),metafunc.config.getoption("algorithmFile"))
+        args = bound_input(metafunc.config.getoption("dataFile"),metafunc.config.getoption("algorithmFile"),metafunc.config.getoption("dropAlgorithm"),metafunc.config.getoption("selectAlgorithm"))
         metafunc.parametrize("bound_input", args)
     if "deep_learning_algorithms" in metafunc.fixturenames:
-        args = deep_learning_algorithms(metafunc.config.getoption("dataFileDL"),metafunc.config.getoption("algorithmFile"))
+        args = deep_learning_algorithms(metafunc.config.getoption("dataFileDL"),metafunc.config.getoption("algorithmFile"),metafunc.config.getoption("dropAlgorithm"),metafunc.config.getoption("selectAlgorithm"))
         metafunc.parametrize("deep_learning_algorithms", args)
-
 
 
 def data_list(filename):
@@ -203,7 +209,7 @@ def data_list(filename):
         yield name, bvals, data
 
 
-def data_ivim_fit_saved(datafile, algorithmFile):
+def data_ivim_fit_saved(datafile, algorithmFile, dropAlgorithm, selectAlgorithm):
     # Find the algorithms from algorithms.json
     current_folder = pathlib.Path.cwd()
     algorithm_path = current_folder / algorithmFile
@@ -217,6 +223,8 @@ def data_ivim_fit_saved(datafile, algorithmFile):
     bvals = all_data.pop('config')
     bvals = bvals['bvalues']
     for algorithm in algorithms:
+        if not algorithm_filter(dropAlgorithm, selectAlgorithm, algorithm):
+            continue
         first = True
         for name, data in all_data.items():
             algorithm_dict = algorithm_information.get(algorithm, {})
@@ -233,7 +241,7 @@ def data_ivim_fit_saved(datafile, algorithmFile):
                 requires_matlab = algorithm_dict.get("requires_matlab", False)
                 yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab
 
-def algorithmlist(algorithmFile):
+def algorithmlist(algorithmFile, dropAlgorithm, selectAlgorithm):
     # Find the algorithms from algorithms.json
     current_folder = pathlib.Path.cwd()
     algorithm_path = current_folder / algorithmFile
@@ -242,11 +250,13 @@ def algorithmlist(algorithmFile):
 
     algorithms = algorithm_information["algorithms"]
     for algorithm in algorithms:
+        if not algorithm_filter(dropAlgorithm, selectAlgorithm, algorithm):
+            continue
         algorithm_dict = algorithm_information.get(algorithm, {})
         requires_matlab = algorithm_dict.get("requires_matlab", False)
         yield algorithm, requires_matlab, algorithm_dict.get('deep_learning', False)
 
-def bound_input(datafile,algorithmFile):
+def bound_input(datafile, algorithmFile, dropAlgorithm, selectAlgorithm):
     # Find the algorithms from algorithms.json
     current_folder = pathlib.Path.cwd()
     algorithm_path = current_folder / algorithmFile
@@ -261,6 +271,8 @@ def bound_input(datafile,algorithmFile):
     bvals = bvals['bvalues']
     for name, data in all_data.items():
         for algorithm in algorithms:
+            if not algorithm_filter(dropAlgorithm, selectAlgorithm, algorithm):
+                continue
             algorithm_dict = algorithm_information.get(algorithm, {})
             if not algorithm_dict.get('deep_learning',False):
                 xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
@@ -270,7 +282,7 @@ def bound_input(datafile,algorithmFile):
                 requires_matlab = algorithm_dict.get("requires_matlab", False)
                 yield name, bvals, data, algorithm, xfail, kwargs, tolerances, requires_matlab
 
-def deep_learning_algorithms(datafile,algorithmFile):
+def deep_learning_algorithms(datafile, algorithmFile, dropAlgorithm, selectAlgorithm):
     # Find the algorithms from algorithms.json
     current_folder = pathlib.Path.cwd()
     algorithm_path = current_folder / algorithmFile
@@ -284,9 +296,19 @@ def deep_learning_algorithms(datafile,algorithmFile):
     bvals = all_data.pop('config')
     bvals = bvals['bvalues']
     for algorithm in algorithms:
+        if not algorithm_filter(dropAlgorithm, selectAlgorithm, algorithm):
+            continue
         algorithm_dict = algorithm_information.get(algorithm, {})
         if algorithm_dict.get('deep_learning',False):
             kwargs = algorithm_dict.get("options", {})
             requires_matlab = algorithm_dict.get("requires_matlab", False)
             tolerances = algorithm_dict.get("tolerances", {"atol":{"f": 2e-1, "D": 8e-4, "Dp": 8e-2},"rtol":{"f": 0.2, "D": 0.3, "Dp": 0.4}})
             yield algorithm, all_data, bvals, kwargs, requires_matlab, tolerances
+
+
+def algorithm_filter(dropAlgorithm, selectAlgorithm, algorithm):
+    if selectAlgorithm != [""] and algorithm not in selectAlgorithm:
+        return False
+    if dropAlgorithm != [""] and algorithm in dropAlgorithm:
+        return False
+    return True
