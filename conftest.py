@@ -244,7 +244,8 @@ def algorithmlist(algorithmFile):
     algorithms = algorithm_information["algorithms"]
     for algorithm in algorithms:
         algorithm_dict = algorithm_information.get(algorithm, {})
-        yield algorithm, algorithm_dict
+        if not algorithm_dict.get('deep_learning', False):
+            yield algorithm, algorithm_dict
 
 def bound_input(datafile,algorithmFile):
     # Find the algorithms from algorithms.json

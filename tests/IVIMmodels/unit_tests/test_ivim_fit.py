@@ -227,7 +227,7 @@ def test_parallel(algorithmlist,eng,threeddata):
         assert np.allclose(fit_result['D'], fit_result2['D'], atol=1e-4), "Results differ between parallel and serial"
         assert np.allclose(fit_result['f'], fit_result2['f'], atol=1e-2), "Results differ between parallel and serial"
         assert np.allclose(fit_result['Dp'], fit_result2['Dp'], atol=1e-2), "Results differ between parallel and serial"
-    if time_parallel*1.3 < time_serial:
+    if time_parallel * 1.3 > time_serial:
         warnings.warn(
             f"[PERFORMANCE WARNING] Parallel code is not significantly faster than serial: "
             f"{time_parallel:.3f}s vs {time_serial:.3f}s", PerformanceWarning
