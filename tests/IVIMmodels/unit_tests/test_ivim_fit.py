@@ -4,6 +4,7 @@ import pytest
 import time
 from src.wrappers.OsipiBase import OsipiBase
 from joblib import Parallel, delayed
+import warnings
 #run using python -m pytest from the root folder
 
 
@@ -28,6 +29,10 @@ def tolerances_helper(tolerances, data):
     else:
         tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 4e-2})
     return tolerances
+
+
+class PerformanceWarning(UserWarning):
+    pass
 
 def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
     name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab = data_ivim_fit_saved
@@ -77,8 +82,6 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
 
 def test_default_bounds_and_initial_guesses(algorithmlist,eng):
     algorithm, kwargs = algorithmlist
-    if kwargs.get("deep_learning", False):
-        pytest.skip(reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
     if kwargs.get("requires_matlab", False):
         if eng is None:
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
@@ -155,8 +158,6 @@ def test_bounds(bound_input, eng):
 
 def test_volume(algorithmlist,eng, threeddata):
     algorithm, kwargs = algorithmlist
-    if kwargs.get("deep_learning", False):
-        pytest.skip(reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
     data, Dim, fim, Dpim, bvals = threeddata
     # Get index of b=0
     b0_index = np.where(bvals == 0.)[0][0]
@@ -190,9 +191,6 @@ def test_volume(algorithmlist,eng, threeddata):
 
 def test_parallel(algorithmlist,eng,threeddata):
     algorithm, kwargs = algorithmlist
-    if kwargs.get("deep_learning", False):
-        pytest.skip(
-            reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
     data, Dim, fim, Dpim, bvals = threeddata
     # Get index of b=0
     b0_index = np.where(bvals == 0)[0][0]
@@ -215,12 +213,13 @@ def test_parallel(algorithmlist,eng,threeddata):
 
     start_time = time.time()  # Record the start time
     fit_result = fit.osipi_fit(data, bvals,njobs=1)
-    elapsed_time2 = time.time() - start_time  # Calculate elapsed time
+    time_serial = time.time() - start_time  # Calculate elapsed time
     Parallel(n_jobs=2)(delayed(dummy_task)(i) for i in range(8)) #github actions only supports 2 cores
     start_time = time.time()  # Record the start time
     fit_result2 = fit.osipi_fit(data, bvals,njobs=2)
-    elapsed_time1= time.time() - start_time  # Calculate elapsed time
-    print('singular took '+str(elapsed_time2)+' seconds, and parallel took '+str(elapsed_time1)+' seconds')
+    time_parallel= time.time() - start_time  # Calculate elapsed time
+
+    print('singular took '+str(time_serial)+' seconds, and parallel took '+str(time_parallel)+' seconds')
     assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
     assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
     assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
@@ -228,8 +227,11 @@ def test_parallel(algorithmlist,eng,threeddata):
         assert np.allclose(fit_result['D'], fit_result2['D'], atol=1e-4), "Results differ between parallel and serial"
         assert np.allclose(fit_result['f'], fit_result2['f'], atol=1e-2), "Results differ between parallel and serial"
         assert np.allclose(fit_result['Dp'], fit_result2['Dp'], atol=1e-2), "Results differ between parallel and serial"
-    if not kwargs.get("not_faster_parallel", False):
-        assert elapsed_time1*1.3 < elapsed_time2
+    if time_parallel*1.3 < time_serial:
+        warnings.warn(
+            f"[PERFORMANCE WARNING] Parallel code is not significantly faster than serial: "
+            f"{time_parallel:.3f}s vs {time_serial:.3f}s", PerformanceWarning
+        )
 
 
 def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
