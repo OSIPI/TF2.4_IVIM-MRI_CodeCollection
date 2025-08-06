@@ -1,5 +1,6 @@
 {
     "algorithms": [
+        "Super_IVIM_DC",
         "ASD_MemorialSloanKettering_QAMPER_IVIM",
         "ETP_SRI_LinearFitting",
         "IAR_LU_biexp",
@@ -18,6 +19,9 @@
         "IVIM_NEToptim"
     ],
     "IVIM_NEToptim": {
+        "deep_learning": true
+    },
+    "Super_IVIM_DC": {
         "deep_learning": true
     },
     "ASD_MemorialSloanKettering_QAMPER_IVIM": {
