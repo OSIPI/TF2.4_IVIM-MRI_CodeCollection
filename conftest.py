@@ -169,31 +169,32 @@ def rician_noise(request):
 def use_prior(request):
     return request.config.getoption("--usePrior")
 
-@pytest.fixture(scope="session")
-def selectAlgorithm(request):
-    return request.config.getoption("--selectAlgorithm")
-
-@pytest.fixture(scope="session")
-def dropAlgorithm(request):
-    return request.config.getoption("--dropAlgorithm")
 
 def pytest_generate_tests(metafunc):
+    config = metafunc.config
+    algorithms = load_filtered_algorithms(config)
+
     if "SNR" in metafunc.fixturenames:
-        metafunc.parametrize("SNR", metafunc.config.getoption("SNR"))
+        metafunc.parametrize("SNR", config.getoption("SNR"))
+
     if "ivim_data" in metafunc.fixturenames:
-        data = data_list(metafunc.config.getoption("dataFile"))
+        data = data_list(config.getoption("dataFile"))
         metafunc.parametrize("ivim_data", data)
-    if "data_ivim_fit_saved" in  metafunc.fixturenames:
-        args = data_ivim_fit_saved(metafunc.config.getoption("dataFile"),metafunc.config.getoption("algorithmFile"),metafunc.config.getoption("dropAlgorithm"),metafunc.config.getoption("selectAlgorithm"))
+
+    if "data_ivim_fit_saved" in metafunc.fixturenames:
+        args = data_ivim_fit_saved(config.getoption("dataFile"), algorithms)
         metafunc.parametrize("data_ivim_fit_saved", args)
+
     if "algorithmlist" in metafunc.fixturenames:
-        args = algorithmlist(metafunc.config.getoption("algorithmFile"),metafunc.config.getoption("dropAlgorithm"),metafunc.config.getoption("selectAlgorithm"))
+        args = algorithmlist(algorithms)
         metafunc.parametrize("algorithmlist", args)
+
     if "bound_input" in metafunc.fixturenames:
-        args = bound_input(metafunc.config.getoption("dataFile"),metafunc.config.getoption("algorithmFile"),metafunc.config.getoption("dropAlgorithm"),metafunc.config.getoption("selectAlgorithm"))
+        args = bound_input(config.getoption("dataFile"), algorithms)
         metafunc.parametrize("bound_input", args)
+
     if "deep_learning_algorithms" in metafunc.fixturenames:
-        args = deep_learning_algorithms(metafunc.config.getoption("dataFileDL"),metafunc.config.getoption("algorithmFile"),metafunc.config.getoption("dropAlgorithm"),metafunc.config.getoption("selectAlgorithm"))
+        args = deep_learning_algorithms(config.getoption("dataFileDL"), algorithms)
         metafunc.parametrize("deep_learning_algorithms", args)
 
 
@@ -208,26 +209,42 @@ def data_list(filename):
     for name, data in all_data.items():
         yield name, bvals, data
 
+def load_filtered_algorithms(config):
+    algorithmFile = config.getoption("algorithmFile")
+    selectAlgorithm = config.getoption("selectAlgorithm")
+    dropAlgorithm = config.getoption("dropAlgorithm")
 
-def data_ivim_fit_saved(datafile, algorithmFile, dropAlgorithm, selectAlgorithm):
-    # Find the algorithms from algorithms.json
     current_folder = pathlib.Path.cwd()
     algorithm_path = current_folder / algorithmFile
     with algorithm_path.open() as f:
-        algorithm_information = json.load(f)
+        algorithm_info = json.load(f)
+
+    algorithms = algorithm_info["algorithms"]
+
+    if selectAlgorithm and selectAlgorithm != [""]:
+        algorithms = [alg for alg in algorithms if alg in selectAlgorithm]
+    else:
+        algorithms = [alg for alg in algorithms if alg not in dropAlgorithm]
+
+    return {
+        "algorithms": algorithms,
+        **{k: v for k, v in algorithm_info.items() if k != "algorithms"}
+    }
+
+
+def data_ivim_fit_saved(datafile, algorithms):
+    # Find the algorithms from algorithms.json
+    current_folder = pathlib.Path.cwd()
     # Load generic test data generated from the included phantom: phantoms/MR_XCAT_qMRI
     generic = current_folder / datafile
     with generic.open() as f:
         all_data = json.load(f)
-    algorithms = algorithm_information["algorithms"]
     bvals = all_data.pop('config')
     bvals = bvals['bvalues']
-    for algorithm in algorithms:
-        if not algorithm_filter(dropAlgorithm, selectAlgorithm, algorithm):
-            continue
+    for algorithm in algorithms["algorithms"]:
         first = True
         for name, data in all_data.items():
-            algorithm_dict = algorithm_information.get(algorithm, {})
+            algorithm_dict = algorithms.get(algorithm, {})
             if not algorithm_dict.get('deep_learning',False):
                 xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
                     "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
@@ -241,39 +258,25 @@ def data_ivim_fit_saved(datafile, algorithmFile, dropAlgorithm, selectAlgorithm)
                 requires_matlab = algorithm_dict.get("requires_matlab", False)
                 yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab
 
-def algorithmlist(algorithmFile, dropAlgorithm, selectAlgorithm):
-    # Find the algorithms from algorithms.json
-    current_folder = pathlib.Path.cwd()
-    algorithm_path = current_folder / algorithmFile
-    with algorithm_path.open() as f:
-        algorithm_information = json.load(f)
 
-    algorithms = algorithm_information["algorithms"]
-    for algorithm in algorithms:
-        if not algorithm_filter(dropAlgorithm, selectAlgorithm, algorithm):
-            continue
-        algorithm_dict = algorithm_information.get(algorithm, {})
+def algorithmlist(algorithms):
+    for algorithm in algorithms["algorithms"]:
+        algorithm_dict = algorithms.get(algorithm, {})
         requires_matlab = algorithm_dict.get("requires_matlab", False)
         yield algorithm, requires_matlab, algorithm_dict.get('deep_learning', False)
 
-def bound_input(datafile, algorithmFile, dropAlgorithm, selectAlgorithm):
-    # Find the algorithms from algorithms.json
+
+def bound_input(datafile, algorithms):
     current_folder = pathlib.Path.cwd()
-    algorithm_path = current_folder / algorithmFile
-    with algorithm_path.open() as f:
-        algorithm_information = json.load(f)
     # Load generic test data generated from the included phantom: phantoms/MR_XCAT_qMRI
     generic = current_folder / datafile
     with generic.open() as f:
         all_data = json.load(f)
-    algorithms = algorithm_information["algorithms"]
     bvals = all_data.pop('config')
     bvals = bvals['bvalues']
     for name, data in all_data.items():
-        for algorithm in algorithms:
-            if not algorithm_filter(dropAlgorithm, selectAlgorithm, algorithm):
-                continue
-            algorithm_dict = algorithm_information.get(algorithm, {})
+        for algorithm in algorithms["algorithms"]:
+            algorithm_dict = algorithms.get(algorithm, {})
             if not algorithm_dict.get('deep_learning',False):
                 xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
                     "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
@@ -282,33 +285,20 @@ def bound_input(datafile, algorithmFile, dropAlgorithm, selectAlgorithm):
                 requires_matlab = algorithm_dict.get("requires_matlab", False)
                 yield name, bvals, data, algorithm, xfail, kwargs, tolerances, requires_matlab
 
-def deep_learning_algorithms(datafile, algorithmFile, dropAlgorithm, selectAlgorithm):
+
+def deep_learning_algorithms(datafile, algorithms):
     # Find the algorithms from algorithms.json
     current_folder = pathlib.Path.cwd()
-    algorithm_path = current_folder / algorithmFile
-    with algorithm_path.open() as f:
-        algorithm_information = json.load(f)
     # Load generic test data generated from the included phantom: phantoms/MR_XCAT_qMRI
     generic = current_folder / datafile
     with generic.open() as f:
         all_data = json.load(f)
-    algorithms = algorithm_information["algorithms"]
     bvals = all_data.pop('config')
     bvals = bvals['bvalues']
-    for algorithm in algorithms:
-        if not algorithm_filter(dropAlgorithm, selectAlgorithm, algorithm):
-            continue
-        algorithm_dict = algorithm_information.get(algorithm, {})
+    for algorithm in algorithms["algorithms"]:
+        algorithm_dict = algorithms.get(algorithm, {})
         if algorithm_dict.get('deep_learning',False):
             kwargs = algorithm_dict.get("options", {})
             requires_matlab = algorithm_dict.get("requires_matlab", False)
             tolerances = algorithm_dict.get("tolerances", {"atol":{"f": 2e-1, "D": 8e-4, "Dp": 8e-2},"rtol":{"f": 0.2, "D": 0.3, "Dp": 0.4}})
             yield algorithm, all_data, bvals, kwargs, requires_matlab, tolerances
-
-
-def algorithm_filter(dropAlgorithm, selectAlgorithm, algorithm):
-    if selectAlgorithm != [""] and algorithm not in selectAlgorithm:
-        return False
-    if dropAlgorithm != [""] and algorithm in dropAlgorithm:
-        return False
-    return True
