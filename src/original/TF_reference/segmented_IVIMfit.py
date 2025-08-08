@@ -24,6 +24,7 @@ def segmented_IVIM_fit(bvalues, dw_data, b_cutoff = 200, bounds=([0.0001, 0.0, 0
         """
     bvalues_D = bvalues[bvalues >= b_cutoff]
     dw_data_D = dw_data[bvalues >= b_cutoff]
+    dw_data_D = np.clip(dw_data_D, 1e-6, None) # ensure we do not get 0 or negative values that cause nans/infs
     log_data_D = np.log(dw_data_D)
 
     D, b0_intercept = d_fit_iterative_wls(bvalues_D, log_data_D)
