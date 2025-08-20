@@ -429,7 +429,7 @@ if __name__ == '__main__':
     elif args.bvalue:
         bvalues = {"cmd": args.bvalue}
     else:
-        bvalues = parse_bvalues_file("b_values.json") 
+        bvalues = parse_bvalues_file("b_values.json")
 
     
     noise = args.noise

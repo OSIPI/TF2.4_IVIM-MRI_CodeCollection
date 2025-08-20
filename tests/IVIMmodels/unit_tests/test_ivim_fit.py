@@ -1,11 +1,10 @@
 import numpy as np
 import numpy.testing as npt
 import pytest
-import json
-import pathlib
 import time
 from src.wrappers.OsipiBase import OsipiBase
 #run using python -m pytest from the root folder
+
 
 def signal_helper(signal):
     signal = np.asarray(signal)
@@ -59,16 +58,25 @@ def data_ivim_fit_saved():
                     first = False
             yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime
 
-#@pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime", data_ivim_fit_saved())
-#def test_ivim_fit_saved(name, bvals, data, algorithm, xfail, kwargs, tolerances,skiptime, request, record_property):
-def test_ivim_fit_saved(ivim_algorithm, ivim_data, record_property):
-    algorithm, options = ivim_algorithm
-    name, bvals, data = ivim_data
 
+def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
+    name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab = data_ivim_fit_saved
+    max_time = 0.5
+    if requires_matlab:
+        max_time = 2
+        if eng is None:
+            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+        else:
+            kwargs = {**kwargs, 'eng': eng}
+    if xfail["xfail"]:
+        mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
+        request.node.add_marker(mark)
     signal = signal_helper(data["data"])
-    tolerances = tolerances_helper(options.get("tolerances", {}), data)
+    tolerances = tolerances_helper(tolerances, data)
+    fit = OsipiBase(algorithm=algorithm, **kwargs)
+    if fit.use_bounds:
+        fit.bounds = ([0, 0, 0.005, 0.7], [0.005, 1.0, 0.2, 1.3])
     start_time = time.time()  # Record the start time
-    fit = OsipiBase(algorithm=algorithm)
     fit_result = fit.osipi_fit(signal, bvals)
     elapsed_time = time.time() - start_time  # Calculate elapsed time
     def to_list_if_needed(value):
@@ -86,6 +94,8 @@ def test_ivim_fit_saved(ivim_algorithm, ivim_data, record_property):
         "atol": tolerances["atol"]
     }
     record_property('test_data', test_result)
+    if (data['f'] > 0.99 or data['f'] < 0.01) and not fit.use_bounds: #in these cases there are multiple solutions (D can become D*, f will be 0 and D* can be anything. This will be a good description of the data, so technically not a fail
+        return
     npt.assert_allclose(data['f'], fit_result['f'], rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
     if data['f']<0.80: # we need some signal for D to be detected
         npt.assert_allclose(data['D'], fit_result['D'], rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
@@ -94,22 +104,20 @@ def test_ivim_fit_saved(ivim_algorithm, ivim_data, record_property):
     #assert fit_result['D'] < fit_result['Dp'], f"D {fit_result['D']} is larger than D* {fit_result['Dp']} for {name}"
     skiptime = False
     if not skiptime:
-        assert elapsed_time < 0.5, f"Algorithm {algorithm} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
+        assert elapsed_time < max_time, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 
-
-def algorithms():
-    # Find the algorithms from algorithms.json
-    file = pathlib.Path(__file__)
-    algorithm_path = file.with_name('algorithms.json')
-    with algorithm_path.open() as f:
-        algorithm_information = json.load(f)
-    algorithms = algorithm_information["algorithms"]
-    for algorithm in algorithms:
-        yield algorithm
-
-@pytest.mark.parametrize("algorithm", algorithms())
-def test_default_bounds_and_initial_guesses(algorithm):
-    fit = OsipiBase(algorithm=algorithm)
+def test_default_bounds_and_initial_guesses(algorithmlist,eng):
+    algorithm, requires_matlab, deep_learning = algorithmlist
+    if requires_matlab:
+        if eng is None:
+            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+        else:
+            kwargs = {'eng': eng}
+    else:
+        kwargs={}
+    if deep_learning:
+        pytest.skip(reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
+    fit = OsipiBase(algorithm=algorithm,**kwargs)
     #assert fit.bounds is not None, f"For {algorithm}, there is no default fit boundary"
     #assert fit.initial_guess is not None, f"For {algorithm}, there is no default fit initial guess"
     if fit.use_bounds:
@@ -129,33 +137,13 @@ def test_default_bounds_and_initial_guesses(algorithm):
         assert 0.9 <= fit.initial_guess[3] <= 1.1, f"For {algorithm}, the default initial guess for S {fit.initial_guess[3]} is unrealistic; note signal is normalized"
 
 
-def bound_input():
-    # Find the algorithms from algorithms.json
-    file = pathlib.Path(__file__)
-    algorithm_path = file.with_name('algorithms.json')
-    with algorithm_path.open() as f:
-        algorithm_information = json.load(f)
-
-    # Load generic test data generated from the included phantom: phantoms/MR_XCAT_qMRI
-    generic = file.with_name('generic.json')
-    with generic.open() as f:
-        all_data = json.load(f)
-
-    algorithms = algorithm_information["algorithms"]
-    bvals = all_data.pop('config')
-    bvals = bvals['bvalues']
-    for name, data in all_data.items():
-        for algorithm in algorithms:
-            algorithm_dict = algorithm_information.get(algorithm, {})
-            xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
-                "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
-            kwargs = algorithm_dict.get("options", {})
-            tolerances = algorithm_dict.get("tolerances", {})
-            yield name, bvals, data, algorithm, xfail, kwargs, tolerances
-
-
-@pytest.mark.parametrize("name, bvals, data, algorithm, xfail, kwargs, tolerances", bound_input())
-def test_bounds(name, bvals, data, algorithm, xfail, kwargs, tolerances, request):
+def test_bounds(bound_input, eng):
+    name, bvals, data, algorithm, xfail, kwargs, tolerances, requires_matlab = bound_input
+    if requires_matlab:
+        if eng is None:
+            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+        else:
+            kwargs = {**kwargs, 'eng': eng}
     bounds = ([0.0008, 0.2, 0.01, 1.1], [0.0012, 0.3, 0.02, 1.3])
     # deliberately have silly bounds to see whether they are used
     fit = OsipiBase(algorithm=algorithm, bounds=bounds, initial_guess = [0.001, 0.25, 0.015, 1.2], **kwargs)
@@ -197,8 +185,60 @@ def test_bounds(name, bvals, data, algorithm, xfail, kwargs, tolerances, request
             assert passDp, f"Fit still passes when initial guess Ds is out of fit bounds; potentially initial guesses not respected for: {name}" '''
 
 
+def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
+    algorithm, data, bvals, kwargs, requires_matlab, tolerances = deep_learning_algorithms
+
+    if requires_matlab:
+        if eng is None:
+            pytest.skip("Running without matlab; if Matlab is available please run pytest --withmatlab")
+        else:
+            kwargs = {**kwargs, 'eng': eng}
+
+    tolerances = tolerances_helper(tolerances, data)
+    fit = OsipiBase(bvalues=bvals, algorithm=algorithm, **kwargs)
+
+    array_2d = np.array([dat["data"] for _, dat in data.items()])
+    start_time = time.time()
+    fit_result = fit.osipi_fit_full_volume(array_2d, bvals)
+    elapsed_time = time.time() - start_time
+
+    errors = []  # Collect all assertion errors
+
+    def to_list_if_needed(value):
+        return value.tolist() if isinstance(value, np.ndarray) else value
+
+    for i, (name, dat) in enumerate(data.items()):
+        try:
+            record_property('test_data', {
+                "name": name,
+                "algorithm": algorithm,
+                "f_fit": to_list_if_needed(fit_result['f'][i]),
+                "Dp_fit": to_list_if_needed(fit_result['Dp'][i]),
+                "D_fit": to_list_if_needed(fit_result['D'][i]),
+                "f": to_list_if_needed(dat['f']),
+                "Dp": to_list_if_needed(dat['Dp']),
+                "D": to_list_if_needed(dat['D']),
+                "rtol": tolerances["rtol"],
+                "atol": tolerances["atol"]
+            })
+
+            npt.assert_allclose(fit_result['f'][i], dat['f'],
+                                rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
+
+            if dat['f'] < 0.80:
+                npt.assert_allclose(fit_result['D'][i], dat['D'],
+                                    rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
+
+            if dat['f'] > 0.03:
+                npt.assert_allclose(fit_result['Dp'][i], dat['Dp'],
+                                    rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
+
+        except AssertionError as e:
+            errors.append(f"{name + ' ' + algorithm+ ' D=' + str(dat['D']) + ' Dp=' + str(dat['Dp']) + ' f=' + str(dat['f'])}: {e}")
+
+    if errors:
+        all_errors = "\n".join(errors)
+        raise AssertionError(f"Some tests failed:\n{all_errors}")
 
 
 
-
-    

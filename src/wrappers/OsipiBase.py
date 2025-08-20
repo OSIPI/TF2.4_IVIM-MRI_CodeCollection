@@ -5,6 +5,7 @@ import pathlib
 import sys
 from tqdm import tqdm
 
+
 class OsipiBase:
     """The base class for OSIPI IVIM fitting"""
     
@@ -16,6 +17,8 @@ class OsipiBase:
         self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
         self.use_bounds = True
         self.use_initial_guess = True
+        self.deep_learning = False
+        self.supervised = False
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
@@ -103,21 +106,30 @@ class OsipiBase:
             #args = [data[ijk], use_bvalues]
             #fit = list(self.ivim_fit(*args, **kwargs))
             #results[ijk] = fit
+        minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
+        b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
 
         for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
-            args = [data[ijk], use_bvalues]
+            # Normalize array
+            single_voxel_data = data[ijk]
+            single_voxel_data_normalization_factor = np.mean(single_voxel_data[b0_indices])
+            single_voxel_data_normalized = single_voxel_data/single_voxel_data_normalization_factor
+
+            args = [single_voxel_data_normalized, use_bvalues]
             fit = self.ivim_fit(*args, **kwargs) # For single voxel fits, we assume this is a dict with a float value per key.
+            fit = self.D_and_Ds_swap(self.ivim_fit(*args, **kwargs)) # For single voxel fits, we assume this is a dict with a float value per key.
             for key in list(fit.keys()):
                 results[key][ijk] = fit[key]
-        
+
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         return results
-    
+
+
     def osipi_fit_full_volume(self, data, bvalues=None, **kwargs):
         """Sends a full volume in one go to the fitting algorithm. The osipi_fit method only sends one voxel at a time.
 
         Args:
-            data (array): 3D (single slice) or 4D (multi slice) DWI data.
+            data (array): 2D (data x b-values), 3D (single slice) or 4D (multi slice) DWI data, with last dimension the b-value dimension.
             bvalues (array, optional): The b-values of the DWI data. Defaults to None.
 
         Returns:
@@ -141,7 +153,15 @@ class OsipiBase:
             for key in self.result_keys:
                 results[key] = np.empty(list(data.shape[:-1]))
 
-            args = [data, use_bvalues]
+            minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
+            b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
+            b0_mean = np.mean(data[..., b0_indices], axis=-1)
+
+            normalization_factors = np.array([b0_mean for i in range(data.shape[-1])])
+            normalization_factors = np.moveaxis(normalization_factors, 0, -1)
+            data_normalized = data/normalization_factors
+
+            args = [data_normalized, use_bvalues]
             fit = self.ivim_fit_full_volume(*args, **kwargs) # Assume this is a dict with an array per key representing the parametric maps
             for key in list(fit.keys()):
                 results[key] = fit[key]
@@ -154,7 +174,8 @@ class OsipiBase:
                 print("Full volume fitting not supported for this algorithm")
 
             return False
-    
+
+
     def osipi_print_requirements(self):
         """
         Prints the requirements of the algorithm.
@@ -260,11 +281,11 @@ class OsipiBase:
         return True
 
     
-    def osipi_check_required_bvalues():
+    def osipi_check_required_bvalues(self):
         """Minimum number of b-values required"""
         pass
 
-    def osipi_author():
+    def osipi_author(self):
         """Author identification"""
         return ''
     
@@ -282,7 +303,7 @@ class OsipiBase:
             noised_signal = np.array([norm.rvs(signal, sigma) for signal in signals])
             
             # Perform fit with the noised signal
-            fit = self.osipi_fit(noised_signal, bvalues)
+            fit = self.D_and_Ds_swap(self.osipi_fit(noised_signal, bvalues))
             f_estimates[i] = fit['f']
             Dstar_estimates[i] = fit['Dp']
             D_estimates[i] = fit['D']
@@ -306,3 +327,12 @@ class OsipiBase:
             print()
         else:
             return {'f':f_bias,'Dstar':Dstar_bias,'D':D_bias}, {'f':f_RMSE,'Dstar':Dstar_RMSE,'D':D_RMSE}
+
+          
+    def D_and_Ds_swap(self,results):
+        if results['D']>results['Dp']:
+            D=results['Dp']
+            results['Dp']=results['D']
+            results['D']=D
+            results['f']=1-results['f']
+        return results
