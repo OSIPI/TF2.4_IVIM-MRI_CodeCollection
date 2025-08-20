@@ -28,6 +28,37 @@ def tolerances_helper(tolerances, data):
         tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 4e-2})
     return tolerances
 
+def data_ivim_fit_saved():
+    # Find the algorithms from algorithms.json
+    file = pathlib.Path(__file__)
+    algorithm_path = file.with_name('algorithms.json')
+    with algorithm_path.open() as f:
+        algorithm_information = json.load(f)
+
+    # Load generic test data generated from the included phantom: phantoms/MR_XCAT_qMRI
+    generic = file.with_name('generic.json')
+    with generic.open() as f:
+        all_data = json.load(f)
+
+    algorithms = algorithm_information["algorithms"]
+    bvals = all_data.pop('config')
+    bvals = bvals['bvalues']
+    first=True
+    for name, data in all_data.items():
+        for algorithm in algorithms:
+            algorithm_dict = algorithm_information.get(algorithm, {})
+            xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
+                "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
+            kwargs = algorithm_dict.get("options", {})
+            tolerances = algorithm_dict.get("tolerances", {})
+            skiptime=False
+            if first == True:
+                if algorithm_dict.get("fail_first_time", {}) == True:
+                    skiptime = True
+                    first = False
+            yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime
+
+
 def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
     name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab = data_ivim_fit_saved
     max_time = 0.5
@@ -65,12 +96,13 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
     record_property('test_data', test_result)
     if (data['f'] > 0.99 or data['f'] < 0.01) and not fit.use_bounds: #in these cases there are multiple solutions (D can become D*, f will be 0 and D* can be anything. This will be a good description of the data, so technically not a fail
         return
-    npt.assert_allclose(fit_result['f'],data['f'], rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
+    npt.assert_allclose(data['f'], fit_result['f'], rtol=tolerances["rtol"]["f"], atol=tolerances["atol"]["f"])
     if data['f']<0.80: # we need some signal for D to be detected
-        npt.assert_allclose(fit_result['D'],data['D'], rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
+        npt.assert_allclose(data['D'], fit_result['D'], rtol=tolerances["rtol"]["D"], atol=tolerances["atol"]["D"])
     if data['f']>0.03: #we need some f for D* to be interpretable
-        npt.assert_allclose(fit_result['Dp'],data['Dp'], rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
+        npt.assert_allclose(data['Dp'], fit_result['Dp'], rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
     #assert fit_result['D'] < fit_result['Dp'], f"D {fit_result['D']} is larger than D* {fit_result['Dp']} for {name}"
+    skiptime = False
     if not skiptime:
         assert elapsed_time < max_time, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 

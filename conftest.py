@@ -190,7 +190,6 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("deep_learning_algorithms", args)
 
 
-
 def data_list(filename):
     current_folder = pathlib.Path.cwd()
     data_path = current_folder / filename
