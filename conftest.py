@@ -264,7 +264,8 @@ def algorithmlist(algorithms):
     for algorithm in algorithms["algorithms"]:
         algorithm_dict = algorithms.get(algorithm, {})
         requires_matlab = algorithm_dict.get("requires_matlab", False)
-        yield algorithm, requires_matlab, algorithm_dict.get('deep_learning', False)
+        if not algorithm_dict.get('deep_learning', False):
+            yield algorithm, requires_matlab
 
 
 def bound_input(datafile, algorithms):
