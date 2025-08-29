@@ -56,6 +56,9 @@ class IVIM_NEToptim(OsipiBase):
         self.fitS0=fitS0
         self.deep_learning = True
         self.supervised = False
+        # Additional options
+        self.stochastic = True
+
         if traindata is None:
             warnings.warn('no training data provided (traindata = None). Training data will be simulated')
             if SNR is None:

@@ -1,8 +1,8 @@
 from src.wrappers.OsipiBase import OsipiBase
-from super_ivim_dc.source.Classsic_ivim_fit import IVIM_fit_sls
+from super_ivim_dc.source.Classsic_ivim_fit import IVIM_fit_sls_lm
 import numpy as np
 
-class TCML_TechnionIIT_SLS(OsipiBase):
+class TCML_TechnionIIT_lsq_sls_lm(OsipiBase):
     """
     TCML_TechnionIIT_lsqlm fitting algorithm by Angeleene Ang, Moti Freiman and Noam Korngut, TechnionIIT
     """
@@ -13,13 +13,14 @@ class TCML_TechnionIIT_SLS(OsipiBase):
 
     # Some basic stuff that identifies the algorithm
     id_author = "Angeleene Ang, Moti Freiman and Noam Korngut, TechnIIT"
-    id_algorithm_type = "Bi-exponential fit, segmented fitting"
+    id_algorithm_type = "Bi-exponential, segmented as initaition, followed by Levenberg-Marquardt algorithm"
     id_return_parameters = "f, D*, D, S0"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
 
     # Algorithm requirements
     required_bvalues = 4
-    required_thresholds = [0,1]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
+    required_thresholds = [0,
+                           1]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
     required_bounds = False
     required_bounds_optional = True  # Bounds may not be required but are optional
     required_initial_guess = False
@@ -40,26 +41,26 @@ class TCML_TechnionIIT_SLS(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(TCML_TechnionIIT_SLS, self).__init__(bvalues=bvalues, bounds=bounds)
-        self.fit_least_squares = IVIM_fit_sls
+        super(TCML_TechnionIIT_lsq_sls_lm, self).__init__(bvalues=bvalues, bounds=bounds)
+        self.fit_least_squares = IVIM_fit_sls_lm
         self.fitS0=fitS0
         self.initialize(bounds, fitS0,thresholds)
 
     def initialize(self, bounds, fitS0,thresholds):
         if bounds is None:
-            print('warning, only D* is bounded between 0.001 and 0.5)')
-            self.bounds = ([0.0003, 0.001, 0.009, 0],[0.008, 0.5,0.04, 3])
+            print(
+                'warning, no bounds were defined, so default bounds are used of ([0.0003, 0.001, 0.009, 0],[0.008, 0.5,0.04, 3])')
+            self.bounds = ([0.0003, 0.001, 0.009, 0], [0.008, 0.5, 0.04, 3])
         else:
-            print('warning, although bounds are given, only D* is bounded)')
-            bounds=bounds
+            bounds = bounds
             self.bounds = bounds
-        self.fitS0=fitS0
-        self.use_bounds = False
         if thresholds is None:
             self.thresholds = 150
             print('warning, no thresholds were defined, so default bounds are used of  150')
         else:
             self.thresholds = thresholds
+        self.fitS0=fitS0
+        self.use_bounds = False
         self.use_initial_guess = False
 
     def ivim_fit(self, signals, bvalues, **kwargs):
@@ -72,17 +73,18 @@ class TCML_TechnionIIT_SLS(OsipiBase):
         Returns:
             _type_: _description_
         """
-
-        bvalues=np.array(bvalues)
-        bounds=np.array(self.bounds)
-        bounds=[bounds[0][[0, 2, 1, 3]], bounds[1][[0, 2, 1, 3]]]
         signals[signals<0]=0
-
-        fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, bounds, min_bval_high=self.thresholds)
+        bvalues=np.array(bvalues)
+        fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, self.bounds, min_bval_high=self.thresholds)
 
         results = {}
-        results["D"] = fit_results[0]
-        results["f"] = fit_results[2]
-        results["Dp"] = fit_results[1]
+        if fit_results[0].size > 0:
+            results["D"] = fit_results[0]
+            results["f"] = fit_results[2]
+            results["Dp"] = fit_results[1]
+        else:
+            results["D"] = 0
+            results["f"] = 0
+            results["Dp"] = 0
 
         return results

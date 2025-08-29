@@ -10,6 +10,8 @@ Group: Uulke van der Heide - NKI
 """
 
 import numpy as np
+import warnings
+
 
 def generate_ADC_standalone(DWIdata, bvalues, bmin: int = 150, bmax: int = 1000, specificBvals: list = []):
     """
@@ -116,9 +118,11 @@ def generate_IVIMmaps_standalone(DWIdata, bvalues, bminADC=150, bmaxADC=1000, bm
             raise Exception('b=0 was not acquired')
 
         if len(bvalues) > 2:
-            print('More than two b-values were detected for D* calculation. ' +
-                  'Note that only the first two will be used for D*.')
-
+            warnings.warn(
+                'More than two b-values were detected for D* calculation. ' + 'Note that only the first two will be used for D*.',
+                category=UserWarning,
+                stacklevel=2  # Ensures correct file/line info in the warning
+            )
     except Exception as e:
         print("Could not calculate D* due to an error: " + str(e))
         return

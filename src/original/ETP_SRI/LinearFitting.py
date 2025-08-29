@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.polynomial.polynomial as poly
+import warnings
 
 from utilities.data_simulation.GenerateData import GenerateData
 
@@ -82,11 +83,17 @@ class LinearFit:
                 # print(Dp_prime)
             
             if np.any(np.asarray(Dp_prime) < 0) or not np.all(np.isfinite(Dp_prime)):
-                print('Perfusion fit failed')
+                warnings.warn('Perfusion fit failed',
+                    category=UserWarning,
+                    stacklevel=2  # Ensures correct file/line info in the warning
+                              )
                 Dp_prime = [0, 0]
             f = signal[0] - D[0]
         else:
-            print("This doesn't seem to be an IVIM set of b-values")
+            warnings.warn('This doesn\'t seem to be an IVIM set of b-values',
+                          category=UserWarning,
+                          stacklevel=2  # Ensures correct file/line info in the warning
+                          )
             f = 1
             Dp_prime = [0, 0]
         D = D[1]

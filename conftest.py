@@ -3,7 +3,8 @@ import pathlib
 import json
 import csv
 # import datetime
-
+import numpy as np
+from phantoms.MR_XCAT_qMRI.sim_ivim_sig import phantom
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -263,7 +264,8 @@ def algorithmlist(algorithms):
     for algorithm in algorithms["algorithms"]:
         algorithm_dict = algorithms.get(algorithm, {})
         requires_matlab = algorithm_dict.get("requires_matlab", False)
-        yield algorithm, requires_matlab, algorithm_dict.get('deep_learning', False)
+        if not algorithm_dict.get('deep_learning', False):
+            yield algorithm, requires_matlab
 
 
 def bound_input(datafile, algorithms):
@@ -302,3 +304,16 @@ def deep_learning_algorithms(datafile, algorithms):
             requires_matlab = algorithm_dict.get("requires_matlab", False)
             tolerances = algorithm_dict.get("tolerances", {"atol":{"f": 2e-1, "D": 8e-4, "Dp": 8e-2},"rtol":{"f": 0.2, "D": 0.3, "Dp": 0.4}})
             yield algorithm, all_data, bvals, kwargs, requires_matlab, tolerances
+
+
+@pytest.fixture(scope="session")
+def threeddata(request):
+    current_folder = pathlib.Path.cwd()
+    datafile = request.config.getoption("dataFile")
+    generic = current_folder / datafile
+    with generic.open() as f:
+        all_data = json.load(f)
+    bvals = all_data.pop('config')
+    bvals = np.array(bvals['bvalues'])
+    sig, _, Dim, fim, Dpim, _=phantom(bvals, 1/1000, TR=3000, TE=40, motion=False, rician=False, interleaved=False, T1T2=True)
+    return sig[::16,::8,::6,:], Dim[::16,::8,::6], fim[::16,::8,::6], Dpim[::16,::8,::6], bvals
