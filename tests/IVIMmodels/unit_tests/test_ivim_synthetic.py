@@ -12,7 +12,7 @@ from utilities.data_simulation.GenerateData import GenerateData
 @pytest.mark.slow
 def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_noise, save_file, save_duration_file, use_prior,eng):
     # assert save_file == "test"
-    ivim_algorithm, requires_matlab, deep_learning = algorithmlist
+    algorithm, requires_matlab, deep_learning = algorithmlist
     if requires_matlab and eng is None:
         pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
     if deep_learning:
@@ -25,7 +25,7 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
     D = data["D"]
     f = data["f"]
     Dp = data["Dp"]
-    fit = OsipiBase(algorithm=ivim_algorithm)
+    fit = OsipiBase(algorithm=algorithm)
     # here is a prior
     if use_prior and hasattr(fit, "supported_priors") and fit.supported_priors:
         prior = [rng.normal(D, D/3, 10), rng.normal(f, f/3, 10), rng.normal(Dp, Dp/3, 10), rng.normal(1, 1/3, 10)]
@@ -41,11 +41,11 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
         fit_result = fit.osipi_fit(signal, bvals) #, prior_in=prior
         time_delta += datetime.datetime.now() - start_time
         if save_file is not None:
-            save_file.writerow([ivim_algorithm, name, SNR, idx, f, Dp, D, fit_result["f"], fit_result["Dp"], fit_result["D"], *signal])
+            save_file.writerow([algorithm, name, SNR, idx, f, Dp, D, fit_result["f"], fit_result["Dp"], fit_result["D"], *signal])
             # save_results(save_file, ivim_algorithm, name, SNR, idx, [f, Dp, D], [f_fit, Dp_fit, D_fit])
         npt.assert_allclose([f, Dp, D], [fit_result["f"], fit_result["Dp"], fit_result["D"]], rtol, atol)
     if save_duration_file is not None:
-        save_duration_file.writerow([ivim_algorithm, name, SNR, time_delta/datetime.timedelta(microseconds=1), fit_count])
+        save_duration_file.writerow([algorithm, name, SNR, time_delta/datetime.timedelta(microseconds=1), fit_count])
         # save_duration(save_duration_file, ivim_algorithm, name, SNR, time_delta, fit_count)
 
 

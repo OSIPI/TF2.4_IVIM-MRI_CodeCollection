@@ -197,7 +197,6 @@ def pytest_generate_tests(metafunc):
         args = deep_learning_algorithms(config.getoption("dataFileDL"), algorithms)
         metafunc.parametrize("deep_learning_algorithms", args)
 
-
 def data_list(filename):
     current_folder = pathlib.Path.cwd()
     data_path = current_folder / filename
