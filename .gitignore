@@ -7,6 +7,7 @@ __pycache__/
 *.nii
 *.npy
 *.dcm
+*.npy
 *.mat
 *.raw
 bvals.txt
