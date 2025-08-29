@@ -6,6 +6,7 @@ __pycache__/
 *.nii.gz
 *.nii
 *.dcm
+*.npy
 *.mat
 *.raw
 bvals.txt

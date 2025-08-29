@@ -9,7 +9,7 @@ import warnings
 
 class Super_IVIM_DC(OsipiBase):
     """
-    Bi-exponential fitting algorithm by Oliver Gurney-Champion, Amsterdam UMC
+    Supervised deep learnt fitting algorithm by Moti Freiman and Noam Korngut, TechnionIIT
     """
 
     # I'm thinking that we define default attributes for each submission like this
@@ -17,7 +17,7 @@ class Super_IVIM_DC(OsipiBase):
     # the user inputs fulfil the requirements
 
     # Some basic stuff that identifies the algorithm
-    id_author = ""
+    id_author = "Moti Freiman and Noam Korngut, TechnIIT"
     id_algorithm_type = "Supervised Deep learnt bi-exponential fit with data consistency"
     id_return_parameters = "f, D*, D, S0"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
@@ -110,19 +110,20 @@ class Super_IVIM_DC(OsipiBase):
         return results
 
 
-    def test_deep_learning_algorithms(self, signals, bvalues, **kwargs):
+    def ivim_fit_full_volume(self, signals, bvalues, retrain_on_input_data=False, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
+            bvalues (array-like): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
-            results: a dictionary containing "d", "f", and "Dp".
+            _type_: _description_
         """
         if not np.array_equal(bvalues, self.bvalues):
             raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
 
+        signals = self.reshape_to_voxelwise(signals)
         Dp, Dt, f, S0_superivimdc = infer_from_signal(
             signal=signals,
             bvalues=self.bvalues,
@@ -135,3 +136,17 @@ class Super_IVIM_DC(OsipiBase):
         results["Dp"] = Dp
 
         return results
+
+
+    def reshape_to_voxelwise(self, data):
+        """
+        reshapes multi-D input (spatial dims, bvvalue) data to 2D voxel-wise array
+        Args:
+            data (array): mulit-D array (data x b-values)
+        Returns:
+            out (array): 2D array (voxel x b-value)
+        """
+        B = data.shape[-1]
+        voxels = int(np.prod(data.shape[:-1]))  # e.g., X*Y*Z
+        return data.reshape(voxels, B)
+
