@@ -1,0 +1,4 @@
+---
+global:
+    image: "dag-ivim-fitting-method"
+    action: "copy"
