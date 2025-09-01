@@ -22,17 +22,20 @@ https://kaapana.readthedocs.io/en/stable/installation_guide/requirements.html#re
 For the build process, I used GitLab registry. You'll need to configure three key parameters in your build-configuration file:
 
 #### 1. `default_registry`
+
 - Create a repository on GitLab
 - Navigate to **Deploy** → **Container Registry**
 - Copy the registry link (format: `registry.gitlab.com/your-username/repository-name`)
 - Example: `registry.gitlab.com/unique-usman/kaapana-tutorial`
 
 #### 2. `registry_password`
+
 - Go to your repository **Settings** → **Access Tokens**
 - Create a new token with read and write registry permissions
-- *Note: I granted all permissions for simplicity*
+- _Note: I granted all permissions for simplicity_
 
 #### 3. `registry_username`
+
 - Use the GitLab username under which you created the repository
 - Since I created my repository under my personal GitLab account, I used my GitLab username
 
@@ -63,7 +66,7 @@ I ran the deployment script directly, and it worked perfectly without any additi
 
 ### Accessing Your Kaapana Instance
 
-After successful deployment, you'll receive a web link to access your Kaapana instance. 
+After successful deployment, you'll receive a web link to access your Kaapana instance.
 
 ### DNS Configuration
 
@@ -87,4 +90,4 @@ your-server-ip    your-kaapana-domain
 
 ---
 
-*This guide reflects a successful single-machine Kaapana deployment using GCP and GitLab registry.*
+_This guide reflects a successful single-machine Kaapana deployment using GCP and GitLab registry._
