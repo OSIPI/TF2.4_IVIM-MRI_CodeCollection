@@ -60,9 +60,21 @@ if __name__ == "__main__":
     dicom_or_nifti = config.get("upload_type", "nifti").lower()
 
     if dicom_or_nifti == "nifti":
-        # Existing logic for NIfTI uploads
+        # Parse and validate source files
         source_files_kaapana = [f.strip() for f in config.get("source_files").split(",")]
         input_file, bvec_file, bval_file = source_files_kaapana
+
+        # Detect by extension
+        input_file = next((f for f in source_files_kaapana if f.endswith((".nii", ".nii.gz"))), None)
+        bvec_file = next((f for f in source_files_kaapana if f.endswith(".bvec")), None)
+        bval_file = next((f for f in source_files_kaapana if f.endswith(".bval")), None)
+
+        # Validate presence
+        if not input_file or not bvec_file or not bval_file:
+            raise ValueError(
+                f"Expected files to include one NIfTI (.nii/.nii.gz), one .bvec, and one .bval, "
+                f"but got: {source_files_kaapana}"
+            )
 
         input_file = os.path.join(element_input_dir, input_file)
         bvec_file = os.path.join(element_input_dir, bvec_file)
