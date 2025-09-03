@@ -6,12 +6,17 @@ LABEL BUILD_IGNORE="False"
 
 WORKDIR /kaapana/app
 
-# Install dependencies: dcm2niix + dcmtk (for dcmdjpls)
+# Install dependencies: curl, unzip, build tools (needed by Python packages)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    dcm2niix \
-    dcmtk \
+    curl \
+    unzip \
     build-essential \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install latest dcm2niix (from GitHub release)
+RUN curl -fLO https://github.com/rordenlab/dcm2niix/releases/latest/download/dcm2niix_lnx.zip \
+    && unzip dcm2niix_lnx.zip -d /usr/local/bin \
+    && rm dcm2niix_lnx.zip
 
 # Copy requirements
 COPY requirements.txt ./
@@ -21,4 +26,3 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY convert_dicom_to_nifti.py ./
 
 ENTRYPOINT ["python3", "-u", "convert_dicom_to_nifti.py"]
-

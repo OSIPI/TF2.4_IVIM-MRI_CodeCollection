@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 import subprocess
-import shutil
 from pathlib import Path
 from glob import glob
 from tqdm import tqdm
@@ -26,29 +25,15 @@ for batch_element_dir in tqdm(batch_folders, desc="Processing batch elements"):
 
     Path(element_output_dir).mkdir(parents=True, exist_ok=True)
 
-    # Create a temporary raw_dicoms directory
-    raw_dicoms_dir = os.path.join(batch_element_dir, "raw_dicoms")
-    Path(raw_dicoms_dir).mkdir(parents=True, exist_ok=True)
+    print(f" Converting {element_input_dir} → {element_output_dir}")
 
-    print(f" Decoding JPEG-LS DICOMs from {element_input_dir} → {raw_dicoms_dir}")
-
-    # Decode each DICOM using dcmdjpls
-    dcm_files = glob(os.path.join(element_input_dir, "*.dcm"))
-    for f in tqdm(dcm_files, desc="Decoding JPEG-LS", leave=False):
-        out_file = os.path.join(raw_dicoms_dir, os.path.basename(f))
-        try:
-            subprocess.run(["dcmdjpls", f, out_file], check=True)
-        except subprocess.CalledProcessError:
-            print(f"# ERROR: Failed to decode {f} with dcmdjpls")
-
-    # Run dcm2niix on the decoded folder
-    print(f" Converting raw_dicoms → {element_output_dir}")
+    # Run dcm2niix directly on the input folder
     cmd = [
         "dcm2niix",
-        "-z", "y",               # compress output
+        "-z", "y",               # compress output (gz)
         "-f", "%p_%t_%s",        # output filename pattern
         "-o", element_output_dir,
-        raw_dicoms_dir
+        element_input_dir
     ]
 
     try:
@@ -56,9 +41,3 @@ for batch_element_dir in tqdm(batch_folders, desc="Processing batch elements"):
         print(f"# Conversion completed for {element_input_dir}")
     except subprocess.CalledProcessError:
         print(f"# ERROR: dcm2niix failed for {element_input_dir}")
-    finally:
-        # Clean up raw_dicoms folder
-        if os.path.exists(raw_dicoms_dir):
-            shutil.rmtree(raw_dicoms_dir)
-            print(f"# Deleted temporary directory {raw_dicoms_dir}")
-
