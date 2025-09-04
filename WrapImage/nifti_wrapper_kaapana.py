@@ -90,22 +90,24 @@ if __name__ == "__main__":
             raise FileNotFoundError(f"No batch folders found in {BATCH_DIR}")
 
         # Pick the first batch folder (usually one per patient/series)
-        batch_input_dir = batch_folders[0]
-        batch_input_dir = os.path.join(batch_input_dir, "dicom_to_nifti")
+        batch_input_dir = os.path.join(batch_folders[0], "dicom_to_nifti")
 
-        nifti_files = glob.glob(os.path.join(batch_input_dir, "*.nii.gz"))
-        bvec_files = glob.glob(os.path.join(batch_input_dir, "*.bvec"))
-        bval_files = glob.glob(os.path.join(batch_input_dir, "*.bval"))
+        nifti_files = sorted(glob.glob(os.path.join(batch_input_dir, "*.nii.gz")))
+        if not nifti_files:
+            raise FileNotFoundError(f"No NIfTI files found in {batch_input_dir}")
 
-        if not nifti_files or not bvec_files or not bval_files:
-            raise FileNotFoundError(
-                f"Cannot find NIfTI or bvec/bval files in {batch_input_dir}"
-            )
+        paired_files = []
+        for nifti in nifti_files:
+            base = os.path.splitext(os.path.splitext(os.path.basename(nifti))[0])[0]  # remove .nii.gz
+            bvec_file = os.path.join(batch_input_dir, f"{base}.bvec")
+            bval_file = os.path.join(batch_input_dir, f"{base}.bval")
+            if os.path.exists(bvec_file) and os.path.exists(bval_file):
+                paired_files.append((nifti, bvec_file, bval_file))
+            else:
+                raise FileNotFoundError(f"Missing bvec/bval for {nifti}")
 
-        # Take the first matching file
-        input_file = nifti_files[0]
-        bvec_file = bvec_files[0]
-        bval_file = bval_files[0]
+        # Use the first matched trio
+        input_file, bvec_file, bval_file = paired_files[0]
 
         print(f"Using DICOM-converted files from {batch_input_dir}:\n"
               f"  {input_file}\n  {bvec_file}\n  {bval_file}")
