@@ -22,6 +22,9 @@ If you would like to contribute with code, please follow the instructions below:
 If you would like to use code from the repository and/or are new to Github or IVIM, please see the jupyter notebook below:
 *   [Introduction to TF2.4_IVIM-MRI_CodeCollection github and IVIM Analysis using Python](doc/Introduction_to_TF24_IVIM-MRI_CodeCollection_github_and_IVIM_Analysis_using_Python.ipynb)
 
+If you would like to use MATLAB-based algorithms or apply the testing framework to one of these algorithms, please have a look at these instructions:
+* [MATLAB-related instructions](doc/matlab_instructions.md)
+
 ## Repository Organization
 
 The repository is organized in four main folders along with configuration files for automated testing. 
