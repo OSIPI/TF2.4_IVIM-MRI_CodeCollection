@@ -1,6 +1,5 @@
 numpy<2
 nibabel
-inquirer
 scipy
 torchio
 torch
