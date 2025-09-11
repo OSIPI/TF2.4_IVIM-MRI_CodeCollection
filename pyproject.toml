@@ -25,7 +25,6 @@ dependencies = [
 dev = [
     "pytest",
     "pytest-json-report",
-    "itk",
 ]
 docs = [
     "sphinx",

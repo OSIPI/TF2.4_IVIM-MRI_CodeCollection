@@ -35,6 +35,8 @@ COPY --from=build /usr/local/bin/dcm2niix /usr/local/bin/dcm2niix
 
 COPY ../.. .
 
+RUN pip install --no-cache-dir "itk-io[full]>=5.3"
+
 RUN pip install --no-cache-dir .
 
 ENTRYPOINT ["python3", "-m", "WrapImage.dicom2niix_wrapper"]

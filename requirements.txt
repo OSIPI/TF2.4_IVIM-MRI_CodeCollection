@@ -1,7 +1,6 @@
 numpy<2
 nibabel
 inquirer
-itk
 scipy
 torchio
 torch
