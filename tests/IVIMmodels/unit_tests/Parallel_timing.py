@@ -3,9 +3,9 @@ import pytest
 import time
 from src.wrappers.OsipiBase import OsipiBase
 from joblib import Parallel, delayed
-import warnings
 import pandas as pd
 from pathlib import Path
+import matplotlib.pyplot as plt
 #run using python -m pytest from the root folder
 
 
@@ -56,3 +56,42 @@ def test_parallel(algorithmlist,eng,threeddata, results_file="parallel_timing_re
         updated = pd.DataFrame([row])
 
     updated.to_csv(results_path, index=False)
+
+    # ============== Plotting All Results ==============
+    df = pd.read_csv(results_path)
+
+    core_counts = [1, 2, 4, 8]
+
+    # --- Plot computing time vs cores for all algorithms ---
+    plt.figure(figsize=(7, 5))
+    for algo, group in df.groupby("algorithm"):
+        times = [group["serial_time_s"].mean()] + [
+            group[f"parallel_{c}_s"].mean() for c in [2, 4, 8]
+        ]
+        plt.plot(core_counts, times, marker="o", label=algo)
+
+    plt.xticks(core_counts)
+    plt.xlabel("Number of cores (n_jobs)")
+    plt.ylabel("Computing time (s)")
+    plt.title("Computing time vs. cores (all algorithms)")
+    plt.grid(True)
+    plt.legend()
+    plt.savefig("time_vs_cores_all.png", dpi=150)
+    plt.close()
+
+    # --- Plot speed-up vs cores for all algorithms ---
+    plt.figure(figsize=(7, 5))
+    for algo, group in df.groupby("algorithm"):
+        speedups = [
+            group[f"speedup_{c}x"].mean() for c in [2, 4, 8]
+        ]
+        plt.plot([2, 4, 8], speedups, marker="o", label=algo)
+
+    plt.xticks([2, 4, 8])
+    plt.xlabel("Number of cores (n_jobs)")
+    plt.ylabel("Speed-up (serial/parallel)")
+    plt.title("Speed-up vs. cores (all algorithms)")
+    plt.grid(True)
+    plt.legend()
+    plt.savefig("speedup_vs_cores_all.png", dpi=150)
+    plt.close()
