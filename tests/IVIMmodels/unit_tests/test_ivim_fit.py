@@ -108,7 +108,6 @@ def test_default_bounds_and_initial_guesses(algorithmlist,eng):
         assert 0.003 <= fit.initial_guess[2] <= 0.1, f"For {algorithm}, the default initial guess for Ds {fit.initial_guess[2]} is unrealistic"
         assert 0.9 <= fit.initial_guess[3] <= 1.1, f"For {algorithm}, the default initial guess for S {fit.initial_guess[3]} is unrealistic; note signal is normalized"
 
-
 def test_bounds(bound_input, eng):
     name, bvals, data, algorithm, xfail, kwargs, tolerances, requires_matlab = bound_input
     if requires_matlab:
@@ -188,7 +187,6 @@ def test_volume(algorithmlist,eng, threeddata):
     else:
         pytest.skip(reason="Wrapper has no ivim_fit_full_volume option")
 
-
 def test_parallel(algorithmlist,eng,threeddata):
     algorithm, requires_matlab = algorithmlist
     data, Dim, fim, Dpim, bvals = threeddata
@@ -232,7 +230,6 @@ def test_parallel(algorithmlist,eng,threeddata):
             f"[PERFORMANCE WARNING] Parallel code is not significantly faster than serial: "
             f"{time_parallel:.3f}s vs {time_serial:.3f}s", PerformanceWarning
         )
-
 
 def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
     algorithm, data, bvals, kwargs, requires_matlab, tolerances = deep_learning_algorithms
