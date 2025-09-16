@@ -115,7 +115,7 @@ class IAR_LU_biexp(OsipiBase):
             
             self.IAR_algorithm = IvimModelBiExp(gtab, bounds=self.bounds, initial_guess=self.initial_guess)
         b0_index = np.where(bvalues == 0)[0][0]
-        mask = signals[...,b0_index]>0.01
+        mask = signals[...,b0_index]>0
         fit_results = self.IAR_algorithm.fit(signals, mask=mask)
         
         results = {}

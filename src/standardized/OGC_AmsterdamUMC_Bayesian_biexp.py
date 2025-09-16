@@ -127,7 +127,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
 
         b0_index = np.where(bvalues == 0)[0][0]
         # Mask of voxels where signal at b=0 >= 0.5
-        valid_mask = signals[..., b0_index] >= 0.01
+        valid_mask = signals[..., b0_index] >= 0
         # Select only valid voxels for fitting
         signals = signals[valid_mask]
 

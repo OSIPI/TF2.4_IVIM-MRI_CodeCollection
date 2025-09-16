@@ -8,7 +8,89 @@ from joblib import Parallel, delayed
 
 
 class OsipiBase:
-    """The base class for OSIPI IVIM fitting"""
+    """
+    Comprehensive base class for OSIPI IVIM fitting algorithms.
+
+    The ``OsipiBase`` class defines a standardized framework for fitting
+    intravoxel incoherent motion (IVIM) models to diffusion-weighted MRI data.
+    It manages common attributes such as b-values, parameter bounds,
+    thresholds, and initial guesses; provides requirement-checking utilities;
+    and offers convenience methods for voxel-wise or full-volume fitting.
+    Subclasses can implement algorithm-specific behavior while inheriting
+    these shared tools.
+
+    Parameters
+    ----------
+    bvalues : array-like, optional
+        Diffusion b-values (s/mm²) matching the last dimension of the input data.
+    thresholds : array-like, optional
+        Thresholds used by specific algorithms (e.g., signal cutoffs).
+    bounds : array-like, optional
+        Parameter bounds for constrained optimization.
+    initial_guess : array-like, optional
+        Initial parameter estimates for the IVIM fit.
+    algorithm : str, optional
+        Name of an algorithm module in ``src/standardized`` to load dynamically.
+        If supplied, the instance is immediately converted to that algorithm’s
+        subclass via :meth:`osipi_initiate_algorithm`.
+    **kwargs
+        Additional keyword arguments forwarded to the selected algorithm’s
+        initializer if ``algorithm`` is provided.
+
+    Attributes
+    ----------
+    bvalues, thresholds, bounds, initial_guess : np.ndarray or None
+        Core fitting inputs stored as arrays when provided.
+    use_bounds, use_initial_guess : bool
+        Flags controlling whether bounds and initial guesses are applied.
+    deep_learning, supervised, stochastic : bool
+        Indicators for the algorithm type; subclasses may set these.
+    result_keys : list of str, optional
+        Names of the output parameters (e.g., ["f", "Dp", "D"]).
+    required_bvalues, required_thresholds, required_bounds,
+    required_bounds_optional, required_initial_guess,
+    required_initial_guess_optional : various, optional
+        Optional attributes used by requirement-checking helpers.
+
+    Key Methods
+    -----------
+    osipi_initiate_algorithm(algorithm, **kwargs)
+        Dynamically replace the current instance with the specified
+        algorithm subclass.
+    osipi_fit(data, bvalues=None, njobs=1, **kwargs)
+        Voxel-wise IVIM fitting with optional parallel processing and
+        automatic signal normalization.
+    osipi_fit_full_volume(data, bvalues=None, **kwargs)
+        Full-volume fitting for algorithms that support it.
+    osipi_print_requirements()
+        Display algorithm requirements such as needed b-values or bounds.
+    osipi_accepted_dimensions(), osipi_accepts_dimension(dim)
+        Query acceptable input dimensionalities.
+    osipi_check_required_*()
+        Validate that provided inputs meet algorithm requirements.
+    osipi_simple_bias_and_RMSE_test(SNR, bvalues, f, Dstar, D, noise_realizations)
+        Monte-Carlo bias/RMSE evaluation of the current fitting method.
+    D_and_Ds_swap(results)
+        Ensure consistency of D and D* estimates by swapping if necessary.
+
+    Notes
+    -----
+    * This class is typically used as a base or as a dynamic loader for
+      a specific algorithm implementation.
+    * Parallel voxel-wise fitting uses :mod:`joblib`.
+    * Subclasses must implement algorithm-specific methods such as
+      :meth:`ivim_fit` or :meth:`ivim_fit_full_volume`.
+
+    Examples
+    --------
+    # Dynamic algorithm loading
+    model = OsipiBase(bvalues=[0, 50, 200, 800],
+                      algorithm="MyAlgorithm")
+
+    # Voxel-wise fitting
+    results = base.osipi_fit(dwi_data, njobs=4)
+    f_map = results["f"]
+    """
     
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, algorithm=None, **kwargs):
         # Define the attributes as numpy arrays only if they are not None
@@ -54,9 +136,48 @@ class OsipiBase:
         pass
 
     #def osipi_fit(self, data=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, **kwargs):
-    def osipi_fit(self, data, bvalues=None, njobs=8, **kwargs):
-        """Fits the data with the bvalues
-        Returns [S0, f, Dstar, D]
+    def osipi_fit(self, data, bvalues=None, njobs=1, **kwargs):
+        """
+        Fit multi-b-value diffusion MRI data using the IVIM model.
+
+        This function normalizes the input signal to the minimum b-value and fits each voxel's signal to the IVIM model to estimate parameters such as
+        perfusion fraction (f), pseudo-diffusion coefficient (D*), and tissue diffusion coefficient (D).
+        Fits can be computed in parallel across voxels using multiple jobs.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            Multi-dimensional array containing the signal intensities. The last dimension must correspond
+            to the b-values (diffusion weightings).
+        bvalues : array-like, optional
+            Array of b-values corresponding to the last dimension of `data`. If not provided, the method
+            uses `self.bvalues` set during object initialization.
+        njobs : int, optional, default=1
+            Number of parallel jobs to use for voxel-wise fitting. If `njobs` > 1, the fitting will be
+            distributed across multiple processes. -1 will use all available cpus
+        **kwargs : dict, optional
+            Additional keyword arguments to be passed to the underlying `ivim_fit` function.
+
+        Returns
+        -------
+        results : dict of np.ndarray
+            Dictionary containing voxel-wise parameter maps. Keys are parameter names ("f", "D", "Dp"),
+            and values are arrays with the same shape as `data` excluding the last dimension.
+
+        Notes
+        -----
+        - The signal is normalized to the minimum b-value before fitting.
+        - Handles NaN values by returning zeros for all parameters in those voxels.
+        - Parallelization is handled using joblib's `Parallel` and `delayed`.
+        - If `self.result_keys` is defined, it determines the output parameter names; otherwise, the default
+          keys are ["f", "Dp", "D"].
+        - The method swaps D and D* values after fitting using `self.D_and_Ds_swap` to maintain consistency.
+
+        Example
+        -------
+        >>> results = instance.osipi_fit(data, bvalues=[0, 50, 200, 800], njobs=4)
+        >>> f_map = results['f']
+        >>> D_map = results['D']
         """
         
         # We should first check whether the attributes in the __init__ are not None
@@ -159,14 +280,46 @@ class OsipiBase:
 
 
     def osipi_fit_full_volume(self, data, bvalues=None, **kwargs):
-        """Sends a full volume in one go to the fitting algorithm. The osipi_fit method only sends one voxel at a time.
+        """
+        Fit an entire volume of multi-b-value diffusion MRI data in a single call using the IVIM model.
 
-        Args:
-            data (array): 2D (data x b-values), 3D (single slice) or 4D (multi slice) DWI data, with last dimension the b-value dimension.
-            bvalues (array, optional): The b-values of the DWI data. Defaults to None.
+        Unlike `osipi_fit`, which processes one voxel at a time, this method sends the full volume
+        to the fitting algorithm. This can be more efficient for algorithms that support full-volume fitting.
 
-        Returns:
-            results (dict): Dict with key each containing an array which is a parametric map.
+        Parameters
+        ----------
+        data : np.ndarray
+            2D (data x b-values), 3D (single slice), or 4D (multi-slice) diffusion-weighted imaging (DWI) data.
+            The last dimension must correspond to the b-values.
+        bvalues : array-like, optional
+            Array of b-values corresponding to the last dimension of `data`. If not provided, the method
+            uses `self.bvalues` set during object initialization.
+        **kwargs : dict, optional
+            Additional keyword arguments to be passed to `ivim_fit_full_volume`.
+
+        Returns
+        -------
+        results : dict of np.ndarray or bool
+            Dictionary containing parametric maps for each IVIM parameter (keys from `self.result_keys`,
+            or defaults ["f", "Dp", "D"]). Each value is an array matching the spatial dimensions of `data`.
+            Returns `False` if full-volume fitting is not supported by the algorithm.
+
+        Notes
+        -----
+        - This method does not normalize the input signal to the minimum b-value, unlike `osipi_fit`.
+
+        Example
+        -------
+        # Standard usage:
+        results = instance.osipi_fit_full_volume(data, bvalues=[0, 50, 200, 800])
+        f_map = results['f']
+        D_map = results['D']
+        Dp_map = results['Dp']
+
+        # If the algorithm does not support full-volume fitting:
+        results = instance.osipi_fit_full_volume(data)
+        if results is False:
+            print("Full-volume fitting not supported.")
         """
         
         try:
