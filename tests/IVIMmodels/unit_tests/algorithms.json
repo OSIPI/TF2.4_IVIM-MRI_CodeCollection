@@ -1,5 +1,10 @@
 {
     "algorithms": [
+        "IVIM_NEToptim",
+        "TCML_TechnionIIT_lsqlm",
+        "TCML_TechnionIIT_lsqtrf",
+        "TCML_TechnionIIT_lsq_sls_lm",
+        "TCML_TechnionIIT_SLS",
         "Super_IVIM_DC",
         "ASD_MemorialSloanKettering_QAMPER_IVIM",
         "ETP_SRI_LinearFitting",
