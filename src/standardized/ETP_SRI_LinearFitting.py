@@ -1,6 +1,8 @@
 import numpy as np
 from src.wrappers.OsipiBase import OsipiBase
 from src.original.ETP_SRI.LinearFitting import LinearFit
+import warnings
+warnings.simplefilter('once', UserWarning)
 
 
 class ETP_SRI_LinearFitting(OsipiBase):
