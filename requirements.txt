@@ -18,3 +18,6 @@ sphinx_rtd_theme
 pytest-json-report
 statsmodels
 ivimnet
+ipykernel
+pylint
+schemdraw
