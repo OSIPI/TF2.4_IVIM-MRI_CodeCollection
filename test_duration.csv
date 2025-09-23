@@ -1,0 +1,1945 @@
+Algorithm,Region,SNR,Duration [us],Count
+TCML_TechnionIIT_lsqlm,Myocardium LV,10,15000.0,2
+TCML_TechnionIIT_lsqtrf,Myocardium LV,10,7999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Myocardium LV,10,6004.0,2
+TCML_TechnionIIT_SLS,Myocardium LV,10,2999.0,2
+ETP_SRI_LinearFitting,Myocardium LV,10,997.0,2
+IAR_LU_biexp,Myocardium LV,10,9000.0,2
+IAR_LU_modified_mix,Myocardium LV,10,134991.0,2
+IAR_LU_modified_topopro,Myocardium LV,10,77997.0,2
+IAR_LU_segmented_2step,Myocardium LV,10,10007.0,2
+IAR_LU_segmented_3step,Myocardium LV,10,14006.0,2
+IAR_LU_subtracted,Myocardium LV,10,8000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Myocardium LV,10,23007.0,2
+OGC_AmsterdamUMC_biexp_segmented,Myocardium LV,10,8031.0,2
+OGC_AmsterdamUMC_biexp,Myocardium LV,10,11007.0,2
+PV_MUMC_biexp,Myocardium LV,10,15002.0,2
+PvH_KB_NKI_IVIMfit,Myocardium LV,10,1007.0,2
+OJ_GU_seg,Myocardium LV,10,4998.0,2
+TF_reference_IVIMfit,Myocardium LV,10,12994.0,2
+TCML_TechnionIIT_lsqlm,myocardium RV,10,3002.0,2
+TCML_TechnionIIT_lsqtrf,myocardium RV,10,6991.0,2
+TCML_TechnionIIT_lsq_sls_lm,myocardium RV,10,5998.0,2
+TCML_TechnionIIT_SLS,myocardium RV,10,3000.0,2
+ETP_SRI_LinearFitting,myocardium RV,10,1000.0,2
+IAR_LU_biexp,myocardium RV,10,7000.0,2
+IAR_LU_modified_mix,myocardium RV,10,133588.0,2
+IAR_LU_modified_topopro,myocardium RV,10,68999.0,2
+IAR_LU_segmented_2step,myocardium RV,10,10001.0,2
+IAR_LU_segmented_3step,myocardium RV,10,13999.0,2
+IAR_LU_subtracted,myocardium RV,10,8999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,myocardium RV,10,21998.0,2
+OGC_AmsterdamUMC_biexp_segmented,myocardium RV,10,7032.0,2
+OGC_AmsterdamUMC_biexp,myocardium RV,10,9030.0,2
+PV_MUMC_biexp,myocardium RV,10,12005.0,2
+PvH_KB_NKI_IVIMfit,myocardium RV,10,999.0,2
+OJ_GU_seg,myocardium RV,10,3992.0,2
+TF_reference_IVIMfit,myocardium RV,10,10038.0,2
+TCML_TechnionIIT_lsqlm,myocardium ra,10,3997.0,2
+TCML_TechnionIIT_lsqtrf,myocardium ra,10,4999.0,2
+TCML_TechnionIIT_lsq_sls_lm,myocardium ra,10,11999.0,2
+TCML_TechnionIIT_SLS,myocardium ra,10,3000.0,2
+ETP_SRI_LinearFitting,myocardium ra,10,1000.0,2
+IAR_LU_biexp,myocardium ra,10,5999.0,2
+IAR_LU_modified_mix,myocardium ra,10,191006.0,2
+IAR_LU_modified_topopro,myocardium ra,10,60444.0,2
+IAR_LU_segmented_2step,myocardium ra,10,8000.0,2
+IAR_LU_segmented_3step,myocardium ra,10,11000.0,2
+IAR_LU_subtracted,myocardium ra,10,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,myocardium ra,10,24000.0,2
+OGC_AmsterdamUMC_biexp_segmented,myocardium ra,10,5007.0,2
+OGC_AmsterdamUMC_biexp,myocardium ra,10,7007.0,2
+PV_MUMC_biexp,myocardium ra,10,9000.0,2
+PvH_KB_NKI_IVIMfit,myocardium ra,10,1017.0,2
+OJ_GU_seg,myocardium ra,10,3997.0,2
+TF_reference_IVIMfit,myocardium ra,10,10999.0,2
+TCML_TechnionIIT_lsqlm,Blood RV,10,1003.0,2
+TCML_TechnionIIT_lsqtrf,Blood RV,10,6000.0,2
+TCML_TechnionIIT_lsq_sls_lm,Blood RV,10,3990.0,2
+TCML_TechnionIIT_SLS,Blood RV,10,2001.0,2
+ETP_SRI_LinearFitting,Blood RV,10,1002.0,2
+IAR_LU_biexp,Blood RV,10,7006.0,2
+IAR_LU_modified_mix,Blood RV,10,103000.0,2
+IAR_LU_modified_topopro,Blood RV,10,40560.0,2
+IAR_LU_segmented_2step,Blood RV,10,10000.0,2
+IAR_LU_segmented_3step,Blood RV,10,13002.0,2
+IAR_LU_subtracted,Blood RV,10,8008.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Blood RV,10,22000.0,2
+OGC_AmsterdamUMC_biexp_segmented,Blood RV,10,8000.0,2
+OGC_AmsterdamUMC_biexp,Blood RV,10,7000.0,2
+PV_MUMC_biexp,Blood RV,10,8010.0,2
+PvH_KB_NKI_IVIMfit,Blood RV,10,997.0,2
+OJ_GU_seg,Blood RV,10,1006.0,2
+TF_reference_IVIMfit,Blood RV,10,11995.0,2
+TCML_TechnionIIT_lsqlm,Blood RA,10,2000.0,2
+TCML_TechnionIIT_lsqtrf,Blood RA,10,7008.0,2
+TCML_TechnionIIT_lsq_sls_lm,Blood RA,10,5002.0,2
+TCML_TechnionIIT_SLS,Blood RA,10,4007.0,2
+ETP_SRI_LinearFitting,Blood RA,10,2001.0,2
+IAR_LU_biexp,Blood RA,10,6003.0,2
+IAR_LU_modified_mix,Blood RA,10,98999.0,2
+IAR_LU_modified_topopro,Blood RA,10,39000.0,2
+IAR_LU_segmented_2step,Blood RA,10,10006.0,2
+IAR_LU_segmented_3step,Blood RA,10,12997.0,2
+IAR_LU_subtracted,Blood RA,10,9007.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Blood RA,10,22000.0,2
+OGC_AmsterdamUMC_biexp_segmented,Blood RA,10,10010.0,2
+OGC_AmsterdamUMC_biexp,Blood RA,10,5999.0,2
+PV_MUMC_biexp,Blood RA,10,7997.0,2
+PvH_KB_NKI_IVIMfit,Blood RA,10,1009.0,2
+OJ_GU_seg,Blood RA,10,2000.0,2
+TF_reference_IVIMfit,Blood RA,10,14000.0,2
+TCML_TechnionIIT_lsqlm,muscle,10,1002.0,2
+TCML_TechnionIIT_lsqtrf,muscle,10,4999.0,2
+TCML_TechnionIIT_lsq_sls_lm,muscle,10,15994.0,2
+TCML_TechnionIIT_SLS,muscle,10,3998.0,2
+ETP_SRI_LinearFitting,muscle,10,998.0,2
+IAR_LU_biexp,muscle,10,5000.0,2
+IAR_LU_modified_mix,muscle,10,204004.0,2
+IAR_LU_modified_topopro,muscle,10,77999.0,2
+IAR_LU_segmented_2step,muscle,10,6010.0,2
+IAR_LU_segmented_3step,muscle,10,10999.0,2
+IAR_LU_subtracted,muscle,10,7004.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,muscle,10,23002.0,2
+OGC_AmsterdamUMC_biexp_segmented,muscle,10,8006.0,2
+OGC_AmsterdamUMC_biexp,muscle,10,7007.0,2
+PV_MUMC_biexp,muscle,10,8004.0,2
+PvH_KB_NKI_IVIMfit,muscle,10,1000.0,2
+OJ_GU_seg,muscle,10,3989.0,2
+TF_reference_IVIMfit,muscle,10,10998.0,2
+TCML_TechnionIIT_lsqlm,Liver,10,3000.0,2
+TCML_TechnionIIT_lsqtrf,Liver,10,5001.0,2
+TCML_TechnionIIT_lsq_sls_lm,Liver,10,14000.0,2
+TCML_TechnionIIT_SLS,Liver,10,4004.0,2
+ETP_SRI_LinearFitting,Liver,10,0.0,2
+IAR_LU_biexp,Liver,10,6000.0,2
+IAR_LU_modified_mix,Liver,10,203545.0,2
+IAR_LU_modified_topopro,Liver,10,94000.0,2
+IAR_LU_segmented_2step,Liver,10,8046.0,2
+IAR_LU_segmented_3step,Liver,10,11000.0,2
+IAR_LU_subtracted,Liver,10,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Liver,10,28000.0,2
+OGC_AmsterdamUMC_biexp_segmented,Liver,10,6993.0,2
+OGC_AmsterdamUMC_biexp,Liver,10,6999.0,2
+PV_MUMC_biexp,Liver,10,10003.0,2
+PvH_KB_NKI_IVIMfit,Liver,10,1001.0,2
+OJ_GU_seg,Liver,10,5007.0,2
+TF_reference_IVIMfit,Liver,10,12009.0,2
+TCML_TechnionIIT_lsqlm,gall bladder,10,2005.0,2
+TCML_TechnionIIT_lsqtrf,gall bladder,10,5999.0,2
+TCML_TechnionIIT_lsq_sls_lm,gall bladder,10,5003.0,2
+TCML_TechnionIIT_SLS,gall bladder,10,2999.0,2
+ETP_SRI_LinearFitting,gall bladder,10,999.0,2
+IAR_LU_biexp,gall bladder,10,10007.0,2
+IAR_LU_modified_mix,gall bladder,10,189999.0,2
+IAR_LU_modified_topopro,gall bladder,10,75003.0,2
+IAR_LU_segmented_2step,gall bladder,10,7999.0,2
+IAR_LU_segmented_3step,gall bladder,10,11008.0,2
+IAR_LU_subtracted,gall bladder,10,8998.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,gall bladder,10,18000.0,2
+OGC_AmsterdamUMC_biexp_segmented,gall bladder,10,5000.0,2
+OGC_AmsterdamUMC_biexp,gall bladder,10,9004.0,2
+PV_MUMC_biexp,gall bladder,10,14001.0,2
+PvH_KB_NKI_IVIMfit,gall bladder,10,1010.0,2
+OJ_GU_seg,gall bladder,10,4000.0,2
+TF_reference_IVIMfit,gall bladder,10,10000.0,2
+TCML_TechnionIIT_lsqlm,esophagus,10,2007.0,2
+TCML_TechnionIIT_lsqtrf,esophagus,10,5002.0,2
+TCML_TechnionIIT_lsq_sls_lm,esophagus,10,5999.0,2
+TCML_TechnionIIT_SLS,esophagus,10,3000.0,2
+ETP_SRI_LinearFitting,esophagus,10,1000.0,2
+IAR_LU_biexp,esophagus,10,5000.0,2
+IAR_LU_modified_mix,esophagus,10,187011.0,2
+IAR_LU_modified_topopro,esophagus,10,82990.0,2
+IAR_LU_segmented_2step,esophagus,10,8004.0,2
+IAR_LU_segmented_3step,esophagus,10,11002.0,2
+IAR_LU_subtracted,esophagus,10,9007.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,esophagus,10,15003.0,2
+OGC_AmsterdamUMC_biexp_segmented,esophagus,10,6000.0,2
+OGC_AmsterdamUMC_biexp,esophagus,10,4003.0,2
+PV_MUMC_biexp,esophagus,10,8035.0,2
+PvH_KB_NKI_IVIMfit,esophagus,10,1007.0,2
+OJ_GU_seg,esophagus,10,5002.0,2
+TF_reference_IVIMfit,esophagus,10,14000.0,2
+TCML_TechnionIIT_lsqlm,esophagus cont,10,2004.0,2
+TCML_TechnionIIT_lsqtrf,esophagus cont,10,5999.0,2
+TCML_TechnionIIT_lsq_sls_lm,esophagus cont,10,5000.0,2
+TCML_TechnionIIT_SLS,esophagus cont,10,3997.0,2
+ETP_SRI_LinearFitting,esophagus cont,10,1011.0,2
+IAR_LU_biexp,esophagus cont,10,4997.0,2
+IAR_LU_modified_mix,esophagus cont,10,202856.0,2
+IAR_LU_modified_topopro,esophagus cont,10,82999.0,2
+IAR_LU_segmented_2step,esophagus cont,10,8007.0,2
+IAR_LU_segmented_3step,esophagus cont,10,12000.0,2
+IAR_LU_subtracted,esophagus cont,10,9018.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,esophagus cont,10,14997.0,2
+OGC_AmsterdamUMC_biexp_segmented,esophagus cont,10,6000.0,2
+OGC_AmsterdamUMC_biexp,esophagus cont,10,4990.0,2
+PV_MUMC_biexp,esophagus cont,10,8003.0,2
+PvH_KB_NKI_IVIMfit,esophagus cont,10,992.0,2
+OJ_GU_seg,esophagus cont,10,5989.0,2
+TF_reference_IVIMfit,esophagus cont,10,14026.0,2
+TCML_TechnionIIT_lsqlm,st wall,10,3006.0,2
+TCML_TechnionIIT_lsqtrf,st wall,10,6010.0,2
+TCML_TechnionIIT_lsq_sls_lm,st wall,10,6006.0,2
+TCML_TechnionIIT_SLS,st wall,10,4001.0,2
+ETP_SRI_LinearFitting,st wall,10,1000.0,2
+IAR_LU_biexp,st wall,10,5000.0,2
+IAR_LU_modified_mix,st wall,10,211947.0,2
+IAR_LU_modified_topopro,st wall,10,56000.0,2
+IAR_LU_segmented_2step,st wall,10,6999.0,2
+IAR_LU_segmented_3step,st wall,10,10992.0,2
+IAR_LU_subtracted,st wall,10,8018.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,st wall,10,28542.0,2
+OGC_AmsterdamUMC_biexp_segmented,st wall,10,5997.0,2
+OGC_AmsterdamUMC_biexp,st wall,10,7002.0,2
+PV_MUMC_biexp,st wall,10,7006.0,2
+PvH_KB_NKI_IVIMfit,st wall,10,1000.0,2
+OJ_GU_seg,st wall,10,6000.0,2
+TF_reference_IVIMfit,st wall,10,11997.0,2
+TCML_TechnionIIT_lsqlm,Stomach Contents,10,2000.0,2
+TCML_TechnionIIT_lsqtrf,Stomach Contents,10,7007.0,2
+TCML_TechnionIIT_lsq_sls_lm,Stomach Contents,10,6011.0,2
+TCML_TechnionIIT_SLS,Stomach Contents,10,1999.0,2
+ETP_SRI_LinearFitting,Stomach Contents,10,1011.0,2
+IAR_LU_biexp,Stomach Contents,10,10005.0,2
+IAR_LU_modified_mix,Stomach Contents,10,194577.0,2
+IAR_LU_modified_topopro,Stomach Contents,10,113907.0,2
+IAR_LU_segmented_2step,Stomach Contents,10,8008.0,2
+IAR_LU_segmented_3step,Stomach Contents,10,12005.0,2
+IAR_LU_subtracted,Stomach Contents,10,9000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Stomach Contents,10,18000.0,2
+OGC_AmsterdamUMC_biexp_segmented,Stomach Contents,10,6007.0,2
+OGC_AmsterdamUMC_biexp,Stomach Contents,10,9000.0,2
+PV_MUMC_biexp,Stomach Contents,10,13034.0,2
+PvH_KB_NKI_IVIMfit,Stomach Contents,10,993.0,2
+OJ_GU_seg,Stomach Contents,10,4004.0,2
+TF_reference_IVIMfit,Stomach Contents,10,10003.0,2
+TCML_TechnionIIT_lsqlm,pancreas,10,2000.0,2
+TCML_TechnionIIT_lsqtrf,pancreas,10,4107.0,2
+TCML_TechnionIIT_lsq_sls_lm,pancreas,10,5007.0,2
+TCML_TechnionIIT_SLS,pancreas,10,4000.0,2
+ETP_SRI_LinearFitting,pancreas,10,1000.0,2
+IAR_LU_biexp,pancreas,10,6999.0,2
+IAR_LU_modified_mix,pancreas,10,203999.0,2
+IAR_LU_modified_topopro,pancreas,10,60546.0,2
+IAR_LU_segmented_2step,pancreas,10,8001.0,2
+IAR_LU_segmented_3step,pancreas,10,11990.0,2
+IAR_LU_subtracted,pancreas,10,6997.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,pancreas,10,33000.0,2
+OGC_AmsterdamUMC_biexp_segmented,pancreas,10,6000.0,2
+OGC_AmsterdamUMC_biexp,pancreas,10,6999.0,2
+PV_MUMC_biexp,pancreas,10,9998.0,2
+PvH_KB_NKI_IVIMfit,pancreas,10,0.0,2
+OJ_GU_seg,pancreas,10,5000.0,2
+TF_reference_IVIMfit,pancreas,10,11007.0,2
+TCML_TechnionIIT_lsqlm,Right kydney cortex,10,4011.0,2
+TCML_TechnionIIT_lsqtrf,Right kydney cortex,10,5004.0,2
+TCML_TechnionIIT_lsq_sls_lm,Right kydney cortex,10,7006.0,2
+TCML_TechnionIIT_SLS,Right kydney cortex,10,4000.0,2
+ETP_SRI_LinearFitting,Right kydney cortex,10,997.0,2
+IAR_LU_biexp,Right kydney cortex,10,8004.0,2
+IAR_LU_modified_mix,Right kydney cortex,10,190998.0,2
+IAR_LU_modified_topopro,Right kydney cortex,10,54000.0,2
+IAR_LU_segmented_2step,Right kydney cortex,10,8000.0,2
+IAR_LU_segmented_3step,Right kydney cortex,10,12000.0,2
+IAR_LU_subtracted,Right kydney cortex,10,8000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Right kydney cortex,10,17999.0,2
+OGC_AmsterdamUMC_biexp_segmented,Right kydney cortex,10,6004.0,2
+OGC_AmsterdamUMC_biexp,Right kydney cortex,10,7000.0,2
+PV_MUMC_biexp,Right kydney cortex,10,11000.0,2
+PvH_KB_NKI_IVIMfit,Right kydney cortex,10,1000.0,2
+OJ_GU_seg,Right kydney cortex,10,4002.0,2
+TF_reference_IVIMfit,Right kydney cortex,10,9991.0,2
+TCML_TechnionIIT_lsqlm,right kidney medulla,10,3000.0,2
+TCML_TechnionIIT_lsqtrf,right kidney medulla,10,4998.0,2
+TCML_TechnionIIT_lsq_sls_lm,right kidney medulla,10,8007.0,2
+TCML_TechnionIIT_SLS,right kidney medulla,10,3999.0,2
+ETP_SRI_LinearFitting,right kidney medulla,10,1000.0,2
+IAR_LU_biexp,right kidney medulla,10,6000.0,2
+IAR_LU_modified_mix,right kidney medulla,10,200002.0,2
+IAR_LU_modified_topopro,right kidney medulla,10,87003.0,2
+IAR_LU_segmented_2step,right kidney medulla,10,11000.0,2
+IAR_LU_segmented_3step,right kidney medulla,10,16000.0,2
+IAR_LU_subtracted,right kidney medulla,10,7997.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,right kidney medulla,10,30000.0,2
+OGC_AmsterdamUMC_biexp_segmented,right kidney medulla,10,5000.0,2
+OGC_AmsterdamUMC_biexp,right kidney medulla,10,7000.0,2
+PV_MUMC_biexp,right kidney medulla,10,8000.0,2
+PvH_KB_NKI_IVIMfit,right kidney medulla,10,1009.0,2
+OJ_GU_seg,right kidney medulla,10,4998.0,2
+TF_reference_IVIMfit,right kidney medulla,10,10010.0,2
+TCML_TechnionIIT_lsqlm,Left kidney cortex,10,4007.0,2
+TCML_TechnionIIT_lsqtrf,Left kidney cortex,10,5546.0,2
+TCML_TechnionIIT_lsq_sls_lm,Left kidney cortex,10,7001.0,2
+TCML_TechnionIIT_SLS,Left kidney cortex,10,3000.0,2
+ETP_SRI_LinearFitting,Left kidney cortex,10,993.0,2
+IAR_LU_biexp,Left kidney cortex,10,5997.0,2
+IAR_LU_modified_mix,Left kidney cortex,10,194033.0,2
+IAR_LU_modified_topopro,Left kidney cortex,10,65002.0,2
+IAR_LU_segmented_2step,Left kidney cortex,10,8001.0,2
+IAR_LU_segmented_3step,Left kidney cortex,10,11010.0,2
+IAR_LU_subtracted,Left kidney cortex,10,7994.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Left kidney cortex,10,19008.0,2
+OGC_AmsterdamUMC_biexp_segmented,Left kidney cortex,10,6001.0,2
+OGC_AmsterdamUMC_biexp,Left kidney cortex,10,6995.0,2
+PV_MUMC_biexp,Left kidney cortex,10,11000.0,2
+PvH_KB_NKI_IVIMfit,Left kidney cortex,10,1006.0,2
+OJ_GU_seg,Left kidney cortex,10,3000.0,2
+TF_reference_IVIMfit,Left kidney cortex,10,9000.0,2
+TCML_TechnionIIT_lsqlm,left kidney medulla,10,4000.0,2
+TCML_TechnionIIT_lsqtrf,left kidney medulla,10,5005.0,2
+TCML_TechnionIIT_lsq_sls_lm,left kidney medulla,10,9008.0,2
+TCML_TechnionIIT_SLS,left kidney medulla,10,3998.0,2
+ETP_SRI_LinearFitting,left kidney medulla,10,1000.0,2
+IAR_LU_biexp,left kidney medulla,10,5995.0,2
+IAR_LU_modified_mix,left kidney medulla,10,194073.0,2
+IAR_LU_modified_topopro,left kidney medulla,10,78733.0,2
+IAR_LU_segmented_2step,left kidney medulla,10,10010.0,2
+IAR_LU_segmented_3step,left kidney medulla,10,14000.0,2
+IAR_LU_subtracted,left kidney medulla,10,8009.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,left kidney medulla,10,31523.0,2
+OGC_AmsterdamUMC_biexp_segmented,left kidney medulla,10,4001.0,2
+OGC_AmsterdamUMC_biexp,left kidney medulla,10,7000.0,2
+PV_MUMC_biexp,left kidney medulla,10,9029.0,2
+PvH_KB_NKI_IVIMfit,left kidney medulla,10,0.0,2
+OJ_GU_seg,left kidney medulla,10,5006.0,2
+TF_reference_IVIMfit,left kidney medulla,10,10007.0,2
+TCML_TechnionIIT_lsqlm,spleen,10,3008.0,2
+TCML_TechnionIIT_lsqtrf,spleen,10,6000.0,2
+TCML_TechnionIIT_lsq_sls_lm,spleen,10,2998.0,2
+TCML_TechnionIIT_SLS,spleen,10,2993.0,2
+ETP_SRI_LinearFitting,spleen,10,1000.0,2
+IAR_LU_biexp,spleen,10,6986.0,2
+IAR_LU_modified_mix,spleen,10,211141.0,2
+IAR_LU_modified_topopro,spleen,10,70292.0,2
+IAR_LU_segmented_2step,spleen,10,8000.0,2
+IAR_LU_segmented_3step,spleen,10,10998.0,2
+IAR_LU_subtracted,spleen,10,6658.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,spleen,10,19019.0,2
+OGC_AmsterdamUMC_biexp_segmented,spleen,10,5997.0,2
+OGC_AmsterdamUMC_biexp,spleen,10,8011.0,2
+PV_MUMC_biexp,spleen,10,8000.0,2
+PvH_KB_NKI_IVIMfit,spleen,10,1000.0,2
+OJ_GU_seg,spleen,10,3998.0,2
+TF_reference_IVIMfit,spleen,10,12998.0,2
+TCML_TechnionIIT_lsqlm,spinal cord,10,2000.0,2
+TCML_TechnionIIT_lsqtrf,spinal cord,10,7000.0,2
+TCML_TechnionIIT_lsq_sls_lm,spinal cord,10,6006.0,2
+TCML_TechnionIIT_SLS,spinal cord,10,4001.0,2
+ETP_SRI_LinearFitting,spinal cord,10,992.0,2
+IAR_LU_biexp,spinal cord,10,5994.0,2
+IAR_LU_modified_mix,spinal cord,10,213556.0,2
+IAR_LU_modified_topopro,spinal cord,10,49665.0,2
+IAR_LU_segmented_2step,spinal cord,10,8000.0,2
+IAR_LU_segmented_3step,spinal cord,10,12007.0,2
+IAR_LU_subtracted,spinal cord,10,7032.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,spinal cord,10,34036.0,2
+OGC_AmsterdamUMC_biexp_segmented,spinal cord,10,7000.0,2
+OGC_AmsterdamUMC_biexp,spinal cord,10,6999.0,2
+PV_MUMC_biexp,spinal cord,10,7999.0,2
+PvH_KB_NKI_IVIMfit,spinal cord,10,1000.0,2
+OJ_GU_seg,spinal cord,10,6005.0,2
+TF_reference_IVIMfit,spinal cord,10,17000.0,2
+TCML_TechnionIIT_lsqlm,Bone Marrow,10,2005.0,2
+TCML_TechnionIIT_lsqtrf,Bone Marrow,10,7000.0,2
+TCML_TechnionIIT_lsq_sls_lm,Bone Marrow,10,7000.0,2
+TCML_TechnionIIT_SLS,Bone Marrow,10,2995.0,2
+ETP_SRI_LinearFitting,Bone Marrow,10,2000.0,2
+IAR_LU_biexp,Bone Marrow,10,7006.0,2
+IAR_LU_modified_mix,Bone Marrow,10,208543.0,2
+IAR_LU_modified_topopro,Bone Marrow,10,69555.0,2
+IAR_LU_segmented_2step,Bone Marrow,10,7990.0,2
+IAR_LU_segmented_3step,Bone Marrow,10,11009.0,2
+IAR_LU_subtracted,Bone Marrow,10,9004.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Bone Marrow,10,24000.0,2
+OGC_AmsterdamUMC_biexp_segmented,Bone Marrow,10,6001.0,2
+OGC_AmsterdamUMC_biexp,Bone Marrow,10,8999.0,2
+PV_MUMC_biexp,Bone Marrow,10,10000.0,2
+PvH_KB_NKI_IVIMfit,Bone Marrow,10,1001.0,2
+OJ_GU_seg,Bone Marrow,10,5000.0,2
+TF_reference_IVIMfit,Bone Marrow,10,11995.0,2
+TCML_TechnionIIT_lsqlm,Artery,10,2000.0,2
+TCML_TechnionIIT_lsqtrf,Artery,10,6000.0,2
+TCML_TechnionIIT_lsq_sls_lm,Artery,10,3998.0,2
+TCML_TechnionIIT_SLS,Artery,10,1999.0,2
+ETP_SRI_LinearFitting,Artery,10,0.0,2
+IAR_LU_biexp,Artery,10,6011.0,2
+IAR_LU_modified_mix,Artery,10,95620.0,2
+IAR_LU_modified_topopro,Artery,10,39001.0,2
+IAR_LU_segmented_2step,Artery,10,9002.0,2
+IAR_LU_segmented_3step,Artery,10,13030.0,2
+IAR_LU_subtracted,Artery,10,20002.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Artery,10,22000.0,2
+OGC_AmsterdamUMC_biexp_segmented,Artery,10,10001.0,2
+OGC_AmsterdamUMC_biexp,Artery,10,7000.0,2
+PV_MUMC_biexp,Artery,10,8001.0,2
+PvH_KB_NKI_IVIMfit,Artery,10,1000.0,2
+OJ_GU_seg,Artery,10,3006.0,2
+TF_reference_IVIMfit,Artery,10,14030.0,2
+TCML_TechnionIIT_lsqlm,Vein,10,2006.0,2
+TCML_TechnionIIT_lsqtrf,Vein,10,6001.0,2
+TCML_TechnionIIT_lsq_sls_lm,Vein,10,5002.0,2
+TCML_TechnionIIT_SLS,Vein,10,2896.0,2
+ETP_SRI_LinearFitting,Vein,10,1000.0,2
+IAR_LU_biexp,Vein,10,6000.0,2
+IAR_LU_modified_mix,Vein,10,91011.0,2
+IAR_LU_modified_topopro,Vein,10,38996.0,2
+IAR_LU_segmented_2step,Vein,10,8620.0,2
+IAR_LU_segmented_3step,Vein,10,13000.0,2
+IAR_LU_subtracted,Vein,10,9006.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Vein,10,22923.0,2
+OGC_AmsterdamUMC_biexp_segmented,Vein,10,9546.0,2
+OGC_AmsterdamUMC_biexp,Vein,10,7001.0,2
+PV_MUMC_biexp,Vein,10,8001.0,2
+PvH_KB_NKI_IVIMfit,Vein,10,999.0,2
+OJ_GU_seg,Vein,10,3000.0,2
+TF_reference_IVIMfit,Vein,10,16001.0,2
+TCML_TechnionIIT_lsqlm,asc lower intestine,10,1002.0,2
+TCML_TechnionIIT_lsqtrf,asc lower intestine,10,6000.0,2
+TCML_TechnionIIT_lsq_sls_lm,asc lower intestine,10,5030.0,2
+TCML_TechnionIIT_SLS,asc lower intestine,10,2994.0,2
+ETP_SRI_LinearFitting,asc lower intestine,10,999.0,2
+IAR_LU_biexp,asc lower intestine,10,5000.0,2
+IAR_LU_modified_mix,asc lower intestine,10,205627.0,2
+IAR_LU_modified_topopro,asc lower intestine,10,69000.0,2
+IAR_LU_segmented_2step,asc lower intestine,10,7009.0,2
+IAR_LU_segmented_3step,asc lower intestine,10,9995.0,2
+IAR_LU_subtracted,asc lower intestine,10,7999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,asc lower intestine,10,16553.0,2
+OGC_AmsterdamUMC_biexp_segmented,asc lower intestine,10,10006.0,2
+OGC_AmsterdamUMC_biexp,asc lower intestine,10,5010.0,2
+PV_MUMC_biexp,asc lower intestine,10,7005.0,2
+PvH_KB_NKI_IVIMfit,asc lower intestine,10,1006.0,2
+OJ_GU_seg,asc lower intestine,10,5006.0,2
+TF_reference_IVIMfit,asc lower intestine,10,11005.0,2
+TCML_TechnionIIT_lsqlm,trans lower intestine,10,2004.0,2
+TCML_TechnionIIT_lsqtrf,trans lower intestine,10,5537.0,2
+TCML_TechnionIIT_lsq_sls_lm,trans lower intestine,10,4994.0,2
+TCML_TechnionIIT_SLS,trans lower intestine,10,3999.0,2
+ETP_SRI_LinearFitting,trans lower intestine,10,1001.0,2
+IAR_LU_biexp,trans lower intestine,10,7000.0,2
+IAR_LU_modified_mix,trans lower intestine,10,200560.0,2
+IAR_LU_modified_topopro,trans lower intestine,10,61553.0,2
+IAR_LU_segmented_2step,trans lower intestine,10,9006.0,2
+IAR_LU_segmented_3step,trans lower intestine,10,11026.0,2
+IAR_LU_subtracted,trans lower intestine,10,8006.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,trans lower intestine,10,17031.0,2
+OGC_AmsterdamUMC_biexp_segmented,trans lower intestine,10,6001.0,2
+OGC_AmsterdamUMC_biexp,trans lower intestine,10,6000.0,2
+PV_MUMC_biexp,trans lower intestine,10,7000.0,2
+PvH_KB_NKI_IVIMfit,trans lower intestine,10,2015.0,2
+OJ_GU_seg,trans lower intestine,10,4997.0,2
+TF_reference_IVIMfit,trans lower intestine,10,12000.0,2
+TCML_TechnionIIT_lsqlm,desc lower intestine,10,2001.0,2
+TCML_TechnionIIT_lsqtrf,desc lower intestine,10,7008.0,2
+TCML_TechnionIIT_lsq_sls_lm,desc lower intestine,10,3998.0,2
+TCML_TechnionIIT_SLS,desc lower intestine,10,4000.0,2
+ETP_SRI_LinearFitting,desc lower intestine,10,1000.0,2
+IAR_LU_biexp,desc lower intestine,10,4987.0,2
+IAR_LU_modified_mix,desc lower intestine,10,188022.0,2
+IAR_LU_modified_topopro,desc lower intestine,10,70007.0,2
+IAR_LU_segmented_2step,desc lower intestine,10,8032.0,2
+IAR_LU_segmented_3step,desc lower intestine,10,10000.0,2
+IAR_LU_subtracted,desc lower intestine,10,9029.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,desc lower intestine,10,15999.0,2
+OGC_AmsterdamUMC_biexp_segmented,desc lower intestine,10,7100.0,2
+OGC_AmsterdamUMC_biexp,desc lower intestine,10,6001.0,2
+PV_MUMC_biexp,desc lower intestine,10,7000.0,2
+PvH_KB_NKI_IVIMfit,desc lower intestine,10,999.0,2
+OJ_GU_seg,desc lower intestine,10,4997.0,2
+TF_reference_IVIMfit,desc lower intestine,10,12007.0,2
+TCML_TechnionIIT_lsqlm,small intestine,10,2007.0,2
+TCML_TechnionIIT_lsqtrf,small intestine,10,5996.0,2
+TCML_TechnionIIT_lsq_sls_lm,small intestine,10,4008.0,2
+TCML_TechnionIIT_SLS,small intestine,10,4000.0,2
+ETP_SRI_LinearFitting,small intestine,10,1000.0,2
+IAR_LU_biexp,small intestine,10,4992.0,2
+IAR_LU_modified_mix,small intestine,10,211296.0,2
+IAR_LU_modified_topopro,small intestine,10,57006.0,2
+IAR_LU_segmented_2step,small intestine,10,9005.0,2
+IAR_LU_segmented_3step,small intestine,10,9999.0,2
+IAR_LU_subtracted,small intestine,10,9027.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,small intestine,10,15994.0,2
+OGC_AmsterdamUMC_biexp_segmented,small intestine,10,7000.0,2
+OGC_AmsterdamUMC_biexp,small intestine,10,6099.0,2
+PV_MUMC_biexp,small intestine,10,7000.0,2
+PvH_KB_NKI_IVIMfit,small intestine,10,1006.0,2
+OJ_GU_seg,small intestine,10,5001.0,2
+TF_reference_IVIMfit,small intestine,10,12001.0,2
+TCML_TechnionIIT_lsqlm,pericardium,10,6000.0,2
+TCML_TechnionIIT_lsqtrf,pericardium,10,6001.0,2
+TCML_TechnionIIT_lsq_sls_lm,pericardium,10,11004.0,2
+TCML_TechnionIIT_SLS,pericardium,10,3999.0,2
+ETP_SRI_LinearFitting,pericardium,10,1000.0,2
+IAR_LU_biexp,pericardium,10,8994.0,2
+IAR_LU_modified_mix,pericardium,10,196376.0,2
+IAR_LU_modified_topopro,pericardium,10,71998.0,2
+IAR_LU_segmented_2step,pericardium,10,7995.0,2
+IAR_LU_segmented_3step,pericardium,10,13021.0,2
+IAR_LU_subtracted,pericardium,10,9008.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,pericardium,10,22006.0,2
+OGC_AmsterdamUMC_biexp_segmented,pericardium,10,4999.0,2
+OGC_AmsterdamUMC_biexp,pericardium,10,6993.0,2
+PV_MUMC_biexp,pericardium,10,10543.0,2
+PvH_KB_NKI_IVIMfit,pericardium,10,1006.0,2
+OJ_GU_seg,pericardium,10,4998.0,2
+TF_reference_IVIMfit,pericardium,10,10006.0,2
+TCML_TechnionIIT_lsqlm,Myocardium LV,50,3007.0,2
+TCML_TechnionIIT_lsqtrf,Myocardium LV,50,4996.0,2
+TCML_TechnionIIT_lsq_sls_lm,Myocardium LV,50,6999.0,2
+TCML_TechnionIIT_SLS,Myocardium LV,50,4006.0,2
+ETP_SRI_LinearFitting,Myocardium LV,50,0.0,2
+IAR_LU_biexp,Myocardium LV,50,7178.0,2
+IAR_LU_modified_mix,Myocardium LV,50,151227.0,2
+IAR_LU_modified_topopro,Myocardium LV,50,90011.0,2
+IAR_LU_segmented_2step,Myocardium LV,50,7995.0,2
+IAR_LU_segmented_3step,Myocardium LV,50,11997.0,2
+IAR_LU_subtracted,Myocardium LV,50,9538.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Myocardium LV,50,15997.0,2
+OGC_AmsterdamUMC_biexp_segmented,Myocardium LV,50,9020.0,2
+OGC_AmsterdamUMC_biexp,Myocardium LV,50,5997.0,2
+PV_MUMC_biexp,Myocardium LV,50,7001.0,2
+PvH_KB_NKI_IVIMfit,Myocardium LV,50,999.0,2
+OJ_GU_seg,Myocardium LV,50,2999.0,2
+TF_reference_IVIMfit,Myocardium LV,50,15007.0,2
+TCML_TechnionIIT_lsqlm,myocardium RV,50,1991.0,2
+TCML_TechnionIIT_lsqtrf,myocardium RV,50,6007.0,2
+TCML_TechnionIIT_lsq_sls_lm,myocardium RV,50,6008.0,2
+TCML_TechnionIIT_SLS,myocardium RV,50,3012.0,2
+ETP_SRI_LinearFitting,myocardium RV,50,2006.0,2
+IAR_LU_biexp,myocardium RV,50,5997.0,2
+IAR_LU_modified_mix,myocardium RV,50,153102.0,2
+IAR_LU_modified_topopro,myocardium RV,50,93523.0,2
+IAR_LU_segmented_2step,myocardium RV,50,8995.0,2
+IAR_LU_segmented_3step,myocardium RV,50,11998.0,2
+IAR_LU_subtracted,myocardium RV,50,7997.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,myocardium RV,50,15541.0,2
+OGC_AmsterdamUMC_biexp_segmented,myocardium RV,50,7001.0,2
+OGC_AmsterdamUMC_biexp,myocardium RV,50,4997.0,2
+PV_MUMC_biexp,myocardium RV,50,5996.0,2
+PvH_KB_NKI_IVIMfit,myocardium RV,50,989.0,2
+OJ_GU_seg,myocardium RV,50,3004.0,2
+TF_reference_IVIMfit,myocardium RV,50,14998.0,2
+TCML_TechnionIIT_lsqlm,myocardium ra,50,2000.0,2
+TCML_TechnionIIT_lsqtrf,myocardium ra,50,5524.0,2
+TCML_TechnionIIT_lsq_sls_lm,myocardium ra,50,7000.0,2
+TCML_TechnionIIT_SLS,myocardium ra,50,4007.0,2
+ETP_SRI_LinearFitting,myocardium ra,50,994.0,2
+IAR_LU_biexp,myocardium ra,50,7006.0,2
+IAR_LU_modified_mix,myocardium ra,50,216095.0,2
+IAR_LU_modified_topopro,myocardium ra,50,70547.0,2
+IAR_LU_segmented_2step,myocardium ra,50,9000.0,2
+IAR_LU_segmented_3step,myocardium ra,50,13986.0,2
+IAR_LU_subtracted,myocardium ra,50,7007.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,myocardium ra,50,21546.0,2
+OGC_AmsterdamUMC_biexp_segmented,myocardium ra,50,8006.0,2
+OGC_AmsterdamUMC_biexp,myocardium ra,50,9000.0,2
+PV_MUMC_biexp,myocardium ra,50,11000.0,2
+PvH_KB_NKI_IVIMfit,myocardium ra,50,1000.0,2
+OJ_GU_seg,myocardium ra,50,3999.0,2
+TF_reference_IVIMfit,myocardium ra,50,14000.0,2
+TCML_TechnionIIT_lsqlm,Blood RV,50,1987.0,2
+TCML_TechnionIIT_lsqtrf,Blood RV,50,6999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Blood RV,50,4994.0,2
+TCML_TechnionIIT_SLS,Blood RV,50,3007.0,2
+ETP_SRI_LinearFitting,Blood RV,50,1000.0,2
+IAR_LU_biexp,Blood RV,50,8000.0,2
+IAR_LU_modified_mix,Blood RV,50,99983.0,2
+IAR_LU_modified_topopro,Blood RV,50,43035.0,2
+IAR_LU_segmented_2step,Blood RV,50,13217.0,2
+IAR_LU_segmented_3step,Blood RV,50,15000.0,2
+IAR_LU_subtracted,Blood RV,50,11000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Blood RV,50,24000.0,2
+OGC_AmsterdamUMC_biexp_segmented,Blood RV,50,10994.0,2
+OGC_AmsterdamUMC_biexp,Blood RV,50,6001.0,2
+PV_MUMC_biexp,Blood RV,50,9128.0,2
+PvH_KB_NKI_IVIMfit,Blood RV,50,998.0,2
+OJ_GU_seg,Blood RV,50,2000.0,2
+TF_reference_IVIMfit,Blood RV,50,15000.0,2
+TCML_TechnionIIT_lsqlm,Blood RA,50,2006.0,2
+TCML_TechnionIIT_lsqtrf,Blood RA,50,6006.0,2
+TCML_TechnionIIT_lsq_sls_lm,Blood RA,50,5006.0,2
+TCML_TechnionIIT_SLS,Blood RA,50,4006.0,2
+ETP_SRI_LinearFitting,Blood RA,50,2000.0,2
+IAR_LU_biexp,Blood RA,50,5997.0,2
+IAR_LU_modified_mix,Blood RA,50,92659.0,2
+IAR_LU_modified_topopro,Blood RA,50,42000.0,2
+IAR_LU_segmented_2step,Blood RA,50,11992.0,2
+IAR_LU_segmented_3step,Blood RA,50,14999.0,2
+IAR_LU_subtracted,Blood RA,50,9000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Blood RA,50,25545.0,2
+OGC_AmsterdamUMC_biexp_segmented,Blood RA,50,9540.0,2
+OGC_AmsterdamUMC_biexp,Blood RA,50,7005.0,2
+PV_MUMC_biexp,Blood RA,50,9999.0,2
+PvH_KB_NKI_IVIMfit,Blood RA,50,1000.0,2
+OJ_GU_seg,Blood RA,50,994.0,2
+TF_reference_IVIMfit,Blood RA,50,13997.0,2
+TCML_TechnionIIT_lsqlm,muscle,50,2000.0,2
+TCML_TechnionIIT_lsqtrf,muscle,50,4999.0,2
+TCML_TechnionIIT_lsq_sls_lm,muscle,50,5989.0,2
+TCML_TechnionIIT_SLS,muscle,50,4007.0,2
+ETP_SRI_LinearFitting,muscle,50,1001.0,2
+IAR_LU_biexp,muscle,50,5007.0,2
+IAR_LU_modified_mix,muscle,50,207030.0,2
+IAR_LU_modified_topopro,muscle,50,77998.0,2
+IAR_LU_segmented_2step,muscle,50,5978.0,2
+IAR_LU_segmented_3step,muscle,50,11001.0,2
+IAR_LU_subtracted,muscle,50,6991.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,muscle,50,24763.0,2
+OGC_AmsterdamUMC_biexp_segmented,muscle,50,5000.0,2
+OGC_AmsterdamUMC_biexp,muscle,50,3006.0,2
+PV_MUMC_biexp,muscle,50,7994.0,2
+PvH_KB_NKI_IVIMfit,muscle,50,1012.0,2
+OJ_GU_seg,muscle,50,5995.0,2
+TF_reference_IVIMfit,muscle,50,13000.0,2
+TCML_TechnionIIT_lsqlm,Liver,50,2001.0,2
+TCML_TechnionIIT_lsqtrf,Liver,50,4999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Liver,50,7000.0,2
+TCML_TechnionIIT_SLS,Liver,50,4998.0,2
+ETP_SRI_LinearFitting,Liver,50,1001.0,2
+IAR_LU_biexp,Liver,50,7011.0,2
+IAR_LU_modified_mix,Liver,50,165625.0,2
+IAR_LU_modified_topopro,Liver,50,63537.0,2
+IAR_LU_segmented_2step,Liver,50,9004.0,2
+IAR_LU_segmented_3step,Liver,50,13000.0,2
+IAR_LU_subtracted,Liver,50,7011.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Liver,50,18007.0,2
+OGC_AmsterdamUMC_biexp_segmented,Liver,50,7045.0,2
+OGC_AmsterdamUMC_biexp,Liver,50,6000.0,2
+PV_MUMC_biexp,Liver,50,9001.0,2
+PvH_KB_NKI_IVIMfit,Liver,50,1000.0,2
+OJ_GU_seg,Liver,50,4654.0,2
+TF_reference_IVIMfit,Liver,50,15999.0,2
+TCML_TechnionIIT_lsqlm,gall bladder,50,8143.0,2
+TCML_TechnionIIT_lsqtrf,gall bladder,50,4998.0,2
+TCML_TechnionIIT_lsq_sls_lm,gall bladder,50,11000.0,2
+TCML_TechnionIIT_SLS,gall bladder,50,3999.0,2
+ETP_SRI_LinearFitting,gall bladder,50,993.0,2
+IAR_LU_biexp,gall bladder,50,6997.0,2
+IAR_LU_modified_mix,gall bladder,50,145006.0,2
+IAR_LU_modified_topopro,gall bladder,50,73185.0,2
+IAR_LU_segmented_2step,gall bladder,50,8999.0,2
+IAR_LU_segmented_3step,gall bladder,50,9989.0,2
+IAR_LU_subtracted,gall bladder,50,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,gall bladder,50,19989.0,2
+OGC_AmsterdamUMC_biexp_segmented,gall bladder,50,4000.0,2
+OGC_AmsterdamUMC_biexp,gall bladder,50,8000.0,2
+PV_MUMC_biexp,gall bladder,50,18000.0,2
+PvH_KB_NKI_IVIMfit,gall bladder,50,1000.0,2
+OJ_GU_seg,gall bladder,50,2000.0,2
+TF_reference_IVIMfit,gall bladder,50,9990.0,2
+TCML_TechnionIIT_lsqlm,esophagus,50,2034.0,2
+TCML_TechnionIIT_lsqtrf,esophagus,50,4995.0,2
+TCML_TechnionIIT_lsq_sls_lm,esophagus,50,4996.0,2
+TCML_TechnionIIT_SLS,esophagus,50,4011.0,2
+ETP_SRI_LinearFitting,esophagus,50,1014.0,2
+IAR_LU_biexp,esophagus,50,4000.0,2
+IAR_LU_modified_mix,esophagus,50,217871.0,2
+IAR_LU_modified_topopro,esophagus,50,61003.0,2
+IAR_LU_segmented_2step,esophagus,50,5000.0,2
+IAR_LU_segmented_3step,esophagus,50,10002.0,2
+IAR_LU_subtracted,esophagus,50,6001.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,esophagus,50,19007.0,2
+OGC_AmsterdamUMC_biexp_segmented,esophagus,50,5994.0,2
+OGC_AmsterdamUMC_biexp,esophagus,50,4000.0,2
+PV_MUMC_biexp,esophagus,50,6001.0,2
+PvH_KB_NKI_IVIMfit,esophagus,50,1001.0,2
+OJ_GU_seg,esophagus,50,5001.0,2
+TF_reference_IVIMfit,esophagus,50,11994.0,2
+TCML_TechnionIIT_lsqlm,esophagus cont,50,0.0,2
+TCML_TechnionIIT_lsqtrf,esophagus cont,50,5000.0,2
+TCML_TechnionIIT_lsq_sls_lm,esophagus cont,50,5000.0,2
+TCML_TechnionIIT_SLS,esophagus cont,50,4003.0,2
+ETP_SRI_LinearFitting,esophagus cont,50,0.0,2
+IAR_LU_biexp,esophagus cont,50,4009.0,2
+IAR_LU_modified_mix,esophagus cont,50,227813.0,2
+IAR_LU_modified_topopro,esophagus cont,50,69997.0,2
+IAR_LU_segmented_2step,esophagus cont,50,5997.0,2
+IAR_LU_segmented_3step,esophagus cont,50,9043.0,2
+IAR_LU_subtracted,esophagus cont,50,6004.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,esophagus cont,50,16998.0,2
+OGC_AmsterdamUMC_biexp_segmented,esophagus cont,50,4991.0,2
+OGC_AmsterdamUMC_biexp,esophagus cont,50,4005.0,2
+PV_MUMC_biexp,esophagus cont,50,6002.0,2
+PvH_KB_NKI_IVIMfit,esophagus cont,50,0.0,2
+OJ_GU_seg,esophagus cont,50,6029.0,2
+TF_reference_IVIMfit,esophagus cont,50,11997.0,2
+TCML_TechnionIIT_lsqlm,st wall,50,998.0,2
+TCML_TechnionIIT_lsqtrf,st wall,50,6005.0,2
+TCML_TechnionIIT_lsq_sls_lm,st wall,50,3993.0,2
+TCML_TechnionIIT_SLS,st wall,50,3005.0,2
+ETP_SRI_LinearFitting,st wall,50,0.0,2
+IAR_LU_biexp,st wall,50,3997.0,2
+IAR_LU_modified_mix,st wall,50,223029.0,2
+IAR_LU_modified_topopro,st wall,50,77031.0,2
+IAR_LU_segmented_2step,st wall,50,5991.0,2
+IAR_LU_segmented_3step,st wall,50,9992.0,2
+IAR_LU_subtracted,st wall,50,5989.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,st wall,50,17997.0,2
+OGC_AmsterdamUMC_biexp_segmented,st wall,50,6028.0,2
+OGC_AmsterdamUMC_biexp,st wall,50,4998.0,2
+PV_MUMC_biexp,st wall,50,6000.0,2
+PvH_KB_NKI_IVIMfit,st wall,50,998.0,2
+OJ_GU_seg,st wall,50,4992.0,2
+TF_reference_IVIMfit,st wall,50,11626.0,2
+TCML_TechnionIIT_lsqlm,Stomach Contents,50,8000.0,2
+TCML_TechnionIIT_lsqtrf,Stomach Contents,50,5999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Stomach Contents,50,9991.0,2
+TCML_TechnionIIT_SLS,Stomach Contents,50,3006.0,2
+ETP_SRI_LinearFitting,Stomach Contents,50,1000.0,2
+IAR_LU_biexp,Stomach Contents,50,7007.0,2
+IAR_LU_modified_mix,Stomach Contents,50,156039.0,2
+IAR_LU_modified_topopro,Stomach Contents,50,76004.0,2
+IAR_LU_segmented_2step,Stomach Contents,50,11000.0,2
+IAR_LU_segmented_3step,Stomach Contents,50,11002.0,2
+IAR_LU_subtracted,Stomach Contents,50,7998.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Stomach Contents,50,20543.0,2
+OGC_AmsterdamUMC_biexp_segmented,Stomach Contents,50,3998.0,2
+OGC_AmsterdamUMC_biexp,Stomach Contents,50,7997.0,2
+PV_MUMC_biexp,Stomach Contents,50,19030.0,2
+PvH_KB_NKI_IVIMfit,Stomach Contents,50,992.0,2
+OJ_GU_seg,Stomach Contents,50,3001.0,2
+TF_reference_IVIMfit,Stomach Contents,50,10998.0,2
+TCML_TechnionIIT_lsqlm,pancreas,50,2035.0,2
+TCML_TechnionIIT_lsqtrf,pancreas,50,5006.0,2
+TCML_TechnionIIT_lsq_sls_lm,pancreas,50,3996.0,2
+TCML_TechnionIIT_SLS,pancreas,50,1995.0,2
+ETP_SRI_LinearFitting,pancreas,50,1006.0,2
+IAR_LU_biexp,pancreas,50,5999.0,2
+IAR_LU_modified_mix,pancreas,50,209779.0,2
+IAR_LU_modified_topopro,pancreas,50,60000.0,2
+IAR_LU_segmented_2step,pancreas,50,6000.0,2
+IAR_LU_segmented_3step,pancreas,50,10994.0,2
+IAR_LU_subtracted,pancreas,50,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,pancreas,50,20999.0,2
+OGC_AmsterdamUMC_biexp_segmented,pancreas,50,4005.0,2
+OGC_AmsterdamUMC_biexp,pancreas,50,5000.0,2
+PV_MUMC_biexp,pancreas,50,8031.0,2
+PvH_KB_NKI_IVIMfit,pancreas,50,1000.0,2
+OJ_GU_seg,pancreas,50,6000.0,2
+TF_reference_IVIMfit,pancreas,50,13000.0,2
+TCML_TechnionIIT_lsqlm,Right kydney cortex,50,1832.0,2
+TCML_TechnionIIT_lsqtrf,Right kydney cortex,50,4997.0,2
+TCML_TechnionIIT_lsq_sls_lm,Right kydney cortex,50,5000.0,2
+TCML_TechnionIIT_SLS,Right kydney cortex,50,2989.0,2
+ETP_SRI_LinearFitting,Right kydney cortex,50,0.0,2
+IAR_LU_biexp,Right kydney cortex,50,7011.0,2
+IAR_LU_modified_mix,Right kydney cortex,50,213377.0,2
+IAR_LU_modified_topopro,Right kydney cortex,50,83543.0,2
+IAR_LU_segmented_2step,Right kydney cortex,50,6999.0,2
+IAR_LU_segmented_3step,Right kydney cortex,50,12006.0,2
+IAR_LU_subtracted,Right kydney cortex,50,7995.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Right kydney cortex,50,21033.0,2
+OGC_AmsterdamUMC_biexp_segmented,Right kydney cortex,50,4994.0,2
+OGC_AmsterdamUMC_biexp,Right kydney cortex,50,5996.0,2
+PV_MUMC_biexp,Right kydney cortex,50,9037.0,2
+PvH_KB_NKI_IVIMfit,Right kydney cortex,50,1000.0,2
+OJ_GU_seg,Right kydney cortex,50,5998.0,2
+TF_reference_IVIMfit,Right kydney cortex,50,11999.0,2
+TCML_TechnionIIT_lsqlm,right kidney medulla,50,1993.0,2
+TCML_TechnionIIT_lsqtrf,right kidney medulla,50,5000.0,2
+TCML_TechnionIIT_lsq_sls_lm,right kidney medulla,50,5000.0,2
+TCML_TechnionIIT_SLS,right kidney medulla,50,4000.0,2
+ETP_SRI_LinearFitting,right kidney medulla,50,0.0,2
+IAR_LU_biexp,right kidney medulla,50,4994.0,2
+IAR_LU_modified_mix,right kidney medulla,50,202602.0,2
+IAR_LU_modified_topopro,right kidney medulla,50,76999.0,2
+IAR_LU_segmented_2step,right kidney medulla,50,7000.0,2
+IAR_LU_segmented_3step,right kidney medulla,50,11006.0,2
+IAR_LU_subtracted,right kidney medulla,50,7033.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,right kidney medulla,50,16001.0,2
+OGC_AmsterdamUMC_biexp_segmented,right kidney medulla,50,4992.0,2
+OGC_AmsterdamUMC_biexp,right kidney medulla,50,3946.0,2
+PV_MUMC_biexp,right kidney medulla,50,8001.0,2
+PvH_KB_NKI_IVIMfit,right kidney medulla,50,999.0,2
+OJ_GU_seg,right kidney medulla,50,5007.0,2
+TF_reference_IVIMfit,right kidney medulla,50,12000.0,2
+TCML_TechnionIIT_lsqlm,Left kidney cortex,50,2000.0,2
+TCML_TechnionIIT_lsqtrf,Left kidney cortex,50,4990.0,2
+TCML_TechnionIIT_lsq_sls_lm,Left kidney cortex,50,5000.0,2
+TCML_TechnionIIT_SLS,Left kidney cortex,50,3003.0,2
+ETP_SRI_LinearFitting,Left kidney cortex,50,999.0,2
+IAR_LU_biexp,Left kidney cortex,50,6001.0,2
+IAR_LU_modified_mix,Left kidney cortex,50,194231.0,2
+IAR_LU_modified_topopro,Left kidney cortex,50,74545.0,2
+IAR_LU_segmented_2step,Left kidney cortex,50,7000.0,2
+IAR_LU_segmented_3step,Left kidney cortex,50,10992.0,2
+IAR_LU_subtracted,Left kidney cortex,50,8040.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Left kidney cortex,50,20001.0,2
+OGC_AmsterdamUMC_biexp_segmented,Left kidney cortex,50,5994.0,2
+OGC_AmsterdamUMC_biexp,Left kidney cortex,50,5858.0,2
+PV_MUMC_biexp,Left kidney cortex,50,9000.0,2
+PvH_KB_NKI_IVIMfit,Left kidney cortex,50,999.0,2
+OJ_GU_seg,Left kidney cortex,50,3998.0,2
+TF_reference_IVIMfit,Left kidney cortex,50,11583.0,2
+TCML_TechnionIIT_lsqlm,left kidney medulla,50,1000.0,2
+TCML_TechnionIIT_lsqtrf,left kidney medulla,50,3988.0,2
+TCML_TechnionIIT_lsq_sls_lm,left kidney medulla,50,5001.0,2
+TCML_TechnionIIT_SLS,left kidney medulla,50,3006.0,2
+ETP_SRI_LinearFitting,left kidney medulla,50,1007.0,2
+IAR_LU_biexp,left kidney medulla,50,5990.0,2
+IAR_LU_modified_mix,left kidney medulla,50,188060.0,2
+IAR_LU_modified_topopro,left kidney medulla,50,88989.0,2
+IAR_LU_segmented_2step,left kidney medulla,50,7001.0,2
+IAR_LU_segmented_3step,left kidney medulla,50,10035.0,2
+IAR_LU_subtracted,left kidney medulla,50,6999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,left kidney medulla,50,17007.0,2
+OGC_AmsterdamUMC_biexp_segmented,left kidney medulla,50,6026.0,2
+OGC_AmsterdamUMC_biexp,left kidney medulla,50,5005.0,2
+PV_MUMC_biexp,left kidney medulla,50,8007.0,2
+PvH_KB_NKI_IVIMfit,left kidney medulla,50,1001.0,2
+OJ_GU_seg,left kidney medulla,50,4001.0,2
+TF_reference_IVIMfit,left kidney medulla,50,12554.0,2
+TCML_TechnionIIT_lsqlm,spleen,50,2006.0,2
+TCML_TechnionIIT_lsqtrf,spleen,50,4007.0,2
+TCML_TechnionIIT_lsq_sls_lm,spleen,50,5006.0,2
+TCML_TechnionIIT_SLS,spleen,50,3000.0,2
+ETP_SRI_LinearFitting,spleen,50,999.0,2
+IAR_LU_biexp,spleen,50,3991.0,2
+IAR_LU_modified_mix,spleen,50,209765.0,2
+IAR_LU_modified_topopro,spleen,50,86999.0,2
+IAR_LU_segmented_2step,spleen,50,5011.0,2
+IAR_LU_segmented_3step,spleen,50,10993.0,2
+IAR_LU_subtracted,spleen,50,5996.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,spleen,50,16711.0,2
+OGC_AmsterdamUMC_biexp_segmented,spleen,50,6005.0,2
+OGC_AmsterdamUMC_biexp,spleen,50,4000.0,2
+PV_MUMC_biexp,spleen,50,7509.0,2
+PvH_KB_NKI_IVIMfit,spleen,50,999.0,2
+OJ_GU_seg,spleen,50,5994.0,2
+TF_reference_IVIMfit,spleen,50,12999.0,2
+TCML_TechnionIIT_lsqlm,spinal cord,50,2006.0,2
+TCML_TechnionIIT_lsqtrf,spinal cord,50,5005.0,2
+TCML_TechnionIIT_lsq_sls_lm,spinal cord,50,4999.0,2
+TCML_TechnionIIT_SLS,spinal cord,50,4001.0,2
+ETP_SRI_LinearFitting,spinal cord,50,2004.0,2
+IAR_LU_biexp,spinal cord,50,4005.0,2
+IAR_LU_modified_mix,spinal cord,50,204770.0,2
+IAR_LU_modified_topopro,spinal cord,50,54998.0,2
+IAR_LU_segmented_2step,spinal cord,50,7001.0,2
+IAR_LU_segmented_3step,spinal cord,50,8995.0,2
+IAR_LU_subtracted,spinal cord,50,6999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,spinal cord,50,22005.0,2
+OGC_AmsterdamUMC_biexp_segmented,spinal cord,50,6000.0,2
+OGC_AmsterdamUMC_biexp,spinal cord,50,5000.0,2
+PV_MUMC_biexp,spinal cord,50,5993.0,2
+PvH_KB_NKI_IVIMfit,spinal cord,50,1000.0,2
+OJ_GU_seg,spinal cord,50,5010.0,2
+TF_reference_IVIMfit,spinal cord,50,12999.0,2
+TCML_TechnionIIT_lsqlm,Bone Marrow,50,0.0,2
+TCML_TechnionIIT_lsqtrf,Bone Marrow,50,4991.0,2
+TCML_TechnionIIT_lsq_sls_lm,Bone Marrow,50,5004.0,2
+TCML_TechnionIIT_SLS,Bone Marrow,50,4004.0,2
+ETP_SRI_LinearFitting,Bone Marrow,50,2007.0,2
+IAR_LU_biexp,Bone Marrow,50,5000.0,2
+IAR_LU_modified_mix,Bone Marrow,50,215730.0,2
+IAR_LU_modified_topopro,Bone Marrow,50,62999.0,2
+IAR_LU_segmented_2step,Bone Marrow,50,7004.0,2
+IAR_LU_segmented_3step,Bone Marrow,50,11031.0,2
+IAR_LU_subtracted,Bone Marrow,50,5998.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Bone Marrow,50,23914.0,2
+OGC_AmsterdamUMC_biexp_segmented,Bone Marrow,50,7004.0,2
+OGC_AmsterdamUMC_biexp,Bone Marrow,50,3998.0,2
+PV_MUMC_biexp,Bone Marrow,50,7548.0,2
+PvH_KB_NKI_IVIMfit,Bone Marrow,50,1007.0,2
+OJ_GU_seg,Bone Marrow,50,4004.0,2
+TF_reference_IVIMfit,Bone Marrow,50,14001.0,2
+TCML_TechnionIIT_lsqlm,Artery,50,2000.0,2
+TCML_TechnionIIT_lsqtrf,Artery,50,6000.0,2
+TCML_TechnionIIT_lsq_sls_lm,Artery,50,4001.0,2
+TCML_TechnionIIT_SLS,Artery,50,3000.0,2
+ETP_SRI_LinearFitting,Artery,50,1000.0,2
+IAR_LU_biexp,Artery,50,7008.0,2
+IAR_LU_modified_mix,Artery,50,93030.0,2
+IAR_LU_modified_topopro,Artery,50,43581.0,2
+IAR_LU_segmented_2step,Artery,50,11000.0,2
+IAR_LU_segmented_3step,Artery,50,15007.0,2
+IAR_LU_subtracted,Artery,50,10000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Artery,50,22007.0,2
+OGC_AmsterdamUMC_biexp_segmented,Artery,50,10005.0,2
+OGC_AmsterdamUMC_biexp,Artery,50,8000.0,2
+PV_MUMC_biexp,Artery,50,9000.0,2
+PvH_KB_NKI_IVIMfit,Artery,50,993.0,2
+OJ_GU_seg,Artery,50,2994.0,2
+TF_reference_IVIMfit,Artery,50,13997.0,2
+TCML_TechnionIIT_lsqlm,Vein,50,2005.0,2
+TCML_TechnionIIT_lsqtrf,Vein,50,6001.0,2
+TCML_TechnionIIT_lsq_sls_lm,Vein,50,3999.0,2
+TCML_TechnionIIT_SLS,Vein,50,4038.0,2
+ETP_SRI_LinearFitting,Vein,50,2007.0,2
+IAR_LU_biexp,Vein,50,5991.0,2
+IAR_LU_modified_mix,Vein,50,98007.0,2
+IAR_LU_modified_topopro,Vein,50,42001.0,2
+IAR_LU_segmented_2step,Vein,50,11999.0,2
+IAR_LU_segmented_3step,Vein,50,15547.0,2
+IAR_LU_subtracted,Vein,50,11007.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Vein,50,25034.0,2
+OGC_AmsterdamUMC_biexp_segmented,Vein,50,9998.0,2
+OGC_AmsterdamUMC_biexp,Vein,50,6995.0,2
+PV_MUMC_biexp,Vein,50,10691.0,2
+PvH_KB_NKI_IVIMfit,Vein,50,999.0,2
+OJ_GU_seg,Vein,50,1999.0,2
+TF_reference_IVIMfit,Vein,50,13994.0,2
+TCML_TechnionIIT_lsqlm,asc lower intestine,50,1007.0,2
+TCML_TechnionIIT_lsqtrf,asc lower intestine,50,6999.0,2
+TCML_TechnionIIT_lsq_sls_lm,asc lower intestine,50,4993.0,2
+TCML_TechnionIIT_SLS,asc lower intestine,50,1999.0,2
+ETP_SRI_LinearFitting,asc lower intestine,50,0.0,2
+IAR_LU_biexp,asc lower intestine,50,4995.0,2
+IAR_LU_modified_mix,asc lower intestine,50,222031.0,2
+IAR_LU_modified_topopro,asc lower intestine,50,99236.0,2
+IAR_LU_segmented_2step,asc lower intestine,50,8001.0,2
+IAR_LU_segmented_3step,asc lower intestine,50,10675.0,2
+IAR_LU_subtracted,asc lower intestine,50,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,asc lower intestine,50,18530.0,2
+OGC_AmsterdamUMC_biexp_segmented,asc lower intestine,50,5999.0,2
+OGC_AmsterdamUMC_biexp,asc lower intestine,50,5994.0,2
+PV_MUMC_biexp,asc lower intestine,50,6000.0,2
+PvH_KB_NKI_IVIMfit,asc lower intestine,50,1000.0,2
+OJ_GU_seg,asc lower intestine,50,6005.0,2
+TF_reference_IVIMfit,asc lower intestine,50,13007.0,2
+TCML_TechnionIIT_lsqlm,trans lower intestine,50,1000.0,2
+TCML_TechnionIIT_lsqtrf,trans lower intestine,50,5993.0,2
+TCML_TechnionIIT_lsq_sls_lm,trans lower intestine,50,6007.0,2
+TCML_TechnionIIT_SLS,trans lower intestine,50,1999.0,2
+ETP_SRI_LinearFitting,trans lower intestine,50,0.0,2
+IAR_LU_biexp,trans lower intestine,50,4999.0,2
+IAR_LU_modified_mix,trans lower intestine,50,221117.0,2
+IAR_LU_modified_topopro,trans lower intestine,50,105196.0,2
+IAR_LU_segmented_2step,trans lower intestine,50,6999.0,2
+IAR_LU_segmented_3step,trans lower intestine,50,8993.0,2
+IAR_LU_subtracted,trans lower intestine,50,8005.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,trans lower intestine,50,20000.0,2
+OGC_AmsterdamUMC_biexp_segmented,trans lower intestine,50,6996.0,2
+OGC_AmsterdamUMC_biexp,trans lower intestine,50,6000.0,2
+PV_MUMC_biexp,trans lower intestine,50,6005.0,2
+PvH_KB_NKI_IVIMfit,trans lower intestine,50,1002.0,2
+OJ_GU_seg,trans lower intestine,50,6552.0,2
+TF_reference_IVIMfit,trans lower intestine,50,12999.0,2
+TCML_TechnionIIT_lsqlm,desc lower intestine,50,1995.0,2
+TCML_TechnionIIT_lsqtrf,desc lower intestine,50,7002.0,2
+TCML_TechnionIIT_lsq_sls_lm,desc lower intestine,50,4001.0,2
+TCML_TechnionIIT_SLS,desc lower intestine,50,2999.0,2
+ETP_SRI_LinearFitting,desc lower intestine,50,1995.0,2
+IAR_LU_biexp,desc lower intestine,50,5008.0,2
+IAR_LU_modified_mix,desc lower intestine,50,218575.0,2
+IAR_LU_modified_topopro,desc lower intestine,50,99655.0,2
+IAR_LU_segmented_2step,desc lower intestine,50,8003.0,2
+IAR_LU_segmented_3step,desc lower intestine,50,10002.0,2
+IAR_LU_subtracted,desc lower intestine,50,6550.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,desc lower intestine,50,21007.0,2
+OGC_AmsterdamUMC_biexp_segmented,desc lower intestine,50,5999.0,2
+OGC_AmsterdamUMC_biexp,desc lower intestine,50,5995.0,2
+PV_MUMC_biexp,desc lower intestine,50,6007.0,2
+PvH_KB_NKI_IVIMfit,desc lower intestine,50,999.0,2
+OJ_GU_seg,desc lower intestine,50,6001.0,2
+TF_reference_IVIMfit,desc lower intestine,50,12996.0,2
+TCML_TechnionIIT_lsqlm,small intestine,50,0.0,2
+TCML_TechnionIIT_lsqtrf,small intestine,50,7000.0,2
+TCML_TechnionIIT_lsq_sls_lm,small intestine,50,6006.0,2
+TCML_TechnionIIT_SLS,small intestine,50,3001.0,2
+ETP_SRI_LinearFitting,small intestine,50,999.0,2
+IAR_LU_biexp,small intestine,50,4998.0,2
+IAR_LU_modified_mix,small intestine,50,218111.0,2
+IAR_LU_modified_topopro,small intestine,50,103996.0,2
+IAR_LU_segmented_2step,small intestine,50,8000.0,2
+IAR_LU_segmented_3step,small intestine,50,9005.0,2
+IAR_LU_subtracted,small intestine,50,7003.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,small intestine,50,21000.0,2
+OGC_AmsterdamUMC_biexp_segmented,small intestine,50,7001.0,2
+OGC_AmsterdamUMC_biexp,small intestine,50,4998.0,2
+PV_MUMC_biexp,small intestine,50,5999.0,2
+PvH_KB_NKI_IVIMfit,small intestine,50,998.0,2
+OJ_GU_seg,small intestine,50,5993.0,2
+TF_reference_IVIMfit,small intestine,50,12002.0,2
+TCML_TechnionIIT_lsqlm,pericardium,50,4000.0,2
+TCML_TechnionIIT_lsqtrf,pericardium,50,5997.0,2
+TCML_TechnionIIT_lsq_sls_lm,pericardium,50,8000.0,2
+TCML_TechnionIIT_SLS,pericardium,50,3000.0,2
+ETP_SRI_LinearFitting,pericardium,50,0.0,2
+IAR_LU_biexp,pericardium,50,7998.0,2
+IAR_LU_modified_mix,pericardium,50,188062.0,2
+IAR_LU_modified_topopro,pericardium,50,70000.0,2
+IAR_LU_segmented_2step,pericardium,50,7007.0,2
+IAR_LU_segmented_3step,pericardium,50,15996.0,2
+IAR_LU_subtracted,pericardium,50,8039.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,pericardium,50,17569.0,2
+OGC_AmsterdamUMC_biexp_segmented,pericardium,50,6000.0,2
+OGC_AmsterdamUMC_biexp,pericardium,50,9994.0,2
+PV_MUMC_biexp,pericardium,50,12000.0,2
+PvH_KB_NKI_IVIMfit,pericardium,50,998.0,2
+OJ_GU_seg,pericardium,50,3993.0,2
+TF_reference_IVIMfit,pericardium,50,12005.0,2
+TCML_TechnionIIT_lsqlm,Myocardium LV,100,998.0,2
+TCML_TechnionIIT_lsqtrf,Myocardium LV,100,5005.0,2
+TCML_TechnionIIT_lsq_sls_lm,Myocardium LV,100,6000.0,2
+TCML_TechnionIIT_SLS,Myocardium LV,100,3001.0,2
+ETP_SRI_LinearFitting,Myocardium LV,100,2005.0,2
+IAR_LU_biexp,Myocardium LV,100,6000.0,2
+IAR_LU_modified_mix,Myocardium LV,100,151191.0,2
+IAR_LU_modified_topopro,Myocardium LV,100,145539.0,2
+IAR_LU_segmented_2step,Myocardium LV,100,7995.0,2
+IAR_LU_segmented_3step,Myocardium LV,100,9992.0,2
+IAR_LU_subtracted,Myocardium LV,100,8030.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Myocardium LV,100,15994.0,2
+OGC_AmsterdamUMC_biexp_segmented,Myocardium LV,100,7283.0,2
+OGC_AmsterdamUMC_biexp,Myocardium LV,100,4000.0,2
+PV_MUMC_biexp,Myocardium LV,100,7002.0,2
+PvH_KB_NKI_IVIMfit,Myocardium LV,100,1000.0,2
+OJ_GU_seg,Myocardium LV,100,5000.0,2
+TF_reference_IVIMfit,Myocardium LV,100,12999.0,2
+TCML_TechnionIIT_lsqlm,myocardium RV,100,1999.0,2
+TCML_TechnionIIT_lsqtrf,myocardium RV,100,6000.0,2
+TCML_TechnionIIT_lsq_sls_lm,myocardium RV,100,5999.0,2
+TCML_TechnionIIT_SLS,myocardium RV,100,3008.0,2
+ETP_SRI_LinearFitting,myocardium RV,100,0.0,2
+IAR_LU_biexp,myocardium RV,100,5000.0,2
+IAR_LU_modified_mix,myocardium RV,100,162155.0,2
+IAR_LU_modified_topopro,myocardium RV,100,101999.0,2
+IAR_LU_segmented_2step,myocardium RV,100,8108.0,2
+IAR_LU_segmented_3step,myocardium RV,100,11999.0,2
+IAR_LU_subtracted,myocardium RV,100,8114.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,myocardium RV,100,14000.0,2
+OGC_AmsterdamUMC_biexp_segmented,myocardium RV,100,7007.0,2
+OGC_AmsterdamUMC_biexp,myocardium RV,100,5683.0,2
+PV_MUMC_biexp,myocardium RV,100,7000.0,2
+PvH_KB_NKI_IVIMfit,myocardium RV,100,1000.0,2
+OJ_GU_seg,myocardium RV,100,5001.0,2
+TF_reference_IVIMfit,myocardium RV,100,12002.0,2
+TCML_TechnionIIT_lsqlm,myocardium ra,100,1996.0,2
+TCML_TechnionIIT_lsqtrf,myocardium ra,100,9036.0,2
+TCML_TechnionIIT_lsq_sls_lm,myocardium ra,100,7994.0,2
+TCML_TechnionIIT_SLS,myocardium ra,100,4000.0,2
+ETP_SRI_LinearFitting,myocardium ra,100,999.0,2
+IAR_LU_biexp,myocardium ra,100,5008.0,2
+IAR_LU_modified_mix,myocardium ra,100,217561.0,2
+IAR_LU_modified_topopro,myocardium ra,100,60996.0,2
+IAR_LU_segmented_2step,myocardium ra,100,7002.0,2
+IAR_LU_segmented_3step,myocardium ra,100,12000.0,2
+IAR_LU_subtracted,myocardium ra,100,7993.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,myocardium ra,100,17006.0,2
+OGC_AmsterdamUMC_biexp_segmented,myocardium ra,100,8010.0,2
+OGC_AmsterdamUMC_biexp,myocardium ra,100,7000.0,2
+PV_MUMC_biexp,myocardium ra,100,7999.0,2
+PvH_KB_NKI_IVIMfit,myocardium ra,100,0.0,2
+OJ_GU_seg,myocardium ra,100,3998.0,2
+TF_reference_IVIMfit,myocardium ra,100,14001.0,2
+TCML_TechnionIIT_lsqlm,Blood RV,100,2006.0,2
+TCML_TechnionIIT_lsqtrf,Blood RV,100,6006.0,2
+TCML_TechnionIIT_lsq_sls_lm,Blood RV,100,4001.0,2
+TCML_TechnionIIT_SLS,Blood RV,100,3004.0,2
+ETP_SRI_LinearFitting,Blood RV,100,2000.0,2
+IAR_LU_biexp,Blood RV,100,7999.0,2
+IAR_LU_modified_mix,Blood RV,100,202576.0,2
+IAR_LU_modified_topopro,Blood RV,100,41000.0,2
+IAR_LU_segmented_2step,Blood RV,100,11996.0,2
+IAR_LU_segmented_3step,Blood RV,100,16000.0,2
+IAR_LU_subtracted,Blood RV,100,10028.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Blood RV,100,21002.0,2
+OGC_AmsterdamUMC_biexp_segmented,Blood RV,100,10029.0,2
+OGC_AmsterdamUMC_biexp,Blood RV,100,7005.0,2
+PV_MUMC_biexp,Blood RV,100,10001.0,2
+PvH_KB_NKI_IVIMfit,Blood RV,100,1007.0,2
+OJ_GU_seg,Blood RV,100,1998.0,2
+TF_reference_IVIMfit,Blood RV,100,13999.0,2
+TCML_TechnionIIT_lsqlm,Blood RA,100,2001.0,2
+TCML_TechnionIIT_lsqtrf,Blood RA,100,7007.0,2
+TCML_TechnionIIT_lsq_sls_lm,Blood RA,100,4000.0,2
+TCML_TechnionIIT_SLS,Blood RA,100,1999.0,2
+ETP_SRI_LinearFitting,Blood RA,100,994.0,2
+IAR_LU_biexp,Blood RA,100,8006.0,2
+IAR_LU_modified_mix,Blood RA,100,218631.0,2
+IAR_LU_modified_topopro,Blood RA,100,43562.0,2
+IAR_LU_segmented_2step,Blood RA,100,11007.0,2
+IAR_LU_segmented_3step,Blood RA,100,15785.0,2
+IAR_LU_subtracted,Blood RA,100,10004.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Blood RA,100,21042.0,2
+OGC_AmsterdamUMC_biexp_segmented,Blood RA,100,9995.0,2
+OGC_AmsterdamUMC_biexp,Blood RA,100,6001.0,2
+PV_MUMC_biexp,Blood RA,100,10006.0,2
+PvH_KB_NKI_IVIMfit,Blood RA,100,994.0,2
+OJ_GU_seg,Blood RA,100,2006.0,2
+TF_reference_IVIMfit,Blood RA,100,12997.0,2
+TCML_TechnionIIT_lsqlm,muscle,100,1993.0,2
+TCML_TechnionIIT_lsqtrf,muscle,100,3995.0,2
+TCML_TechnionIIT_lsq_sls_lm,muscle,100,5007.0,2
+TCML_TechnionIIT_SLS,muscle,100,2982.0,2
+ETP_SRI_LinearFitting,muscle,100,1000.0,2
+IAR_LU_biexp,muscle,100,4001.0,2
+IAR_LU_modified_mix,muscle,100,229310.0,2
+IAR_LU_modified_topopro,muscle,100,85240.0,2
+IAR_LU_segmented_2step,muscle,100,7000.0,2
+IAR_LU_segmented_3step,muscle,100,10001.0,2
+IAR_LU_subtracted,muscle,100,7010.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,muscle,100,18000.0,2
+OGC_AmsterdamUMC_biexp_segmented,muscle,100,5998.0,2
+OGC_AmsterdamUMC_biexp,muscle,100,4008.0,2
+PV_MUMC_biexp,muscle,100,6999.0,2
+PvH_KB_NKI_IVIMfit,muscle,100,994.0,2
+OJ_GU_seg,muscle,100,6007.0,2
+TF_reference_IVIMfit,muscle,100,11999.0,2
+TCML_TechnionIIT_lsqlm,Liver,100,1999.0,2
+TCML_TechnionIIT_lsqtrf,Liver,100,5006.0,2
+TCML_TechnionIIT_lsq_sls_lm,Liver,100,3996.0,2
+TCML_TechnionIIT_SLS,Liver,100,2001.0,2
+ETP_SRI_LinearFitting,Liver,100,997.0,2
+IAR_LU_biexp,Liver,100,7004.0,2
+IAR_LU_modified_mix,Liver,100,154998.0,2
+IAR_LU_modified_topopro,Liver,100,87025.0,2
+IAR_LU_segmented_2step,Liver,100,9068.0,2
+IAR_LU_segmented_3step,Liver,100,11950.0,2
+IAR_LU_subtracted,Liver,100,9033.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Liver,100,20999.0,2
+OGC_AmsterdamUMC_biexp_segmented,Liver,100,7004.0,2
+OGC_AmsterdamUMC_biexp,Liver,100,6003.0,2
+PV_MUMC_biexp,Liver,100,5998.0,2
+PvH_KB_NKI_IVIMfit,Liver,100,1000.0,2
+OJ_GU_seg,Liver,100,3002.0,2
+TF_reference_IVIMfit,Liver,100,14007.0,2
+TCML_TechnionIIT_lsqlm,gall bladder,100,8000.0,2
+TCML_TechnionIIT_lsqtrf,gall bladder,100,7007.0,2
+TCML_TechnionIIT_lsq_sls_lm,gall bladder,100,11999.0,2
+TCML_TechnionIIT_SLS,gall bladder,100,4018.0,2
+ETP_SRI_LinearFitting,gall bladder,100,1000.0,2
+IAR_LU_biexp,gall bladder,100,8008.0,2
+IAR_LU_modified_mix,gall bladder,100,168448.0,2
+IAR_LU_modified_topopro,gall bladder,100,75027.0,2
+IAR_LU_segmented_2step,gall bladder,100,7999.0,2
+IAR_LU_segmented_3step,gall bladder,100,11999.0,2
+IAR_LU_subtracted,gall bladder,100,7999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,gall bladder,100,18000.0,2
+OGC_AmsterdamUMC_biexp_segmented,gall bladder,100,5012.0,2
+OGC_AmsterdamUMC_biexp,gall bladder,100,7997.0,2
+PV_MUMC_biexp,gall bladder,100,20513.0,2
+PvH_KB_NKI_IVIMfit,gall bladder,100,1000.0,2
+OJ_GU_seg,gall bladder,100,3006.0,2
+TF_reference_IVIMfit,gall bladder,100,10993.0,2
+TCML_TechnionIIT_lsqlm,esophagus,100,2000.0,2
+TCML_TechnionIIT_lsqtrf,esophagus,100,5999.0,2
+TCML_TechnionIIT_lsq_sls_lm,esophagus,100,4955.0,2
+TCML_TechnionIIT_SLS,esophagus,100,2994.0,2
+ETP_SRI_LinearFitting,esophagus,100,2006.0,2
+IAR_LU_biexp,esophagus,100,4991.0,2
+IAR_LU_modified_mix,esophagus,100,222997.0,2
+IAR_LU_modified_topopro,esophagus,100,58004.0,2
+IAR_LU_segmented_2step,esophagus,100,6000.0,2
+IAR_LU_segmented_3step,esophagus,100,10533.0,2
+IAR_LU_subtracted,esophagus,100,6999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,esophagus,100,16999.0,2
+OGC_AmsterdamUMC_biexp_segmented,esophagus,100,5997.0,2
+OGC_AmsterdamUMC_biexp,esophagus,100,4000.0,2
+PV_MUMC_biexp,esophagus,100,5992.0,2
+PvH_KB_NKI_IVIMfit,esophagus,100,0.0,2
+OJ_GU_seg,esophagus,100,4994.0,2
+TF_reference_IVIMfit,esophagus,100,13070.0,2
+TCML_TechnionIIT_lsqlm,esophagus cont,100,1998.0,2
+TCML_TechnionIIT_lsqtrf,esophagus cont,100,5008.0,2
+TCML_TechnionIIT_lsq_sls_lm,esophagus cont,100,3994.0,2
+TCML_TechnionIIT_SLS,esophagus cont,100,3000.0,2
+ETP_SRI_LinearFitting,esophagus cont,100,2001.0,2
+IAR_LU_biexp,esophagus cont,100,4999.0,2
+IAR_LU_modified_mix,esophagus cont,100,204998.0,2
+IAR_LU_modified_topopro,esophagus cont,100,53005.0,2
+IAR_LU_segmented_2step,esophagus cont,100,6000.0,2
+IAR_LU_segmented_3step,esophagus cont,100,10000.0,2
+IAR_LU_subtracted,esophagus cont,100,6026.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,esophagus cont,100,18001.0,2
+OGC_AmsterdamUMC_biexp_segmented,esophagus cont,100,6190.0,2
+OGC_AmsterdamUMC_biexp,esophagus cont,100,4000.0,2
+PV_MUMC_biexp,esophagus cont,100,6000.0,2
+PvH_KB_NKI_IVIMfit,esophagus cont,100,0.0,2
+OJ_GU_seg,esophagus cont,100,6001.0,2
+TF_reference_IVIMfit,esophagus cont,100,12000.0,2
+TCML_TechnionIIT_lsqlm,st wall,100,2000.0,2
+TCML_TechnionIIT_lsqtrf,st wall,100,5000.0,2
+TCML_TechnionIIT_lsq_sls_lm,st wall,100,4000.0,2
+TCML_TechnionIIT_SLS,st wall,100,4000.0,2
+ETP_SRI_LinearFitting,st wall,100,2000.0,2
+IAR_LU_biexp,st wall,100,4000.0,2
+IAR_LU_modified_mix,st wall,100,216535.0,2
+IAR_LU_modified_topopro,st wall,100,79000.0,2
+IAR_LU_segmented_2step,st wall,100,6025.0,2
+IAR_LU_segmented_3step,st wall,100,10000.0,2
+IAR_LU_subtracted,st wall,100,6000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,st wall,100,17999.0,2
+OGC_AmsterdamUMC_biexp_segmented,st wall,100,6000.0,2
+OGC_AmsterdamUMC_biexp,st wall,100,4999.0,2
+PV_MUMC_biexp,st wall,100,6001.0,2
+PvH_KB_NKI_IVIMfit,st wall,100,1000.0,2
+OJ_GU_seg,st wall,100,6000.0,2
+TF_reference_IVIMfit,st wall,100,12000.0,2
+TCML_TechnionIIT_lsqlm,Stomach Contents,100,9522.0,2
+TCML_TechnionIIT_lsqtrf,Stomach Contents,100,6999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Stomach Contents,100,12000.0,2
+TCML_TechnionIIT_SLS,Stomach Contents,100,2000.0,2
+ETP_SRI_LinearFitting,Stomach Contents,100,999.0,2
+IAR_LU_biexp,Stomach Contents,100,7000.0,2
+IAR_LU_modified_mix,Stomach Contents,100,150558.0,2
+IAR_LU_modified_topopro,Stomach Contents,100,93537.0,2
+IAR_LU_segmented_2step,Stomach Contents,100,8000.0,2
+IAR_LU_segmented_3step,Stomach Contents,100,12016.0,2
+IAR_LU_subtracted,Stomach Contents,100,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Stomach Contents,100,18023.0,2
+OGC_AmsterdamUMC_biexp_segmented,Stomach Contents,100,4000.0,2
+OGC_AmsterdamUMC_biexp,Stomach Contents,100,7000.0,2
+PV_MUMC_biexp,Stomach Contents,100,18534.0,2
+PvH_KB_NKI_IVIMfit,Stomach Contents,100,1001.0,2
+OJ_GU_seg,Stomach Contents,100,2000.0,2
+TF_reference_IVIMfit,Stomach Contents,100,10001.0,2
+TCML_TechnionIIT_lsqlm,pancreas,100,1000.0,2
+TCML_TechnionIIT_lsqtrf,pancreas,100,5000.0,2
+TCML_TechnionIIT_lsq_sls_lm,pancreas,100,5000.0,2
+TCML_TechnionIIT_SLS,pancreas,100,4000.0,2
+ETP_SRI_LinearFitting,pancreas,100,1000.0,2
+IAR_LU_biexp,pancreas,100,5000.0,2
+IAR_LU_modified_mix,pancreas,100,221023.0,2
+IAR_LU_modified_topopro,pancreas,100,90023.0,2
+IAR_LU_segmented_2step,pancreas,100,6023.0,2
+IAR_LU_segmented_3step,pancreas,100,8998.0,2
+IAR_LU_subtracted,pancreas,100,6001.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,pancreas,100,21000.0,2
+OGC_AmsterdamUMC_biexp_segmented,pancreas,100,5000.0,2
+OGC_AmsterdamUMC_biexp,pancreas,100,3999.0,2
+PV_MUMC_biexp,pancreas,100,8000.0,2
+PvH_KB_NKI_IVIMfit,pancreas,100,2001.0,2
+OJ_GU_seg,pancreas,100,6000.0,2
+TF_reference_IVIMfit,pancreas,100,11000.0,2
+TCML_TechnionIIT_lsqlm,Right kydney cortex,100,2000.0,2
+TCML_TechnionIIT_lsqtrf,Right kydney cortex,100,5000.0,2
+TCML_TechnionIIT_lsq_sls_lm,Right kydney cortex,100,5000.0,2
+TCML_TechnionIIT_SLS,Right kydney cortex,100,3000.0,2
+ETP_SRI_LinearFitting,Right kydney cortex,100,1000.0,2
+IAR_LU_biexp,Right kydney cortex,100,6000.0,2
+IAR_LU_modified_mix,Right kydney cortex,100,215093.0,2
+IAR_LU_modified_topopro,Right kydney cortex,100,90023.0,2
+IAR_LU_segmented_2step,Right kydney cortex,100,6535.0,2
+IAR_LU_segmented_3step,Right kydney cortex,100,11001.0,2
+IAR_LU_subtracted,Right kydney cortex,100,5999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Right kydney cortex,100,24000.0,2
+OGC_AmsterdamUMC_biexp_segmented,Right kydney cortex,100,6000.0,2
+OGC_AmsterdamUMC_biexp,Right kydney cortex,100,6000.0,2
+PV_MUMC_biexp,Right kydney cortex,100,7999.0,2
+PvH_KB_NKI_IVIMfit,Right kydney cortex,100,1000.0,2
+OJ_GU_seg,Right kydney cortex,100,6000.0,2
+TF_reference_IVIMfit,Right kydney cortex,100,12000.0,2
+TCML_TechnionIIT_lsqlm,right kidney medulla,100,2000.0,2
+TCML_TechnionIIT_lsqtrf,right kidney medulla,100,4000.0,2
+TCML_TechnionIIT_lsq_sls_lm,right kidney medulla,100,4000.0,2
+TCML_TechnionIIT_SLS,right kidney medulla,100,2998.0,2
+ETP_SRI_LinearFitting,right kidney medulla,100,1000.0,2
+IAR_LU_biexp,right kidney medulla,100,4999.0,2
+IAR_LU_modified_mix,right kidney medulla,100,212093.0,2
+IAR_LU_modified_topopro,right kidney medulla,100,95560.0,2
+IAR_LU_segmented_2step,right kidney medulla,100,6000.0,2
+IAR_LU_segmented_3step,right kidney medulla,100,11000.0,2
+IAR_LU_subtracted,right kidney medulla,100,6000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,right kidney medulla,100,22000.0,2
+OGC_AmsterdamUMC_biexp_segmented,right kidney medulla,100,6000.0,2
+OGC_AmsterdamUMC_biexp,right kidney medulla,100,5000.0,2
+PV_MUMC_biexp,right kidney medulla,100,6000.0,2
+PvH_KB_NKI_IVIMfit,right kidney medulla,100,999.0,2
+OJ_GU_seg,right kidney medulla,100,6000.0,2
+TF_reference_IVIMfit,right kidney medulla,100,11527.0,2
+TCML_TechnionIIT_lsqlm,Left kidney cortex,100,2000.0,2
+TCML_TechnionIIT_lsqtrf,Left kidney cortex,100,6001.0,2
+TCML_TechnionIIT_lsq_sls_lm,Left kidney cortex,100,5002.0,2
+TCML_TechnionIIT_SLS,Left kidney cortex,100,4023.0,2
+ETP_SRI_LinearFitting,Left kidney cortex,100,1000.0,2
+IAR_LU_biexp,Left kidney cortex,100,7000.0,2
+IAR_LU_modified_mix,Left kidney cortex,100,216093.0,2
+IAR_LU_modified_topopro,Left kidney cortex,100,87540.0,2
+IAR_LU_segmented_2step,Left kidney cortex,100,6000.0,2
+IAR_LU_segmented_3step,Left kidney cortex,100,10001.0,2
+IAR_LU_subtracted,Left kidney cortex,100,6998.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Left kidney cortex,100,24001.0,2
+OGC_AmsterdamUMC_biexp_segmented,Left kidney cortex,100,6000.0,2
+OGC_AmsterdamUMC_biexp,Left kidney cortex,100,6001.0,2
+PV_MUMC_biexp,Left kidney cortex,100,8000.0,2
+PvH_KB_NKI_IVIMfit,Left kidney cortex,100,999.0,2
+OJ_GU_seg,Left kidney cortex,100,4991.0,2
+TF_reference_IVIMfit,Left kidney cortex,100,12000.0,2
+TCML_TechnionIIT_lsqlm,left kidney medulla,100,2000.0,2
+TCML_TechnionIIT_lsqtrf,left kidney medulla,100,4000.0,2
+TCML_TechnionIIT_lsq_sls_lm,left kidney medulla,100,4023.0,2
+TCML_TechnionIIT_SLS,left kidney medulla,100,3000.0,2
+ETP_SRI_LinearFitting,left kidney medulla,100,0.0,2
+IAR_LU_biexp,left kidney medulla,100,4999.0,2
+IAR_LU_modified_mix,left kidney medulla,100,216115.0,2
+IAR_LU_modified_topopro,left kidney medulla,100,96023.0,2
+IAR_LU_segmented_2step,left kidney medulla,100,6000.0,2
+IAR_LU_segmented_3step,left kidney medulla,100,10001.0,2
+IAR_LU_subtracted,left kidney medulla,100,6000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,left kidney medulla,100,21023.0,2
+OGC_AmsterdamUMC_biexp_segmented,left kidney medulla,100,6000.0,2
+OGC_AmsterdamUMC_biexp,left kidney medulla,100,5001.0,2
+PV_MUMC_biexp,left kidney medulla,100,6024.0,2
+PvH_KB_NKI_IVIMfit,left kidney medulla,100,1000.0,2
+OJ_GU_seg,left kidney medulla,100,6000.0,2
+TF_reference_IVIMfit,left kidney medulla,100,11000.0,2
+TCML_TechnionIIT_lsqlm,spleen,100,0.0,2
+TCML_TechnionIIT_lsqtrf,spleen,100,4844.0,2
+TCML_TechnionIIT_lsq_sls_lm,spleen,100,5001.0,2
+TCML_TechnionIIT_SLS,spleen,100,3001.0,2
+ETP_SRI_LinearFitting,spleen,100,1999.0,2
+IAR_LU_biexp,spleen,100,4000.0,2
+IAR_LU_modified_mix,spleen,100,212023.0,2
+IAR_LU_modified_topopro,spleen,100,93000.0,2
+IAR_LU_segmented_2step,spleen,100,6000.0,2
+IAR_LU_segmented_3step,spleen,100,10000.0,2
+IAR_LU_subtracted,spleen,100,6000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,spleen,100,18000.0,2
+OGC_AmsterdamUMC_biexp_segmented,spleen,100,5999.0,2
+OGC_AmsterdamUMC_biexp,spleen,100,4001.0,2
+PV_MUMC_biexp,spleen,100,7000.0,2
+PvH_KB_NKI_IVIMfit,spleen,100,0.0,2
+OJ_GU_seg,spleen,100,5999.0,2
+TF_reference_IVIMfit,spleen,100,13000.0,2
+TCML_TechnionIIT_lsqlm,spinal cord,100,1000.0,2
+TCML_TechnionIIT_lsqtrf,spinal cord,100,4999.0,2
+TCML_TechnionIIT_lsq_sls_lm,spinal cord,100,5000.0,2
+TCML_TechnionIIT_SLS,spinal cord,100,3000.0,2
+ETP_SRI_LinearFitting,spinal cord,100,1000.0,2
+IAR_LU_biexp,spinal cord,100,3999.0,2
+IAR_LU_modified_mix,spinal cord,100,223094.0,2
+IAR_LU_modified_topopro,spinal cord,100,65008.0,2
+IAR_LU_segmented_2step,spinal cord,100,5999.0,2
+IAR_LU_segmented_3step,spinal cord,100,10000.0,2
+IAR_LU_subtracted,spinal cord,100,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,spinal cord,100,17023.0,2
+OGC_AmsterdamUMC_biexp_segmented,spinal cord,100,6000.0,2
+OGC_AmsterdamUMC_biexp,spinal cord,100,4000.0,2
+PV_MUMC_biexp,spinal cord,100,6535.0,2
+PvH_KB_NKI_IVIMfit,spinal cord,100,0.0,2
+OJ_GU_seg,spinal cord,100,5000.0,2
+TF_reference_IVIMfit,spinal cord,100,13000.0,2
+TCML_TechnionIIT_lsqlm,Bone Marrow,100,0.0,2
+TCML_TechnionIIT_lsqtrf,Bone Marrow,100,4000.0,2
+TCML_TechnionIIT_lsq_sls_lm,Bone Marrow,100,5001.0,2
+TCML_TechnionIIT_SLS,Bone Marrow,100,3999.0,2
+ETP_SRI_LinearFitting,Bone Marrow,100,999.0,2
+IAR_LU_biexp,Bone Marrow,100,3999.0,2
+IAR_LU_modified_mix,Bone Marrow,100,211579.0,2
+IAR_LU_modified_topopro,Bone Marrow,100,57999.0,2
+IAR_LU_segmented_2step,Bone Marrow,100,6025.0,2
+IAR_LU_segmented_3step,Bone Marrow,100,11000.0,2
+IAR_LU_subtracted,Bone Marrow,100,8000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Bone Marrow,100,18855.0,2
+OGC_AmsterdamUMC_biexp_segmented,Bone Marrow,100,6999.0,2
+OGC_AmsterdamUMC_biexp,Bone Marrow,100,4999.0,2
+PV_MUMC_biexp,Bone Marrow,100,7535.0,2
+PvH_KB_NKI_IVIMfit,Bone Marrow,100,1000.0,2
+OJ_GU_seg,Bone Marrow,100,4999.0,2
+TF_reference_IVIMfit,Bone Marrow,100,14000.0,2
+TCML_TechnionIIT_lsqlm,Artery,100,2000.0,2
+TCML_TechnionIIT_lsqtrf,Artery,100,5999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Artery,100,4000.0,2
+TCML_TechnionIIT_SLS,Artery,100,4000.0,2
+ETP_SRI_LinearFitting,Artery,100,1000.0,2
+IAR_LU_biexp,Artery,100,7999.0,2
+IAR_LU_modified_mix,Artery,100,210583.0,2
+IAR_LU_modified_topopro,Artery,100,43000.0,2
+IAR_LU_segmented_2step,Artery,100,12000.0,2
+IAR_LU_segmented_3step,Artery,100,15023.0,2
+IAR_LU_subtracted,Artery,100,10000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Artery,100,21022.0,2
+OGC_AmsterdamUMC_biexp_segmented,Artery,100,10000.0,2
+OGC_AmsterdamUMC_biexp,Artery,100,7695.0,2
+PV_MUMC_biexp,Artery,100,9999.0,2
+PvH_KB_NKI_IVIMfit,Artery,100,0.0,2
+OJ_GU_seg,Artery,100,2000.0,2
+TF_reference_IVIMfit,Artery,100,13000.0,2
+TCML_TechnionIIT_lsqlm,Vein,100,2000.0,2
+TCML_TechnionIIT_lsqtrf,Vein,100,6000.0,2
+TCML_TechnionIIT_lsq_sls_lm,Vein,100,3999.0,2
+TCML_TechnionIIT_SLS,Vein,100,2998.0,2
+ETP_SRI_LinearFitting,Vein,100,1000.0,2
+IAR_LU_biexp,Vein,100,7994.0,2
+IAR_LU_modified_mix,Vein,100,214047.0,2
+IAR_LU_modified_topopro,Vein,100,45001.0,2
+IAR_LU_segmented_2step,Vein,100,12023.0,2
+IAR_LU_segmented_3step,Vein,100,16000.0,2
+IAR_LU_subtracted,Vein,100,10000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Vein,100,21000.0,2
+OGC_AmsterdamUMC_biexp_segmented,Vein,100,9535.0,2
+OGC_AmsterdamUMC_biexp,Vein,100,8000.0,2
+PV_MUMC_biexp,Vein,100,9001.0,2
+PvH_KB_NKI_IVIMfit,Vein,100,999.0,2
+OJ_GU_seg,Vein,100,2999.0,2
+TF_reference_IVIMfit,Vein,100,14000.0,2
+TCML_TechnionIIT_lsqlm,asc lower intestine,100,2000.0,2
+TCML_TechnionIIT_lsqtrf,asc lower intestine,100,6024.0,2
+TCML_TechnionIIT_lsq_sls_lm,asc lower intestine,100,4000.0,2
+TCML_TechnionIIT_SLS,asc lower intestine,100,3000.0,2
+ETP_SRI_LinearFitting,asc lower intestine,100,1000.0,2
+IAR_LU_biexp,asc lower intestine,100,5000.0,2
+IAR_LU_modified_mix,asc lower intestine,100,221044.0,2
+IAR_LU_modified_topopro,asc lower intestine,100,82001.0,2
+IAR_LU_segmented_2step,asc lower intestine,100,8000.0,2
+IAR_LU_segmented_3step,asc lower intestine,100,8000.0,2
+IAR_LU_subtracted,asc lower intestine,100,5998.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,asc lower intestine,100,17000.0,2
+OGC_AmsterdamUMC_biexp_segmented,asc lower intestine,100,9000.0,2
+OGC_AmsterdamUMC_biexp,asc lower intestine,100,5999.0,2
+PV_MUMC_biexp,asc lower intestine,100,7000.0,2
+PvH_KB_NKI_IVIMfit,asc lower intestine,100,999.0,2
+OJ_GU_seg,asc lower intestine,100,4000.0,2
+TF_reference_IVIMfit,asc lower intestine,100,11999.0,2
+TCML_TechnionIIT_lsqlm,trans lower intestine,100,1000.0,2
+TCML_TechnionIIT_lsqtrf,trans lower intestine,100,5999.0,2
+TCML_TechnionIIT_lsq_sls_lm,trans lower intestine,100,5001.0,2
+TCML_TechnionIIT_SLS,trans lower intestine,100,4000.0,2
+ETP_SRI_LinearFitting,trans lower intestine,100,1000.0,2
+IAR_LU_biexp,trans lower intestine,100,5000.0,2
+IAR_LU_modified_mix,trans lower intestine,100,221558.0,2
+IAR_LU_modified_topopro,trans lower intestine,100,84047.0,2
+IAR_LU_segmented_2step,trans lower intestine,100,8000.0,2
+IAR_LU_segmented_3step,trans lower intestine,100,9000.0,2
+IAR_LU_subtracted,trans lower intestine,100,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,trans lower intestine,100,16000.0,2
+OGC_AmsterdamUMC_biexp_segmented,trans lower intestine,100,7000.0,2
+OGC_AmsterdamUMC_biexp,trans lower intestine,100,6000.0,2
+PV_MUMC_biexp,trans lower intestine,100,7000.0,2
+PvH_KB_NKI_IVIMfit,trans lower intestine,100,1000.0,2
+OJ_GU_seg,trans lower intestine,100,4001.0,2
+TF_reference_IVIMfit,trans lower intestine,100,11999.0,2
+TCML_TechnionIIT_lsqlm,desc lower intestine,100,1998.0,2
+TCML_TechnionIIT_lsqtrf,desc lower intestine,100,6001.0,2
+TCML_TechnionIIT_lsq_sls_lm,desc lower intestine,100,5000.0,2
+TCML_TechnionIIT_SLS,desc lower intestine,100,4029.0,2
+ETP_SRI_LinearFitting,desc lower intestine,100,1000.0,2
+IAR_LU_biexp,desc lower intestine,100,4999.0,2
+IAR_LU_modified_mix,desc lower intestine,100,220094.0,2
+IAR_LU_modified_topopro,desc lower intestine,100,78024.0,2
+IAR_LU_segmented_2step,desc lower intestine,100,7000.0,2
+IAR_LU_segmented_3step,desc lower intestine,100,8000.0,2
+IAR_LU_subtracted,desc lower intestine,100,7001.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,desc lower intestine,100,17000.0,2
+OGC_AmsterdamUMC_biexp_segmented,desc lower intestine,100,6000.0,2
+OGC_AmsterdamUMC_biexp,desc lower intestine,100,5000.0,2
+PV_MUMC_biexp,desc lower intestine,100,6000.0,2
+PvH_KB_NKI_IVIMfit,desc lower intestine,100,1000.0,2
+OJ_GU_seg,desc lower intestine,100,6000.0,2
+TF_reference_IVIMfit,desc lower intestine,100,12000.0,2
+TCML_TechnionIIT_lsqlm,small intestine,100,1996.0,2
+TCML_TechnionIIT_lsqtrf,small intestine,100,6000.0,2
+TCML_TechnionIIT_lsq_sls_lm,small intestine,100,4001.0,2
+TCML_TechnionIIT_SLS,small intestine,100,3000.0,2
+ETP_SRI_LinearFitting,small intestine,100,1000.0,2
+IAR_LU_biexp,small intestine,100,4001.0,2
+IAR_LU_modified_mix,small intestine,100,221557.0,2
+IAR_LU_modified_topopro,small intestine,100,86025.0,2
+IAR_LU_segmented_2step,small intestine,100,10000.0,2
+IAR_LU_segmented_3step,small intestine,100,8000.0,2
+IAR_LU_subtracted,small intestine,100,6000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,small intestine,100,17000.0,2
+OGC_AmsterdamUMC_biexp_segmented,small intestine,100,6000.0,2
+OGC_AmsterdamUMC_biexp,small intestine,100,6007.0,2
+PV_MUMC_biexp,small intestine,100,6000.0,2
+PvH_KB_NKI_IVIMfit,small intestine,100,1000.0,2
+OJ_GU_seg,small intestine,100,5999.0,2
+TF_reference_IVIMfit,small intestine,100,12999.0,2
+TCML_TechnionIIT_lsqlm,pericardium,100,2840.0,2
+TCML_TechnionIIT_lsqtrf,pericardium,100,5999.0,2
+TCML_TechnionIIT_lsq_sls_lm,pericardium,100,8000.0,2
+TCML_TechnionIIT_SLS,pericardium,100,3000.0,2
+ETP_SRI_LinearFitting,pericardium,100,1001.0,2
+IAR_LU_biexp,pericardium,100,8999.0,2
+IAR_LU_modified_mix,pericardium,100,164069.0,2
+IAR_LU_modified_topopro,pericardium,100,91046.0,2
+IAR_LU_segmented_2step,pericardium,100,8001.0,2
+IAR_LU_segmented_3step,pericardium,100,12000.0,2
+IAR_LU_subtracted,pericardium,100,8000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,pericardium,100,27000.0,2
+OGC_AmsterdamUMC_biexp_segmented,pericardium,100,6000.0,2
+OGC_AmsterdamUMC_biexp,pericardium,100,11023.0,2
+PV_MUMC_biexp,pericardium,100,10000.0,2
+PvH_KB_NKI_IVIMfit,pericardium,100,0.0,2
+OJ_GU_seg,pericardium,100,5000.0,2
+TF_reference_IVIMfit,pericardium,100,12023.0,2
+TCML_TechnionIIT_lsqlm,Myocardium LV,200,2001.0,2
+TCML_TechnionIIT_lsqtrf,Myocardium LV,200,5999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Myocardium LV,200,4000.0,2
+TCML_TechnionIIT_SLS,Myocardium LV,200,4000.0,2
+ETP_SRI_LinearFitting,Myocardium LV,200,2000.0,2
+IAR_LU_biexp,Myocardium LV,200,6000.0,2
+IAR_LU_modified_mix,Myocardium LV,200,149023.0,2
+IAR_LU_modified_topopro,Myocardium LV,200,86998.0,2
+IAR_LU_segmented_2step,Myocardium LV,200,6999.0,2
+IAR_LU_segmented_3step,Myocardium LV,200,11999.0,2
+IAR_LU_subtracted,Myocardium LV,200,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Myocardium LV,200,16999.0,2
+OGC_AmsterdamUMC_biexp_segmented,Myocardium LV,200,7000.0,2
+OGC_AmsterdamUMC_biexp,Myocardium LV,200,5535.0,2
+PV_MUMC_biexp,Myocardium LV,200,6000.0,2
+PvH_KB_NKI_IVIMfit,Myocardium LV,200,1000.0,2
+OJ_GU_seg,Myocardium LV,200,5000.0,2
+TF_reference_IVIMfit,Myocardium LV,200,12023.0,2
+TCML_TechnionIIT_lsqlm,myocardium RV,200,999.0,2
+TCML_TechnionIIT_lsqtrf,myocardium RV,200,5000.0,2
+TCML_TechnionIIT_lsq_sls_lm,myocardium RV,200,5000.0,2
+TCML_TechnionIIT_SLS,myocardium RV,200,3999.0,2
+ETP_SRI_LinearFitting,myocardium RV,200,1000.0,2
+IAR_LU_biexp,myocardium RV,200,6023.0,2
+IAR_LU_modified_mix,myocardium RV,200,155022.0,2
+IAR_LU_modified_topopro,myocardium RV,200,86069.0,2
+IAR_LU_segmented_2step,myocardium RV,200,8000.0,2
+IAR_LU_segmented_3step,myocardium RV,200,12000.0,2
+IAR_LU_subtracted,myocardium RV,200,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,myocardium RV,200,18000.0,2
+OGC_AmsterdamUMC_biexp_segmented,myocardium RV,200,7000.0,2
+OGC_AmsterdamUMC_biexp,myocardium RV,200,5000.0,2
+PV_MUMC_biexp,myocardium RV,200,7000.0,2
+PvH_KB_NKI_IVIMfit,myocardium RV,200,1000.0,2
+OJ_GU_seg,myocardium RV,200,5000.0,2
+TF_reference_IVIMfit,myocardium RV,200,13000.0,2
+TCML_TechnionIIT_lsqlm,myocardium ra,200,2000.0,2
+TCML_TechnionIIT_lsqtrf,myocardium ra,200,4000.0,2
+TCML_TechnionIIT_lsq_sls_lm,myocardium ra,200,5000.0,2
+TCML_TechnionIIT_SLS,myocardium ra,200,4023.0,2
+ETP_SRI_LinearFitting,myocardium ra,200,2000.0,2
+IAR_LU_biexp,myocardium ra,200,5023.0,2
+IAR_LU_modified_mix,myocardium ra,200,162022.0,2
+IAR_LU_modified_topopro,myocardium ra,200,73045.0,2
+IAR_LU_segmented_2step,myocardium ra,200,7000.0,2
+IAR_LU_segmented_3step,myocardium ra,200,11951.0,2
+IAR_LU_subtracted,myocardium ra,200,8000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,myocardium ra,200,21000.0,2
+OGC_AmsterdamUMC_biexp_segmented,myocardium ra,200,6000.0,2
+OGC_AmsterdamUMC_biexp,myocardium ra,200,5000.0,2
+PV_MUMC_biexp,myocardium ra,200,7999.0,2
+PvH_KB_NKI_IVIMfit,myocardium ra,200,1000.0,2
+OJ_GU_seg,myocardium ra,200,4000.0,2
+TF_reference_IVIMfit,myocardium ra,200,14001.0,2
+TCML_TechnionIIT_lsqlm,Blood RV,200,2000.0,2
+TCML_TechnionIIT_lsqtrf,Blood RV,200,6000.0,2
+TCML_TechnionIIT_lsq_sls_lm,Blood RV,200,3999.0,2
+TCML_TechnionIIT_SLS,Blood RV,200,1999.0,2
+ETP_SRI_LinearFitting,Blood RV,200,1000.0,2
+IAR_LU_biexp,Blood RV,200,8999.0,2
+IAR_LU_modified_mix,Blood RV,200,104001.0,2
+IAR_LU_modified_topopro,Blood RV,200,46000.0,2
+IAR_LU_segmented_2step,Blood RV,200,12000.0,2
+IAR_LU_segmented_3step,Blood RV,200,15999.0,2
+IAR_LU_subtracted,Blood RV,200,10999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Blood RV,200,23023.0,2
+OGC_AmsterdamUMC_biexp_segmented,Blood RV,200,10000.0,2
+OGC_AmsterdamUMC_biexp,Blood RV,200,8000.0,2
+PV_MUMC_biexp,Blood RV,200,9893.0,2
+PvH_KB_NKI_IVIMfit,Blood RV,200,1000.0,2
+OJ_GU_seg,Blood RV,200,3000.0,2
+TF_reference_IVIMfit,Blood RV,200,14000.0,2
+TCML_TechnionIIT_lsqlm,Blood RA,200,2000.0,2
+TCML_TechnionIIT_lsqtrf,Blood RA,200,6000.0,2
+TCML_TechnionIIT_lsq_sls_lm,Blood RA,200,4000.0,2
+TCML_TechnionIIT_SLS,Blood RA,200,4001.0,2
+ETP_SRI_LinearFitting,Blood RA,200,999.0,2
+IAR_LU_biexp,Blood RA,200,8537.0,2
+IAR_LU_modified_mix,Blood RA,200,107535.0,2
+IAR_LU_modified_topopro,Blood RA,200,48994.0,2
+IAR_LU_segmented_2step,Blood RA,200,13000.0,2
+IAR_LU_segmented_3step,Blood RA,200,16999.0,2
+IAR_LU_subtracted,Blood RA,200,10999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Blood RA,200,24999.0,2
+OGC_AmsterdamUMC_biexp_segmented,Blood RA,200,11004.0,2
+OGC_AmsterdamUMC_biexp,Blood RA,200,8000.0,2
+PV_MUMC_biexp,Blood RA,200,10000.0,2
+PvH_KB_NKI_IVIMfit,Blood RA,200,2000.0,2
+OJ_GU_seg,Blood RA,200,1999.0,2
+TF_reference_IVIMfit,Blood RA,200,13999.0,2
+TCML_TechnionIIT_lsqlm,muscle,200,1003.0,2
+TCML_TechnionIIT_lsqtrf,muscle,200,4000.0,2
+TCML_TechnionIIT_lsq_sls_lm,muscle,200,5000.0,2
+TCML_TechnionIIT_SLS,muscle,200,3027.0,2
+ETP_SRI_LinearFitting,muscle,200,1000.0,2
+IAR_LU_biexp,muscle,200,4001.0,2
+IAR_LU_modified_mix,muscle,200,215268.0,2
+IAR_LU_modified_topopro,muscle,200,81996.0,2
+IAR_LU_segmented_2step,muscle,200,5999.0,2
+IAR_LU_segmented_3step,muscle,200,10999.0,2
+IAR_LU_subtracted,muscle,200,6999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,muscle,200,18998.0,2
+OGC_AmsterdamUMC_biexp_segmented,muscle,200,6000.0,2
+OGC_AmsterdamUMC_biexp,muscle,200,4000.0,2
+PV_MUMC_biexp,muscle,200,6999.0,2
+PvH_KB_NKI_IVIMfit,muscle,200,1000.0,2
+OJ_GU_seg,muscle,200,4998.0,2
+TF_reference_IVIMfit,muscle,200,12000.0,2
+TCML_TechnionIIT_lsqlm,Liver,200,1000.0,2
+TCML_TechnionIIT_lsqtrf,Liver,200,4999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Liver,200,3999.0,2
+TCML_TechnionIIT_SLS,Liver,200,2000.0,2
+ETP_SRI_LinearFitting,Liver,200,1000.0,2
+IAR_LU_biexp,Liver,200,4999.0,2
+IAR_LU_modified_mix,Liver,200,153505.0,2
+IAR_LU_modified_topopro,Liver,200,82504.0,2
+IAR_LU_segmented_2step,Liver,200,8000.0,2
+IAR_LU_segmented_3step,Liver,200,11999.0,2
+IAR_LU_subtracted,Liver,200,6999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Liver,200,22998.0,2
+OGC_AmsterdamUMC_biexp_segmented,Liver,200,6999.0,2
+OGC_AmsterdamUMC_biexp,Liver,200,4999.0,2
+PV_MUMC_biexp,Liver,200,7999.0,2
+PvH_KB_NKI_IVIMfit,Liver,200,1000.0,2
+OJ_GU_seg,Liver,200,3999.0,2
+TF_reference_IVIMfit,Liver,200,13999.0,2
+TCML_TechnionIIT_lsqlm,gall bladder,200,7998.0,2
+TCML_TechnionIIT_lsqtrf,gall bladder,200,6999.0,2
+TCML_TechnionIIT_lsq_sls_lm,gall bladder,200,14997.0,2
+TCML_TechnionIIT_SLS,gall bladder,200,4000.0,2
+ETP_SRI_LinearFitting,gall bladder,200,1001.0,2
+IAR_LU_biexp,gall bladder,200,5998.0,2
+IAR_LU_modified_mix,gall bladder,200,161504.0,2
+IAR_LU_modified_topopro,gall bladder,200,95998.0,2
+IAR_LU_segmented_2step,gall bladder,200,8999.0,2
+IAR_LU_segmented_3step,gall bladder,200,11999.0,2
+IAR_LU_subtracted,gall bladder,200,7999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,gall bladder,200,16999.0,2
+OGC_AmsterdamUMC_biexp_segmented,gall bladder,200,4000.0,2
+OGC_AmsterdamUMC_biexp,gall bladder,200,7999.0,2
+PV_MUMC_biexp,gall bladder,200,23999.0,2
+PvH_KB_NKI_IVIMfit,gall bladder,200,1000.0,2
+OJ_GU_seg,gall bladder,200,1998.0,2
+TF_reference_IVIMfit,gall bladder,200,9999.0,2
+TCML_TechnionIIT_lsqlm,esophagus,200,1000.0,2
+TCML_TechnionIIT_lsqtrf,esophagus,200,4000.0,2
+TCML_TechnionIIT_lsq_sls_lm,esophagus,200,4000.0,2
+TCML_TechnionIIT_SLS,esophagus,200,3000.0,2
+ETP_SRI_LinearFitting,esophagus,200,1000.0,2
+IAR_LU_biexp,esophagus,200,4000.0,2
+IAR_LU_modified_mix,esophagus,200,159998.0,2
+IAR_LU_modified_topopro,esophagus,200,56999.0,2
+IAR_LU_segmented_2step,esophagus,200,5000.0,2
+IAR_LU_segmented_3step,esophagus,200,9999.0,2
+IAR_LU_subtracted,esophagus,200,4999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,esophagus,200,18505.0,2
+OGC_AmsterdamUMC_biexp_segmented,esophagus,200,6000.0,2
+OGC_AmsterdamUMC_biexp,esophagus,200,3999.0,2
+PV_MUMC_biexp,esophagus,200,6998.0,2
+PvH_KB_NKI_IVIMfit,esophagus,200,1000.0,2
+OJ_GU_seg,esophagus,200,4999.0,2
+TF_reference_IVIMfit,esophagus,200,12000.0,2
+TCML_TechnionIIT_lsqlm,esophagus cont,200,2000.0,2
+TCML_TechnionIIT_lsqtrf,esophagus cont,200,4000.0,2
+TCML_TechnionIIT_lsq_sls_lm,esophagus cont,200,4000.0,2
+TCML_TechnionIIT_SLS,esophagus cont,200,3000.0,2
+ETP_SRI_LinearFitting,esophagus cont,200,2000.0,2
+IAR_LU_biexp,esophagus cont,200,4000.0,2
+IAR_LU_modified_mix,esophagus cont,200,160998.0,2
+IAR_LU_modified_topopro,esophagus cont,200,54998.0,2
+IAR_LU_segmented_2step,esophagus cont,200,5999.0,2
+IAR_LU_segmented_3step,esophagus cont,200,9999.0,2
+IAR_LU_subtracted,esophagus cont,200,6000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,esophagus cont,200,17999.0,2
+OGC_AmsterdamUMC_biexp_segmented,esophagus cont,200,6000.0,2
+OGC_AmsterdamUMC_biexp,esophagus cont,200,5000.0,2
+PV_MUMC_biexp,esophagus cont,200,6000.0,2
+PvH_KB_NKI_IVIMfit,esophagus cont,200,1000.0,2
+OJ_GU_seg,esophagus cont,200,5998.0,2
+TF_reference_IVIMfit,esophagus cont,200,12507.0,2
+TCML_TechnionIIT_lsqlm,st wall,200,1001.0,2
+TCML_TechnionIIT_lsqtrf,st wall,200,4001.0,2
+TCML_TechnionIIT_lsq_sls_lm,st wall,200,4001.0,2
+TCML_TechnionIIT_SLS,st wall,200,4001.0,2
+ETP_SRI_LinearFitting,st wall,200,0.0,2
+IAR_LU_biexp,st wall,200,4000.0,2
+IAR_LU_modified_mix,st wall,200,206503.0,2
+IAR_LU_modified_topopro,st wall,200,79998.0,2
+IAR_LU_segmented_2step,st wall,200,5999.0,2
+IAR_LU_segmented_3step,st wall,200,9999.0,2
+IAR_LU_subtracted,st wall,200,6000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,st wall,200,18998.0,2
+OGC_AmsterdamUMC_biexp_segmented,st wall,200,5999.0,2
+OGC_AmsterdamUMC_biexp,st wall,200,4999.0,2
+PV_MUMC_biexp,st wall,200,6999.0,2
+PvH_KB_NKI_IVIMfit,st wall,200,1001.0,2
+OJ_GU_seg,st wall,200,5504.0,2
+TF_reference_IVIMfit,st wall,200,14999.0,2
+TCML_TechnionIIT_lsqlm,Stomach Contents,200,8998.0,2
+TCML_TechnionIIT_lsqtrf,Stomach Contents,200,6999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Stomach Contents,200,12998.0,2
+TCML_TechnionIIT_SLS,Stomach Contents,200,3000.0,2
+ETP_SRI_LinearFitting,Stomach Contents,200,1001.0,2
+IAR_LU_biexp,Stomach Contents,200,7999.0,2
+IAR_LU_modified_mix,Stomach Contents,200,104998.0,2
+IAR_LU_modified_topopro,Stomach Contents,200,86997.0,2
+IAR_LU_segmented_2step,Stomach Contents,200,8999.0,2
+IAR_LU_segmented_3step,Stomach Contents,200,11999.0,2
+IAR_LU_subtracted,Stomach Contents,200,7999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Stomach Contents,200,16997.0,2
+OGC_AmsterdamUMC_biexp_segmented,Stomach Contents,200,4000.0,2
+OGC_AmsterdamUMC_biexp,Stomach Contents,200,6998.0,2
+PV_MUMC_biexp,Stomach Contents,200,22999.0,2
+PvH_KB_NKI_IVIMfit,Stomach Contents,200,1001.0,2
+OJ_GU_seg,Stomach Contents,200,1999.0,2
+TF_reference_IVIMfit,Stomach Contents,200,10999.0,2
+TCML_TechnionIIT_lsqlm,pancreas,200,2000.0,2
+TCML_TechnionIIT_lsqtrf,pancreas,200,4999.0,2
+TCML_TechnionIIT_lsq_sls_lm,pancreas,200,4000.0,2
+TCML_TechnionIIT_SLS,pancreas,200,4000.0,2
+ETP_SRI_LinearFitting,pancreas,200,2000.0,2
+IAR_LU_biexp,pancreas,200,5508.0,2
+IAR_LU_modified_mix,pancreas,200,212997.0,2
+IAR_LU_modified_topopro,pancreas,200,85999.0,2
+IAR_LU_segmented_2step,pancreas,200,5999.0,2
+IAR_LU_segmented_3step,pancreas,200,10000.0,2
+IAR_LU_subtracted,pancreas,200,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,pancreas,200,21999.0,2
+OGC_AmsterdamUMC_biexp_segmented,pancreas,200,4000.0,2
+OGC_AmsterdamUMC_biexp,pancreas,200,3000.0,2
+PV_MUMC_biexp,pancreas,200,7999.0,2
+PvH_KB_NKI_IVIMfit,pancreas,200,1000.0,2
+OJ_GU_seg,pancreas,200,5999.0,2
+TF_reference_IVIMfit,pancreas,200,12000.0,2
+TCML_TechnionIIT_lsqlm,Right kydney cortex,200,2000.0,2
+TCML_TechnionIIT_lsqtrf,Right kydney cortex,200,4000.0,2
+TCML_TechnionIIT_lsq_sls_lm,Right kydney cortex,200,4000.0,2
+TCML_TechnionIIT_SLS,Right kydney cortex,200,3000.0,2
+ETP_SRI_LinearFitting,Right kydney cortex,200,1000.0,2
+IAR_LU_biexp,Right kydney cortex,200,5999.0,2
+IAR_LU_modified_mix,Right kydney cortex,200,214010.0,2
+IAR_LU_modified_topopro,Right kydney cortex,200,76998.0,2
+IAR_LU_segmented_2step,Right kydney cortex,200,6000.0,2
+IAR_LU_segmented_3step,Right kydney cortex,200,11000.0,2
+IAR_LU_subtracted,Right kydney cortex,200,6999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Right kydney cortex,200,15999.0,2
+OGC_AmsterdamUMC_biexp_segmented,Right kydney cortex,200,6011.0,2
+OGC_AmsterdamUMC_biexp,Right kydney cortex,200,5999.0,2
+PV_MUMC_biexp,Right kydney cortex,200,7999.0,2
+PvH_KB_NKI_IVIMfit,Right kydney cortex,200,1000.0,2
+OJ_GU_seg,Right kydney cortex,200,4998.0,2
+TF_reference_IVIMfit,Right kydney cortex,200,12000.0,2
+TCML_TechnionIIT_lsqlm,right kidney medulla,200,2000.0,2
+TCML_TechnionIIT_lsqtrf,right kidney medulla,200,4000.0,2
+TCML_TechnionIIT_lsq_sls_lm,right kidney medulla,200,4000.0,2
+TCML_TechnionIIT_SLS,right kidney medulla,200,3000.0,2
+ETP_SRI_LinearFitting,right kidney medulla,200,1999.0,2
+IAR_LU_biexp,right kidney medulla,200,5999.0,2
+IAR_LU_modified_mix,right kidney medulla,200,214503.0,2
+IAR_LU_modified_topopro,right kidney medulla,200,99999.0,2
+IAR_LU_segmented_2step,right kidney medulla,200,6000.0,2
+IAR_LU_segmented_3step,right kidney medulla,200,9999.0,2
+IAR_LU_subtracted,right kidney medulla,200,6000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,right kidney medulla,200,17998.0,2
+OGC_AmsterdamUMC_biexp_segmented,right kidney medulla,200,5999.0,2
+OGC_AmsterdamUMC_biexp,right kidney medulla,200,4999.0,2
+PV_MUMC_biexp,right kidney medulla,200,6997.0,2
+PvH_KB_NKI_IVIMfit,right kidney medulla,200,1000.0,2
+OJ_GU_seg,right kidney medulla,200,5998.0,2
+TF_reference_IVIMfit,right kidney medulla,200,12000.0,2
+TCML_TechnionIIT_lsqlm,Left kidney cortex,200,2001.0,2
+TCML_TechnionIIT_lsqtrf,Left kidney cortex,200,4999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Left kidney cortex,200,3999.0,2
+TCML_TechnionIIT_SLS,Left kidney cortex,200,3000.0,2
+ETP_SRI_LinearFitting,Left kidney cortex,200,1000.0,2
+IAR_LU_biexp,Left kidney cortex,200,6000.0,2
+IAR_LU_modified_mix,Left kidney cortex,200,209505.0,2
+IAR_LU_modified_topopro,Left kidney cortex,200,78998.0,2
+IAR_LU_segmented_2step,Left kidney cortex,200,6999.0,2
+IAR_LU_segmented_3step,Left kidney cortex,200,9999.0,2
+IAR_LU_subtracted,Left kidney cortex,200,6000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Left kidney cortex,200,16998.0,2
+OGC_AmsterdamUMC_biexp_segmented,Left kidney cortex,200,5000.0,2
+OGC_AmsterdamUMC_biexp,Left kidney cortex,200,6000.0,2
+PV_MUMC_biexp,Left kidney cortex,200,6999.0,2
+PvH_KB_NKI_IVIMfit,Left kidney cortex,200,1001.0,2
+OJ_GU_seg,Left kidney cortex,200,5997.0,2
+TF_reference_IVIMfit,Left kidney cortex,200,11999.0,2
+TCML_TechnionIIT_lsqlm,left kidney medulla,200,2000.0,2
+TCML_TechnionIIT_lsqtrf,left kidney medulla,200,4001.0,2
+TCML_TechnionIIT_lsq_sls_lm,left kidney medulla,200,5000.0,2
+TCML_TechnionIIT_SLS,left kidney medulla,200,3000.0,2
+ETP_SRI_LinearFitting,left kidney medulla,200,0.0,2
+IAR_LU_biexp,left kidney medulla,200,5999.0,2
+IAR_LU_modified_mix,left kidney medulla,200,213998.0,2
+IAR_LU_modified_topopro,left kidney medulla,200,97505.0,2
+IAR_LU_segmented_2step,left kidney medulla,200,5999.0,2
+IAR_LU_segmented_3step,left kidney medulla,200,9999.0,2
+IAR_LU_subtracted,left kidney medulla,200,6001.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,left kidney medulla,200,17998.0,2
+OGC_AmsterdamUMC_biexp_segmented,left kidney medulla,200,5999.0,2
+OGC_AmsterdamUMC_biexp,left kidney medulla,200,4999.0,2
+PV_MUMC_biexp,left kidney medulla,200,5999.0,2
+PvH_KB_NKI_IVIMfit,left kidney medulla,200,1000.0,2
+OJ_GU_seg,left kidney medulla,200,4998.0,2
+TF_reference_IVIMfit,left kidney medulla,200,10999.0,2
+TCML_TechnionIIT_lsqlm,spleen,200,1000.0,2
+TCML_TechnionIIT_lsqtrf,spleen,200,3999.0,2
+TCML_TechnionIIT_lsq_sls_lm,spleen,200,4001.0,2
+TCML_TechnionIIT_SLS,spleen,200,2000.0,2
+ETP_SRI_LinearFitting,spleen,200,1001.0,2
+IAR_LU_biexp,spleen,200,3001.0,2
+IAR_LU_modified_mix,spleen,200,210504.0,2
+IAR_LU_modified_topopro,spleen,200,86506.0,2
+IAR_LU_segmented_2step,spleen,200,5000.0,2
+IAR_LU_segmented_3step,spleen,200,9999.0,2
+IAR_LU_subtracted,spleen,200,6999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,spleen,200,15998.0,2
+OGC_AmsterdamUMC_biexp_segmented,spleen,200,5000.0,2
+OGC_AmsterdamUMC_biexp,spleen,200,4000.0,2
+PV_MUMC_biexp,spleen,200,6999.0,2
+PvH_KB_NKI_IVIMfit,spleen,200,1000.0,2
+OJ_GU_seg,spleen,200,5998.0,2
+TF_reference_IVIMfit,spleen,200,12000.0,2
+TCML_TechnionIIT_lsqlm,spinal cord,200,1001.0,2
+TCML_TechnionIIT_lsqtrf,spinal cord,200,4999.0,2
+TCML_TechnionIIT_lsq_sls_lm,spinal cord,200,4000.0,2
+TCML_TechnionIIT_SLS,spinal cord,200,3000.0,2
+ETP_SRI_LinearFitting,spinal cord,200,0.0,2
+IAR_LU_biexp,spinal cord,200,3999.0,2
+IAR_LU_modified_mix,spinal cord,200,205502.0,2
+IAR_LU_modified_topopro,spinal cord,200,68998.0,2
+IAR_LU_segmented_2step,spinal cord,200,5999.0,2
+IAR_LU_segmented_3step,spinal cord,200,9999.0,2
+IAR_LU_subtracted,spinal cord,200,5999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,spinal cord,200,20999.0,2
+OGC_AmsterdamUMC_biexp_segmented,spinal cord,200,6001.0,2
+OGC_AmsterdamUMC_biexp,spinal cord,200,4000.0,2
+PV_MUMC_biexp,spinal cord,200,6999.0,2
+PvH_KB_NKI_IVIMfit,spinal cord,200,1000.0,2
+OJ_GU_seg,spinal cord,200,5998.0,2
+TF_reference_IVIMfit,spinal cord,200,12999.0,2
+TCML_TechnionIIT_lsqlm,Bone Marrow,200,1001.0,2
+TCML_TechnionIIT_lsqtrf,Bone Marrow,200,4999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Bone Marrow,200,4999.0,2
+TCML_TechnionIIT_SLS,Bone Marrow,200,3999.0,2
+ETP_SRI_LinearFitting,Bone Marrow,200,1001.0,2
+IAR_LU_biexp,Bone Marrow,200,4001.0,2
+IAR_LU_modified_mix,Bone Marrow,200,217999.0,2
+IAR_LU_modified_topopro,Bone Marrow,200,56012.0,2
+IAR_LU_segmented_2step,Bone Marrow,200,7000.0,2
+IAR_LU_segmented_3step,Bone Marrow,200,9999.0,2
+IAR_LU_subtracted,Bone Marrow,200,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Bone Marrow,200,22999.0,2
+OGC_AmsterdamUMC_biexp_segmented,Bone Marrow,200,6000.0,2
+OGC_AmsterdamUMC_biexp,Bone Marrow,200,5000.0,2
+PV_MUMC_biexp,Bone Marrow,200,6999.0,2
+PvH_KB_NKI_IVIMfit,Bone Marrow,200,1000.0,2
+OJ_GU_seg,Bone Marrow,200,5998.0,2
+TF_reference_IVIMfit,Bone Marrow,200,13999.0,2
+TCML_TechnionIIT_lsqlm,Artery,200,2000.0,2
+TCML_TechnionIIT_lsqtrf,Artery,200,5999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Artery,200,3000.0,2
+TCML_TechnionIIT_SLS,Artery,200,3000.0,2
+ETP_SRI_LinearFitting,Artery,200,0.0,2
+IAR_LU_biexp,Artery,200,8999.0,2
+IAR_LU_modified_mix,Artery,200,105998.0,2
+IAR_LU_modified_topopro,Artery,200,42999.0,2
+IAR_LU_segmented_2step,Artery,200,11999.0,2
+IAR_LU_segmented_3step,Artery,200,15999.0,2
+IAR_LU_subtracted,Artery,200,9999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Artery,200,22997.0,2
+OGC_AmsterdamUMC_biexp_segmented,Artery,200,10999.0,2
+OGC_AmsterdamUMC_biexp,Artery,200,8505.0,2
+PV_MUMC_biexp,Artery,200,10999.0,2
+PvH_KB_NKI_IVIMfit,Artery,200,1000.0,2
+OJ_GU_seg,Artery,200,1000.0,2
+TF_reference_IVIMfit,Artery,200,11999.0,2
+TCML_TechnionIIT_lsqlm,Vein,200,2000.0,2
+TCML_TechnionIIT_lsqtrf,Vein,200,5999.0,2
+TCML_TechnionIIT_lsq_sls_lm,Vein,200,4001.0,2
+TCML_TechnionIIT_SLS,Vein,200,3000.0,2
+ETP_SRI_LinearFitting,Vein,200,2000.0,2
+IAR_LU_biexp,Vein,200,7998.0,2
+IAR_LU_modified_mix,Vein,200,103998.0,2
+IAR_LU_modified_topopro,Vein,200,43999.0,2
+IAR_LU_segmented_2step,Vein,200,11999.0,2
+IAR_LU_segmented_3step,Vein,200,14998.0,2
+IAR_LU_subtracted,Vein,200,11999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,Vein,200,23998.0,2
+OGC_AmsterdamUMC_biexp_segmented,Vein,200,9999.0,2
+OGC_AmsterdamUMC_biexp,Vein,200,7999.0,2
+PV_MUMC_biexp,Vein,200,9998.0,2
+PvH_KB_NKI_IVIMfit,Vein,200,1000.0,2
+OJ_GU_seg,Vein,200,1000.0,2
+TF_reference_IVIMfit,Vein,200,13000.0,2
+TCML_TechnionIIT_lsqlm,asc lower intestine,200,2000.0,2
+TCML_TechnionIIT_lsqtrf,asc lower intestine,200,6999.0,2
+TCML_TechnionIIT_lsq_sls_lm,asc lower intestine,200,4000.0,2
+TCML_TechnionIIT_SLS,asc lower intestine,200,3000.0,2
+ETP_SRI_LinearFitting,asc lower intestine,200,1001.0,2
+IAR_LU_biexp,asc lower intestine,200,4999.0,2
+IAR_LU_modified_mix,asc lower intestine,200,224503.0,2
+IAR_LU_modified_topopro,asc lower intestine,200,85999.0,2
+IAR_LU_segmented_2step,asc lower intestine,200,7000.0,2
+IAR_LU_segmented_3step,asc lower intestine,200,9000.0,2
+IAR_LU_subtracted,asc lower intestine,200,6011.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,asc lower intestine,200,15999.0,2
+OGC_AmsterdamUMC_biexp_segmented,asc lower intestine,200,6000.0,2
+OGC_AmsterdamUMC_biexp,asc lower intestine,200,4000.0,2
+PV_MUMC_biexp,asc lower intestine,200,5999.0,2
+PvH_KB_NKI_IVIMfit,asc lower intestine,200,1000.0,2
+OJ_GU_seg,asc lower intestine,200,4999.0,2
+TF_reference_IVIMfit,asc lower intestine,200,12001.0,2
+TCML_TechnionIIT_lsqlm,trans lower intestine,200,1000.0,2
+TCML_TechnionIIT_lsqtrf,trans lower intestine,200,5999.0,2
+TCML_TechnionIIT_lsq_sls_lm,trans lower intestine,200,4000.0,2
+TCML_TechnionIIT_SLS,trans lower intestine,200,3000.0,2
+ETP_SRI_LinearFitting,trans lower intestine,200,1000.0,2
+IAR_LU_biexp,trans lower intestine,200,4000.0,2
+IAR_LU_modified_mix,trans lower intestine,200,207505.0,2
+IAR_LU_modified_topopro,trans lower intestine,200,88999.0,2
+IAR_LU_segmented_2step,trans lower intestine,200,6999.0,2
+IAR_LU_segmented_3step,trans lower intestine,200,9000.0,2
+IAR_LU_subtracted,trans lower intestine,200,6999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,trans lower intestine,200,15998.0,2
+OGC_AmsterdamUMC_biexp_segmented,trans lower intestine,200,6001.0,2
+OGC_AmsterdamUMC_biexp,trans lower intestine,200,4000.0,2
+PV_MUMC_biexp,trans lower intestine,200,6000.0,2
+PvH_KB_NKI_IVIMfit,trans lower intestine,200,0.0,2
+OJ_GU_seg,trans lower intestine,200,4999.0,2
+TF_reference_IVIMfit,trans lower intestine,200,12000.0,2
+TCML_TechnionIIT_lsqlm,desc lower intestine,200,1001.0,2
+TCML_TechnionIIT_lsqtrf,desc lower intestine,200,7000.0,2
+TCML_TechnionIIT_lsq_sls_lm,desc lower intestine,200,4000.0,2
+TCML_TechnionIIT_SLS,desc lower intestine,200,3000.0,2
+ETP_SRI_LinearFitting,desc lower intestine,200,1000.0,2
+IAR_LU_biexp,desc lower intestine,200,4000.0,2
+IAR_LU_modified_mix,desc lower intestine,200,223011.0,2
+IAR_LU_modified_topopro,desc lower intestine,200,86998.0,2
+IAR_LU_segmented_2step,desc lower intestine,200,8000.0,2
+IAR_LU_segmented_3step,desc lower intestine,200,8999.0,2
+IAR_LU_subtracted,desc lower intestine,200,6001.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,desc lower intestine,200,16998.0,2
+OGC_AmsterdamUMC_biexp_segmented,desc lower intestine,200,6000.0,2
+OGC_AmsterdamUMC_biexp,desc lower intestine,200,3999.0,2
+PV_MUMC_biexp,desc lower intestine,200,6000.0,2
+PvH_KB_NKI_IVIMfit,desc lower intestine,200,1000.0,2
+OJ_GU_seg,desc lower intestine,200,4998.0,2
+TF_reference_IVIMfit,desc lower intestine,200,12001.0,2
+TCML_TechnionIIT_lsqlm,small intestine,200,1001.0,2
+TCML_TechnionIIT_lsqtrf,small intestine,200,6000.0,2
+TCML_TechnionIIT_lsq_sls_lm,small intestine,200,4001.0,2
+TCML_TechnionIIT_SLS,small intestine,200,3001.0,2
+ETP_SRI_LinearFitting,small intestine,200,1001.0,2
+IAR_LU_biexp,small intestine,200,3999.0,2
+IAR_LU_modified_mix,small intestine,200,218505.0,2
+IAR_LU_modified_topopro,small intestine,200,82998.0,2
+IAR_LU_segmented_2step,small intestine,200,7000.0,2
+IAR_LU_segmented_3step,small intestine,200,9000.0,2
+IAR_LU_subtracted,small intestine,200,7000.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,small intestine,200,16999.0,2
+OGC_AmsterdamUMC_biexp_segmented,small intestine,200,6000.0,2
+OGC_AmsterdamUMC_biexp,small intestine,200,5000.0,2
+PV_MUMC_biexp,small intestine,200,5999.0,2
+PvH_KB_NKI_IVIMfit,small intestine,200,1000.0,2
+OJ_GU_seg,small intestine,200,3999.0,2
+TF_reference_IVIMfit,small intestine,200,12000.0,2
+TCML_TechnionIIT_lsqlm,pericardium,200,2000.0,2
+TCML_TechnionIIT_lsqtrf,pericardium,200,5000.0,2
+TCML_TechnionIIT_lsq_sls_lm,pericardium,200,5999.0,2
+TCML_TechnionIIT_SLS,pericardium,200,2999.0,2
+ETP_SRI_LinearFitting,pericardium,200,2000.0,2
+IAR_LU_biexp,pericardium,200,11999.0,2
+IAR_LU_modified_mix,pericardium,200,157504.0,2
+IAR_LU_modified_topopro,pericardium,200,170999.0,2
+IAR_LU_segmented_2step,pericardium,200,6000.0,2
+IAR_LU_segmented_3step,pericardium,200,11000.0,2
+IAR_LU_subtracted,pericardium,200,7999.0,2
+OGC_AmsterdamUMC_Bayesian_biexp,pericardium,200,19999.0,2
+OGC_AmsterdamUMC_biexp_segmented,pericardium,200,6000.0,2
+OGC_AmsterdamUMC_biexp,pericardium,200,11998.0,2
+PV_MUMC_biexp,pericardium,200,9999.0,2
+PvH_KB_NKI_IVIMfit,pericardium,200,1000.0,2
+OJ_GU_seg,pericardium,200,3998.0,2
+TF_reference_IVIMfit,pericardium,200,12000.0,2
