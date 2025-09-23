@@ -29,7 +29,7 @@ ivim_simulation.bval
 ivim_simulation.bvec
 *.pt
 papers/paper1/figs
-papers/paper1/test-results.xml
+papers/paper1/test-results*.xml
 
 # Unit test / coverage reports
 .tox/

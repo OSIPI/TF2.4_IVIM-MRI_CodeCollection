@@ -19,3 +19,6 @@ pytest-json-report
 statsmodels
 ivimnet
 nlopt
+ipykernel
+pylint
+schemdraw
