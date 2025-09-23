@@ -46,7 +46,7 @@ class Super_IVIM_DC(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        if bvalues == None:
+        if bvalues is None:
             raise ValueError("for deep learning models, bvalues need defining at initiaition")
         super(Super_IVIM_DC, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
         self.fitS0=fitS0
@@ -127,7 +127,8 @@ class Super_IVIM_DC(OsipiBase):
         if not np.array_equal(bvalues, self.bvalues):
             raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
 
-        signals = self.reshape_to_voxelwise(signals)
+        nanmask = np.any(np.isnan(signals),axis=-1)
+        signals,shape = self.reshape_to_voxelwise(signals)
         Dp, Dt, f, S0_superivimdc = infer_from_signal(
             signal=signals,
             bvalues=self.bvalues,
@@ -135,9 +136,12 @@ class Super_IVIM_DC(OsipiBase):
         )
 
         results = {}
-        results["D"] = Dt
-        results["f"] = f
-        results["Dp"] = Dp
+        for name,par in zip(["D","f","Dp"],[Dt,f,Dp]):
+            parmap = np.full(shape[:-1],np.nan)
+            parmap[~nanmask] = par
+            results[name] = parmap
+#        results["f"] = np.reshape(f,shape[:-1])
+ #       results["Dp"] = np.reshape(Dp,shape[:-1])
 
         return results
 
@@ -152,5 +156,5 @@ class Super_IVIM_DC(OsipiBase):
         """
         B = data.shape[-1]
         voxels = int(np.prod(data.shape[:-1]))  # e.g., X*Y*Z
-        return data.reshape(voxels, B)
+        return data.reshape(voxels, B), data.shape
 

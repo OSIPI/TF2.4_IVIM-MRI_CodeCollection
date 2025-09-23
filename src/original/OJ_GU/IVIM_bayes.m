@@ -263,11 +263,11 @@ for i = 1:ceil(M/voxelsPerRun)
 
         % Display iteration every 500th iteration
         if ~mod(j,500) && j > burns
-            disp(['Iterations: ' num2str(j-burns)]);
+            %disp(['Iterations: ' num2str(j-burns)]);
         elseif ~mod(j,100) && j < burns
-            disp(['Burn in-steps: ' num2str(j)]);
+            %disp(['Burn in-steps: ' num2str(j)]);
         elseif j == burns
-            disp(['Burn in complete: ' num2str(j)]);
+            %disp(['Burn in complete: ' num2str(j)]);
         end
     end
     

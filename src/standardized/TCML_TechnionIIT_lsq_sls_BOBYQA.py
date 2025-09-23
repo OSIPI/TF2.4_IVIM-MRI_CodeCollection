@@ -1,8 +1,8 @@
 from src.wrappers.OsipiBase import OsipiBase
-from super_ivim_dc.source.Classsic_ivim_fit import IVIM_fit_sls_trf
+from super_ivim_dc.source.Classsic_ivim_fit import IVIM_fit_sls_BOBYQA
 import numpy as np
 
-class TCML_TechnionIIT_lsq_sls_trf(OsipiBase):
+class TCML_TechnionIIT_lsq_sls_BOBYQA(OsipiBase):
     """
     TCML_TechnionIIT_lsqlm fitting algorithm by Angeleene Ang, Moti Freiman and Noam Korngut, TechnionIIT
     """
@@ -41,15 +41,15 @@ class TCML_TechnionIIT_lsq_sls_trf(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        super(TCML_TechnionIIT_lsq_sls_trf, self).__init__(bvalues=bvalues, bounds=bounds)
-        self.fit_least_squares = IVIM_fit_sls_trf
+        super(TCML_TechnionIIT_lsq_sls_BOBYQA, self).__init__(bvalues=bvalues, bounds=bounds)
+        self.fit_least_squares = IVIM_fit_sls_BOBYQA
         self.fitS0=fitS0
         self.initialize(bounds, fitS0, thresholds)
 
     def initialize(self, bounds, fitS0, thresholds):
         if bounds is None:
             print('warning, no bounds were defined, so default bounds are used of ([0.0003, 0.001, 0.009, 0],[0.008, 1.0,0.04, 3])')
-            self.bounds = ([0.0003, 0.001, 0.009, 0],[0.008, 1.0,0.04, 3])
+            self.bounds = ([0.0003, 0.001, 0.009, 0],[0.008, 1.0 ,0.04, 3])
         else:
             bounds=bounds
             self.bounds = bounds
