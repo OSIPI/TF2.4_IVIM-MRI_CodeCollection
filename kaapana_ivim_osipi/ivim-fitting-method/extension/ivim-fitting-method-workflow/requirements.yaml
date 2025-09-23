@@ -1,0 +1,5 @@
+---
+dependencies:
+  - name: dag-installer-chart
+    version: 0.0.0
+    repository: "file:///home/usman/kaapana/services/utils/dag-installer-chart/"

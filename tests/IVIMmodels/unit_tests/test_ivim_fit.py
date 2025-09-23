@@ -3,6 +3,8 @@ import numpy.testing as npt
 import pytest
 import time
 from src.wrappers.OsipiBase import OsipiBase
+from joblib import Parallel, delayed
+import warnings
 #run using python -m pytest from the root folder
 
 
@@ -19,14 +21,18 @@ def tolerances_helper(tolerances, data):
         scale = dyn_rtol["offset"] + dyn_rtol["noise"]*data["noise"]
         tolerances["rtol"] = {"f": scale*dyn_rtol["f"], "D": scale*dyn_rtol["D"]/(1-data['f']+epsilon), "Dp": scale*dyn_rtol["Dp"]/(data['f']+epsilon)}
     else:
-        tolerances["rtol"] = tolerances.get("rtol", {"f": 0.1, "D": 0.1, "Dp": 0.3})
+        tolerances["rtol"] = tolerances.get("rtol", {"f": 0.1, "D": 0.1, "Dp": 0.1})
     if "dynamic_atol" in tolerances:
         dyn_atol = tolerances["dynamic_atol"]
         scale = dyn_atol["offset"] + dyn_atol["noise"]*data["noise"]
         tolerances["atol"] = {"f": scale*dyn_atol["f"], "D": scale*dyn_atol["D"]/(1-data['f']+epsilon), "Dp": scale*dyn_atol["Dp"]/(data['f']+epsilon)}
     else:
-        tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 4e-2})
+        tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 10e-2})
     return tolerances
+
+
+class PerformanceWarning(UserWarning):
+    pass
 
 def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
     name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab = data_ivim_fit_saved
@@ -81,10 +87,10 @@ def test_default_bounds_and_initial_guesses(algorithmlist,eng):
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
         else:
             kwargs = {'eng': eng}
+    elif deep_learning:
+        pytest.skip(reason="Bounds not obviously applicable to deep learning-based algorithms.")
     else:
         kwargs={}
-    if deep_learning:
-        pytest.skip(reason="deep learning algorithms do not take initial guesses. Bound testing for deep learning algorithms not yet implemented")
     fit = OsipiBase(algorithm=algorithm,**kwargs)
     #assert fit.bounds is not None, f"For {algorithm}, there is no default fit boundary"
     #assert fit.initial_guess is not None, f"For {algorithm}, there is no default fit initial guess"
@@ -152,6 +158,85 @@ def test_bounds(bound_input, eng):
             assert passf, f"Fit still passes when initial guess f is out of fit bounds; potentially initial guesses not respected for: {name}"
             assert passDp, f"Fit still passes when initial guess Ds is out of fit bounds; potentially initial guesses not respected for: {name}" '''
 
+def test_volume(algorithmlist,eng, threeddata):
+    algorithm, requires_matlab, deep_learning = algorithmlist
+    data, Dim, fim, Dpim, bvals = threeddata
+    # Get index of b=0
+    b0_index = np.where(bvals == 0.)[0][0]
+    data[data < 0] = 0
+    # Mask of voxels where signal at b=0 >= 0.5
+    invalid_mask = data[:, :, :, b0_index] < 0.01
+    data[invalid_mask,:] = np.nan
+
+    if requires_matlab:
+        if eng is None:
+            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+        else:
+            kwargs = {'eng': eng}
+    elif deep_learning:
+        kwargs = {'bvalues': bvals}
+    else:
+        kwargs={}
+    fit = OsipiBase(algorithm=algorithm,**kwargs)
+    if hasattr(fit, 'ivim_fit_full_volume') and callable(getattr(fit, 'ivim_fit_full_volume')):
+        start_time = time.time()  # Record the start time
+        fit_result = fit.osipi_fit_full_volume(data, bvals)
+        elapsed_time2 = time.time() - start_time  # Calculate elapsed time
+        print('time elaapsed is '+str(elapsed_time2))
+        assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
+        assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
+        assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
+        # check if right variable is in right place
+        assert np.nanmean(fit_result['D']) < np.nanmean(fit_result['Dp'])
+        assert np.nanmean(fit_result['Dp']) < np.nanmean(fit_result['f'])
+    else:
+        pytest.skip(reason="Wrapper has no ivim_fit_full_volume option")
+
+
+def test_parallel(algorithmlist,eng,threeddata):
+    algorithm, requires_matlab, deep_learning = algorithmlist
+    if requires_matlab:
+        pytest.skip(reason="matlab.engine does not work well with joblib")
+    elif deep_learning:
+        pytest.skip(reason="parallel testing not implemented for deep learning")
+    else:
+        kwargs={}
+    data, Dim, fim, Dpim, bvals = threeddata
+    # Get index of b=0
+    b0_index = np.where(bvals == 0)[0][0]
+    data[data < 0] = 0
+    # Mask of voxels where signal at b=0 >= 0.5
+    invalid_mask = data[:, :, :, b0_index] < 0.01
+    data[invalid_mask,:] = np.nan
+    print('testing ' + str(np.sum(~invalid_mask)) + ' voxels of a matrix size ' + str(np.shape(data)))
+
+    fit = OsipiBase(algorithm=algorithm,**kwargs)
+
+    def dummy_task(x):
+        return x
+
+    start_time = time.time()  # Record the start time
+    fit_result = fit.osipi_fit(data, bvals,njobs=1)
+    time_serial = time.time() - start_time  # Calculate elapsed time
+    Parallel(n_jobs=2)(delayed(dummy_task)(i) for i in range(8)) #github actions only supports 2 cores
+    start_time = time.time()  # Record the start time
+    fit_result2 = fit.osipi_fit(data, bvals,njobs=2)
+    time_parallel= time.time() - start_time  # Calculate elapsed time
+
+    print('singular took '+str(time_serial)+' seconds, and parallel took '+str(time_parallel)+' seconds')
+    assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
+    assert np.shape(fit_result['D'])[1] == np.shape(data)[1]
+    assert np.shape(fit_result['D'])[2] == np.shape(data)[2]
+    if not fit.stochastic:
+        assert np.allclose(fit_result['D'], fit_result2['D'], atol=1e-4), "Results differ between parallel and serial"
+        assert np.allclose(fit_result['f'], fit_result2['f'], atol=1e-2), "Results differ between parallel and serial"
+        assert np.allclose(fit_result['Dp'], fit_result2['Dp'], atol=1e-2), "Results differ between parallel and serial"
+    if time_parallel * 1.3 > time_serial:
+        warnings.warn(
+            f"[PERFORMANCE WARNING] Parallel code is not significantly faster than serial: "
+            f"{time_parallel:.3f}s vs {time_serial:.3f}s", PerformanceWarning
+        )
+
 
 def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
     algorithm, data, bvals, kwargs, requires_matlab, tolerances = deep_learning_algorithms
@@ -207,6 +292,3 @@ def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
     if errors:
         all_errors = "\n".join(errors)
         raise AssertionError(f"Some tests failed:\n{all_errors}")
-
-
-

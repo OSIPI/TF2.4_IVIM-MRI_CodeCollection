@@ -5,6 +5,9 @@
 __pycache__/
 *.nii.gz
 *.nii
+*.bval
+*.bvec
+*.npy
 *.dcm
 *.npy
 *.mat
