@@ -5,6 +5,7 @@ import json
 import argparse
 import os
 from utilities.data_simulation.Download_data import download_data
+import pathlib
 
 ##########
 # code written by Oliver J Gurney-Champion
@@ -12,6 +13,7 @@ from utilities.data_simulation.Download_data import download_data
 # This code generates a 4D IVIM phantom as nifti file
 
 def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleaved=False,T1T2=True):
+    download_data()
     np.random.seed(42)
     if motion:
         states = range(1,21)
@@ -19,14 +21,17 @@ def phantom(bvalue, noise, TR=3000, TE=40, motion=False, rician=False, interleav
         states = [1]
     for state in states:
         # Load the .mat file
-        mat_data = loadmat('../../download/Phantoms/XCAT_MAT_RESP/XCAT5D_RP_' + str(state) + '_CP_1.mat')
+        project_root = pathlib.Path(__file__).resolve().parent.parent
+        filename = f'XCAT5D_RP_{state}_CP_1.mat'
+        mat_path = project_root / '..' /'download' / 'Phantoms' / 'XCAT_MAT_RESP' / filename
+        mat_data = loadmat(mat_path)
 
         # Access the variables in the loaded .mat file
         XCAT = mat_data['IMG']
         XCAT = XCAT[-1:0:-2,-1:0:-2,10:160:4]
 
         D, f, Ds = contrast_curve_calc()
-        S, Dim, fim, Dpim, legend = XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds,T1T2=T1T2)
+        S, Dim, fim, Dpim, legend = XCAT_to_MR_IVIM(XCAT, TR, TE, bvalue, D, f, Ds,T1T2=T1T2)
         if state == 1:
             Dim_out = Dim
             fim_out = fim
@@ -187,7 +192,7 @@ def contrast_curve_calc():
     return D, f, Ds
 
 
-def XCAT_to_MR_DCE(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True, T1T2=True):
+def XCAT_to_MR_IVIM(XCAT, TR, TE, bvalue, D, f, Ds, b0=3, ivim_cont = True, T1T2=True):
     ###########################################################################################
     # This script converts XCAT tissue values to MR contrast based on the SSFP signal equation.
     # Christopher W. Roy 2018-12-04 # fetal.xcmr@gmail.com
@@ -436,7 +441,6 @@ if __name__ == '__main__':
     motion = args.motion
     interleaved = args.interleaved
     T1T2 = args.T1T2
-    download_data()
     for key, bvalue in bvalues.items():
         bvalue = np.array(bvalue)
         sig, XCAT, Dim, fim, Dpim, legend = phantom(bvalue, noise, motion=motion, interleaved=interleaved,T1T2=T1T2)

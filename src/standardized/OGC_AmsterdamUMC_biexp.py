@@ -85,24 +85,3 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         results["Dp"] = fit_results[2]
 
         return results
-
-    def ivim_fit_full_volume(self, signals, bvalues, **kwargs):
-        """Perform the IVIM fit
-
-        Args:
-            signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
-
-        Returns:
-            _type_: _description_
-        """
-
-        bvalues=np.array(bvalues)
-        fit_results = self.OGC_algorithm_array(bvalues, signals, p0=self.initial_guess, bounds=self.bounds, fitS0=self.fitS0)
-
-        results = {}
-        results["D"] = fit_results[0]
-        results["f"] = fit_results[1]
-        results["Dp"] = fit_results[2]
-
-        return results
