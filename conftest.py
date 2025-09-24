@@ -194,7 +194,7 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("bound_input", args)
 
     if "deep_learning_algorithms" in metafunc.fixturenames:
-        args = deep_learning_algorithms(config.getoption("dataFileDL"), algorithms)
+        args = deep_learning_algorithms(config.getoption("dataFile"), algorithms)
         metafunc.parametrize("deep_learning_algorithms", args)
 
 
