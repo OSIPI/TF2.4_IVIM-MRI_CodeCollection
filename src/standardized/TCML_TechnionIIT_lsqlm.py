@@ -4,7 +4,7 @@ import numpy as np
 
 class TCML_TechnionIIT_lsqlm(OsipiBase):
     """
-    TCML_TechnionIIT_lsqlm fitting algorithm by Moti Freiman and Noam Korngut, TechnionIIT
+    TCML_TechnionIIT_lsqlm fitting algorithm by Angeleene Ang, Moti Freiman and Noam Korngut, TechnionIIT
     """
 
     # I'm thinking that we define default attributes for each submission like this
@@ -12,8 +12,8 @@ class TCML_TechnionIIT_lsqlm(OsipiBase):
     # the user inputs fulfil the requirements
 
     # Some basic stuff that identifies the algorithm
-    id_author = "Moti Freiman and Noam Korngut, TechnIIT"
-    id_algorithm_type = "Bi-exponential fit"
+    id_author = "Angeleene Ang, Moti Freiman and Noam Korngut, TechnIIT"
+    id_algorithm_type = "Bi-exponential fit with Levenberg-Marquardt algorithm"
     id_return_parameters = "f, D*, D, S0"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
 
@@ -22,14 +22,14 @@ class TCML_TechnionIIT_lsqlm(OsipiBase):
     required_thresholds = [0,
                            0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
     required_bounds = False
-    required_bounds_optional = False  # Bounds may not be required but are optional
+    required_bounds_optional = True  # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
     accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
 
     # Supported inputs in the standardized class
-    supported_bounds = False
+    supported_bounds = True
     supported_initial_guess = True
     supported_thresholds = False
 
@@ -74,8 +74,13 @@ class TCML_TechnionIIT_lsqlm(OsipiBase):
         fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], initial_guess)
 
         results = {}
-        results["D"] = fit_results[0]
-        results["f"] = fit_results[2]
-        results["Dp"] = fit_results[1]
+        if fit_results[0].size >0:
+            results["D"] = fit_results[0]
+            results["f"] = fit_results[2]
+            results["Dp"] = fit_results[1]
+        else:
+            results["D"] = 0
+            results["f"] = 0
+            results["Dp"] = 0
 
         return results
