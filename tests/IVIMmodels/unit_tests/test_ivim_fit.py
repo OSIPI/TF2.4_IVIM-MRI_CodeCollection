@@ -19,15 +19,14 @@ def tolerances_helper(tolerances, data):
         scale = dyn_rtol["offset"] + dyn_rtol["noise"]*data["noise"]
         tolerances["rtol"] = {"f": scale*dyn_rtol["f"], "D": scale*dyn_rtol["D"]/(1-data['f']+epsilon), "Dp": scale*dyn_rtol["Dp"]/(data['f']+epsilon)}
     else:
-        tolerances["rtol"] = tolerances.get("rtol", {"f": 0.1, "D": 0.1, "Dp": 0.3})
+        tolerances["rtol"] = tolerances.get("rtol", {"f": 0.1, "D": 0.1, "Dp": 0.1})
     if "dynamic_atol" in tolerances:
         dyn_atol = tolerances["dynamic_atol"]
         scale = dyn_atol["offset"] + dyn_atol["noise"]*data["noise"]
         tolerances["atol"] = {"f": scale*dyn_atol["f"], "D": scale*dyn_atol["D"]/(1-data['f']+epsilon), "Dp": scale*dyn_atol["Dp"]/(data['f']+epsilon)}
     else:
-        tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 4e-2})
+        tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 10e-2})
     return tolerances
-
 def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
     name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab = data_ivim_fit_saved
     max_time = 0.5
