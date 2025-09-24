@@ -195,7 +195,7 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("bound_input", args)
 
     if "deep_learning_algorithms" in metafunc.fixturenames:
-        args = deep_learning_algorithms(config.getoption("dataFile"), algorithms)
+        args = deep_learning_algorithms(config.getoption("dataFileDL"), algorithms)
         metafunc.parametrize("deep_learning_algorithms", args)
 
 
@@ -302,8 +302,8 @@ def deep_learning_algorithms(datafile, algorithms):
         if algorithm_dict.get('deep_learning',False):
             kwargs = algorithm_dict.get("options", {})
             requires_matlab = algorithm_dict.get("requires_matlab", False)
-            #tolerances = algorithm_dict.get("tolerances", {"atol":{"f": 2e-1, "D": 8e-4, "Dp": 8e-2},"rtol":{"f": 0.2, "D": 0.3, "Dp": 0.4}})
-            tolerances = algorithm_dict.get("tolerances", {})
+            tolerances = algorithm_dict.get("tolerances", {"atol":{"f": 2e-1, "D": 8e-4, "Dp": 8e-2},"rtol":{"f": 0.2, "D": 0.3, "Dp": 0.4}})
+            #tolerances = algorithm_dict.get("tolerances", {})
             yield algorithm, all_data, bvals, kwargs, requires_matlab, tolerances
 
 
