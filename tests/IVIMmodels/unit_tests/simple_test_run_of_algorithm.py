@@ -16,7 +16,7 @@ from src.standardized.OGC_AmsterdamUMC_biexp import OGC_AmsterdamUMC_biexp
 ## Simple test code... 
 # Used to just do a test run of an algorithm during development
 def dev_test_run(model, **kwargs):
-    bvalues = np.array([0, 50, 100, 150, 200, 500, 800])
+    bvalues = np.array([0, 50, 0, 100, 0, 150, 200, 500, 0, 800])
 
     def ivim_model(b, S0=1, f=0.1, Dstar=0.01, D=0.001):
         return S0*(f*np.exp(-b*Dstar) + (1-f)*np.exp(-b*D))
@@ -28,9 +28,9 @@ def dev_test_run(model, **kwargs):
 
     #model = ETP_SRI_LinearFitting(thresholds=[200])
     if kwargs:
-        results = model.osipi_fit_full_volume(signals, bvalues, **kwargs)
+        results = model.osipi_fit(signals, bvalues, **kwargs)
     else:
-        results = model.osipi_fit_full_volume(signals, bvalues)
+        results = model.osipi_fit(signals, bvalues)
     print(results)
     #test = model.osipi_simple_bias_and_RMSE_test(SNR=20, bvalues=bvalues, f=0.1, Dstar=0.03, D=0.001, noise_realizations=10)
     
