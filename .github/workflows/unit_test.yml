@@ -1,6 +1,6 @@
 name: Unit tests
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   build:
@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13"]
         exclude:
           - os: windows-latest
             python-version: "3.13"
@@ -33,4 +33,5 @@ jobs:
       - name: Test with pytest
         run: |
           pip install pytest pytest-cov
-          python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
+          python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html -r w
+

@@ -1,0 +1,15 @@
+---
+apiVersion: v2 # Helm chart version number
+description: Workflow for IVIM model fitting using standardized pipelines and test data in Kaapana.
+deprecated: False
+appVersion: "0.1.0" # Version number of the Application
+name: ivim-fitting-method-workflow
+version: "0.5.1-5-g1a6aae746" # The version of the kaapana you are running
+type: application
+keywords:
+  - ivimworkflow
+  - ivimkaapana
+maintainers:
+  - name: IVIM Team
+    email: o.j.gurney-champion@amsterdamumc.nl
+    url: https://osipi.ismrm.org/task-forces/task-force-2-4/
