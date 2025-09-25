@@ -33,6 +33,12 @@ class OsipiBase:
         Name of an algorithm module in ``src/standardized`` to load dynamically.
         If supplied, the instance is immediately converted to that algorithm’s
         subclass via :meth:`osipi_initiate_algorithm`.
+    force_default_settings : bool, optional
+        If bounds and initial guesses are not provided, the wrapper will set
+        them to reasonable physical ones in the format [S0, f, Dp, D]. To prevent
+        this, set this bool to False. Default bounds are [0.7, 0, 0.005, 0] (lower)
+        and [1.3, 1.0, 0.2, 0.005] (upper). Default initial guess 
+        [1, 0.1, 0.01, 0.001].
     **kwargs
         Additional keyword arguments forwarded to the selected algorithm’s
         initializer if ``algorithm`` is provided.
@@ -92,7 +98,7 @@ class OsipiBase:
     f_map = results["f"]
     """
     
-    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, algorithm=None, **kwargs):
+    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, algorithm=None, force_default_settings=True, **kwargs):
         # Define the attributes as numpy arrays only if they are not None
         self.bvalues = np.asarray(bvalues) if bvalues is not None else None
         self.thresholds = np.asarray(thresholds) if thresholds is not None else None
@@ -103,6 +109,18 @@ class OsipiBase:
         self.deep_learning = False
         self.supervised = False
         self.stochastic = False
+        
+        if force_default_settings:
+            if self.bounds is None:
+                print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
+                self.bounds=([0.7, 0, 0.005, 0.0],[1.3, 1.0, 0.2, 0.005]) # These are defined in the order [S0, f, Dp, D]
+                self.forced_default_bounds = True
+
+            if self.initial_guess is None:
+                print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
+                self.initial_guess = [1, 0.1, 0.01, 0.001] # Defined in the order [S0, f, Dp, D]
+                self.forced_default_initial_guess = True
+
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
