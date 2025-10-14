@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from super_ivim_dc.source.Classsic_ivim_fit import fit_least_squers_BOBYQA
+from super_ivim_dc.source.Classsic_ivim_fit import fit_least_squares_BOBYQA
 import numpy as np
 
 class TCML_TechnionIIT_lsqBOBYQA(OsipiBase):
@@ -42,20 +42,20 @@ class TCML_TechnionIIT_lsqBOBYQA(OsipiBase):
             the requirements.
         """
         super(TCML_TechnionIIT_lsqBOBYQA, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
-        self.fit_least_squares = fit_least_squers_BOBYQA
+        self.fit_least_squares = fit_least_squares_BOBYQA
         self.fitS0=fitS0
         self.initialize(bounds, initial_guess, fitS0)
 
     def initialize(self, bounds, initial_guess, fitS0):
         if bounds is None:
             print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
-            self.bounds = ([0.0003, 0.001, 0.009, 0],[0.01, 0.5,0.04, 3])
+            self.bounds = ([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
         else:
             bounds=bounds
             self.bounds = bounds
         if initial_guess is None:
             print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
-            self.initial_guess = [0.001, 0.1, 0.01, 1]  # D, Dp, f, S0
+            self.initial_guess = [0.001, 0.1, 0.02, 1]  # D, Dp, f, S0
         else:
             self.initial_guess = initial_guess
             self.use_initial_guess = True
@@ -80,11 +80,16 @@ class TCML_TechnionIIT_lsqBOBYQA(OsipiBase):
         initial_guess = np.array(self.initial_guess)
         initial_guess = initial_guess[[0, 2, 1, 3]]
 
-        fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], bounds, initial_guess)
+        fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], bounds, initial_guess.copy())
 
         results = {}
-        results["D"] = fit_results[0]
-        results["f"] = fit_results[2]
-        results["Dp"] = fit_results[1]
+        if fit_results[0].size == 0:
+            results["D"] = initial_guess[0]
+            results["f"] = initial_guess[2]
+            results["Dp"] = initial_guess[1]
+        else:
+            results["D"] = fit_results[0]
+            results["f"] = fit_results[2]
+            results["Dp"] = fit_results[1]
 
         return results

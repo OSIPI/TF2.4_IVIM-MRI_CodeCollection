@@ -481,7 +481,9 @@ class OsipiBase:
             noised_signal = np.array([norm.rvs(signal, sigma) for signal in signals])
             
             # Perform fit with the noised signal
-            f_estimates[i], Dstar_estimates[i], D_estimates[i] = self.D_and_Ds_swap(self.ivim_fit(noised_signal, bvalues))
+            # f_estimates[i], Dstar_estimates[i], D_estimates[i] = self.D_and_Ds_swap(self.ivim_fit(noised_signal, bvalues))
+            result = self.ivim_fit(noised_signal, bvalues)
+            f_estimates[i], Dstar_estimates[i], D_estimates[i] = result['f'], result['Dp'], result['D']
             
         # Calculate bias
         f_bias = np.mean(f_estimates) - f
@@ -493,9 +495,9 @@ class OsipiBase:
         Dstar_RMSE = np.sqrt(np.var(Dstar_estimates) + Dstar_bias**2)
         D_RMSE = np.sqrt(np.var(D_estimates) + D_bias**2)
             
-        print(f"f bias:\t{f_bias}\nf RMSE:\t{f_RMSE}")
-        print(f"Dstar bias:\t{Dstar_bias}\nDstar RMSE:\t{Dstar_RMSE}")
-        print(f"D bias:\t{D_bias}\nD RMSE:\t{D_RMSE}")
+        print(f"f bias:     {f_bias:.4g}    \nf RMSE:     {f_RMSE:.4g}")
+        print(f"Dstar bias: {Dstar_bias:.4g}\nDstar RMSE: {Dstar_RMSE:.4g}")
+        print(f"D bias:     {D_bias:.4g}    \nD RMSE:     {D_RMSE:.4g}")
 
     
     def D_and_Ds_swap(self,results):

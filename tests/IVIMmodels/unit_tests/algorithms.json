@@ -3,7 +3,10 @@
         "IVIM_NEToptim",
         "TCML_TechnionIIT_lsqlm",
         "TCML_TechnionIIT_lsqtrf",
+        "TCML_TechnionIIT_lsqBOBYQA",
         "TCML_TechnionIIT_lsq_sls_lm",
+        "TCML_TechnionIIT_lsq_sls_trf",
+        "TCML_TechnionIIT_lsq_sls_BOBYQA",
         "TCML_TechnionIIT_SLS",
         "Super_IVIM_DC",
         "ASD_MemorialSloanKettering_QAMPER_IVIM",
@@ -20,6 +23,8 @@
         "PV_MUMC_biexp",
         "PvH_KB_NKI_IVIMfit",
         "OJ_GU_seg",
+        "OJ_GU_segMATLAB",
+        "OJ_GU_bayesMATLAB",
         "TF_reference_IVIMfit"
     ],
     "IVIM_NEToptim": {
@@ -29,6 +34,12 @@
         "deep_learning": true
     },
     "ASD_MemorialSloanKettering_QAMPER_IVIM": {
+        "requires_matlab": true
+    },
+    "OJ_GU_segMATLAB": {
+        "requires_matlab": true
+    },
+    "OJ_GU_bayesMATLAB": {
         "requires_matlab": true
     },
     "IAR_LU_biexp": {

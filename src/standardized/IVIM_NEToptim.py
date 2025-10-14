@@ -44,7 +44,7 @@ class IVIM_NEToptim(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        if bvalues == None:
+        if bvalues is None:
             raise ValueError("for deep learning models, bvalues need defining at initiaition")
         #super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
         super(IVIM_NEToptim, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
@@ -112,15 +112,15 @@ class IVIM_NEToptim(OsipiBase):
         if not np.array_equal(bvalues, self.bvalues):
             raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
 
-        signals = self.reshape_to_voxelwise(signals)
+        signals, shape = self.reshape_to_voxelwise(signals)
         if retrain_on_input_data:
             self.net = deep.learn_IVIM(signals, self.bvalues, self.arg, net=self.net)
         paramsNN = deep.predict_IVIM(signals, self.bvalues, self.net, self.arg)
 
         results = {}
-        results["D"] = paramsNN[0]
-        results["f"] = paramsNN[1]
-        results["Dp"] = paramsNN[2]
+        results["D"] = np.reshape(paramsNN[0],shape[:-1])
+        results["f"] = np.reshape(paramsNN[1],shape[:-1])
+        results["Dp"] = np.reshape(paramsNN[2],shape[:-1])
 
         return results
 
@@ -134,7 +134,7 @@ class IVIM_NEToptim(OsipiBase):
         """
         B = data.shape[-1]
         voxels = int(np.prod(data.shape[:-1]))  # e.g., X*Y*Z
-        return data.reshape(voxels, B)
+        return data.reshape(voxels, B), data.shape
 
 
     def training_data(self, bvalues, data=None, SNR=(5,1000), n=1000000,Drange=(0.0005,0.0034),frange=(0,1),Dprange=(0.005,0.1),rician_noise=False):
