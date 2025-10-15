@@ -113,18 +113,18 @@ class OsipiBase:
         if force_default_settings:
             if self.bounds is None:
                 print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
-                self.bounds=([0.7, 0, 0.005, 0.0],[1.3, 1.0, 0.2, 0.005]) # These are defined in the order [S0, f, Dp, D]
+                self.bounds = {"S0" : [0.7, 1.3], "f" : [0, 1.0], "Dp" : [0.005, 0.2], "D" : [0, 0.005]} # These are defined as [lower, upper]
                 self.forced_default_bounds = True
 
             if self.initial_guess is None:
                 print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
-                self.initial_guess = [1, 0.1, 0.01, 0.001] # Defined in the order [S0, f, Dp, D]
+                self.initial_guess = {"S0" : 1, "f" : 0.1, "Dp" : 0.01, "D" : 0.001}
                 self.forced_default_initial_guess = True
 
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
-            self.osipi_initiate_algorithm(algorithm, bvalues=bvalues, thresholds=thresholds, bounds=bounds, initial_guess=initial_guess, **kwargs)
+            self.osipi_initiate_algorithm(algorithm, bvalues=self.bvalues, thresholds=self.thresholds, bounds=self.bounds, initial_guess=self.initial_guess, **kwargs)
             
     def osipi_initiate_algorithm(self, algorithm, **kwargs):
         """Turns the class into a specified one by the input.
