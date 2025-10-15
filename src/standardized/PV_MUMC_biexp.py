@@ -62,23 +62,15 @@ class PV_MUMC_biexp(OsipiBase):
         if self.bounds is None:
             self.bounds = ([0.9, 0.0001, 0.0, 0.0025], [1.1, 0.003, 1, 0.2])
 
-        MAX_RETRIES = 3
-        DEFAULT_PARAMS = {"f":0.1, "D":0.003, "Ds":0.05}  # replace with sensible defaults
+        DEFAULT_PARAMS = [0.003,0.1,0.05]
 
-        for attempt in range(MAX_RETRIES):
-            try:
-                fit_results = self.PV_algorithm(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds)
-                break  # success
-            except RuntimeError as e:
-                if "maximum number of function evaluations" in str(e):
-                    # perturb initial guess slightly
-                    p0 = p0 * (1 + 0.01 * np.random.randn(*p0.shape))
-                else:
-                    raise
-        else:
-            # still failed after retries
-            popt = DEFAULT_PARAMS
-            pcov = np.zeros((len(DEFAULT_PARAMS), len(DEFAULT_PARAMS)))
+        try:
+            fit_results = self.PV_algorithm(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds)
+        except RuntimeError as e:
+            if "maximum number of function evaluations" in str(e):
+                fit_results = DEFAULT_PARAMS
+            else:
+                raise
 
         results = {} 
         results["f"] = fit_results[1]
