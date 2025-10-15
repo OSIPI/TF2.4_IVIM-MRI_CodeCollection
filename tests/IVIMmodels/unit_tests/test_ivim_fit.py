@@ -160,6 +160,8 @@ def test_bounds(bound_input, eng):
 
 def test_volume(algorithmlist,eng, threeddata):
     algorithm, requires_matlab, deep_learning = algorithmlist
+    if deep_learning:
+        pytest.skip(reason="AI algorithms are not tested in this test")
     data, Dim, fim, Dpim, bvals = threeddata
     # Get index of b=0
     b0_index = np.where(bvals == 0.)[0][0]
