@@ -137,7 +137,7 @@ class IVIM_NEToptim(OsipiBase):
         return data.reshape(voxels, B), data.shape
 
 
-    def training_data(self, bvalues, data=None, SNR=(5,100), n=5000000,Drange=(0.0003,0.0045),frange=(0,1),Dprange=(0.006,0.12),rician_noise=False):
+    def training_data(self, bvalues, data=None, SNR=(5,100), n=5000000,Drange=(0.0003,0.0035),frange=(0,1),Dprange=(0.005,0.12),rician_noise=False):
         rng = np.random.RandomState(42)
         if data is None:
             gen = GenerateData(rng=rng)

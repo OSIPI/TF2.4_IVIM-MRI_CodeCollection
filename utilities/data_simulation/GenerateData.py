@@ -189,7 +189,7 @@ class GenerateData:
         D = Drange[0] + test[:, [0]] * (Drange[1] - Drange[0])
         f = frange[0] + test[:, [1]] * (frange[1] - frange[0])
         Dp = Dprange[0] + test[:, [2]] * (Dprange[1] - Dprange[0])
-        data_sim = np.zeros([len(D), len(bvalues)])
+        #data_sim = np.zeros([len(D), len(bvalues)])
         bvalues = np.array(bvalues)
         if type(SNR) == tuple:
             test = self._rng.uniform(0, 1, (n, 1))
