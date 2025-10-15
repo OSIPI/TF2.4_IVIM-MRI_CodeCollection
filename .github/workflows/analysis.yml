@@ -80,32 +80,37 @@ jobs:
               test_output_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv
               test_duration_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv
             overwrite: true
-
+  
   merge:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Download artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+  
       - name: Merge fitting results
         run: |
-          head -n 1 $(ls artifacts/Working_Data_${{ matrix.algorithm }}_${{ matrix.SNR }}_${{ github.run_attempt }}/test_output_*.csv | head -n 1) > test_output.csv
-          tail -q -n +2 artifacts/Working_Data_${{ matrix.algorithm }}_${{ matrix.SNR }}_${{ github.run_attempt }}/test_output_*.csv >> test_output.csv
+          mkdir -p merged
+          # Find all test_output CSVs and merge them
+          head -n 1 $(find artifacts -type f -name "test_output_*.csv" | head -n 1) > merged/test_output.csv
+          find artifacts -type f -name "test_output_*.csv" | xargs tail -q -n +2 >> merged/test_output.csv
+  
       - name: Merge timing results
         run: |
-          head -n 1 $(ls artifacts/Working_Data_${{ matrix.algorithm }}_${{ matrix.SNR }}_${{ github.run_attempt }}/test_duration_*.csv | head -n 1) > test_duration.csv
-          tail -q -n +2 artifacts/Working_Data_${{ matrix.algorithm }}_${{ matrix.SNR }}_${{ github.run_attempt }}/test_duration_*.csv >> test_duration.csv
+          mkdir -p merged
+          head -n 1 $(find artifacts -type f -name "test_duration_*.csv" | head -n 1) > merged/test_duration.csv
+          find artifacts -type f -name "test_duration_*.csv" | xargs tail -q -n +2 >> merged/test_duration.csv
+  
       - name: Upload merged artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Data
           path: |
-            test_output.csv
-            test_duration.csv
+            merged/test_output.csv
+            merged/test_duration.csv
           overwrite: true
-
   analyze:
     runs-on: ubuntu-latest
     needs: merge
