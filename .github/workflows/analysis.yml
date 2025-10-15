@@ -73,7 +73,7 @@ jobs:
       - name: Upload raw data
         uses: actions/upload-artifact@v4
         with:
-            name: Working_Data
+            name: Working_Data_${{ matrix.algorithm }}_${{ matrix.SNR }}
             retention-days: 1
             path: |
               test_output_${{ matrix.algorithm }}_${{ matrix.SNR }}.csv
@@ -90,12 +90,12 @@ jobs:
           path: artifacts
       - name: Merge fitting results
         run: |
-          head -n 1 $(ls artifacts/Working_Data/test_output_*.csv | head -n 1) > test_output.csv
-          tail -q -n +2 artifacts/Working_Data/test_output_*.csv >> test_output.csv
+          head -n 1 $(ls artifacts/Working_Data_${{ matrix.algorithm }}_${{ matrix.SNR }}/test_output_*.csv | head -n 1) > test_output.csv
+          tail -q -n +2 artifacts/Working_Data_${{ matrix.algorithm }}_${{ matrix.SNR }}/test_output_*.csv >> test_output.csv
       - name: Merge timing results
         run: |
-          head -n 1 $(ls artifacts/Working_Data/test_duration_*.csv | head -n 1) > test_duration.csv
-          tail -q -n +2 artifacts/Working_Data/test_duration_*.csv >> test_duration.csv
+          head -n 1 $(ls artifacts/Working_Data_${{ matrix.algorithm }}_${{ matrix.SNR }}/test_duration_*.csv | head -n 1) > test_duration.csv
+          tail -q -n +2 artifacts/Working_Data_${{ matrix.algorithm }}_${{ matrix.SNR }}/test_duration_*.csv >> test_duration.csv
       - name: Upload merged artifacts
         uses: actions/upload-artifact@v4
         with:
