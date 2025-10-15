@@ -36,7 +36,7 @@ class IVIM_NEToptim(OsipiBase):
     supported_initial_guess = False
     supported_thresholds = False
 
-    def __init__(self, SNR=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, fitS0=True, traindata=None, n=10000000):
+    def __init__(self, SNR=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, fitS0=True, traindata=None, n=5000000):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -137,7 +137,7 @@ class IVIM_NEToptim(OsipiBase):
         return data.reshape(voxels, B), data.shape
 
 
-    def training_data(self, bvalues, data=None, SNR=(5,100), n=10000000,Drange=(0.0003,0.0045),frange=(0,1),Dprange=(0.006,0.12),rician_noise=False):
+    def training_data(self, bvalues, data=None, SNR=(5,100), n=5000000,Drange=(0.0003,0.0045),frange=(0,1),Dprange=(0.006,0.12),rician_noise=False):
         rng = np.random.RandomState(42)
         if data is None:
             gen = GenerateData(rng=rng)
