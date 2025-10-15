@@ -106,8 +106,9 @@ def create_boxplot(df, y_map, main_title, y_label, log=False):
             if log:
                 ax.set_yscale('log')
 
-            ax.set_title(f'{region} - {param}')
+            ax.set_title(f'{param}')
             ax.set_ylabel(y_label)
+            ax.set_xlabel('')
 
             # Add category bands below x-axis
             add_category_bands(ax, algorithm_categories, algorithms_ordered)
@@ -166,7 +167,7 @@ def adjust_ylim_to_box_from_data(ax, df, y_col, x_col, x_order, showfliers=False
 
 
 # Load the CSV (update the path if needed)
-file_path = '/home/rnga/dkuppens/test_output.csv'
+file_path = '/home/rnga/dkuppens/test_output_tmp.csv'
 df = pd.read_csv(file_path)
 
 # Convert relevant columns to numeric, coercing errors to NaN
