@@ -96,7 +96,9 @@ def fit_phantom_data(
 
 if __name__ == "__main__":
     # Load JSON
-    json_path = r"C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\tests\IVIMmodels\unit_tests\algorithms.json"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(base_dir, "..", "tests", "IVIMmodels", "unit_tests", "algorithms.json")
+    json_path = os.path.abspath(json_path)
     with open(json_path, "r") as f:
         config = json.load(f)
 
@@ -110,7 +112,8 @@ if __name__ == "__main__":
 
     # Phantom and folder
     phantom = "original"
-    folder = r"C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\phantoms\MR_XCAT_qMRI"
+    folder = os.path.join(base_dir, "..", "phantoms", "MR_XCAT_qMRI")
+    folder = os.path.abspath(folder)
 
     # Open CSV files
     with open("test_output_phantom.csv", "w", newline="") as f1, \
