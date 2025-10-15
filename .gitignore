@@ -26,7 +26,9 @@ junit/*
 ivim_simulation.bval
 ivim_simulation.bvec
 *.pt
-
+*map.png
+*map_log.png
+test_output.csv
 # Unit test / coverage reports
 .tox/
 .coverage
