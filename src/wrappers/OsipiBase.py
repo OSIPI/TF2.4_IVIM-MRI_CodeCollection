@@ -269,6 +269,7 @@ class OsipiBase:
                 single_voxel_data = data[ijk]
                 if not np.isnan(single_voxel_data[0]):
                     args = [single_voxel_data, use_bvalues]
+                    fit = self.ivim_fit(*args, **kwargs)
                 else:
                     fit={'D':0,'f':0,'Dp':0}
                 for key in list(fit.keys()):
