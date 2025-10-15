@@ -36,7 +36,7 @@ class IVIM_NEToptim(OsipiBase):
     supported_initial_guess = False
     supported_thresholds = False
 
-    def __init__(self, SNR=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, fitS0=True, traindata=None):
+    def __init__(self, SNR=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, fitS0=True, traindata=None, n=10000000):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -50,9 +50,9 @@ class IVIM_NEToptim(OsipiBase):
         super(IVIM_NEToptim, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
         self.fitS0=fitS0
         self.bvalues=np.array(bvalues)
-        self.initialize(bounds, initial_guess, fitS0, traindata, SNR)
+        self.initialize(bounds, initial_guess, fitS0, traindata, SNR, n)
 
-    def initialize(self, bounds, initial_guess, fitS0, traindata, SNR):
+    def initialize(self, bounds, initial_guess, fitS0, traindata, SNR, n):
         self.fitS0=fitS0
         self.deep_learning = True
         self.supervised = False
@@ -64,7 +64,7 @@ class IVIM_NEToptim(OsipiBase):
             if SNR is None:
                 warnings.warn('No SNR indicated. Data simulated with SNR = (5-100)')
                 SNR = (5, 100)
-            self.training_data(self.bvalues,n=10000000,SNR=SNR)
+            self.training_data(self.bvalues,n=n,SNR=SNR)
         self.arg=Arg()
         if bounds is not None:
             self.arg.net_pars.cons_min = bounds[0]  # Dt, Fp, Ds, S0
