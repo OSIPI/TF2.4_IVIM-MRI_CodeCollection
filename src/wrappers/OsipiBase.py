@@ -246,7 +246,6 @@ class OsipiBase:
                 single_voxel_data = np.array(data[ijk], copy=True)
                 if not np.isnan(single_voxel_data[0]):
                     fit = self.ivim_fit(single_voxel_data, use_bvalues, **kwargs)
-                    fit = self.D_and_Ds_swap(fit)
                 else:
                     fit={'D':0,'f':0,'Dp':0}
                 return ijk, fit
@@ -270,7 +269,6 @@ class OsipiBase:
                 single_voxel_data = data[ijk]
                 if not np.isnan(single_voxel_data[0]):
                     args = [single_voxel_data, use_bvalues]
-                    fit = self.D_and_Ds_swap(self.ivim_fit(*args, **kwargs)) # For single voxel fits, we assume this is a dict with a float value per key.
                 else:
                     fit={'D':0,'f':0,'Dp':0}
                 for key in list(fit.keys()):
