@@ -62,9 +62,9 @@ class IVIM_NEToptim(OsipiBase):
         if traindata is None:
             warnings.warn('no training data provided (traindata = None). Training data will be simulated')
             if SNR is None:
-                warnings.warn('No SNR indicated. Data simulated with SNR = (5-1000)')
-                SNR = (5, 1000)
-            self.training_data(self.bvalues,n=1000000,SNR=SNR)
+                warnings.warn('No SNR indicated. Data simulated with SNR = (5-100)')
+                SNR = (5, 100)
+            self.training_data(self.bvalues,n=10000000,SNR=SNR)
         self.arg=Arg()
         if bounds is not None:
             self.arg.net_pars.cons_min = bounds[0]  # Dt, Fp, Ds, S0
@@ -137,7 +137,7 @@ class IVIM_NEToptim(OsipiBase):
         return data.reshape(voxels, B), data.shape
 
 
-    def training_data(self, bvalues, data=None, SNR=(5,1000), n=1000000,Drange=(0.0005,0.0034),frange=(0,1),Dprange=(0.005,0.1),rician_noise=False):
+    def training_data(self, bvalues, data=None, SNR=(5,100), n=10000000,Drange=(0.0003,0.0045),frange=(0,1),Dprange=(0.006,0.12),rician_noise=False):
         rng = np.random.RandomState(42)
         if data is None:
             gen = GenerateData(rng=rng)
