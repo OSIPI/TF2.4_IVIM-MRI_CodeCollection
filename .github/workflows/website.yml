@@ -47,8 +47,9 @@ jobs:
           name: 'Data'
 
       - name: Run the test that generates the plots report.
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
-          cd $GITHUB_WORKSPACE
           pytest tests/IVIMmodels/unit_tests/test_ivim_fit.py --json-report
           mv .report.json utilities/
           python utilities/report-summary.py .report.json report-summary.json
