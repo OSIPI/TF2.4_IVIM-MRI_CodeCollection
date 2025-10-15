@@ -89,7 +89,8 @@ class IAR_LU_biexp(OsipiBase):
         results["f"] = fit_results.model_params[1]
         results["Dp"] = fit_results.model_params[2]
         results["D"] = fit_results.model_params[3]
-        
+        results = self.D_and_Ds_swap(results)
+
         return results
 
     def ivim_fit_full_volume(self, signals, bvalues, **kwargs):
@@ -122,5 +123,5 @@ class IAR_LU_biexp(OsipiBase):
         results["f"] = fit_results.model_params[..., 1]
         results["Dp"] = fit_results.model_params[..., 2]
         results["D"] = fit_results.model_params[..., 3]
-        
+
         return results
