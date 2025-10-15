@@ -79,7 +79,7 @@ class IAR_LU_biexp(OsipiBase):
             
             bvec = np.zeros((bvalues.size, 3))
             bvec[:,2] = 1
-            gtab = gradient_table(bvalues, bvec, b0_threshold=0)
+            gtab = gradient_table(bvalues, bvecs=bvec, b0_threshold=0)
             
             self.IAR_algorithm = IvimModelBiExp(gtab, bounds=self.bounds, initial_guess=self.initial_guess)
             
@@ -89,7 +89,8 @@ class IAR_LU_biexp(OsipiBase):
         results["f"] = fit_results.model_params[1]
         results["Dp"] = fit_results.model_params[2]
         results["D"] = fit_results.model_params[3]
-        
+        results = self.D_and_Ds_swap(results)
+
         return results
 
     def ivim_fit_full_volume(self, signals, bvalues, **kwargs):
@@ -111,7 +112,7 @@ class IAR_LU_biexp(OsipiBase):
             
             bvec = np.zeros((bvalues.size, 3))
             bvec[:,2] = 1
-            gtab = gradient_table(bvalues, bvec, b0_threshold=0)
+            gtab = gradient_table(bvalues, bvecs=bvec, b0_threshold=0)
             
             self.IAR_algorithm = IvimModelBiExp(gtab, bounds=self.bounds, initial_guess=self.initial_guess)
         b0_index = np.where(bvalues == 0)[0][0]
@@ -122,5 +123,5 @@ class IAR_LU_biexp(OsipiBase):
         results["f"] = fit_results.model_params[..., 1]
         results["Dp"] = fit_results.model_params[..., 2]
         results["D"] = fit_results.model_params[..., 3]
-        
+
         return results
