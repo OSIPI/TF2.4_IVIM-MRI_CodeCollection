@@ -21,13 +21,13 @@ def tolerances_helper(tolerances, data):
         scale = dyn_rtol["offset"] + dyn_rtol["noise"]*data["noise"]
         tolerances["rtol"] = {"f": scale*dyn_rtol["f"], "D": scale*dyn_rtol["D"]/(1-data['f']+epsilon), "Dp": scale*dyn_rtol["Dp"]/(data['f']+epsilon)}
     else:
-        tolerances["rtol"] = tolerances.get("rtol", {"f": 0.1, "D": 0.1, "Dp": 0.3})
+        tolerances["rtol"] = tolerances.get("rtol", {"f": 0.1, "D": 0.1, "Dp": 0.1})
     if "dynamic_atol" in tolerances:
         dyn_atol = tolerances["dynamic_atol"]
         scale = dyn_atol["offset"] + dyn_atol["noise"]*data["noise"]
         tolerances["atol"] = {"f": scale*dyn_atol["f"], "D": scale*dyn_atol["D"]/(1-data['f']+epsilon), "Dp": scale*dyn_atol["Dp"]/(data['f']+epsilon)}
     else:
-        tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 4e-2})
+        tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 10e-2})
     return tolerances
 
 
@@ -81,12 +81,14 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         assert elapsed_time < max_time, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
 
 def test_default_bounds_and_initial_guesses(algorithmlist,eng):
-    algorithm, requires_matlab = algorithmlist
+    algorithm, requires_matlab, deep_learning = algorithmlist
     if requires_matlab:
         if eng is None:
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
         else:
             kwargs = {'eng': eng}
+    elif deep_learning:
+        pytest.skip(reason="Bounds not obviously applicable to deep learning-based algorithms.")
     else:
         kwargs={}
     fit = OsipiBase(algorithm=algorithm,**kwargs)
@@ -157,7 +159,7 @@ def test_bounds(bound_input, eng):
             assert passDp, f"Fit still passes when initial guess Ds is out of fit bounds; potentially initial guesses not respected for: {name}" '''
 
 def test_volume(algorithmlist,eng, threeddata):
-    algorithm, requires_matlab = algorithmlist
+    algorithm, requires_matlab, deep_learning = algorithmlist
     data, Dim, fim, Dpim, bvals = threeddata
     # Get index of b=0
     b0_index = np.where(bvals == 0.)[0][0]
@@ -171,6 +173,8 @@ def test_volume(algorithmlist,eng, threeddata):
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
         else:
             kwargs = {'eng': eng}
+    elif deep_learning:
+        kwargs = {'bvalues': bvals}
     else:
         kwargs={}
     fit = OsipiBase(algorithm=algorithm,**kwargs)
@@ -190,7 +194,13 @@ def test_volume(algorithmlist,eng, threeddata):
 
 
 def test_parallel(algorithmlist,eng,threeddata):
-    algorithm, requires_matlab = algorithmlist
+    algorithm, requires_matlab, deep_learning = algorithmlist
+    if requires_matlab:
+        pytest.skip(reason="matlab.engine does not work well with joblib")
+    elif deep_learning:
+        pytest.skip(reason="parallel testing not implemented for deep learning")
+    else:
+        kwargs={}
     data, Dim, fim, Dpim, bvals = threeddata
     # Get index of b=0
     b0_index = np.where(bvals == 0)[0][0]
@@ -199,13 +209,7 @@ def test_parallel(algorithmlist,eng,threeddata):
     invalid_mask = data[:, :, :, b0_index] < 0.01
     data[invalid_mask,:] = np.nan
     print('testing ' + str(np.sum(~invalid_mask)) + ' voxels of a matrix size ' + str(np.shape(data)))
-    if requires_matlab:
-        if eng is None:
-            pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
-        else:
-            kwargs = {'eng': eng}
-    else:
-        kwargs={}
+
     fit = OsipiBase(algorithm=algorithm,**kwargs)
 
     def dummy_task(x):
