@@ -50,7 +50,7 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
     tolerances = tolerances_helper(tolerances, data)
     fit = OsipiBase(algorithm=algorithm, **kwargs)
     if fit.use_bounds:
-        fit.bounds = ([0, 0, 0.005, 0.7], [0.005, 1.0, 0.2, 1.3])
+        fit.bounds = {"S0" : [0.7, 1.3], "f" : [0, 1.0], "Dp" : [0.005, 0.2], "D" : [0, 0.005]}
     start_time = time.time()  # Record the start time
     fit_result = fit.osipi_fit(signal, bvals)
     elapsed_time = time.time() - start_time  # Calculate elapsed time
@@ -95,20 +95,20 @@ def test_default_bounds_and_initial_guesses(algorithmlist,eng):
     #assert fit.bounds is not None, f"For {algorithm}, there is no default fit boundary"
     #assert fit.initial_guess is not None, f"For {algorithm}, there is no default fit initial guess"
     if fit.use_bounds:
-        assert 0 <= fit.bounds[0][0] <= 0.003, f"For {algorithm}, the default lower bound of D {fit.bounds[0][0]} is unrealistic"
-        assert 0 <= fit.bounds[1][0] <= 0.01, f"For {algorithm}, the default upper bound of D {fit.bounds[1][0]} is unrealistic"
-        assert 0 <= fit.bounds[0][1] <= 1, f"For {algorithm}, the default lower bound of f {fit.bounds[0][1]} is unrealistic"
-        assert 0 <= fit.bounds[1][1] <= 1, f"For {algorithm}, the default upper bound of f {fit.bounds[1][1]} is unrealistic"
-        assert 0.003 <= fit.bounds[0][2] <= 0.05, f"For {algorithm}, the default lower bound of Ds {fit.bounds[0][2]} is unrealistic"
-        assert 0.003 <= fit.bounds[1][2] <= 0.5, f"For {algorithm}, the default upper bound of Ds {fit.bounds[1][2]} is unrealistic"
-        assert 0 <= fit.bounds[0][3] <= 1, f"For {algorithm}, the default lower bound of S {fit.bounds[0][3]} is unrealistic; note data is normaized"
-        assert 1 <= fit.bounds[1][3] <= 1000, f"For {algorithm}, the default upper bound of S {fit.bounds[1][3]} is unrealistic; note data is normaized"
-        assert fit.bounds[1][0] <= fit.bounds[0][2], f"For {algorithm}, the default upper bound of D {fit.bounds[1][0]} is higher than lower bound of D* {fit.bounds[0][2]}"
+        assert 0 <= fit.bounds["D"][0] <= 0.003, f"For {algorithm}, the default lower bound of D {fit.bounds["D"][0]} is unrealistic"
+        assert 0 <= fit.bounds["D"][1] <= 0.01, f"For {algorithm}, the default upper bound of D {fit.bounds["D"][1]} is unrealistic"
+        assert 0 <= fit.bounds["f"][0] <= 1, f"For {algorithm}, the default lower bound of f {fit.bounds["f"][0]} is unrealistic"
+        assert 0 <= fit.bounds["f"][1] <= 1, f"For {algorithm}, the default upper bound of f {fit.bounds["f"][1]} is unrealistic"
+        assert 0.003 <= fit.bounds["Dp"][0] <= 0.05, f"For {algorithm}, the default lower bound of Dp {fit.bounds["Dp"][0]} is unrealistic"
+        assert 0.003 <= fit.bounds["Dp"][1] <= 0.5, f"For {algorithm}, the default upper bound of Dp {fit.bounds["Dp"][1]} is unrealistic"
+        assert 0 <= fit.bounds["S0"][0] <= 1, f"For {algorithm}, the default lower bound of S0 {fit.bounds["S0"][0]} is unrealistic; note data is normaized"
+        assert 1 <= fit.bounds["S0"][1] <= 1000, f"For {algorithm}, the default upper bound of S0 {fit.bounds["S0"][1]} is unrealistic; note data is normaized"
+        assert fit.bounds["D"][1] <= fit.bounds["Dp"][0], f"For {algorithm}, the default upper bound of D {fit.bounds["D"][1]} is higher than lower bound of Dp {fit.bounds["Dp"][0]}"
     if fit.use_initial_guess:
-        assert 0.0008 <= fit.initial_guess[0] <= 0.002, f"For {algorithm}, the default initial guess for D {fit.initial_guess[0]} is unrealistic"
-        assert 0 <= fit.initial_guess[1] <= 0.5, f"For {algorithm}, the default initial guess for f {fit.initial_guess[1]} is unrealistic"
-        assert 0.003 <= fit.initial_guess[2] <= 0.1, f"For {algorithm}, the default initial guess for Ds {fit.initial_guess[2]} is unrealistic"
-        assert 0.9 <= fit.initial_guess[3] <= 1.1, f"For {algorithm}, the default initial guess for S {fit.initial_guess[3]} is unrealistic; note signal is normalized"
+        assert 0.0008 <= fit.initial_guess["D"] <= 0.002, f"For {algorithm}, the default initial guess for D {fit.initial_guess["D"]} is unrealistic"
+        assert 0 <= fit.initial_guess["f"] <= 0.5, f"For {algorithm}, the default initial guess for f {fit.initial_guess["f"]} is unrealistic"
+        assert 0.003 <= fit.initial_guess["Dp"] <= 0.1, f"For {algorithm}, the default initial guess for Dp {fit.initial_guess["Dp"]} is unrealistic"
+        assert 0.9 <= fit.initial_guess["S0"] <= 1.1, f"For {algorithm}, the default initial guess for S0 {fit.initial_guess["S0"]} is unrealistic; note signal is normalized"
 
 
 def test_bounds(bound_input, eng):
@@ -118,16 +118,17 @@ def test_bounds(bound_input, eng):
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
         else:
             kwargs = {**kwargs, 'eng': eng}
-    bounds = ([0.0008, 0.2, 0.01, 1.1], [0.0012, 0.3, 0.02, 1.3])
+    #bounds = ([0.0008, 0.2, 0.01, 1.1], [0.0012, 0.3, 0.02, 1.3])
+    bounds = {"S0" : [1.1, 1.3], "f" : [0.2, 0.3], "Dp" : [0.01, 0.02], "D" : [0.0008, 0.0012]}
     # deliberately have silly bounds to see whether they are used
-    fit = OsipiBase(algorithm=algorithm, bounds=bounds, initial_guess = [0.001, 0.25, 0.015, 1.2], **kwargs)
+    fit = OsipiBase(algorithm=algorithm, bounds=bounds, initial_guess={"S0" : 1.2, "f" : 0.25, "Dp" : 0.015, "D" : 0.001}, **kwargs)
     if fit.use_bounds:
         signal = signal_helper(data["data"])
         fit_result = fit.osipi_fit(signal, bvals)
 
-        assert bounds[0][0] <= fit_result['D'] <= bounds[1][0],  f"Result {fit_result['D']} out of bounds for data: {name}"
-        assert bounds[0][1] <= fit_result['f'] <= bounds[1][1], f"Result {fit_result['f']} out of bounds for data: {name}"
-        assert bounds[0][2] <= fit_result['Dp'] <= bounds[1][2], f"Result {fit_result['Dp']} out of bounds for data: {name}"
+        assert bounds["D"][0] <= fit_result['D'] <= bounds["D"][1],  f"Result {fit_result['D']} out of bounds for data: {name}"
+        assert bounds["f"][0] <= fit_result['f'] <= bounds["f"][1], f"Result {fit_result['f']} out of bounds for data: {name}"
+        assert bounds["Dp"][0] <= fit_result['Dp'] <= bounds["Dp"][1], f"Result {fit_result['Dp']} out of bounds for data: {name}"
         # S0 is not returned as argument...
         #assert bounds[0][3] <= fit_result['S0'] <= bounds[1][3], f"Result {fit_result['S0']} out of bounds for data: {name}"
         '''if fit.use_initial_guess:
