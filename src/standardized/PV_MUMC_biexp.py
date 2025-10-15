@@ -1,6 +1,6 @@
 import numpy as np
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.PV_MUMC.two_step_IVIM_fit import fit_least_squares_array, fit_least_squares
+from src.original.PV_MUMC.two_step_IVIM_fit import fit_least_squares
 
 
 class PV_MUMC_biexp(OsipiBase):
@@ -62,7 +62,23 @@ class PV_MUMC_biexp(OsipiBase):
         if self.bounds is None:
             self.bounds = ([0.9, 0.0001, 0.0, 0.0025], [1.1, 0.003, 1, 0.2])
 
-        fit_results = self.PV_algorithm(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds)
+        MAX_RETRIES = 3
+        DEFAULT_PARAMS = {"f":0.1, "D":0.003, "Ds":0.05}  # replace with sensible defaults
+
+        for attempt in range(MAX_RETRIES):
+            try:
+                fit_results = self.PV_algorithm(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds)
+                break  # success
+            except RuntimeError as e:
+                if "maximum number of function evaluations" in str(e):
+                    # perturb initial guess slightly
+                    p0 = p0 * (1 + 0.01 * np.random.randn(*p0.shape))
+                else:
+                    raise
+        else:
+            # still failed after retries
+            popt = DEFAULT_PARAMS
+            pcov = np.zeros((len(DEFAULT_PARAMS), len(DEFAULT_PARAMS)))
 
         results = {} 
         results["f"] = fit_results[1]
