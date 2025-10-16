@@ -1,6 +1,11 @@
 name: Build & Deploy Website
 
 on:
+  push:
+    branches:
+      - 'main'
+      - 'analysis/**'
+      - 'Fix_website'
   workflow_run:
     workflows: [Algorithm Analysis]
     branches:
@@ -56,7 +61,7 @@ jobs:
           mv .report.json utilities/
           python utilities/report-summary.py .report.json report-summary.json
       - name: 'Filter and compress results file.'
-        run: python utilities/reduce_output_size.py test_output.csv test_output.csv.gz
+        run: python utilities/reduce_output_size.py Data/test_output.csv test_output.csv.gz
 
       - name: move data to the dashboard folder
         run: |
