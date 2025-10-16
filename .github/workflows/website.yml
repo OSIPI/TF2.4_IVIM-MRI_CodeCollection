@@ -1,6 +1,11 @@
 name: Build & Deploy Website
 
 on:
+  push:
+    branches:
+      - 'main'
+      - 'analysis/**'
+      - 'Fix_website'
   workflow_run:
     workflows: [Algorithm Analysis]
     branches:
