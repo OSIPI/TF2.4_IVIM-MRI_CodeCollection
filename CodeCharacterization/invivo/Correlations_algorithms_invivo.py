@@ -6,6 +6,8 @@ import pandas as pd
 from utilities.data_simulation.Download_data import download_data
 import json
 import matplotlib.pyplot as plt
+from scipy.stats import pearsonr
+import seaborn as sns
 
 def load_mask(anatomy):
     """Load the corresponding mask for the given anatomy."""
@@ -65,11 +67,43 @@ D1_masked = D1[mask]
 D2_masked = D2[mask]
 D1_masked = np.clip(D1_masked, 0,1)
 D2_masked = np.clip(D2_masked, 0,1)
+r, p = pearsonr(D1_masked, D2_masked)
+
+print(f"Pearson r = {r:.3f}, p = {p:.3e}")
 plt.figure(figsize=(6,6))
 plt.scatter(D1_masked, D2_masked, alpha=0.6)
+m, b = np.polyfit(D1_masked, D2_masked, 1)
+plt.plot(D1_masked, m*D1_masked + b, 'g-', label='Linear fit')
 plt.xlabel(f"{alg1} D values")
 plt.ylabel(f"{alg2} D values")
 plt.title(f"D Scatter Plot ({np.sum(mask)} voxels, mask==1)")
 plt.legend()
 plt.grid(True)
 plt.show()
+algorithms = list(datasets.keys())
+corr_matrix = pd.DataFrame(index=algorithms, columns=algorithms, dtype=float)
+
+# Compute pairwise correlations
+for alg1 in algorithms:
+    D1 = np.array(datasets[alg1]["D"]).flatten()
+    D1 = D1[mask]
+
+    for alg2 in algorithms:
+        D2 = np.array(datasets[alg2]["D"]).flatten()
+        D2 = D2[mask]
+
+        # Compute Pearson correlation
+        r, _ = pearsonr(D1, D2)
+        corr_matrix.loc[alg1, alg2] = r
+
+        print(corr_matrix)
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(corr_matrix.astype(float), annot=True, fmt=".2f",
+            cmap="coolwarm", square=True, vmin=-1, vmax=1,
+            cbar_kws={'label': 'Pearson r'})
+plt.title(f"Algorithm Correlation Matrix (masked voxels: {np.sum(mask)})")
+plt.show()
+
+print("Pearson Correlation Matrix:")
+print(corr_matrix.round(3))
