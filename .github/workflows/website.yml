@@ -3,6 +3,8 @@ name: Build & Deploy Website
 on:
   workflow_run:
     workflows: [Algorithm Analysis]
+    branches
+      - '*'
     types:
       - completed
 permissions:
