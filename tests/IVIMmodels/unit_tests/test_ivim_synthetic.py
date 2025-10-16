@@ -22,18 +22,21 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
     S0 = 1
     gd = GenerateData(rng=rng)
     name, bvals, data = ivim_data
-    D = data["D"]
-    f = data["f"]
-    Dp = data["Dp"]
+    D_arr = rng.uniform(0.5e-3, 3e-3, 1000)
+    Dp_arr = rng.uniform(5e-3, 100e-3, 1000)
+    f_arr = rng.uniform(0.05, 0.95, 1000)
     fit = OsipiBase(algorithm=ivim_algorithm)
     # here is a prior
-    if use_prior and hasattr(fit, "supported_priors") and fit.supported_priors:
-        prior = [rng.normal(D, D/3, 10), rng.normal(f, f/3, 10), rng.normal(Dp, Dp/3, 10), rng.normal(1, 1/3, 10)]
-        # prior = [np.repeat(D, 10)+np.random.normal(0,D/3,np.shape(np.repeat(D, 10))), np.repeat(f, 10)+np.random.normal(0,f/3,np.shape(np.repeat(D, 10))), np.repeat(Dp, 10)+np.random.normal(0,Dp/3,np.shape(np.repeat(D, 10))),np.repeat(np.ones_like(Dp), 10)+np.random.normal(0,1/3,np.shape(np.repeat(D, 10)))]  # D, f, D*
-        fit.initialize(prior_in=prior)
+#    if use_prior and hasattr(fit, "supported_priors") and fit.supported_priors:
+#        prior = [rng.normal(D, D/3, 10), rng.normal(f, f/3, 10), rng.normal(Dp, Dp/3, 10), rng.normal(1, 1/3, 10)]
+#        # prior = [np.repeat(D, 10)+np.random.normal(0,D/3,np.shape(np.repeat(D, 10))), np.repeat(f, 10)+np.random.normal(0,f/3,np.shape(np.repeat(D, 10))), np.repeat(Dp, 10)+np.random.normal(0,Dp/3,np.shape(np.repeat(D, 10))),np.repeat(np.ones_like(Dp), 10)+np.random.normal(0,1/3,np.shape(np.repeat(D, 10)))]  # D, f, D*
+#        fit.initialize(prior_in=prior)
     time_delta = datetime.timedelta()
     for idx in range(fit_count):
         # if "data" not in data:
+        D = D_arr[idx]
+        Dp = Dp_arr[idx]
+        f = f_arr[idx]
         signal = gd.ivim_signal(D, Dp, f, S0, bvals, SNR, rician_noise)
         # else:
         #     signal = data["data"]
