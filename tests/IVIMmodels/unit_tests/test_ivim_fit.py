@@ -95,20 +95,20 @@ def test_default_bounds_and_initial_guesses(algorithmlist,eng):
     #assert fit.bounds is not None, f"For {algorithm}, there is no default fit boundary"
     #assert fit.initial_guess is not None, f"For {algorithm}, there is no default fit initial guess"
     if fit.use_bounds:
-        assert 0 <= fit.bounds["D"][0] <= 0.003, f"For {algorithm}, the default lower bound of D {fit.bounds["D"][0]} is unrealistic"
-        assert 0 <= fit.bounds["D"][1] <= 0.01, f"For {algorithm}, the default upper bound of D {fit.bounds["D"][1]} is unrealistic"
-        assert 0 <= fit.bounds["f"][0] <= 1, f"For {algorithm}, the default lower bound of f {fit.bounds["f"][0]} is unrealistic"
-        assert 0 <= fit.bounds["f"][1] <= 1, f"For {algorithm}, the default upper bound of f {fit.bounds["f"][1]} is unrealistic"
-        assert 0.003 <= fit.bounds["Dp"][0] <= 0.05, f"For {algorithm}, the default lower bound of Dp {fit.bounds["Dp"][0]} is unrealistic"
-        assert 0.003 <= fit.bounds["Dp"][1] <= 0.5, f"For {algorithm}, the default upper bound of Dp {fit.bounds["Dp"][1]} is unrealistic"
-        assert 0 <= fit.bounds["S0"][0] <= 1, f"For {algorithm}, the default lower bound of S0 {fit.bounds["S0"][0]} is unrealistic; note data is normaized"
-        assert 1 <= fit.bounds["S0"][1] <= 1000, f"For {algorithm}, the default upper bound of S0 {fit.bounds["S0"][1]} is unrealistic; note data is normaized"
-        assert fit.bounds["D"][1] <= fit.bounds["Dp"][0], f"For {algorithm}, the default upper bound of D {fit.bounds["D"][1]} is higher than lower bound of Dp {fit.bounds["Dp"][0]}"
+        assert 0 <= fit.bounds["D"][0] <= 0.003, f"For {algorithm}, the default lower bound of D {fit.bounds['D'][0]} is unrealistic"
+        assert 0 <= fit.bounds["D"][1] <= 0.01, f"For {algorithm}, the default upper bound of D {fit.bounds['D'][1]} is unrealistic"
+        assert 0 <= fit.bounds["f"][0] <= 1, f"For {algorithm}, the default lower bound of f {fit.bounds['f'][0]} is unrealistic"
+        assert 0 <= fit.bounds["f"][1] <= 1, f"For {algorithm}, the default upper bound of f {fit.bounds['f'][1]} is unrealistic"
+        assert 0.003 <= fit.bounds["Dp"][0] <= 0.05, f"For {algorithm}, the default lower bound of Dp {fit.bounds['Dp'][0]} is unrealistic"
+        assert 0.003 <= fit.bounds["Dp"][1] <= 0.5, f"For {algorithm}, the default upper bound of Dp {fit.bounds['Dp'][1]} is unrealistic"
+        assert 0 <= fit.bounds["S0"][0] <= 1, f"For {algorithm}, the default lower bound of S0 {fit.bounds['S0'][0]} is unrealistic; note data is normaized"
+        assert 1 <= fit.bounds["S0"][1] <= 1000, f"For {algorithm}, the default upper bound of S0 {fit.bounds['S0'][1]} is unrealistic; note data is normaized"
+        assert fit.bounds["D"][1] <= fit.bounds["Dp"][0], f"For {algorithm}, the default upper bound of D {fit.bounds['D'][1]} is higher than lower bound of Dp {fit.bounds['Dp'][0]}"
     if fit.use_initial_guess:
-        assert 0.0008 <= fit.initial_guess["D"] <= 0.002, f"For {algorithm}, the default initial guess for D {fit.initial_guess["D"]} is unrealistic"
-        assert 0 <= fit.initial_guess["f"] <= 0.5, f"For {algorithm}, the default initial guess for f {fit.initial_guess["f"]} is unrealistic"
-        assert 0.003 <= fit.initial_guess["Dp"] <= 0.1, f"For {algorithm}, the default initial guess for Dp {fit.initial_guess["Dp"]} is unrealistic"
-        assert 0.9 <= fit.initial_guess["S0"] <= 1.1, f"For {algorithm}, the default initial guess for S0 {fit.initial_guess["S0"]} is unrealistic; note signal is normalized"
+        assert 0.0008 <= fit.initial_guess["D"] <= 0.002, f"For {algorithm}, the default initial guess for D {fit.initial_guess['D']} is unrealistic"
+        assert 0 <= fit.initial_guess["f"] <= 0.5, f"For {algorithm}, the default initial guess for f {fit.initial_guess['f']} is unrealistic"
+        assert 0.003 <= fit.initial_guess["Dp"] <= 0.1, f"For {algorithm}, the default initial guess for Dp {fit.initial_guess['Dp']} is unrealistic"
+        assert 0.9 <= fit.initial_guess["S0"] <= 1.1, f"For {algorithm}, the default initial guess for S0 {fit.initial_guess['S0']} is unrealistic; note signal is normalized"
 
 
 def test_bounds(bound_input, eng):
