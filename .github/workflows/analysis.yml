@@ -7,7 +7,6 @@ on:
       - 'main'
       - 'analysis/**'
       - 'Fix_website'
-
 jobs:
   algorithms:
     runs-on: ubuntu-latest
