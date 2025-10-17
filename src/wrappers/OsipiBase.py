@@ -102,8 +102,8 @@ class OsipiBase:
         # Define the attributes as numpy arrays only if they are not None
         self.bvalues = np.asarray(bvalues) if bvalues is not None else None
         self.thresholds = np.asarray(thresholds) if thresholds is not None else None
-        self.bounds = np.asarray(bounds) if bounds is not None else None
-        self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
+        self.bounds = bounds if bounds is not None else None
+        self.initial_guess = initial_guess if initial_guess is not None else None
         self.use_bounds = True
         self.use_initial_guess = True
         self.deep_learning = False
@@ -115,11 +115,16 @@ class OsipiBase:
                 print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
                 self.bounds = {"S0" : [0.7, 1.3], "f" : [0, 1.0], "Dp" : [0.005, 0.2], "D" : [0, 0.005]} # These are defined as [lower, upper]
                 self.forced_default_bounds = True
+                self.use_bounds = True
 
             if self.initial_guess is None:
                 print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
                 self.initial_guess = {"S0" : 1, "f" : 0.1, "Dp" : 0.01, "D" : 0.001}
                 self.forced_default_initial_guess = True
+                self.use_initial_guess = True
+
+        self.osipi_bounds = self.bounds # self.bounds will change form, store it in the osipi format here
+        self.osipi_initial_guess = self.initial_guess # self.initial_guess will change form, store it in the osipi format here
 
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
