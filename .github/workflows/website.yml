@@ -40,7 +40,7 @@ jobs:
       # Download Figures artifact
       - name: Download Figures artifact
 
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        #if: ${{ github.event.workflow_run.conclusion == 'success' }}
         uses: actions/download-artifact@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -50,7 +50,7 @@ jobs:
 
       # Download Data artifact
       - name: Download Data artifact
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        #if: ${{ github.event.workflow_run.conclusion == 'success' }}
         uses: actions/download-artifact@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
