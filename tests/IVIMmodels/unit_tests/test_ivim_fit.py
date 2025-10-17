@@ -30,7 +30,6 @@ def tolerances_helper(tolerances, data):
         tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 10e-2})
     return tolerances
 
-
 class PerformanceWarning(UserWarning):
     pass
 
