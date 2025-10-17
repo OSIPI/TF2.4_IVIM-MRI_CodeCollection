@@ -185,21 +185,20 @@ class GenerateData:
          - Noise is applied after generating noise-free IVIM signals, using either Gaussian or Rician noise.
          - Simulated signals are normalized by the mean S0 (b = 0) signal.
          """
-        test = self._rng.uniform(0, 1, (n, 3))
+        test = self._rng.uniform(0, 1, (n, 4))
         D = Drange[0] + test[:, [0]] * (Drange[1] - Drange[0])
         f = frange[0] + test[:, [1]] * (frange[1] - frange[0])
         Dp = Dprange[0] + test[:, [2]] * (Dprange[1] - Dprange[0])
         #data_sim = np.zeros([len(D), len(bvalues)])
         bvalues = np.array(bvalues)
         if type(SNR) == tuple:
-            test = self._rng.uniform(0, 1, (n, 1))
-            SNR = np.exp(np.log(SNR[1]) + (test * (np.log(SNR[0]) - np.log(SNR[1]))))
+            noise_std = 1/SNR[1] + test[:,4] * (1/SNR[0] - 1/SNR[1])
             addnoise = True
         elif SNR == 0:
             addnoise = False
-            SNR = np.ones((n, 1))
+            noise_std = np.ones((n, 1))
         else:
-            SNR = np.full((n, 1), SNR)
+            noise_std = np.full((n, 1), 1/SNR)
             addnoise = True
         # loop over array to fill with simulated IVIM data
         bvalues = np.array(bvalues).reshape(1, -1)
@@ -207,7 +206,6 @@ class GenerateData:
 
         # if SNR is set to zero, don't add noise
         if addnoise:
-            noise_std = 1 / SNR  # shape (n, 1)
             noise_real = self._rng.normal(0, noise_std, data_sim.shape)
             noise_imag = self._rng.normal(0, noise_std, data_sim.shape)
 
