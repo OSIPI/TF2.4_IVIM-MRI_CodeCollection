@@ -45,16 +45,25 @@ class IAR_LU_segmented_2step(OsipiBase):
         super(IAR_LU_segmented_2step, self).__init__(bvalues, thresholds, bounds, initial_guess)
         if bounds is not None:
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
-        self.use_bounds = False
-        self.use_initial_guess = False
+        if bounds is None:
+            self.use_bounds = False
+        if initial_guess is None:
+            self.use_initial_guess = False
         # Check the inputs
+
+        # Adapt the bounds to the format needed for the algorithm
+        self.bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]], \
+                       [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
+        
+        # Adapt the initial guess to the format needed for the algorithm
+        self.initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
         
         # Initialize the algorithm
         if self.bvalues is not None:
             bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
-            
+
             self.IAR_algorithm = IvimModelSegmented2Step(gtab, bounds=self.bounds, initial_guess=self.initial_guess, b_threshold=self.thresholds)
         else:
             self.IAR_algorithm = None

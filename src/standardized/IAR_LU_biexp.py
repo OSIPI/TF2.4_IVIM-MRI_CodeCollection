@@ -45,10 +45,19 @@ class IAR_LU_biexp(OsipiBase):
         super(IAR_LU_biexp, self).__init__(bvalues, thresholds, bounds, initial_guess)
         if bounds is not None:
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
-        self.use_bounds = False
-        self.use_initial_guess = False
+        if bounds is None:
+            self.use_bounds = False
+        if initial_guess is None:
+            self.use_initial_guess = False
+
         # Check the inputs
+        # Adapt the standardized bounds to the format of the specific algorithm
+        self.bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]], 
+                       [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
         
+        # Adapt the standardized initial guess to the format of the specific algorithm
+        self.initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
+
         # Initialize the algorithm
         if self.bvalues is not None:
             bvec = np.zeros((self.bvalues.size, 3))

@@ -46,21 +46,26 @@ class IAR_LU_modified_mix(OsipiBase):
         super(IAR_LU_modified_mix, self).__init__(bvalues, thresholds, bounds, initial_guess)
         if bounds is not None:
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
-        self.use_bounds = False
-        self.use_initial_guess = False
+        if bounds is None:
+            self.use_bounds = False
+        self.use_initial_guess = False # This algorithm does not use initial guesses
 
         # Additional options
         self.stochastic = True
 
         # Check the inputs
-        
+        # Adapt the standardized bounds to the format of the specific algorithm
+        self.bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000], 
+                       [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
+        #self.bounds = [[bounds["f"][0], bounds["f"][1]], [bounds["Dp"][0]*1000, bounds["Dp"][1]*1000], [bounds["D"][0]*1000, bounds["D"][1]*1000]]
+
         # Initialize the algorithm
         if self.bvalues is not None:
             bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
             
-            self.IAR_algorithm = IvimModelVP(gtab, bounds=self.bounds, rescale_results_to_mm2_s=True)
+            self.IAR_algorithm = IvimModelVP(gtab, bounds=self.bounds, rescale_units=False, rescale_results_to_mm2_s=True)
         else:
             self.IAR_algorithm = None
         
