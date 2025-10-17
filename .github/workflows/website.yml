@@ -20,7 +20,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout the same branch as the triggering workflow
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Set up Python
@@ -40,18 +43,25 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      # Action Figures artifact
-      - name: 'Download artifact'
-        #if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        uses: ./.github/actions/download-artifact
+      # Download Figures artifact
+      - name: Download Figures artifact
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        uses: actions/download-artifact@v4
         with:
-          name: 'Figures'
-      # Action analysis data artifact
-      - name: 'Download analysis data'
-        #if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        uses: ./.github/actions/download-artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: Figures
+          path: Figures
+
+      # Download Data artifact
+      - name: Download Data artifact
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        uses: actions/download-artifact@v4
         with:
-          name: 'Data'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: Data
+          path: Data
 
       - name: Debug artifact contents
         run: |
