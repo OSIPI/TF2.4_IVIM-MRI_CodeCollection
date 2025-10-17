@@ -42,16 +42,23 @@ jobs:
 
       # Action Figures artifact
       - name: 'Download artifact'
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        #if: ${{ github.event.workflow_run.conclusion == 'success' }}
         uses: ./.github/actions/download-artifact
         with:
           name: 'Figures'
       # Action analysis data artifact
       - name: 'Download analysis data'
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        #if: ${{ github.event.workflow_run.conclusion == 'success' }}
         uses: ./.github/actions/download-artifact
         with:
           name: 'Data'
+
+      - name: Debug artifact contents
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Files after artifact download:"
+          ls -R
 
       - name: Run the test that generates the plots report.
         env:
@@ -60,6 +67,7 @@ jobs:
           pytest tests/IVIMmodels/unit_tests/test_ivim_fit.py --json-report
           mv .report.json utilities/
           python utilities/report-summary.py .report.json report-summary.json
+
       - name: 'Filter and compress results file.'
         run: python utilities/reduce_output_size.py Data/test_output.csv test_output.csv.gz
 
@@ -67,7 +75,6 @@ jobs:
         run: |
           mv test_output.csv.gz website/dashboard
           mv report-summary.json website/dashboard
-
 
       - name: Build documentation
         run: |
