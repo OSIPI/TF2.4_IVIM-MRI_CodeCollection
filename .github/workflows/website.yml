@@ -41,10 +41,12 @@ jobs:
 
       - name: Install dependencies
         run: |
+          pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
 
       # Download Figures artifact
       - name: Download Figures artifact
+
         if: ${{ github.event.workflow_run.conclusion == 'success' }}
         uses: actions/download-artifact@v4
         with:
