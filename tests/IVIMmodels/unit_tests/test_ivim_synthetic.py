@@ -7,6 +7,8 @@ import datetime
 from src.wrappers.OsipiBase import OsipiBase
 from utilities.data_simulation.GenerateData import GenerateData
 
+TRAINED_MODELS = {}
+
 #run using pytest <path_to_this_file> --saveFileName test_output.txt --SNR 50 100 200
 #e.g. pytest -m slow tests/IVIMmodels/unit_tests/test_ivim_synthetic.py  --saveFileName test_output.csv --SNR 10 50 100 200 --fitCount 20
 @pytest.mark.slow
@@ -15,9 +17,6 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
     ivim_algorithm, requires_matlab, deep_learning = algorithmlist
     if requires_matlab and eng is None:
         pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
-    if deep_learning:
-        pytest.skip(
-            reason="Slow drifting in performance not yet implmented for deep learning algorithms")  # requieres training a network per b-value set and inferencing all data in 1 go. So not 1 data point per time, but all data in 1 go :). Otherwise network will be trained many many times...
     rng = np.random.RandomState(42)
     # random.seed(42)
     S0 = 1
@@ -26,7 +25,16 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
     D = data["D"]
     f = data["f"]
     Dp = data["Dp"]
-    fit = OsipiBase(algorithm=ivim_algorithm)
+    if deep_learning:
+        if ivim_algorithm+str(SNR) not in TRAINED_MODELS:
+            print(f"Training deep learning model {ivim_algorithm} ...")
+            fit = OsipiBase(bvalues=bvals, algorithm=ivim_algorithm,SNR=SNR)
+            TRAINED_MODELS[ivim_algorithm+str(SNR)] = fit
+        else:
+            print(f"Reusing trained model {ivim_algorithm}")
+            fit = TRAINED_MODELS[ivim_algorithm+str(SNR)]
+    else:
+        fit = OsipiBase(algorithm=ivim_algorithm)
     # here is a prior
     if use_prior and hasattr(fit, "supported_priors") and fit.supported_priors:
         prior = [rng.normal(D, D/3, 10), rng.normal(f, f/3, 10), rng.normal(Dp, Dp/3, 10), rng.normal(1, 1/3, 10)]
