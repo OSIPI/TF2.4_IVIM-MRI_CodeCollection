@@ -200,6 +200,7 @@ class GenerateData:
         else:
             noise_std = np.full((n, 1), 1/SNR)
             addnoise = True
+        noise_std = noise_std[:, np.newaxis]
         # loop over array to fill with simulated IVIM data
         bvalues = np.array(bvalues).reshape(1, -1)
         data_sim = 1 * (f * np.exp(-bvalues * Dp) + (1 - f) * np.exp(-bvalues * D))
