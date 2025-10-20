@@ -67,8 +67,9 @@ class IVIM_NEToptim(OsipiBase):
             self.training_data(self.bvalues,n=1000000,SNR=SNR)
         self.arg=Arg()
         if bounds is not None:
-            self.arg.net_pars.cons_min = bounds[0]  # Dt, Fp, Ds, S0
-            self.arg.net_pars.cons_max = bounds[1]  # Dt, Fp, Ds, S0
+            self.arg.net_pars.cons_min = np.array([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]])#bounds[0]  # Dt, Fp, Ds, S0
+            self.arg.net_pars.cons_max = np.array([self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])#bounds[1]  # Dt, Fp, Ds, S0
+            self.use_bounds = True
         if traindata is None:
             self.net = deep.learn_IVIM(self.train_data['data'], self.bvalues, self.arg)
         else:
