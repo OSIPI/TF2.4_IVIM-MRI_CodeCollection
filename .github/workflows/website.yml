@@ -84,7 +84,7 @@ jobs:
       - name: Build documentation
         run: |
           mkdir docs/_static
-          mv *.pdf docs/_static/
+          mv Figures/*.pdf docs/_static/ 2>/dev/null || echo "No PDFs found to move."
           sphinx-apidoc -o docs src
           cd docs/
           make html
