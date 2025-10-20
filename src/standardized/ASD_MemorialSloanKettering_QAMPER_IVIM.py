@@ -64,16 +64,17 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         return D_arr/1000, f_arr, Dx_arr/1000, s0_arr
 
     def initialize(self, bounds, initial_guess):
-        if bounds is None:
+        if self.bounds is None:
             print('warning, no bounds were defined, so algorithm-specific default bounds are used')
             self.bounds=([1e-6, 0, 0.004, 0],[0.003, 1.0, 0.2, 5])
         else:
-            self.bounds=bounds
-        if initial_guess is None:
+            self.bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                           [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
+        if self.initial_guess is None:
             print('warning, no initial guesses were defined, so algorithm-specific default initial guess is used')
             self.initial_guess = [0.001, 0.2, 0.01, 1]
         else:
-            self.initial_guess = initial_guess
+            self.initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
             self.use_initial_guess = True
         self.use_initial_guess = True
         self.use_bounds = True
