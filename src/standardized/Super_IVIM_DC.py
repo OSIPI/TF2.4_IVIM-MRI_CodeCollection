@@ -106,15 +106,18 @@ class Super_IVIM_DC(OsipiBase):
             bvalues=self.bvalues,
             model_path=f"{self.working_dir}/{self.super_ivim_dc_filename}.pt",
         )
-
-        Dp = float(np.atleast_1d(Dp).ravel()[0])
-        Dt = float(np.atleast_1d(Dt).ravel()[0])
-        f = float(np.atleast_1d(f).ravel()[0])
+        # fallback for empty arrays
+        if Dp.size == 0:
+            Dp = 0.0
+        if Dt.size == 0:
+            Dt = 0.0
+        if f.size == 0:
+            f = 0.0
 
         results = {}
-        results["D"] = safe_scalar(float(np.array(Dt).item()))
-        results["f"] = safe_scalar(float(np.array(f).item()))
-        results["Dp"] = safe_scalar(float(np.array(Dp).item()))
+        results["D"] = Dt
+        results["f"] = f
+        results["Dp"] = Dp
 
         return results
 
