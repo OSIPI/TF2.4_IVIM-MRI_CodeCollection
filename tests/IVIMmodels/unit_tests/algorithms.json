@@ -1,7 +1,7 @@
 {
     "algorithms": [
-        "IVIM_NEToptim",
         "Super_IVIM_DC",
+        "IVIM_NEToptim",
         "TCML_TechnionIIT_lsqlm",
         "TCML_TechnionIIT_lsqtrf",
         "TCML_TechnionIIT_lsqBOBYQA",

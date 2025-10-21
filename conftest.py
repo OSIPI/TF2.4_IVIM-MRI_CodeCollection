@@ -112,10 +112,10 @@ def set_global_seed(seed: int = 42):
     torch.backends.cudnn.benchmark = False
     print(f"✅ Global seed set to {seed}")
 
-@pytest.fixture(autouse=True, scope="session")
+@pytest.fixture(autouse=True)
 def global_seed():
     """Automatically seed all random generators at test session start."""
-    set_global_seed(1234)
+    set_global_seed(42)
 
 @pytest.fixture(scope="session")
 def eng(request):
