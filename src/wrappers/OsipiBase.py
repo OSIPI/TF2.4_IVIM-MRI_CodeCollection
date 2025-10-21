@@ -25,20 +25,24 @@ class OsipiBase:
         Diffusion b-values (s/mm²) matching the last dimension of the input data.
     thresholds : array-like, optional
         Thresholds used by specific algorithms (e.g., signal cutoffs).
-    bounds : array-like, optional
-        Parameter bounds for constrained optimization.
-    initial_guess : array-like, optional
-        Initial parameter estimates for the IVIM fit.
+    bounds : dict, optional
+        Parameter bounds for constrained optimization. Should be a dict with keys
+        like "S0", "f", "Dp", "D" and values as [lower, upper] lists or arrays.
+        E.g. {"S0" : [0.7, 1.3], "f" : [0, 1], "Dp" : [0.005, 0.2], "D" : [0, 0.005]}.
+    initial_guess : dict, optional
+        Initial parameter estimates for the IVIM fit. Should be a dict with keys
+        like "S0", "f", "Dp", "D" and float values. 
+        E.g. {"S0" : 1, "f" : 0.1, "Dp" : 0.01, "D" : 0.001}.
     algorithm : str, optional
         Name of an algorithm module in ``src/standardized`` to load dynamically.
         If supplied, the instance is immediately converted to that algorithm’s
         subclass via :meth:`osipi_initiate_algorithm`.
     force_default_settings : bool, optional
         If bounds and initial guesses are not provided, the wrapper will set
-        them to reasonable physical ones in the format [S0, f, Dp, D]. To prevent
-        this, set this bool to False. Default bounds are [0.7, 0, 0.005, 0] (lower)
-        and [1.3, 1.0, 0.2, 0.005] (upper). Default initial guess 
-        [1, 0.1, 0.01, 0.001].
+        them to reasonable physical ones, i.e. {"S0":[0.7, 1.3], "f":[0, 1], 
+        "Dp":[0.005, 0.2], "D":[0, 0.005]}. 
+        To prevent this, set this bool to False. Default initial guess 
+        {"S0" : 1, "f": 0.1, "Dp": 0.01, "D": 0.001}.
     **kwargs
         Additional keyword arguments forwarded to the selected algorithm’s
         initializer if ``algorithm`` is provided.
