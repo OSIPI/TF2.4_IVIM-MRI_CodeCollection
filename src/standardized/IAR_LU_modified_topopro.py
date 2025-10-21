@@ -45,8 +45,20 @@ class IAR_LU_modified_topopro(OsipiBase):
         super(IAR_LU_modified_topopro, self).__init__(bvalues, thresholds, bounds, initial_guess)
         if bounds is not None:
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
-        self.use_bounds = False
-        self.use_initial_guess = False
+        if bounds is None:
+            self.use_bounds = False
+        self.use_initial_guess = False # This algorithm does not use initial guesses
+
+        # Additional options
+        self.stochastic = True
+
+        # Check the inputs
+        # Adapt the standardized bounds to the format of the specific algorithm
+        if self.bounds["Dp"][0] == self.bounds["D"][1]:
+            print('warning, bounds for D* and D are equal, this will likely cause fitting errors. Setting D_upper to 99 percent of D_upper')
+            self.bounds["D"][1] = self.bounds["D"][1]*0.99
+        self.bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000], 
+                       [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
         # Check the inputs
         
         # Initialize the algorithm

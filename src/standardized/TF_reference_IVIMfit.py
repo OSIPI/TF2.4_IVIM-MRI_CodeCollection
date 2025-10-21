@@ -51,7 +51,8 @@ class TF_reference_IVIMfit(OsipiBase):
             print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005],[0.005, 1.0, 0.2]')
             self.bounds=([0, 0, 0.005, 0.8],[0.005, 1.0, 0.2, 1.2])
         else:
-            self.bounds=bounds
+            self.bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                           [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
         self.use_bounds = True
         if thresholds is None:
             self.thresholds = 200

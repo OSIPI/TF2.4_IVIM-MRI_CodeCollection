@@ -51,7 +51,8 @@ class TCML_TechnionIIT_lsqlm(OsipiBase):
             print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.1, 0.01, 1]')
             self.initial_guess = [0.001, 0.1, 0.01, 1]
         else:
-            self.initial_guess = initial_guess
+            #self.initial_guess = initial_guess
+            self.initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
             self.use_initial_guess = True
         self.fitS0=fitS0
         self.use_initial_guess = True

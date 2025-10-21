@@ -53,12 +53,13 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
             print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
             self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
         else:
-            self.bounds=bounds
+            self.bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                           [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
         if initial_guess is None:
             print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
             self.initial_guess = [0.001, 0.001, 0.01, 1]
         else:
-            self.initial_guess = initial_guess
+            self.initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
         self.use_initial_guess = True
         self.use_bounds = True
         if thresholds is None:

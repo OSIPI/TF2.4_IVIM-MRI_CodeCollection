@@ -25,14 +25,24 @@ class OsipiBase:
         Diffusion b-values (s/mm²) matching the last dimension of the input data.
     thresholds : array-like, optional
         Thresholds used by specific algorithms (e.g., signal cutoffs).
-    bounds : array-like, optional
-        Parameter bounds for constrained optimization.
-    initial_guess : array-like, optional
-        Initial parameter estimates for the IVIM fit.
+    bounds : dict, optional
+        Parameter bounds for constrained optimization. Should be a dict with keys
+        like "S0", "f", "Dp", "D" and values as [lower, upper] lists or arrays.
+        E.g. {"S0" : [0.7, 1.3], "f" : [0, 1], "Dp" : [0.005, 0.2], "D" : [0, 0.005]}.
+    initial_guess : dict, optional
+        Initial parameter estimates for the IVIM fit. Should be a dict with keys
+        like "S0", "f", "Dp", "D" and float values. 
+        E.g. {"S0" : 1, "f" : 0.1, "Dp" : 0.01, "D" : 0.001}.
     algorithm : str, optional
         Name of an algorithm module in ``src/standardized`` to load dynamically.
         If supplied, the instance is immediately converted to that algorithm’s
         subclass via :meth:`osipi_initiate_algorithm`.
+    force_default_settings : bool, optional
+        If bounds and initial guesses are not provided, the wrapper will set
+        them to reasonable physical ones, i.e. {"S0":[0.7, 1.3], "f":[0, 1], 
+        "Dp":[0.005, 0.2], "D":[0, 0.005]}. 
+        To prevent this, set this bool to False. Default initial guess 
+        {"S0" : 1, "f": 0.1, "Dp": 0.01, "D": 0.001}.
     **kwargs
         Additional keyword arguments forwarded to the selected algorithm’s
         initializer if ``algorithm`` is provided.
@@ -92,21 +102,38 @@ class OsipiBase:
     f_map = results["f"]
     """
     
-    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, algorithm=None, **kwargs):
+    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, algorithm=None, force_default_settings=True, **kwargs):
         # Define the attributes as numpy arrays only if they are not None
         self.bvalues = np.asarray(bvalues) if bvalues is not None else None
         self.thresholds = np.asarray(thresholds) if thresholds is not None else None
-        self.bounds = np.asarray(bounds) if bounds is not None else None
-        self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
+        self.bounds = bounds if bounds is not None else None
+        self.initial_guess = initial_guess if initial_guess is not None else None
         self.use_bounds = True
         self.use_initial_guess = True
         self.deep_learning = False
         self.supervised = False
         self.stochastic = False
+        
+        if force_default_settings:
+            if self.bounds is None:
+                print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
+                self.bounds = {"S0" : [0.7, 1.3], "f" : [0, 1.0], "Dp" : [0.005, 0.2], "D" : [0, 0.005]} # These are defined as [lower, upper]
+                self.forced_default_bounds = True
+                self.use_bounds = True
+
+            if self.initial_guess is None:
+                print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
+                self.initial_guess = {"S0" : 1, "f" : 0.1, "Dp" : 0.01, "D" : 0.001}
+                self.forced_default_initial_guess = True
+                self.use_initial_guess = True
+
+        self.osipi_bounds = self.bounds # self.bounds will change form, store it in the osipi format here
+        self.osipi_initial_guess = self.initial_guess # self.initial_guess will change form, store it in the osipi format here
+
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
-            self.osipi_initiate_algorithm(algorithm, bvalues=bvalues, thresholds=thresholds, bounds=bounds, initial_guess=initial_guess, **kwargs)
+            self.osipi_initiate_algorithm(algorithm, bvalues=self.bvalues, thresholds=self.thresholds, bounds=self.bounds, initial_guess=self.initial_guess, **kwargs)
             
     def osipi_initiate_algorithm(self, algorithm, **kwargs):
         """Turns the class into a specified one by the input.
