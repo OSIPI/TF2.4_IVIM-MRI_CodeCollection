@@ -93,6 +93,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
             results["f"] = f
             results["Dp"] = Dstar
             results["D"] = D
+            results = self.D_and_Ds_swap(results)
 
             return results
     

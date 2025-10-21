@@ -5,6 +5,9 @@ import csv
 # import datetime
 import numpy as np
 from phantoms.MR_XCAT_qMRI.sim_ivim_sig import phantom
+import warnings
+from tests.IVIMmodels.unit_tests.test_ivim_fit import PerformanceWarning
+warnings.simplefilter("always", PerformanceWarning)
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -316,3 +319,4 @@ def threeddata(request):
     bvals = np.array(bvals['bvalues'])
     sig, _, Dim, fim, Dpim, _=phantom(bvals, 1/1000, TR=3000, TE=40, motion=False, rician=False, interleaved=False, T1T2=True)
     return sig[::16,::8,::6,:], Dim[::16,::8,::6], fim[::16,::8,::6], Dpim[::16,::8,::6], bvals
+

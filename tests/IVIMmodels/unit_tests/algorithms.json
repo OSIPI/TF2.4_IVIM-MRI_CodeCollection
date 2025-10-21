@@ -28,7 +28,8 @@
         "TF_reference_IVIMfit"
     ],
     "IVIM_NEToptim": {
-        "deep_learning": true
+        "deep_learning": true,
+        "n":3000000
     },
     "Super_IVIM_DC": {
         "deep_learning": true
