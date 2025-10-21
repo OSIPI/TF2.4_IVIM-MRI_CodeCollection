@@ -192,7 +192,7 @@ class GenerateData:
         #data_sim = np.zeros([len(D), len(bvalues)])
         bvalues = np.array(bvalues)
         if type(SNR) == tuple:
-            noise_std = np.array(1/SNR[1] + test[:,3] * (1/SNR[0] - 1/SNR[1]))
+            noise_std = (1 / SNR[1] + test[:, 3] * (1 / SNR[0] - 1 / SNR[1]))[:, None]
             addnoise = True
         elif SNR == 0:
             addnoise = False
