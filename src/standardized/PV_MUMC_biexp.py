@@ -41,7 +41,11 @@ class PV_MUMC_biexp(OsipiBase):
         self.PV_algorithm = fit_least_squares
         if bounds is not None:
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
-        self.use_bounds = False
+
+        self.bounds = ([self.bounds["S0"][0], self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0]],
+                       [self.bounds["S0"][1], self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1]])
+
+        self.use_bounds = True
         self.use_initial_guess = False
         
     

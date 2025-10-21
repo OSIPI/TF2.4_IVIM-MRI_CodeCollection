@@ -51,10 +51,12 @@ class TCML_TechnionIIT_SLS(OsipiBase):
             self.bounds = ([0.0003, 0.001, 0.009, 0],[0.008, 0.5,0.04, 3])
         else:
             print('warning, although bounds are given, only D* is bounded)')
-            bounds=bounds
-            self.bounds = bounds
+            #bounds=bounds
+            #self.bounds = bounds
+            self.bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                           [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
         self.fitS0=fitS0
-        self.use_bounds = False
+        self.use_bounds = True
         if thresholds is None:
             self.thresholds = 150
             print('warning, no thresholds were defined, so default bounds are used of  150')

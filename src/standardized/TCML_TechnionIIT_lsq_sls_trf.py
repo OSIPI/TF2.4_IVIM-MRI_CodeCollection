@@ -51,15 +51,17 @@ class TCML_TechnionIIT_lsq_sls_trf(OsipiBase):
             print('warning, no bounds were defined, so default bounds are used of ([0.0003, 0.001, 0.009, 0],[0.008, 1.0,0.04, 3])')
             self.bounds = ([0.0003, 0.001, 0.009, 0],[0.008, 1.0,0.04, 3])
         else:
-            bounds=bounds
-            self.bounds = bounds
+            #bounds=bounds
+            #self.bounds = bounds
+            self.bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                           [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
         if thresholds is None:
             self.thresholds = 200
             print('warning, no thresholds were defined, so default bounds are used of  200')
         else:
             self.thresholds = thresholds
         self.fitS0=fitS0
-        self.use_bounds = False
+        self.use_bounds = True
         self.use_initial_guess = False
 
     def ivim_fit(self, signals, bvalues, **kwargs):
