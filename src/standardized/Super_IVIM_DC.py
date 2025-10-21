@@ -99,7 +99,8 @@ class Super_IVIM_DC(OsipiBase):
         """
         if not np.array_equal(bvalues, self.bvalues):
             raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
-
+        if np.shape(np.shape(signals)) == (1,):
+            signals=signals[np.newaxis, :]
         Dp, Dt, f, S0_superivimdc = infer_from_signal(
             signal=signals,
             bvalues=self.bvalues,

@@ -192,7 +192,7 @@ class GenerateData:
         #data_sim = np.zeros([len(D), len(bvalues)])
         bvalues = np.array(bvalues)
         if type(SNR) == tuple:
-            noise_std = 1/SNR[1] + test[:,3] * (1/SNR[0] - 1/SNR[1])
+            noise_std = np.array(1/SNR[1] + test[:,3] * (1/SNR[0] - 1/SNR[1]))
             addnoise = True
         elif SNR == 0:
             addnoise = False
@@ -200,7 +200,6 @@ class GenerateData:
         else:
             noise_std = np.full((n, 1), 1/SNR)
             addnoise = True
-        noise_std = noise_std[:, np.newaxis]
         # loop over array to fill with simulated IVIM data
         bvalues = np.array(bvalues).reshape(1, -1)
         data_sim = 1 * (f * np.exp(-bvalues * Dp) + (1 - f) * np.exp(-bvalues * D))

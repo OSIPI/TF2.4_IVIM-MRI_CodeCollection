@@ -1,6 +1,7 @@
 {
     "algorithms": [
         "IVIM_NEToptim",
+        "Super_IVIM_DC",
         "TCML_TechnionIIT_lsqlm",
         "TCML_TechnionIIT_lsqtrf",
         "TCML_TechnionIIT_lsqBOBYQA",
@@ -8,7 +9,6 @@
         "TCML_TechnionIIT_lsq_sls_trf",
         "TCML_TechnionIIT_lsq_sls_BOBYQA",
         "TCML_TechnionIIT_SLS",
-        "Super_IVIM_DC",
         "ASD_MemorialSloanKettering_QAMPER_IVIM",
         "ETP_SRI_LinearFitting",
         "IAR_LU_biexp",
