@@ -99,12 +99,20 @@ class Super_IVIM_DC(OsipiBase):
         """
         if not np.array_equal(bvalues, self.bvalues):
             raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
-
+        if np.shape(np.shape(signals)) == (1,):
+            signals=signals[np.newaxis, :]
         Dp, Dt, f, S0_superivimdc = infer_from_signal(
             signal=signals,
             bvalues=self.bvalues,
             model_path=f"{self.working_dir}/{self.super_ivim_dc_filename}.pt",
         )
+        # fallback for empty arrays
+        if Dp.size == 0:
+            Dp = 0.0
+        if Dt.size == 0:
+            Dt = 0.0
+        if f.size == 0:
+            f = 0.0
 
         results = {}
         results["D"] = Dt

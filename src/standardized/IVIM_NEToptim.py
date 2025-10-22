@@ -88,7 +88,8 @@ class IVIM_NEToptim(OsipiBase):
         """
         if not np.array_equal(bvalues, self.bvalues):
             raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
-
+        if np.shape(np.shape(signals)) == (1,):
+            signals=signals[np.newaxis, :]
         paramsNN = deep.predict_IVIM(signals, self.bvalues, self.net, self.arg)
 
         results = {}
