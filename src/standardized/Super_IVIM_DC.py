@@ -166,9 +166,3 @@ class Super_IVIM_DC(OsipiBase):
         voxels = int(np.prod(data.shape[:-1]))  # e.g., X*Y*Z
         return data.reshape(voxels, B), data.shape
 
-def safe_scalar(val):
-    """Ensure val is always a Python float scalar."""
-    try:
-        return float(np.array(val).ravel()[0])
-    except Exception:
-        return 0.0  # fallback if conversion fails
