@@ -181,7 +181,7 @@ burnUpdateFraction = 1/2;
 for i = 1:ceil(M/voxelsPerRun)
     % partition voxels
     usedVoxels = (i-1)*voxelsPerRun + 1:min(i*voxelsPerRun,M);
-    
+
     fpart = f(usedVoxels);
     Dpart = D(usedVoxels);
     Dstarpart = Dstar(usedVoxels);
@@ -263,11 +263,11 @@ for i = 1:ceil(M/voxelsPerRun)
 
         % Display iteration every 500th iteration
         if ~mod(j,500) && j > burns
-            disp(['Iterations: ' num2str(j-burns)]);
+            %disp(['Iterations: ' num2str(j-burns)]);
         elseif ~mod(j,100) && j < burns
-            disp(['Burn in-steps: ' num2str(j)]);
+            %disp(['Burn in-steps: ' num2str(j)]);
         elseif j == burns
-            disp(['Burn in complete: ' num2str(j)]);
+            %disp(['Burn in complete: ' num2str(j)]);
         end
     end
     
@@ -286,28 +286,28 @@ for i = 1:ceil(M/voxelsPerRun)
         out.S0.std(usedVoxels) = sqrt(theta2sum(:,4)/n-(thetasum(:,4)/n).^2);
     else
         %mean
-        out.f.mean(usedVoxels) = mean(squeeze(theta(:,1,burns + 1:n+burns)),2);
-        out.D.mean(usedVoxels) = mean(squeeze(theta(:,2,burns + 1:n+burns)),2);
-        out.Dstar.mean(usedVoxels) = mean(squeeze(theta(:,3,burns + 1:n+burns)),2);
-        out.S0.mean(usedVoxels) = mean(squeeze(theta(:,4,burns + 1:n+burns)),2);
+        out.f.mean(usedVoxels) = mean(reshape(theta(:,1,burns + 1:n+burns),[size(theta,1),n]),2);
+        out.D.mean(usedVoxels) = mean(reshape(theta(:,2,burns + 1:n+burns),[size(theta,1),n]),2);
+        out.Dstar.mean(usedVoxels) = mean(reshape(theta(:,3,burns + 1:n+burns),[size(theta,1),n]),2);
+        out.S0.mean(usedVoxels) = mean(reshape(theta(:,4,burns + 1:n+burns),[size(theta,1),n]),2);
 
         %median
-        out.f.median(usedVoxels) = median(squeeze(theta(:,1,burns + 1:n+burns)),2);
-        out.D.median(usedVoxels) = median(squeeze(theta(:,2,burns + 1:n+burns)),2);
-        out.Dstar.median(usedVoxels) = median(squeeze(theta(:,3,burns + 1:n+burns)),2);
-        out.S0.median(usedVoxels) = median(squeeze(theta(:,4,burns + 1:n+burns)),2);
+        out.f.median(usedVoxels) = median(reshape(theta(:,1,burns + 1:n+burns),[size(theta,1),n]),2);
+        out.D.median(usedVoxels) = median(reshape(theta(:,2,burns + 1:n+burns),[size(theta,1),n]),2);
+        out.Dstar.median(usedVoxels) = median(reshape(theta(:,3,burns + 1:n+burns),[size(theta,1),n]),2);
+        out.S0.median(usedVoxels) = median(reshape(theta(:,4,burns + 1:n+burns),[size(theta,1),n]),2);
 
         % mode
-        out.f.mode(usedVoxels) = halfSampleMode(squeeze(theta(:,1,burns + 1:n+burns)));
-        out.D.mode(usedVoxels) = halfSampleMode(squeeze(theta(:,2,burns + 1:n+burns)));
-        out.Dstar.mode(usedVoxels) = halfSampleMode(squeeze(theta(:,3,burns + 1:n+burns)));
-        out.S0.mode(usedVoxels) = halfSampleMode(squeeze(theta(:,4,burns + 1:n+burns)));
+        out.f.mode(usedVoxels) = halfSampleMode(reshape(theta(:,1,burns + 1:n+burns),[size(theta,1),n]));
+        out.D.mode(usedVoxels) = halfSampleMode(reshape(theta(:,2,burns + 1:n+burns),[size(theta,1),n]));
+        out.Dstar.mode(usedVoxels) = halfSampleMode(reshape(theta(:,3,burns + 1:n+burns),[size(theta,1),n]));
+        out.S0.mode(usedVoxels) = halfSampleMode(reshape(theta(:,4,burns + 1:n+burns),[size(theta,1),n]));
 
         % standard deviation
-        out.f.std(usedVoxels) = std(squeeze(theta(:,1,burns + 1:n+burns)),1,2);
-        out.D.std(usedVoxels) = std(squeeze(theta(:,2,burns + 1:n+burns)),1,2);
-        out.Dstar.std(usedVoxels) = std(squeeze(theta(:,3,burns + 1:n+burns)),1,2);
-        out.S0.std(usedVoxels) = std(squeeze(theta(:,4,burns + 1:n+burns)),1,2);
+        out.f.std(usedVoxels) = std(reshape(theta(:,1,burns + 1:n+burns),[size(theta,1),n]),1,2);
+        out.D.std(usedVoxels) = std(reshape(theta(:,2,burns + 1:n+burns),[size(theta,1),n]),1,2);
+        out.Dstar.std(usedVoxels) = std(reshape(theta(:,3,burns + 1:n+burns),[size(theta,1),n]),1,2);
+        out.S0.std(usedVoxels) = std(reshape(theta(:,4,burns + 1:n+burns),[size(theta,1),n]),1,2);
     end
 end
 
@@ -381,7 +381,52 @@ a2 = 3.75./b(b >= 3.75);
 y(b < 3.75) = log(1.0 + a1.*(3.5156229 + a1.*(3.0899424 + a1.*(1.2067492 + a1.*(0.2659732 + a1.*(0.0360768 + a1.*0.0045813))))));
 y(b >= 3.75) = b(b >= 3.75) + log((0.39894228+a2.*(0.01328592+a2.*(0.00225319+a2.*(-0.00157565+a2.*(0.00916281+a2.*(-0.02057706+a2.*(0.02635537+a2.*(-0.01647633+a2.*0.00392377))))))))./sqrt(b(b>=3.75)));
 
-
+function hsm = halfSampleMode(X)
+% calculates the half sample mode for each row in X
+if ~ismatrix(X)
+    error('X must be a matrix or vector');
+end
+X = sort(X,2);
+n = size(X,2);
+hsm = HSM_rec(n,X);
+function hsm = HSM_rec(n,X)
+% special cases
+if size(X,2) == 1
+    hsm = X;
+    return;
+elseif size(X,2) == 2
+    hsm = sum(X,2)/2;
+    return;
+elseif size(X,2) == 3   
+    hsm = zeros(size(X,1),1);
+    low = (X(:,2) - X(:,1)) < (X(:,3) - X(:,2)); % use lower pair
+    eq = (X(:,2) - X(:,1)) == (X(:,3) - X(:,2)); % use mid value
+    
+    if any(low)
+        hsm(low) = sum(X(low,1:2),2)/2;
+    end
+    if any(eq)
+        hsm(eq) = X(eq,2);
+    end
+    if any(~(low|eq))
+        hsm(~(low|eq)) = sum(X(~(low|eq),2:3),2)/2; % otherwise
+    end
+    return
+end
+% general case (n > 3)
+wmin = X(:,end) - X(:,1);
+N = ceil(n/2);
+j = ones(size(X,1),1);
+for i = 1:(n-N+1)
+   w = X(:,i+N-1) - X(:,i);
+   m = w < wmin;
+   wmin(m) = w(m);
+   j(m) = i;
+end
+rowsub = repmat((1:size(X,1))',1,N);
+colsub = repmat(j,1,N) + repmat(0:N-1,size(X,1),1);
+Xsub = reshape(X(sub2ind(size(X),rowsub,colsub)),size(X,1),N);
+hsm = HSM_rec(N,Xsub);
 
 
 

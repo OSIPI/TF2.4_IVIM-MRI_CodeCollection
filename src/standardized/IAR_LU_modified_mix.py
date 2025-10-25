@@ -26,12 +26,14 @@ class IAR_LU_modified_mix(OsipiBase):
     required_bounds_optional = True # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
-    accepted_dimensions = 1 # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
     
     # Supported inputs in the standardized class
     supported_bounds = True
     supported_initial_guess = False
     supported_thresholds = False
+    supported_dimensions = 1
+    supported_priors = False
+
 
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
         """
@@ -46,6 +48,10 @@ class IAR_LU_modified_mix(OsipiBase):
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
         self.use_bounds = False
         self.use_initial_guess = False
+
+        # Additional options
+        self.stochastic = True
+
         # Check the inputs
         
         # Initialize the algorithm
@@ -91,5 +97,6 @@ class IAR_LU_modified_mix(OsipiBase):
         results["f"] = fit_results.model_params[1]
         results["Dp"] = fit_results.model_params[2]
         results["D"] = fit_results.model_params[3]
-        
+        results = self.D_and_Ds_swap(results)
+
         return results

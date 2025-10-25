@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_least_squares
+from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_least_squares, fit_least_squares_array
 import numpy as np
 
 class OGC_AmsterdamUMC_biexp(OsipiBase):
@@ -25,13 +25,14 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
     required_bounds_optional = True  # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
-    accepted_dimensions = 1  # Not sure how to define this for the number of accepted dimensions. Perhaps like the thresholds, at least and at most?
 
 
     # Supported inputs in the standardized class
     supported_bounds = True
     supported_initial_guess = True
     supported_thresholds = False
+    supported_dimensions = 1
+    supported_priors = False
 
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, fitS0=True):
         """
@@ -44,6 +45,7 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         #super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
         super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
         self.OGC_algorithm = fit_least_squares
+        self.OGC_algorithm_array = fit_least_squares_array
         self.fitS0=fitS0
         self.initialize(bounds, initial_guess, fitS0)
 
@@ -55,7 +57,7 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
             self.bounds=bounds
         if initial_guess is None:
             print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
-            self.initial_guess = [0.001, 0.001, 0.01, 1]
+            self.initial_guess = [0.001, 0.1, 0.01, 1]
         else:
             self.initial_guess = initial_guess
             self.use_initial_guess = True

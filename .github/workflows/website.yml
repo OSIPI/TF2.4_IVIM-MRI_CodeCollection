@@ -13,14 +13,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout the same branch as the triggering workflow
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Set up Python
         id: setup_python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.13"
       - name: Cache pip
         uses: actions/cache@v3
         id: pip-cache
@@ -31,40 +34,57 @@ jobs:
 
       - name: Install dependencies
         run: |
+          pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
 
-      # Action Figures artifact
-      - name: 'Download artifact'
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        uses: ./.github/actions/download-artifact
+      # Download Figures artifact
+      - name: Download Figures artifact
+
+        #if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        uses: actions/download-artifact@v4
         with:
-          name: 'Figures'
-      # Action analysis data artifact
-      - name: 'Download analysis data'
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        uses: ./.github/actions/download-artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: Figures
+          path: Figures
+
+      # Download Data artifact
+      - name: Download Data artifact
+        #if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        uses: actions/download-artifact@v4
         with:
-          name: 'Data'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: Data
+          path: Data
+
+      - name: Debug artifact contents
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Files after artifact download:"
+          ls -R
 
       - name: Run the test that generates the plots report.
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           pytest tests/IVIMmodels/unit_tests/test_ivim_fit.py --json-report
           mv .report.json utilities/
           python utilities/report-summary.py .report.json report-summary.json
 
       - name: 'Filter and compress results file.'
-        run: python utilities/reduce_output_size.py test_output.csv test_output.csv.gz
+        run: python utilities/reduce_output_size.py Data/test_output.csv test_output.csv.gz
 
       - name: move data to the dashboard folder
         run: |
           mv test_output.csv.gz website/dashboard
           mv report-summary.json website/dashboard
 
-
       - name: Build documentation
         run: |
           mkdir docs/_static
-          mv *.pdf docs/_static/
+          mv Figures/*.pdf docs/_static/ 2>/dev/null || echo "No PDFs found to move."
           sphinx-apidoc -o docs src
           cd docs/
           make html
