@@ -5,49 +5,8 @@ from pathlib import Path
 import selectors
 import subprocess
 import sys
-import inquirer
 import numpy as np
 
-def prompt_input_directory():
-    return inquirer.prompt([
-        inquirer.Path(
-            "path",
-            message="📂 Select an input directory containing DICOM image files:",
-            path_type=inquirer.Path.DIRECTORY,
-            exists=True,
-        )
-    ])["path"]
-
-
-def prompt_output_directory(input_dir):
-    # List subfolders of input_dir
-    subdirs = [
-        name for name in os.listdir(input_dir)
-        if os.path.isdir(os.path.join(input_dir, name))
-    ]
-
-    choices = [f"./{name}" for name in subdirs]
-    choices.append("📥 Enter a custom output path...")
-
-    answer = inquirer.prompt([
-        inquirer.List(
-            "choice",
-            message=f"📁 Choose an output directory for NIfTI files from:\n → {input_dir}",
-            choices=choices
-        )
-    ])["choice"]
-
-    if answer == "📥 Enter a custom output path...":
-        return inquirer.prompt([
-            inquirer.Path(
-                "custom_path",
-                message="📥 Enter custom output directory path:",
-                path_type=inquirer.Path.DIRECTORY,
-                exists=True
-            )
-        ])["custom_path"]
-    else:
-        return os.path.abspath(os.path.join(input_dir, answer.strip("./")))
 
 
 def dicom_to_niix(vol_dir: Path, out_dir: Path = None, merge_2d: bool = False, is_single_file: bool = False):
@@ -118,7 +77,7 @@ def capture_subprocess_output(subprocess_args):
         buf.write(line)
         sys.stdout.write(line)
 
-    selector = selectors.DefaultSelector()               # register callback 
+    selector = selectors.DefaultSelector() # register callback 
     selector.register(process.stdout, selectors.EVENT_READ, handle_output) # for 'read' event from subprocess stdout stream
 
     while process.poll() is None:
@@ -143,45 +102,6 @@ def capture_subprocess_output(subprocess_args):
     buf.close()
 
     return success, output
-
-def run_interactive():
-
-    input_dirs = []
-    output_dirs = []
-
-    while True:
-        input_dir = prompt_input_directory()
-        output_dir = prompt_output_directory(input_dir)
-
-        input_dirs.append(input_dir)
-        output_dirs.append(output_dir)
-
-        add_more = inquirer.prompt([
-            inquirer.Confirm("more", message="➕ Add another input/output pair?", default=False)
-        ])["more"]
-
-        if not add_more:
-            break
-
-    merge_answer = inquirer.prompt([
-        inquirer.Confirm("merge", message="🧩 Merge 2D slices into a single NIfTI (-m y)?", default=True)
-    ])
-    merge_2d = merge_answer["merge"]
-
-    single_file = inquirer.prompt([
-        inquirer.Confirm("single", message="📦 Force single file input (-s y)?", default=False)
-    ])["single"]
-
-    for in_dir, out_dir in zip(input_dirs, output_dirs):
-        vol_dir = Path(in_dir)
-        out_path = Path(out_dir)
-
-        print(f"Converting:\n → Input: {vol_dir}\n → Output: {out_path}")
-        try:
-            nifti, bval, bvec = dicom_to_niix(vol_dir, out_path, merge_2d, single_file)
-            print(f" Conversion succeeded: {nifti}")
-        except RuntimeError as err:
-            print(f"❌ Conversion failed: {err}")
 
 def run_cli(input_path: str, output_path: str, **kwargs):
     vol_dir = Path(input_path)
@@ -214,15 +134,12 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output", nargs="?", help="Path to output directory for NIfTI files, defaults to the same folder as the original DICOM files.")
     parser.add_argument("-m", "--merge-2d", action="store_true", help="Merge 2D slices (-m y)")
     parser.add_argument("-s", "--single-file", action="store_true", help="Enable single file mode (-s y)")
-    parser.add_argument("-pu", "--prompt-user", action="store_true", help="Run in interactive mode")
 
     args = parser.parse_args()
 
-    if args.prompt_user:
-        run_interactive()
-    elif args.input:
+    if args.input:
         run_cli(args.input, args.output, **vars(args))
     else:
-        print("❗ You must provide input and output paths OR use --prompt-user for interactive mode.")
+        print("❗ You must provide input and output paths ")
         parser.print_help()
         sys.exit(1)
