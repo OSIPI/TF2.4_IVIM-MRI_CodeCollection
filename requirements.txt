@@ -20,3 +20,4 @@ statsmodels
 ivimnet
 nlopt
 pyyaml
+statsmodels

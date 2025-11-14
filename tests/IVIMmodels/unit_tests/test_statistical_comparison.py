@@ -46,8 +46,8 @@ def generate_config_for_algorithm(algorithm):
 
     print(f"Generating reference data for {algorithm}")
     
-    if "NET" in algorithm or "DC" in algorithm:
-        print("  Skipping deep learning algorithm")
+    if "NET" in algorithm or "DC" in algorithm or "MATLAB" in algorithm:
+        print("  Skipping deep learning or MATLAB algorithm")
         return None
 
     new_config_entry[algorithm] = {}
