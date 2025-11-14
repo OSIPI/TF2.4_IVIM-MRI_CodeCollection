@@ -41,3 +41,4 @@ phantoms/MR_XCAT_qMRI/*.txt
 tests/IVIMmodels/unit_tests/models
 models
 test_output.csv
+proposed_statistical_config.yml

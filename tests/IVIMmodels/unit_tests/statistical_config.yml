@@ -1,0 +1,93 @@
+# Configuration for statistical tests of IVIM models.
+# This file defines the acceptance criteria for each test case, including
+# ground truth values, reference means, standard deviations, and tolerances.
+
+ETP_SRI_LinearFitting:
+  "Blood RV":
+    100:
+      ground_truth:
+        f: 1.0
+        Dp: 0.1
+        D: 0.003
+      acceptance_criteria:
+        f:
+          mean: 0.9038
+          std_dev: 0.3742
+          mean_tolerance: 0.2
+          std_dev_tolerance_percent: 100.0
+        Dp:
+          mean: 0.0326
+          std_dev: 0.0907
+          mean_tolerance: 0.2
+          std_dev_tolerance_percent: 100.0
+        D:
+          mean: 0.0012
+          std_dev: 0.0020
+          mean_tolerance: 0.002
+          std_dev_tolerance_percent: 100.0
+  "Myocardium LV":
+    100:
+      ground_truth:
+        f: 0.15
+        Dp: 0.08
+        D: 0.0024
+      acceptance_criteria:
+        f:
+          mean: 0.1504
+          std_dev: 0.1653
+          mean_tolerance: 0.1
+          std_dev_tolerance_percent: 50.0
+        Dp:
+          mean: 0.0515
+          std_dev: 0.1271
+          mean_tolerance: 0.1
+          std_dev_tolerance_percent: 50.0
+        D:
+          mean: 0.0024
+          std_dev: 0.0003
+          mean_tolerance: 0.001
+          std_dev_tolerance_percent: 50.0
+  "myocardium RV":
+    100:
+      ground_truth:
+        f: 0.15
+        Dp: 0.08
+        D: 0.0024
+      acceptance_criteria:
+        f:
+          mean: 0.1504
+          std_dev: 0.1653
+          mean_tolerance: 0.1
+          std_dev_tolerance_percent: 50.0
+        Dp:
+          mean: 0.0515
+          std_dev: 0.1271
+          mean_tolerance: 0.1
+          std_dev_tolerance_percent: 50.0
+        D:
+          mean: 0.0024
+          std_dev: 0.0003
+          mean_tolerance: 0.001
+          std_dev_tolerance_percent: 50.0
+  "myocardium ra":
+    100:
+      ground_truth:
+        f: 0.07
+        Dp: 0.07
+        D: 0.0015
+      acceptance_criteria:
+        f:
+          mean: 0.0749
+          std_dev: 0.0736
+          mean_tolerance: 0.2
+          std_dev_tolerance_percent: 100.0
+        Dp:
+          mean: 0.0678
+          std_dev: 0.2695
+          mean_tolerance: 0.2
+          std_dev_tolerance_percent: 100.0
+        D:
+          mean: 0.0015
+          std_dev: 0.0001
+          mean_tolerance: 0.002
+          std_dev_tolerance_percent: 100.0
