@@ -19,3 +19,4 @@ pytest-json-report
 statsmodels
 ivimnet
 nlopt
+pyyaml
