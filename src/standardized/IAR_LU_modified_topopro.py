@@ -43,22 +43,17 @@ class IAR_LU_modified_topopro(OsipiBase):
             the requirements.
         """
         super(IAR_LU_modified_topopro, self).__init__(bvalues, thresholds, bounds, initial_guess)
-        if bounds is not None:
-            print('warning, bounds from wrapper are not (yet) used in this algorithm')
-        if bounds is None:
-            self.use_bounds = False
-        self.use_initial_guess = False # This algorithm does not use initial guesses
+
+        self.use_bounds = {"f" : False, "Dp": False, "D": False} # This algorithm performs intermediate steps that generates new bounds
+        self.use_initial_guess = {"f" : False, "Dp": False, "D": False} # This algorithm does not use initial guesses
 
         # Additional options
         self.stochastic = True
 
         # Check the inputs
-        # Adapt the standardized bounds to the format of the specific algorithm
         if self.bounds["Dp"][0] == self.bounds["D"][1]:
             print('warning, bounds for D* and D are equal, this will likely cause fitting errors. Setting D_upper to 99 percent of D_upper')
             self.bounds["D"][1] = self.bounds["D"][1]*0.99
-        self.bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000], 
-                       [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
         # Check the inputs
         
         # Initialize the algorithm
@@ -66,8 +61,11 @@ class IAR_LU_modified_topopro(OsipiBase):
             bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
+
+            bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000], 
+                           [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
             
-            self.IAR_algorithm = IvimModelTopoPro(gtab, bounds=self.bounds, rescale_results_to_mm2_s=True)
+            self.IAR_algorithm = IvimModelTopoPro(gtab, bounds=bounds, rescale_results_to_mm2_s=True)
         else:
             self.IAR_algorithm = None
         
@@ -82,6 +80,8 @@ class IAR_LU_modified_topopro(OsipiBase):
         Returns:
             _type_: _description_
         """
+        bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000], 
+                  [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
         
         if self.IAR_algorithm is None:
             if bvalues is None:
@@ -93,7 +93,7 @@ class IAR_LU_modified_topopro(OsipiBase):
             bvec[:,2] = 1
             gtab = gradient_table(bvalues, bvec, b0_threshold=0)
             
-            self.IAR_algorithm = IvimModelTopoPro(gtab, bounds=self.bounds, rescale_results_to_mm2_s=True)
+            self.IAR_algorithm = IvimModelTopoPro(gtab, bounds=bounds, rescale_results_to_mm2_s=True)
             
         fit_results = self.IAR_algorithm.fit(signals)
         
