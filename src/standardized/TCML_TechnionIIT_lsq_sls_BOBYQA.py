@@ -74,8 +74,13 @@ class TCML_TechnionIIT_lsq_sls_BOBYQA(OsipiBase):
         fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, bounds,min_bval_high=self.thresholds)
 
         results = {}
-        results["D"] = fit_results[0]
-        results["f"] = fit_results[2]
-        results["Dp"] = fit_results[1]
+        if fit_results[0].size > 0:
+            results["D"] = fit_results[0]
+            results["f"] = fit_results[2]
+            results["Dp"] = fit_results[1]
+        else:
+            results["D"] = 0
+            results["f"] = 0
+            results["Dp"] = 0
 
         return results
