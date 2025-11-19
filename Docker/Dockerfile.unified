@@ -1,113 +1,84 @@
+# Multi-Stage Unified Dockerfile for IVIM Fitting Method
 
-# Unified Dockerfile for IVIM Fitting Method
-# 
-# Supports both standalone and Kaapana deployment using build arguments.
+# Supports both standalone and Kaapana deployment using multi-stage builds.
+# This approach is cleaner than using if statements throughout.
 #
 # BUILD COMMANDS:
-# ===============
+# Note: Run from PROJECT ROOT, not from Docker/ folder!
 # 
-# For standalone (default):
-# $ docker build --build-arg ENV_TYPE=standalone \
-#                -t ivim-fitting:standalone \
-#                -f Dockerfile.unified .
+# For standalone:
+# $ docker build --target standalone -t ivim-fitting:standalone -f Docker/Dockerfile.unified .
 #
-# For Kaapana deployment:
-# $ docker build --build-arg BASE_IMAGE=local-only/base-python-cpu:latest \
-#                --build-arg ENV_TYPE=kaapana \
+# For Kaapana:
+# $ docker build --target kaapana \
+#                --build-arg BASE_IMAGE=local-only/base-python-cpu:latest \
 #                -t ivim-fitting:kaapana \
-#                -f Dockerfile.unified .
+#                -f Docker/Dockerfile.unified .
 #
 
-
-# Step 1: Set base image (before FROM)
+# Build argument for base image (default for standalone)
 ARG BASE_IMAGE=python:3.11-slim
 
-FROM ${BASE_IMAGE}
-
-# Step 2: Define build-time configuration
-ARG ENV_TYPE=standalone
-ARG WORKDIR_PATH=/usr/src/app
+# Stage: BASE - Common setup shared by both environments
+FROM ${BASE_IMAGE} AS base
 
 # Metadata labels
 LABEL IMAGE="ivim-fitting-method"
 LABEL VERSION="0.2.4"
 LABEL BUILD_IGNORE="False"
 
-
-# COMMON SETUP (applies to both standalone and Kaapana)
 # Install common system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Stage: STANDALONE - For standalone IVIM fitting
+FROM base AS standalone
 
-# ENVIRONMENT-SPECIFIC SETUP
-# Kaapana setup
-RUN if [ "$ENV_TYPE" = "kaapana" ]; then \
-        echo "=== Configuring for KAAPANA ==="; \
-        apt-get update && apt-get install -y --no-install-recommends \
-        texlive-xetex \
-        texlive-fonts-recommended \
-        texlive-plain-generic \
-        git && \
-        apt-get clean && rm -rf /var/lib/apt/lists/*; \
-    fi
+WORKDIR /usr/src/app
 
-# Standalone setup
-RUN if [ "$ENV_TYPE" = "standalone" ]; then \
-        echo "=== Configuring for STANDALONE ==="; \
-    fi
-
-# CODE ACQUISITION
-# For Kaapana: Clone from GitHub and install dependencies
-RUN if [ "$ENV_TYPE" = "kaapana" ]; then \
-        mkdir -p /kaapana/app && \
-        cd /kaapana/app && \
-        git clone https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection.git && \
-        cd TF2.4_IVIM-MRI_CodeCollection && \
-        pip install --no-cache-dir -r requirements.txt; \
-    fi
-
-# For Standalone: Copy requirements and install
-RUN if [ "$ENV_TYPE" = "standalone" ]; then \
-        mkdir -p /usr/src/app; \
-    fi
-
-# Set working directory
-WORKDIR ${WORKDIR_PATH}
-
-
-# COPY FILES AND INSTALL DEPENDENCIES
-# Copy requirements.txt from project root to current working directory
+# Copy requirements and source code
 COPY requirements.txt ./
-
-# Copy source code (WrapImage and other files)
 COPY WrapImage ./WrapImage/
 
-# Install Python dependencies for standalone
-RUN if [ "$ENV_TYPE" = "standalone" ]; then \
-        pip install --no-cache-dir -r requirements.txt; \
-    fi
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-
-# SET ENTRYPOINT
-# Kaapana entrypoint with verbose output
-RUN if [ "$ENV_TYPE" = "kaapana" ]; then \
-        echo "Kaapana wrapper selected"; \
-    else \
-        echo "Standalone wrapper selected"; \
-    fi
-
-# Use entrypoint script approach for flexibility
+# Create entrypoint script
 RUN echo '#!/bin/bash' > /entrypoint.sh && \
-    if [ "$ENV_TYPE" = "kaapana" ]; then \
-        echo 'cd /kaapana/app/TF2.4_IVIM-MRI_CodeCollection' >> /entrypoint.sh && \
-        echo 'exec python3 -u -m WrapImage.nifti_wrapper_kaapana "$@"' >> /entrypoint.sh; \
-    else \
-        echo 'cd /usr/src/app' >> /entrypoint.sh && \
-        echo 'exec python3 -m WrapImage.nifti_wrapper "$@"' >> /entrypoint.sh; \
-    fi && \
+    echo 'cd /usr/src/app' >> /entrypoint.sh && \
+    echo 'exec python3 -m WrapImage.nifti_wrapper "$@"' >> /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD []
+
+# Stage: KAAPANA - For Kaapana platform deployment
+FROM base AS kaapana
+
+# Install additional Kaapana dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    texlive-xetex \
+    texlive-fonts-recommended \
+    texlive-plain-generic \
+    git && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /kaapana/app
+
+# Clone IVIM code collection and install dependencies
+RUN git clone https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection.git && \
+    cd TF2.4_IVIM-MRI_CodeCollection && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Set final working directory
+WORKDIR /kaapana/app/TF2.4_IVIM-MRI_CodeCollection
+
+# Create entrypoint script
+RUN echo '#!/bin/bash' > /entrypoint.sh && \
+    echo 'cd /kaapana/app/TF2.4_IVIM-MRI_CodeCollection' >> /entrypoint.sh && \
+    echo 'exec python3 -u -m WrapImage.nifti_wrapper_kaapana "$@"' >> /entrypoint.sh && \
     chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
