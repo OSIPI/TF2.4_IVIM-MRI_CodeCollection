@@ -58,8 +58,8 @@ class Super_IVIM_DC(OsipiBase):
             warnings.warn('No SNR indicated. Data simulated with SNR = 100')
             SNR=100
         self.fitS0=fitS0
-        self.use_initial_guess = False
-        self.use_bounds = False
+        self.use_initial_guess = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
+        self.use_bounds = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
         self.deep_learning = True
         self.supervised = True
 
