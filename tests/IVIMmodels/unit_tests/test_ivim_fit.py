@@ -47,6 +47,7 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
         request.node.add_marker(mark)
     signal = signal_helper(data["data"])
+    print(signal.shape)
     tolerances = tolerances_helper(tolerances, data)
     fit = OsipiBase(algorithm=algorithm, **kwargs)
     if fit.use_bounds:

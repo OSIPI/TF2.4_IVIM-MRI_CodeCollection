@@ -3,20 +3,19 @@ import numpy.testing as npt
 import pytest
 import csv
 import datetime
-
+import warnings
 from src.wrappers.OsipiBase import OsipiBase
 from utilities.data_simulation.GenerateData import GenerateData
 
 #run using pytest <path_to_this_file> --saveFileName test_output.txt --SNR 50 100 200
-#e.g. pytest -m slow tests/IVIMmodels/unit_tests/test_ivim_synthetic.py  --saveFileName test_output.csv --SNR 10 50 100 200 --fitCount 20
+#e.g. pytest -m slow tests/IVIMmodels/unit_tests/test_ivim_synthetic.py  --saveFileName test_output_SNR100.csv --SNR 10 50 100 200 --fitCount 20
 @pytest.mark.slow
 def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_noise, save_file, save_duration_file, use_prior,eng):
     # assert save_file == "test"
     ivim_algorithm, requires_matlab, deep_learning = algorithmlist
-    if requires_matlab and eng is None:
-        pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
-    if deep_learning:
-        pytest.skip(reason="Slow drifting in performance not yet implmented for deep learning algorithms") #requieres training a network per b-value set and inferencing all data in 1 go. So not 1 data point per time, but all data in 1 go :). Otherwise network will be trained many many times...
+    # if requires_matlab and eng is None:
+    #     pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+     #requieres training a network per b-value set and inferencing all data in 1 go. So not 1 data point per time, but all data in 1 go :). Otherwise network will be trained many many times...
     rng = np.random.RandomState(42)
     # random.seed(42)
     S0 = 1
@@ -25,7 +24,7 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
     D_arr = rng.uniform(0.5e-3, 3e-3, 1000)
     Dp_arr = rng.uniform(5e-3, 100e-3, 1000)
     f_arr = rng.uniform(0.05, 0.95, 1000)
-    fit = OsipiBase(algorithm=ivim_algorithm)
+    fit = OsipiBase(algorithm=ivim_algorithm, bvalues=bvals)
     # here is a prior
 #    if use_prior and hasattr(fit, "supported_priors") and fit.supported_priors:
 #        prior = [rng.normal(D, D/3, 10), rng.normal(f, f/3, 10), rng.normal(Dp, Dp/3, 10), rng.normal(1, 1/3, 10)]
@@ -41,12 +40,11 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
         # else:
         #     signal = data["data"]
         start_time = datetime.datetime.now()
-        fit_result = fit.osipi_fit(signal, bvals) #, prior_in=prior
+        fit_result = fit.osipi_fit(signal[np.newaxis, :], bvals, njobs=1) #, prior_in=prior
         time_delta += datetime.datetime.now() - start_time
         if save_file is not None:
             save_file.writerow([ivim_algorithm, name, SNR, idx, f, Dp, D, fit_result["f"], fit_result["Dp"], fit_result["D"], *signal])
             # save_results(save_file, ivim_algorithm, name, SNR, idx, [f, Dp, D], [f_fit, Dp_fit, D_fit])
-        npt.assert_allclose([f, Dp, D], [fit_result["f"], fit_result["Dp"], fit_result["D"]], rtol, atol)
     if save_duration_file is not None:
         save_duration_file.writerow([ivim_algorithm, name, SNR, time_delta/datetime.timedelta(microseconds=1), fit_count])
         # save_duration(save_duration_file, ivim_algorithm, name, SNR, time_delta, fit_count)

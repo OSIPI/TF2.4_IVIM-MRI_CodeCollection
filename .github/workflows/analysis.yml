@@ -128,7 +128,7 @@ jobs:
         with:
           name: Data
       - name: Generate figures
-        run: Rscript --vanilla tests/IVIMmodels/unit_tests/analyze.r test_output.csv test_duration.csv
+        run: Rscript --vanilla tests/IVIMmodels/unit_tests/analyze.r test_output_SNR100.csv test_duration.csv
       - name: Upload figures
         uses: actions/upload-artifact@v4
         if: always()
@@ -167,7 +167,7 @@ jobs:
         with:
           name: Data
       - name: Test against previous results
-        run: Rscript --vanilla tests/IVIMmodels/unit_tests/compare.r test_output.csv test_reference.csv tests/IVIMmodels/unit_tests/reference_output.csv test_results.csv
+        run: Rscript --vanilla tests/IVIMmodels/unit_tests/compare.r test_output_SNR100.csv test_reference.csv tests/IVIMmodels/unit_tests/reference_output.csv test_results.csv
       - name: Upload data
         uses: actions/upload-artifact@v4
         if: always()

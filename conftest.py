@@ -5,6 +5,9 @@ import csv
 # import datetime
 import numpy as np
 from phantoms.MR_XCAT_qMRI.sim_ivim_sig import phantom
+import warnings
+from tests.IVIMmodels.unit_tests.test_ivim_fit import PerformanceWarning
+warnings.simplefilter("always", PerformanceWarning)
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -104,6 +107,7 @@ def eng(request):
     import matlab.engine
     print("Starting MATLAB engine...")
     eng = matlab.engine.start_matlab()
+    eng.addpath(r'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\src\original\OJ_GU', nargout=0)
     print("MATLAB engine started.")
     return eng
 
@@ -246,26 +250,26 @@ def data_ivim_fit_saved(datafile, algorithms):
         first = True
         for name, data in all_data.items():
             algorithm_dict = algorithms.get(algorithm, {})
-            if not algorithm_dict.get('deep_learning',False):
-                xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
-                    "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
-                kwargs = algorithm_dict.get("options", {})
-                tolerances = algorithm_dict.get("tolerances", {})
-                skiptime=False
-                if first:
-                    if algorithm_dict.get("fail_first_time", False):
-                        skiptime = True
-                        first = False
-                requires_matlab = algorithm_dict.get("requires_matlab", False)
-                yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab
+            #if not algorithm_dict.get('deep_learning',False):
+            xfail = {"xfail": name in algorithm_dict.get("xfail_names", {}),
+                "strict": algorithm_dict.get("xfail_names", {}).get(name, True)}
+            kwargs = algorithm_dict.get("options", {})
+            tolerances = algorithm_dict.get("tolerances", {})
+            skiptime=False
+            if first:
+                if algorithm_dict.get("fail_first_time", False):
+                    skiptime = True
+                    first = False
+            requires_matlab = algorithm_dict.get("requires_matlab", False)
+            yield name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab
 
 
 def algorithmlist(algorithms):
     for algorithm in algorithms["algorithms"]:
         algorithm_dict = algorithms.get(algorithm, {})
         requires_matlab = algorithm_dict.get("requires_matlab", False)
-        if not algorithm_dict.get('deep_learning', False):
-            yield algorithm, requires_matlab, False
+        deep_learning = algorithm_dict.get("deep_learning", False)
+        yield algorithm, requires_matlab, deep_learning
 
 
 def bound_input(datafile, algorithms):

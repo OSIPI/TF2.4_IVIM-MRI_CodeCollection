@@ -30,7 +30,7 @@ ivim_simulation.bvec
 *.pt
 *map.png
 *map_log.png
-test_output.csv
+test_output_SNR100.csv
 # Unit test / coverage reports
 .tox/
 .coverage
@@ -42,4 +42,4 @@ phantoms/MR_XCAT_qMRI/*.json
 phantoms/MR_XCAT_qMRI/*.txt
 tests/IVIMmodels/unit_tests/models
 models
-test_output.csv
+test_output_SNR100.csv

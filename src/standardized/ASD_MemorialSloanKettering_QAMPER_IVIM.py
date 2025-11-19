@@ -53,11 +53,24 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
             self.keep_alive=True
 
     def algorithm(self,dwi_arr, bval_arr, LB0, UB0, x0in):
-        dwi_arr = matlab.double(dwi_arr.tolist())
-        bval_arr = matlab.double(bval_arr.tolist())
-        LB0 = matlab.double(LB0.tolist())
-        UB0 = matlab.double(UB0.tolist())
-        x0in = matlab.double(x0in.tolist())
+        dwi_arr = matlab.double(np.asarray(dwi_arr, dtype=float).tolist())
+        bval_arr = matlab.double(np.asarray(bval_arr, dtype=float).tolist())
+        LB0 = matlab.double(np.asarray(LB0, dtype=float).tolist())
+        UB0 = matlab.double(np.asarray(UB0, dtype=float).tolist())
+        x0in = matlab.double(np.asarray(x0in, dtype=float).tolist())
+        self.eng.addpath(r'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\src\original\ASD_MemorialSloanKettering\MRI-QAMPER_IVIM',
+                         nargout=0)
+        self.eng.addpath(
+            r'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\src\original\ASD_MemorialSloanKettering\MRI-QAMPER_IVIM\qa_fitting',
+            nargout=0)
+        self.eng.addpath(
+            r'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\src\original\ASD_MemorialSloanKettering\MRI-QAMPER_IVIM\utils',
+            nargout=0)
+        self.eng.addpath(
+            r'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\src\original\ASD_MemorialSloanKettering\MRI-QAMPER_IVIM\utils\nifti_toolbox',
+            nargout=0)
+
+        #print(self.eng.which('IVIM_standard_bcin'))
         results = self.eng.IVIM_standard_bcin(
             dwi_arr, bval_arr, 0.0, LB0, UB0, x0in, False, 0, 0,nargout=11)
         (f_arr, D_arr, Dx_arr, s0_arr, fitted_dwi_arr, RSS, rms_val, chi, AIC, BIC, R_sq) = results

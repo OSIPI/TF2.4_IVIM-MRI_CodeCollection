@@ -244,7 +244,8 @@ class OsipiBase:
             # Define parallel function
             def parfun(ijk):
                 single_voxel_data = np.array(data[ijk], copy=True)
-                if not np.isnan(single_voxel_data[0]):
+                if not np.isnan(single_voxel_data).any():
+                    #single_voxel_data = np.atleast_2d(single_voxel_data)
                     fit = self.ivim_fit(single_voxel_data, use_bvalues, **kwargs)
                 else:
                     fit={'D':0,'f':0,'Dp':0}
@@ -262,18 +263,32 @@ class OsipiBase:
             # Populate results after parallel loop
             for ijk, fit in results_list:
                 for key in fit:
-                    results[key][ijk] = fit[key]
+                    val = fit[key]
+                    if isinstance(val, (list, np.ndarray)):
+                        val = np.array(val).flatten()[0]  # ensure scalar
+                    results[key][ijk] = val
+
         else:
             for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1]), mininterval=60):
                 # Normalize array
                 single_voxel_data = data[ijk]
-                if not np.isnan(single_voxel_data[0]):
+                #single_voxel_data = np.atleast_2d(single_voxel_data)
+                if not np.isnan(single_voxel_data).any():
                     args = [single_voxel_data, use_bvalues]
                     fit = self.ivim_fit(*args, **kwargs)
+                    #print(fit)
                 else:
                     fit={'D':0,'f':0,'Dp':0}
                 for key in list(fit.keys()):
-                    results[key][ijk] = fit[key]
+                    val = fit.get(key, np.nan)  # Get the value if it exists
+
+                    # If it's an empty array or list → fill with NaN
+                    if isinstance(val, (list, np.ndarray)) and len(np.atleast_1d(val)) == 0:
+                        val = np.nan
+                    if isinstance(val, (list, np.ndarray)):
+                        val = np.array(val).flatten()[0]
+
+                    results[key][ijk] = val
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         return results
 

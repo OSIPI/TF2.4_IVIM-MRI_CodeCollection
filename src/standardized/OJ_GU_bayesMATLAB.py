@@ -60,6 +60,7 @@ class OJ_GU_bayesMATLAB(OsipiBase):
         S0 = matlab.double(self.initial_guess[3])
         b = matlab.double(b.tolist())
         lim = matlab.double(lim.tolist())
+        self.eng.addpath(r'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\src\original\OJ_GU', nargout=0)
         out = self.eng.IVIM_bayes(Y, f, D, Dstar, S0, b, lim, nargout=1)
         return out['D']['mode'], out['f']['mode'], out['Dstar']['mode'], out['S0']['mode']
 

@@ -6,6 +6,7 @@ import pandas as pd
 from utilities.data_simulation.Download_data import download_data
 import json
 from src.wrappers.OsipiBase import OsipiBase
+import matlab.engine
 
 def load_data(anatomy):
     """Load b-values, b-vectors, and NIfTI data for the given anatomy."""
@@ -56,20 +57,20 @@ def preprocess_data(data, bval, mask=None, slice_idx=None):
 
 def run_algorithms(algorithm_name, requires_matlab, deep_learning, data_norm, bval, valid_id, sx, sy, sz, anatomy, base_dir, nii,  slice_idx=None, eng=None):
     """Run multiple IVIM algorithms and save results to CSV."""
+
     if requires_matlab and eng is None:
         print(f"Skipping {algorithm_name}: requires Matlab")
         return
-    if deep_learning:
-        print(f"Skipping {algorithm_name}: deep learning not implemented for phantom test")
-        return
-    fit = OsipiBase(algorithm=algorithm_name)
-    maps = fit.osipi_fit(data_norm, bval)
+
+    print(algorithm_name)
+    fit = OsipiBase(algorithm=algorithm_name,bvalues=bval)
+    maps = fit.osipi_fit(data_norm[np.newaxis, :], bval)
 
     f_array, Dstar_array, D_array = maps["f"], maps["Dp"], maps["D"]
 
     # Initialize full-size arrays
     f_map, Dstar_map, D_map = np.zeros(sx * sy * sz), np.zeros(sx * sy * sz), np.zeros(sx * sy * sz)
-    f_map[valid_id], Dstar_map[valid_id], D_map[valid_id] = f_array, Dstar_array, D_array
+    f_map[valid_id], Dstar_map[valid_id], D_map[valid_id] = np.squeeze(f_array), np.squeeze(Dstar_array),np.squeeze(D_array)
 
     # Save results to CSV
     suffix = f'_slice{slice_idx}' if slice_idx is not None else ''
@@ -104,9 +105,9 @@ if __name__ == "__main__":
         requires_matlab = settings.get("requires_matlab", False)
         deep_learning = settings.get("deep_learning", False)
         algorithmlist.append((name, requires_matlab, deep_learning))
-
+    eng = matlab.engine.start_matlab()
     for anatomy in ["brain"]:
         bval, data, nifti = load_data(anatomy)
         data_norm, valid_id, sx, sy, sz = preprocess_data(data, bval, slice_idx=slice_idx)
         for name, requires_matlab, deep_learning in algorithmlist:
-            run_algorithms(name, requires_matlab, deep_learning, data_norm, bval, valid_id, sx, sy, sz, anatomy, base_dir, nifti, slice_idx)
+            run_algorithms(name, requires_matlab, deep_learning, data_norm, bval, valid_id, sx, sy, sz, anatomy, base_dir, nifti, slice_idx, eng=eng)

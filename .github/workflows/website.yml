@@ -54,7 +54,7 @@ jobs:
           python utilities/report-summary.py .report.json report-summary.json
 
       - name: 'Filter and compress results file.'
-        run: python utilities/reduce_output_size.py test_output.csv test_output.csv.gz
+        run: python utilities/reduce_output_size.py test_output_SNR100.csv test_output_SNR100.csv.gz
 
       - name: move data to the dashboard folder
         run: |
