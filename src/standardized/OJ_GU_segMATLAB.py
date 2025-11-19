@@ -42,9 +42,9 @@ class OJ_GU_segMATLAB(OsipiBase):
             the requirements.
         """
         #super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
-        super(OJ_GU_segMATLAB, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
-        self.use_initial_guess = False
-        self.initialize(bounds, thresholds)
+        super(OJ_GU_segMATLAB, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess, thresholds=thresholds)
+        self.use_bounds = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
+        self.use_initial_guess = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
         if eng is None:
             print('initiating matlab; this may take some time. For repeated testing one could use the optional input eng as an already initiated matlab engine')
             self.eng=matlab.engine.start_matlab()
@@ -62,19 +62,6 @@ class OJ_GU_segMATLAB(OsipiBase):
         (pars, mask, gof) = results
         return pars['D'], pars['f'], pars['Dstar'], pars['S0']
 
-    def initialize(self, bounds, thresholds):
-        if bounds is None:
-            print('warning, no bounds were defined, so algorithm-specific default bounds are used')
-            self.bounds=([1e-6, 0, 0.003, 0],[0.003, 1.0, 0.2, 5])
-        else:
-            self.bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
-                           [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
-        self.use_bounds = True
-        if thresholds is None:
-            self.thresholds = 200
-            print('warning, no thresholds were defined, so default bounds are used of 200')
-        else:
-            self.thresholds = thresholds
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
@@ -86,10 +73,12 @@ class OJ_GU_segMATLAB(OsipiBase):
         Returns:
             _type_: _description_
         """
+        bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                  [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
 
         fit_results = self.algorithm(np.array(signals)[:,np.newaxis], 
                                      np.array(bvalues), 
-                                     np.array(self.bounds)[:,[0,3,1,2]], 
+                                     np.array(bounds)[:,[0,3,1,2]], 
                                      self.thresholds)
 
         results = {}

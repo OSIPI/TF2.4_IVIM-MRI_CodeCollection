@@ -41,10 +41,8 @@ class OJ_GU_seg(OsipiBase):
             the requirements.
         """
         super(OJ_GU_seg, self).__init__(bvalues, thresholds, bounds, initial_guess)
-        if bounds is not None:
-            print('warning, bounds from wrapper are not (yet) used in this algorithm')
-        self.use_bounds = False
-        self.use_initial_guess = False
+        self.use_bounds = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
+        self.use_initial_guess = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
         # Check the inputs
         
         # Initialize the algorithm

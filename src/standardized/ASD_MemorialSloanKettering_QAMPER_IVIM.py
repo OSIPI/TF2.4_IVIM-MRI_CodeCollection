@@ -41,9 +41,11 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
             Our OsipiBase object could contain functions that compare the inputs with
             the requirements.
         """
-        #super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
         super(ASD_MemorialSloanKettering_QAMPER_IVIM, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
-        self.initialize(bounds, initial_guess)
+
+        self.use_bounds = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
+        self.use_initial_guess = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
+
         if eng is None:
             print('initiating matlab; this may take some time. For repeated testing one could use the optional input eng as an already initiated matlab engine')
             self.eng=matlab.engine.start_matlab()
@@ -63,22 +65,6 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         (f_arr, D_arr, Dx_arr, s0_arr, fitted_dwi_arr, RSS, rms_val, chi, AIC, BIC, R_sq) = results
         return D_arr/1000, f_arr, Dx_arr/1000, s0_arr
 
-    def initialize(self, bounds, initial_guess):
-        if self.bounds is None:
-            print('warning, no bounds were defined, so algorithm-specific default bounds are used')
-            self.bounds=([1e-6, 0, 0.004, 0],[0.003, 1.0, 0.2, 5])
-        else:
-            self.bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
-                           [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
-        if self.initial_guess is None:
-            print('warning, no initial guesses were defined, so algorithm-specific default initial guess is used')
-            self.initial_guess = [0.001, 0.2, 0.01, 1]
-        else:
-            self.initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
-            self.use_initial_guess = True
-        self.use_initial_guess = True
-        self.use_bounds = True
-
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
 
@@ -89,12 +75,16 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         Returns:
             _type_: _description_
         """
+        bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                  [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
+
+        initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
         bvalues=np.array(bvalues)
-        LB = np.array(self.bounds[0])[[1,0,2,3]]
-        UB = np.array(self.bounds[1])[[1,0,2,3]]
+        LB = np.array(bounds[0])[[1,0,2,3]]
+        UB = np.array(bounds[1])[[1,0,2,3]]
 
-        fit_results = self.algorithm(np.array(signals)[:,np.newaxis], bvalues, LB, UB, np.array(self.initial_guess)[[1,0,2,3]])
+        fit_results = self.algorithm(np.array(signals)[:,np.newaxis], bvalues, LB, UB, np.array(initial_guess)[[1,0,2,3]])
 
         results = {}
         results["D"] = fit_results[0]

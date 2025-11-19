@@ -43,20 +43,14 @@ class TF_reference_IVIMfit(OsipiBase):
         super(TF_reference_IVIMfit, self).__init__(bvalues=bvalues, thresholds=thresholds,bounds=bounds,initial_guess=initial_guess)
         self.TF_reference_algorithm = segmented_IVIM_fit
         self.initialize(bounds, thresholds)
-        self.use_initial_guess = False
+        self.use_initial_guess = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
 
 
     def initialize(self, bounds, thresholds):
-        if bounds is None:
-            print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005],[0.005, 1.0, 0.2]')
-            self.bounds=([0, 0, 0.005, 0.8],[0.005, 1.0, 0.2, 1.2])
-        else:
-            self.bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
-                           [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
-        self.use_bounds = True
-        if thresholds is None:
+        self.use_bounds = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
+        if self.thresholds is None:
             self.thresholds = 200
-            print('warning, no thresholds were defined, so default threshold are used of  200')
+            print('warning, no thresholds were defined, so default threshold are used of 200')
         else:
             self.thresholds = thresholds
 
@@ -71,7 +65,9 @@ class TF_reference_IVIMfit(OsipiBase):
         Returns:
             _type_: _description_
         """
-        #bvalues = np.array(bvalues)
+        bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                  [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
+
         bvalues = np.array(bvalues)
 
         if np.any(signals < 0):
@@ -79,7 +75,7 @@ class TF_reference_IVIMfit(OsipiBase):
             print('warning, negative values in signal: values clipped to 0.01')
 
 
-        fit_results = self.TF_reference_algorithm(bvalues,signals,b_cutoff=self.thresholds, bounds=self.bounds)
+        fit_results = self.TF_reference_algorithm(bvalues,signals,b_cutoff=self.thresholds, bounds=bounds)
 
         results = {}
         results["D"] = fit_results[0]

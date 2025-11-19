@@ -57,28 +57,13 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         self.fit_segmented=fit_segmented
 
     def initialize(self, bounds=None, initial_guess=None, fitS0=True, prior_in=None, thresholds=None):
-
-
-        if bounds is None:
-            print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
-            self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
-        else:
-            self.bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
-                           [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
-        if initial_guess is None:
-            print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
-            self.initial_guess = [0.001, 0.001, 0.01, 1]
-        else:
-            self.initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
-        self.use_initial_guess = True
-        self.use_bounds = True
-        if thresholds is None:
-            print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
-            thresholds = 150
+        self.use_initial_guess = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
+        self.use_bounds = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
         self.thresholds = thresholds
+
         if prior_in is None:
             print('using a flat prior between bounds')
-            self.neg_log_prior=flat_neg_log_prior([self.bounds[0][0],self.bounds[1][0]],[self.bounds[0][1],self.bounds[1][1]],[self.bounds[0][2],self.bounds[1][2]],[self.bounds[0][3],self.bounds[1][3]])
+            self.neg_log_prior=flat_neg_log_prior([self.bounds["D"][0],self.bounds["D"][1]],[self.bounds["f"][0],self.bounds["f"][1]],[self.bounds["Dp"][0],self.bounds["Dp"][1]],[self.bounds["S0"][0],self.bounds["S0"][1]])
         else:
             print('warning, bounds are not used, as a prior is used instead')
             if len(prior_in) == 4:
@@ -97,15 +82,20 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
+        bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                  [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
+
+        initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
+
         bvalues=np.array(bvalues)
 
         epsilon = 0.000001
-        fit_results = fit_segmented(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds, p0=self.initial_guess)
+        fit_results = fit_segmented(bvalues, signals, bounds=bounds, cutoff=self.thresholds, p0=initial_guess)
         fit_results=np.array(fit_results+(1,))
         for i in range(4):
-            if fit_results[i] < self.bounds[0][i] : fit_results[0] = self.bounds[0][i]+epsilon
-            if fit_results[i] > self.bounds[1][i] : fit_results[0] = self.bounds[1][i]-epsilon
-        fit_results = self.OGC_algorithm(bvalues, signals, self.neg_log_prior, x0=fit_results, fitS0=self.fitS0, bounds=self.bounds)
+            if fit_results[i] < bounds[0][i] : fit_results[0] = bounds[0][i]+epsilon
+            if fit_results[i] > bounds[1][i] : fit_results[0] = bounds[1][i]-epsilon
+        fit_results = self.OGC_algorithm(bvalues, signals, self.neg_log_prior, x0=fit_results, fitS0=self.fitS0, bounds=bounds)
 
         results = {}
         results["D"] = fit_results[0]
@@ -122,6 +112,11 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
+        bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                  [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
+
+        initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
+
         # normalize signals
         # Get index of b=0
         shape=np.shape(signals)
@@ -140,7 +135,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         bvalues=np.array(bvalues)
 
         epsilon = 0.000001
-        fit_results = np.array(fit_segmented_array(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds, p0=self.initial_guess))
+        fit_results = np.array(fit_segmented_array(bvalues, signals, bounds=bounds, cutoff=self.thresholds, p0=initial_guess))
         #fit_results=np.array(fit_results+(1,))
         # Loop over parameters (rows)
 
@@ -148,11 +143,11 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             if i == 3:
                 fit_results[i] = np.random.normal(1,0.2,np.shape(fit_results[i]))
             else:
-                below = fit_results[i] < self.bounds[0][i]
-                above = fit_results[i] > self.bounds[1][i]
+                below = fit_results[i] < bounds[0][i]
+                above = fit_results[i] > bounds[1][i]
 
-                fit_results[i, below] = self.bounds[0][i] + epsilon
-                fit_results[i, above] = self.bounds[1][i] - epsilon
+                fit_results[i, below] = bounds[0][i] + epsilon
+                fit_results[i, above] = bounds[1][i] - epsilon
         self.jobs=njobs
         fit_results = self.OGC_algorithm_array(bvalues, signals,fit_results, self)
 

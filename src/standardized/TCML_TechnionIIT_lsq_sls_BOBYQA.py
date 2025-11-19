@@ -47,22 +47,14 @@ class TCML_TechnionIIT_lsq_sls_BOBYQA(OsipiBase):
         self.initialize(bounds, fitS0, thresholds)
 
     def initialize(self, bounds, fitS0, thresholds):
-        if bounds is None:
-            print('warning, no bounds were defined, so default bounds are used of ([0.0003, 0.001, 0.009, 0],[0.008, 1.0,0.04, 3])')
-            self.bounds = ([0.0003, 0.001, 0.009, 0],[0.008, 1.0 ,0.04, 3])
-        else:
-            #bounds=bounds
-            #self.bounds = bounds
-            self.bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
-                           [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
-        if thresholds is None:
+        if self.thresholds is None:
             self.thresholds = 200
             print('warning, no thresholds were defined, so default bounds are used of  200')
         else:
             self.thresholds = thresholds
         self.fitS0=fitS0
-        self.use_bounds = True
-        self.use_initial_guess = False
+        self.use_bounds = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
+        self.use_initial_guess = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
@@ -74,9 +66,12 @@ class TCML_TechnionIIT_lsq_sls_BOBYQA(OsipiBase):
         Returns:
             _type_: _description_
         """
+        bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                  [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
+
         signals[signals<0]=0
         bvalues=np.array(bvalues)
-        bounds=np.array(self.bounds)
+        bounds=np.array(bounds)
         bounds=[bounds[0][[0, 2, 1, 3]], bounds[1][[0, 2, 1, 3]]]
         fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, bounds,min_bval_high=self.thresholds)
 
