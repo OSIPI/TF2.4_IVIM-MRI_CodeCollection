@@ -54,7 +54,7 @@ class IvimModelSegmented3Step(ReconstModel):
             data = data / data_max
         
         ### Fit the diffusion signal to bvals >= diff_b_threshold_lower
-        diff_bounds = [(self.bounds[0][0], self.bounds[0][3]), \
+        diff_bounds = [(0, self.bounds[0][3]), \
             (self.bounds[1][0], self.bounds[1][3])] # Bounds for S0 and D
         
         diff_bval_indices = np.where(self.bvals >= self.diff_b_threshold_lower)[0]
@@ -80,7 +80,8 @@ class IvimModelSegmented3Step(ReconstModel):
         f_est = S0_perf_est/(S0_perf_est + S0_diff_est)
         
         # Fit to the full bi-exponential, f estimate as initial guess, D fixed
-        full_initial_guess = np.array([self.initial_guess[0], f_est, self.initial_guess[2]])
+        f_intial_guess = np.min((f_est, self.bounds[0][1])) if f_est > self.bounds[0][1] else np.max((f_est, self.bounds[1][1]))
+        full_initial_guess = np.array([self.initial_guess[0], f_intial_guess, self.initial_guess[2]])
         
         full_bounds_lower = self.bounds[0][:-1]
         full_bounds_upper = self.bounds[1][:-1]
