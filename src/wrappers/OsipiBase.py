@@ -121,7 +121,7 @@ class OsipiBase:
                 self.forced_default_bounds = True
 
             if self.initial_guess is None:
-                print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
+                print('warning, no initial guesses were defined, so default initial guesses are used of  [0.001, 0.001, 0.01, 1]')
                 self.initial_guess = {"S0" : 1, "f" : 0.1, "Dp" : 0.01, "D" : 0.001}
                 self.forced_default_initial_guess = True
 
@@ -528,7 +528,7 @@ class OsipiBase:
 
     
     def D_and_Ds_swap(self,results):
-        if results['D']>results['Dp']:
+        if results['D']>results['Dp'] and results['Dp'] < 0.05:
             D=results['Dp']
             results['Dp']=results['D']
             results['D']=D

@@ -66,18 +66,21 @@ class TCML_TechnionIIT_lsq_sls_BOBYQA(OsipiBase):
         Returns:
             _type_: _description_
         """
-        bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
-                  [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
-
         signals[signals<0]=0
         bvalues=np.array(bvalues)
-        bounds=np.array(bounds)
-        bounds=[bounds[0][[0, 2, 1, 3]], bounds[1][[0, 2, 1, 3]]]
+        bounds = ([self.bounds["D"][0], self.bounds["Dp"][0], self.bounds["f"][0], self.bounds["S0"][0]],
+                       [self.bounds["D"][1], self.bounds["Dp"][1], self.bounds["f"][1], self.bounds["S0"][1]])
+
         fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, bounds,min_bval_high=self.thresholds)
 
         results = {}
-        results["D"] = fit_results[0]
-        results["f"] = fit_results[2]
-        results["Dp"] = fit_results[1]
+        if fit_results[0].size > 0:
+            results["D"] = fit_results[0]
+            results["f"] = fit_results[2]
+            results["Dp"] = fit_results[1]
+        else:
+            results["D"] = 0
+            results["f"] = 0
+            results["Dp"] = 0
 
         return results
