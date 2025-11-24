@@ -57,7 +57,7 @@ class OJ_GU_segMATLAB(OsipiBase):
         Y = matlab.double(Y.tolist())
         b = matlab.double(b.tolist())
         lim = matlab.double(lim.tolist())
-        blim = matlab.double(blim)
+        blim = matlab.double(float(blim))
         results = self.eng.IVIM_seg(Y, b, lim, blim, False,nargout=3)
         (pars, mask, gof) = results
         return pars['D'], pars['f'], pars['Dstar'], pars['S0']
