@@ -16,7 +16,8 @@ class OJ_GU_seg(OsipiBase):
     id_algorithm_type = "Segmented bi-exponential fit"
     id_return_parameters = "f, D*, D"
     id_units = "mm2/s"
-    
+    id_ref = "https://doi.org/10.1002/mrm.26783"
+
     # Algorithm requirements
     required_bvalues = 4
     required_thresholds = [0,0] # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds

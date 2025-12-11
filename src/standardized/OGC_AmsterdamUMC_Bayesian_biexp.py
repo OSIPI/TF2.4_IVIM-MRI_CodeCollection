@@ -16,7 +16,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
     id_algorithm_type = "Bi-exponential fit"
     id_return_parameters = "f, D*, D, S0"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
-
+    id_ref = "reference method in https://doi.org/10.1002/mrm.28852"
     # Algorithm requirements
     required_bvalues = 4
     required_thresholds = [0,

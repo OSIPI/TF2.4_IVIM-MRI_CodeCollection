@@ -19,7 +19,7 @@ class IVIM_NEToptim(OsipiBase):
     id_algorithm_type = "Deep learnt bi-exponential fit"
     id_return_parameters = "f, D*, D, S0"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
-
+    id_ref = "https://doi.org/10.1002/mrm.28852"
     # Algorithm requirements
     required_bvalues = 4
     required_thresholds = [0,

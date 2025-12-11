@@ -16,6 +16,7 @@ class TCML_TechnionIIT_lsq_sls_lm(OsipiBase):
     id_algorithm_type = "Bi-exponential, segmented as initaition, followed by Levenberg-Marquardt algorithm"
     id_return_parameters = "f, D*, D, S0"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
+    id_ref = "same github as https://doi.org/10.1007/978-3-031-16434-7_71, but not the main code from the paper"
 
     # Algorithm requirements
     required_bvalues = 4
