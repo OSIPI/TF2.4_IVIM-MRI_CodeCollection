@@ -6,6 +6,9 @@ import csv
 import numpy as np
 from phantoms.MR_XCAT_qMRI.sim_ivim_sig import phantom
 import warnings
+import os
+import torch
+import random
 from tests.IVIMmodels.unit_tests.test_ivim_fit import PerformanceWarning
 warnings.simplefilter("always", PerformanceWarning)
 
@@ -98,6 +101,21 @@ def pytest_addoption(parser):
         help="Run MATLAB-dependent tests"
     )
 
+def set_global_seed(seed: int = 42):
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    print(f"✅ Global seed set to {seed}")
+
+@pytest.fixture(autouse=True)
+def global_seed():
+    """Automatically seed all random generators at test session start."""
+    set_global_seed(42)
 
 @pytest.fixture(scope="session")
 def eng(request):
