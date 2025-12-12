@@ -254,12 +254,10 @@ def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
             kwargs = {**kwargs, 'eng': eng}
 
     tolerances = tolerances_helper(tolerances, data)
-    fit = OsipiBase(bvalues=bvals, algorithm=algorithm, **kwargs)
+    fit = OsipiBase(bvalues=bvals, algorithm=algorithm, bounds={"S0" : [0, 2], "f" : [0, 1], "Dp" : [0.005, 0.2], "D" : [0, 0.005]}, **kwargs)
 
     array_2d = np.array([dat["data"] for _, dat in data.items()])
-    start_time = time.time()
     fit_result = fit.osipi_fit_full_volume(array_2d, bvals)
-    elapsed_time = time.time() - start_time
 
     errors = []  # Collect all assertion errors
 

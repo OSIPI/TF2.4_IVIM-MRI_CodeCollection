@@ -124,6 +124,10 @@ class IVIM_NEToptim(OsipiBase):
         """
         if not np.array_equal(bvalues, self.bvalues):
             raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
+        minimum_bvalue = np.min(self.bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
+        b0_indices = np.where(self.bvalues == minimum_bvalue)[0]
+        normalization_factor = np.mean(signals[..., b0_indices],axis=-1)
+        signals = signals / np.repeat(normalization_factor[...,np.newaxis],np.shape(signals)[-1],-1)
 
         signals, shape = self.reshape_to_voxelwise(signals)
         if retrain_on_input_data:
