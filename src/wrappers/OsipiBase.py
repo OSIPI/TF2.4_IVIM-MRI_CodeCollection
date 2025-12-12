@@ -509,7 +509,7 @@ class OsipiBase:
         return results
 
     def cite(self):
-        print("thank you for using our repository. If it was usefull for your paper, please cite our upcoming paper in jMRI.")
+        print("thank you for using our repository. If it was usefull for your paper, please cite our upcoming paper in MRM.")
         if self.id_ref is not None:
             print("The current fit method you have loaded should be cited with: " + self.id_ref)
         else:
