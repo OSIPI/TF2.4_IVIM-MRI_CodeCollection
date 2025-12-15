@@ -62,7 +62,15 @@ class PV_MUMC_biexp(OsipiBase):
         if self.bounds is None:
             self.bounds = ([0.9, 0.0001, 0.0, 0.0025], [1.1, 0.003, 1, 0.2])
 
-        fit_results = self.PV_algorithm(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds)
+        DEFAULT_PARAMS = [0.003,0.1,0.05]
+
+        try:
+            fit_results = self.PV_algorithm(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds)
+        except RuntimeError as e:
+            if "maximum number of function evaluations" in str(e):
+                fit_results = DEFAULT_PARAMS
+            else:
+                raise
 
         results = {} 
         results["f"] = fit_results[1]

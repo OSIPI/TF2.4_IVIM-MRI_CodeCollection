@@ -6,6 +6,7 @@ import os
 from src.wrappers.OsipiBase import OsipiBase
 import json
 
+## A script that applies the unit test fitting code to phantom data and saves a .csv file with the results
 
 def phantom_to_array(phantom, folder):
     nii_fn = f"output_{phantom}.nii.gz"

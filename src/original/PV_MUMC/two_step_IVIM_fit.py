@@ -82,7 +82,7 @@ def fit_least_squares(bvalues, dw_data, S0_output=False, fitS0=False,
     if not fitS0:
         boundsupdated=([bounds[0][2] , bounds[0][3] ],
                     [bounds[1][2] , bounds[1][3] ])    
-        params, _ = curve_fit(lambda b, Fmv, Dmv: two_exp_noS0(b, Dpar1, Fmv, Dmv), bvalues, dw_data, p0=[(bounds[0][2]+bounds[1][2])/2, (bounds[0][3]+bounds[1][3])/2], bounds=boundsupdated, maxfev=10000)
+        params, _ = curve_fit(lambda b, Fmv, Dmv: two_exp_noS0(b, Dpar1, Fmv, Dmv), bvalues, dw_data, p0=[(bounds[0][2]+bounds[1][2])/2, (bounds[0][3]+bounds[1][3])/2], bounds=boundsupdated)
         Fmv, Dmv = params[0], params[1]
         #when the fraction of a compartment equals zero (or very very small), the corresponding diffusivity is non-existing (=NaN)
         #if Fmv < 1e-4:

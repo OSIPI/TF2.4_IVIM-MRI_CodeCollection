@@ -4,6 +4,9 @@ import numpy as np
 import pandas as pd
 
 
+## Script to make a boxplot with the fitting errors for all algorithms in the repository
+## Uses category band to distinguish between sub-groups of algorithms
+
 def add_category_bands(ax, algorithm_categories, algorithms_ordered, rotation=45):
     """
     Draws background bands per category and labels them below the x-axis.

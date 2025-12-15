@@ -4,6 +4,7 @@ import nibabel as nib
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
+##Code to plot a single slice of the in-vivo fitting results
 
 # ==========================================
 # 1. Setup

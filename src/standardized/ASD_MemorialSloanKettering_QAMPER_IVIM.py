@@ -70,7 +70,6 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
             r'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\src\original\ASD_MemorialSloanKettering\MRI-QAMPER_IVIM\utils\nifti_toolbox',
             nargout=0)
 
-        #print(self.eng.which('IVIM_standard_bcin'))
         results = self.eng.IVIM_standard_bcin(
             dwi_arr, bval_arr, 0.0, LB0, UB0, x0in, False, 0, 0,nargout=11)
         (f_arr, D_arr, Dx_arr, s0_arr, fitted_dwi_arr, RSS, rms_val, chi, AIC, BIC, R_sq) = results

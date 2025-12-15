@@ -30,7 +30,6 @@ def tolerances_helper(tolerances, data):
         tolerances["atol"] = tolerances.get("atol", {"f": 2e-1, "D": 5e-4, "Dp": 10e-2})
     return tolerances
 
-
 class PerformanceWarning(UserWarning):
     pass
 
@@ -47,7 +46,6 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
         request.node.add_marker(mark)
     signal = signal_helper(data["data"])
-    print(signal.shape)
     tolerances = tolerances_helper(tolerances, data)
     fit = OsipiBase(algorithm=algorithm, **kwargs)
     if fit.use_bounds:

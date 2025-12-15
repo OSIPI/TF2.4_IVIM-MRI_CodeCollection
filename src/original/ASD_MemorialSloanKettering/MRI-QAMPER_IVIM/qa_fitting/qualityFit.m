@@ -26,6 +26,6 @@ for i = 1:numVoxels
     BIC(i) = Nb * log(RSS(i)/Nb) + Np * log(Nb);
 end
 
-% disp(['mean Rsq ' num2str(mean(R_sq(find(R_sq > 0))))]);
+disp(['mean Rsq ' num2str(mean(R_sq(find(R_sq > 0))))]);
 
 R_sq_mean = mean(R_sq(find(R_sq > 0)));
