@@ -38,10 +38,10 @@ The **test** folder contains the test files corresponding to the contributed cod
 The **utils** folder contains various helpful tools.
 
 ## Citing
-If this repository was usefull, please cite our [upcoming MRM paper](https://eur04.safelinks.protection.outlook.com/?url=https%3A%2F%2Furldefense.com%2Fv3%2F__https%3A%2Fdrive.google.com%2Fdrive%2Fu%2F0%2Ffolders%2F1Yh7cHuBIDQ0fmlWum9banDFgCc6uf3XH__%3B!!K-Hz7m0Vt54!gNxtgp_trP5qT7uJBD7zz5-Wwi7y83_56-qBO2I2Zd9ATILK5_BWzAKmxSah9-y8N8Wsgy67pn1LMeCd9xfaQGM%24&data=05%7C02%7Co.j.gurney-champion%40amsterdamumc.nl%7Cceeee39962fc4098e61708de2e90699a%7C68dfab1a11bb4cc6beb528d756984fb6%7C0%7C0%7C638999394967163935%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=mu6wjTAM1DlCgZjfM3mkKZEuSm1vNiteCxdh5kV29WY%3D&reserved=0). The repository contains a lot of code from other sites. Please cite the appropriate papers depending on the code you used. The citations can be found with the "cite" function from OsipiBase:
+If this repository was useful, please cite our [upcoming MRM paper](https://eur04.safelinks.protection.outlook.com/?url=https%3A%2F%2Furldefense.com%2Fv3%2F__https%3A%2Fdrive.google.com%2Fdrive%2Fu%2F0%2Ffolders%2F1Yh7cHuBIDQ0fmlWum9banDFgCc6uf3XH__%3B!!K-Hz7m0Vt54!gNxtgp_trP5qT7uJBD7zz5-Wwi7y83_56-qBO2I2Zd9ATILK5_BWzAKmxSah9-y8N8Wsgy67pn1LMeCd9xfaQGM%24&data=05%7C02%7Co.j.gurney-champion%40amsterdamumc.nl%7Cceeee39962fc4098e61708de2e90699a%7C68dfab1a11bb4cc6beb528d756984fb6%7C0%7C0%7C638999394967163935%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=mu6wjTAM1DlCgZjfM3mkKZEuSm1vNiteCxdh5kV29WY%3D&reserved=0). The repository contains a lot of code from other sites. Please cite the appropriate papers depending on the code you used. The citations can be found with the "cite" function from OsipiBase:
 ```ruby
 fit=osipibase(algorithm="IAR_LU_biexp")
-fit.cite
+fit.cite()
 ```
 DOIs can also be found in [code_contributions_record](doc/code_contributions_record.csv).
 
