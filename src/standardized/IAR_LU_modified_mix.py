@@ -18,7 +18,8 @@ class IAR_LU_modified_mix(OsipiBase):
     id_algorithm_type = "Bi-exponential fit"
     id_return_parameters = "f, D*, D"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
-    
+    id_ref = "https://doi.org/10.1038/srep38927"
+
     # Algorithm requirements
     required_bvalues = 4
     required_thresholds = [0,0] # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
