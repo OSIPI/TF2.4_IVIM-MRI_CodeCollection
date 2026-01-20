@@ -1,0 +1,42 @@
+[project]
+name = "TF2.4_IVIM-MRI-CodeCollection"
+version = "0.1.0"
+description = "IVIM MRI signal processing and NIfTI/DICOM processing tools"
+requires-python = ">=3.9"
+readme = "README.md"
+dependencies = [
+    "numpy<2",
+    "nibabel",
+    "scipy",
+    "torchio",
+    "torch",
+    "joblib",
+    "dipy",
+    "matplotlib",
+    "scienceplots",
+    "cvxpy",
+    "zenodo-get",
+    "tqdm",
+    "pandas",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-json-report",
+]
+docs = [
+    "sphinx",
+    "sphinx_rtd_theme",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["src", "utilities", "WrapImage"]
+
+[tool.setuptools.package-dir]
+"" = "."
+
