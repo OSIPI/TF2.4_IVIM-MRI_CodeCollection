@@ -126,12 +126,13 @@ def test_bounds(bound_input, eng):
     if fit.use_bounds["f"] or fit.use_bounds["D"] or fit.use_bounds["Dp"]:
         signal = signal_helper(data["data"])
         fit_result = fit.osipi_fit(signal, bvals)
+        eps=1e-10 # without this margin it can cause floating point failures on mac systems
         if fit.use_bounds["D"]:
-            assert bounds["D"][0] <= fit_result['D'] <= bounds["D"][1],  f"Result {fit_result['D']} out of bounds for data: {name}"
+            assert bounds["D"][0]-eps <= fit_result['D'] <= bounds["D"][1]+eps,  f"Result {fit_result['D']} out of bounds for data: {name}"
         if fit.use_bounds["f"]:
-            assert bounds["f"][0] <= fit_result['f'] <= bounds["f"][1], f"Result {fit_result['f']} out of bounds for data: {name}"
+            assert bounds["f"][0]-eps <= fit_result['f'] <= bounds["f"][1]+eps, f"Result {fit_result['f']} out of bounds for data: {name}"
         if fit.use_bounds["Dp"]:
-            assert bounds["Dp"][0] <= fit_result['Dp'] <= bounds["Dp"][1], f"Result {fit_result['Dp']} out of bounds for data: {name}"
+            assert bounds["Dp"][0]-eps <= fit_result['Dp'] <= bounds["Dp"][1]+eps, f"Result {fit_result['Dp']} out of bounds for data: {name}"
         # S0 is not returned as argument...
         #assert bounds[0][3] <= fit_result['S0'] <= bounds[1][3], f"Result {fit_result['S0']} out of bounds for data: {name}"
         '''if fit.use_initial_guess:
@@ -254,12 +255,10 @@ def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
             kwargs = {**kwargs, 'eng': eng}
 
     tolerances = tolerances_helper(tolerances, data)
-    fit = OsipiBase(bvalues=bvals, algorithm=algorithm, **kwargs)
+    fit = OsipiBase(bvalues=bvals, algorithm=algorithm, bounds={"S0" : [0, 2], "f" : [0, 1], "Dp" : [0.005, 0.2], "D" : [0, 0.005]}, **kwargs)
 
     array_2d = np.array([dat["data"] for _, dat in data.items()])
-    start_time = time.time()
     fit_result = fit.osipi_fit_full_volume(array_2d, bvals)
-    elapsed_time = time.time() - start_time
 
     errors = []  # Collect all assertion errors
 
