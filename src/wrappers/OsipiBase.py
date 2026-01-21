@@ -98,6 +98,8 @@ class OsipiBase:
         self.thresholds = np.asarray(thresholds) if thresholds is not None else None
         self.bounds = np.asarray(bounds) if bounds is not None else None
         self.initial_guess = np.asarray(initial_guess) if initial_guess is not None else None
+        self.required_bounds_optional = getattr(self, "required_bounds_optional", True)
+        self.required_initial_guess_optional = getattr(self, "required_initial_guess_optional", True)
         self.use_bounds = True
         self.use_initial_guess = True
         self.deep_learning = False
@@ -444,31 +446,24 @@ class OsipiBase:
     def osipi_check_required_thresholds(self):
         """Checks if the number of input thresholds fulfil the algorithm requirements"""
         if not hasattr(self, "required_thresholds"):
-            raise AttributeError("required_thresholds is not defined for this algorithm")
+            return
         if self.thresholds is None:
-            raise ValueError("thresholds are not provided")
-        if len(self.thresholds) < self.required_thresholds[0] and len(self.thresholds) > self.required_thresholds[1]:
-            raise ValueError(f"Thresholds should be between {self.required_thresholds[0]} and {self.required_thresholds[1]} but {len(self.thresholds)} were provided")
-        
+            raise ValueError("thresholds are required but not provided")
+        min_t, max_t = self.required_thresholds
+        num_thresholds = len(self.thresholds) if hasattr(self.thresholds, '__len__') else 1
+        if num_thresholds < min_t or num_thresholds > max_t:
+            raise ValueError(f"Number of thresholds should be between {min_t} and {max_t} but {num_thresholds} were provided")
+    
     def osipi_check_required_bounds(self):
         """Checks if input bounds fulfil the algorithm requirements"""
-        if self.required_bounds is False and self.bounds is None:
+        if self.required_bounds_optional is False and self.bounds is None:
             raise ValueError("bounds are required but not provided")
 
     def osipi_check_required_initial_guess(self):
         """Checks if input initial guess fulfil the algorithm requirements"""
         
-        #if self.required_initial_guess is True and self.initial_guess is None:
-            #print("Conformance error: Initial guess")
-            #return False
-        #else:
-            #return True
-        return True
-
-    
-    def osipi_check_required_bvalues(self):
-        """Minimum number of b-values required"""
-        pass
+        if self.required_initial_guess_optional is False and self.initial_guess is None:
+            raise ValueError("initial guess are required but not provided")
 
     def osipi_author(self):
         """Author identification"""

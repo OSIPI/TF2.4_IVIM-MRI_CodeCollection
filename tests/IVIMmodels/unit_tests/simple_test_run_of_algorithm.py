@@ -1,18 +1,18 @@
 import sys
-sys.path.append(r"C:\Users\ivan5\Box\OSIPI\TF2.4_IVIM-MRI_CodeCollection")
+sys.path.append(r"D:\OpenSource\osipi_ivim\TF2.4_IVIM-MRI_CodeCollection")
 
 
 import os
 import numpy as np
 from pathlib import Path
-#from src.standardized.ETP_SRI_LinearFitting import ETP_SRI_LinearFitting
+from src.standardized.ETP_SRI_LinearFitting import ETP_SRI_LinearFitting
 from src.standardized.IAR_LU_biexp import IAR_LU_biexp
 from src.standardized.IAR_LU_modified_mix import IAR_LU_modified_mix
 #from src.standardized.IAR_LU_segmented_2step import IAR_LU_segmented_2step
 #from src.standardized.PvH_KB_NKI_IVIMfit import PvH_KB_NKI_IVIMfit
 #from src.standardized.PV_MUMC_biexp import PV_MUMC_biexp
 from src.standardized.OGC_AmsterdamUMC_biexp import OGC_AmsterdamUMC_biexp
-from src.standardized.TF_reference_IVIMfit import TF_reference_IVIMfit
+#from src.standardized.TF_reference_IVIMfit import TF_reference_IVIMfit
 
 ## Simple test code... 
 # Used to just do a test run of an algorithm during development
