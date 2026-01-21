@@ -61,10 +61,9 @@ def run_algorithms(algorithm_name, requires_matlab, deep_learning, data_norm, bv
     if requires_matlab and eng is None:
         print(f"Skipping {algorithm_name}: requires Matlab")
         return
-
     print(algorithm_name)
     fit = OsipiBase(algorithm=algorithm_name,bvalues=bval)
-    maps = fit.osipi_fit(data_norm[np.newaxis, :], bval)
+    maps = fit.osipi_fit(data_norm, bval)
 
     f_array, Dstar_array, D_array = maps["f"], maps["Dp"], maps["D"]
 
@@ -91,7 +90,7 @@ def run_algorithms(algorithm_name, requires_matlab, deep_learning, data_norm, bv
 
 
 if __name__ == "__main__":
-    slice_idx = None  # Set to an integer (e.g., 30) to process only a single 2D slice
+    slice_idx = 12  # Set to an integer (e.g., 30) to process only a single 2D slice
     base_dir = os.path.join(os.path.dirname(__file__), 'results')
     os.makedirs(base_dir, exist_ok=True)
     project_root = os.path.abspath(os.path.join(base_dir, "..", "..", ".."))

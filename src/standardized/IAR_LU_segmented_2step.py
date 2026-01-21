@@ -54,6 +54,9 @@ class IAR_LU_segmented_2step(OsipiBase):
             bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
+
+            if self.thresholds is None:
+                self.thresholds = 200
             
             self.IAR_algorithm = IvimModelSegmented2Step(gtab, bounds=self.bounds, initial_guess=self.initial_guess, b_threshold=self.thresholds)
         else:
@@ -70,7 +73,7 @@ class IAR_LU_segmented_2step(OsipiBase):
         Returns:
             _type_: _description_
         """
-        print(thresholds)
+        #print(thresholds)
         
         if self.IAR_algorithm is None:
             if bvalues is None:

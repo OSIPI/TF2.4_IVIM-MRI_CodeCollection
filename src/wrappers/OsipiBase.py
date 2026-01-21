@@ -272,11 +272,11 @@ class OsipiBase:
             for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1]), mininterval=60):
                 # Normalize array
                 single_voxel_data = data[ijk]
-                #single_voxel_data = np.atleast_2d(single_voxel_data)
+                if self.deep_learning:
+                    single_voxel_data = np.atleast_2d(single_voxel_data) ## Needed for IVIMNET_OPTIM and SUPER_IVIM_DC
                 if not np.isnan(single_voxel_data).any():
                     args = [single_voxel_data, use_bvalues]
                     fit = self.ivim_fit(*args, **kwargs)
-                    #print(fit)
                 else:
                     fit={'D':0,'f':0,'Dp':0}
                 for key in list(fit.keys()):
