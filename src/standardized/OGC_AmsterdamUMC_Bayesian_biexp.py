@@ -96,6 +96,9 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
+        
+        if initial_guess is not None and len(initial_guess) == 4:
+            self.initial_guess = initial_guess
         bvalues=np.array(bvalues)
 
         epsilon = 0.000001
@@ -110,6 +113,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         results["D"] = fit_results[0]
         results["f"] = fit_results[1]
         results["Dp"] = fit_results[2]
+        results["S0"] = fit_results[3]
 
         return results
 

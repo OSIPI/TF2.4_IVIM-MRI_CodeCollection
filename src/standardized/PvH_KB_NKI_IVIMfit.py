@@ -22,8 +22,7 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
 
     # Algorithm requirements
     required_bvalues = 4
-    required_thresholds = [0,
-                           0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
+    required_thresholds = [0,0]  # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
     required_bounds = False
     required_bounds_optional = False  # Bounds may not be required but are optional
     required_initial_guess = False

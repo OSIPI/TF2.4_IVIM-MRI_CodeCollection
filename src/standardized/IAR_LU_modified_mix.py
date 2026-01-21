@@ -76,7 +76,7 @@ class IAR_LU_modified_mix(OsipiBase):
         Returns:
             _type_: _description_
         """
-        
+       
         if self.IAR_algorithm is None:
             if bvalues is None:
                 bvalues = self.bvalues
