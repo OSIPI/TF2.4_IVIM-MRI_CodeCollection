@@ -1,11 +1,7 @@
 import numpy as np
 import numpy.testing as npt
 import pytest
-import json
-import pathlib
-import os
 import csv
-import random
 import datetime
 
 from src.wrappers.OsipiBase import OsipiBase
@@ -14,8 +10,14 @@ from utilities.data_simulation.GenerateData import GenerateData
 #run using pytest <path_to_this_file> --saveFileName test_output.txt --SNR 50 100 200
 #e.g. pytest -m slow tests/IVIMmodels/unit_tests/test_ivim_synthetic.py  --saveFileName test_output.csv --SNR 10 50 100 200 --fitCount 20
 @pytest.mark.slow
-def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician_noise, save_file, save_duration_file, use_prior):
+def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_noise, save_file, save_duration_file, use_prior,eng):
     # assert save_file == "test"
+    ivim_algorithm, requires_matlab, deep_learning = algorithmlist
+    if requires_matlab and eng is None:
+        pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
+    if deep_learning:
+        pytest.skip(
+            reason="Slow drifting in performance not yet implmented for deep learning algorithms")  # requieres training a network per b-value set and inferencing all data in 1 go. So not 1 data point per time, but all data in 1 go :). Otherwise network will be trained many many times...
     rng = np.random.RandomState(42)
     # random.seed(42)
     S0 = 1
@@ -26,7 +28,7 @@ def test_generated(ivim_algorithm, ivim_data, SNR, rtol, atol, fit_count, rician
     Dp = data["Dp"]
     fit = OsipiBase(algorithm=ivim_algorithm)
     # here is a prior
-    if use_prior and hasattr(fit, "accepts_priors") and fit.accepts_priors:
+    if use_prior and hasattr(fit, "supported_priors") and fit.supported_priors:
         prior = [rng.normal(D, D/3, 10), rng.normal(f, f/3, 10), rng.normal(Dp, Dp/3, 10), rng.normal(1, 1/3, 10)]
         # prior = [np.repeat(D, 10)+np.random.normal(0,D/3,np.shape(np.repeat(D, 10))), np.repeat(f, 10)+np.random.normal(0,f/3,np.shape(np.repeat(D, 10))), np.repeat(Dp, 10)+np.random.normal(0,Dp/3,np.shape(np.repeat(D, 10))),np.repeat(np.ones_like(Dp), 10)+np.random.normal(0,1/3,np.shape(np.repeat(D, 10)))]  # D, f, D*
         fit.initialize(prior_in=prior)

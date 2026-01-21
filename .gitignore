@@ -5,7 +5,11 @@
 __pycache__/
 *.nii.gz
 *.nii
+*.bval
+*.bvec
+*.npy
 *.dcm
+*.npy
 *.mat
 *.raw
 bvals.txt
@@ -16,6 +20,16 @@ md5sums.txt
 *.gz
 *.zip
 *.tmp
+*.asv
+src/original/ASD_MemorialSloanKettering/MRI-QAMPER_IVIM/test_data
+src/original/ASD_MemorialSloanKettering/MRI-QAMPER_IVIM/output_files
+tests/IVIMmodels/unit_tests/*.log
+junit/*
+ivim_simulation.bval
+ivim_simulation.bvec
+*.pt
+papers/paper1/figs
+papers/paper1/test-results*.xml
 
 # Unit test / coverage reports
 .tox/
@@ -26,4 +40,5 @@ coverage.xml
 *.pyc
 phantoms/MR_XCAT_qMRI/*.json
 phantoms/MR_XCAT_qMRI/*.txt
-
+tests/IVIMmodels/unit_tests/models
+models

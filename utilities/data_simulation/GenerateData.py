@@ -145,3 +145,76 @@ class GenerateData:
         signal *= S0
         signal += offset
         return signal
+
+    def simulate_training_data(self, bvalues, SNR = (5,100), n = 1000000, Drange = (0.0005,0.0034), frange = (0,1), Dprange = (0.005,0.1), rician_noise = False):
+        """
+         Simulates IVIM (Intravoxel Incoherent Motion) training data with optional Rician noise.
+
+         Parameters:
+         ----------
+         bvalues : array-like
+             A list or array of b-values used in the diffusion signal simulation.
+         SNR : float, or tuple of two floats, optional
+             Signal-to-noise ratio. If a tuple (min, max) is provided, SNRs are sampled
+             logarithmically between those bounds. If set to 0, no noise is added. Default is (5, 100).
+         n : int, optional
+             Number of simulated voxels/signals to generate. Default is 1,000,000.
+         Drange : tuple of two floats, optional
+             Range (min, max) for the diffusion coefficient D (in mm²/s). Default is (0.0005, 0.0034).
+         frange : tuple of two floats, optional
+             Range (min, max) for the perfusion fraction f. Default is (0, 1).
+         Dprange : tuple of two floats, optional
+             Range (min, max) for the pseudo-diffusion coefficient Dp (in mm²/s). Default is (0.005, 0.1).
+         rician_noise : bool, optional
+             If True, Rician noise is added to the simulated signal. Default is False.
+
+         Returns:
+         -------
+         data_sim : ndarray of shape (n, len(bvalues))
+             Simulated IVIM signal data normalized by S0.
+         D : ndarray of shape (n, 1)
+             Ground truth diffusion coefficient values used in simulation.
+         f : ndarray of shape (n, 1)
+             Ground truth perfusion fraction values used in simulation.
+         Dp : ndarray of shape (n, 1)
+             Ground truth pseudo-diffusion coefficient values used in simulation.
+
+         Notes:
+         -----
+         - The function uses self.ivim_signal() to generate signals.
+         - Noise is applied after generating noise-free IVIM signals, using either Gaussian or Rician noise.
+         - Simulated signals are normalized by the mean S0 (b = 0) signal.
+         """
+        test = self._rng.uniform(0, 1, (n, 4))
+        D = Drange[0] + test[:, [0]] * (Drange[1] - Drange[0])
+        f = frange[0] + test[:, [1]] * (frange[1] - frange[0])
+        Dp = Dprange[0] + test[:, [2]] * (Dprange[1] - Dprange[0])
+        #data_sim = np.zeros([len(D), len(bvalues)])
+        bvalues = np.array(bvalues)
+        if type(SNR) == tuple:
+            noise_std = 1/SNR[1] + test[:,3] * (1/SNR[0] - 1/SNR[1])
+            addnoise = True
+        elif SNR == 0:
+            addnoise = False
+            noise_std = np.ones((n, 1))
+        else:
+            noise_std = np.full((n, 1), 1/SNR)
+            addnoise = True
+        noise_std = noise_std[:, np.newaxis]
+        # loop over array to fill with simulated IVIM data
+        bvalues = np.array(bvalues).reshape(1, -1)
+        data_sim = 1 * (f * np.exp(-bvalues * Dp) + (1 - f) * np.exp(-bvalues * D))
+
+        # if SNR is set to zero, don't add noise
+        if addnoise:
+            noise_real = self._rng.normal(0, noise_std, data_sim.shape)
+            noise_imag = self._rng.normal(0, noise_std, data_sim.shape)
+
+            if rician_noise:
+                data_sim = np.sqrt((data_sim + noise_real) ** 2 + noise_imag ** 2)
+            else:
+                data_sim = data_sim + noise_real
+        S0_noisy = np.mean(data_sim[:, bvalues.flatten() == 0], axis=1)
+        data_sim = data_sim / S0_noisy[:, None]
+        return data_sim, D, f, Dp
+

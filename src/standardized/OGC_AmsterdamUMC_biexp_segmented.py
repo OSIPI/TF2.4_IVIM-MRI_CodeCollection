@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_segmented
+from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_segmented, fit_segmented_array
 import numpy as np
 
 class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
@@ -24,13 +24,14 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
     required_bounds_optional = True  # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
-    accepted_dimensions = (1,1) #(min dimension, max dimension)
 
 
     # Supported inputs in the standardized class
     supported_bounds = True
     supported_initial_guess = True
     supported_thresholds = True
+    supported_dimensions = 1
+    supported_priors = False
 
     def __init__(self, bvalues=None, thresholds=150, bounds=None, initial_guess=None):
         """
@@ -42,6 +43,7 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         """
         super(OGC_AmsterdamUMC_biexp_segmented, self).__init__(bvalues, thresholds, bounds, initial_guess)
         self.OGC_algorithm = fit_segmented
+        self.OGC_algorithm_array = fit_segmented_array
         self.initialize(bounds, initial_guess, thresholds)
         
 
@@ -63,6 +65,7 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
             print('warning, no thresholds were defined, so default bounds are used of  150')
         else:
             self.thresholds = thresholds
+
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
 

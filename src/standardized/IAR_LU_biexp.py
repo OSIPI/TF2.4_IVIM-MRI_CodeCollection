@@ -26,12 +26,13 @@ class IAR_LU_biexp(OsipiBase):
     required_bounds_optional = True # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
-    accepted_dimensions = (1,1) #(min dimension, max dimension)
 
     # Supported inputs in the standardized class
     supported_bounds = True
     supported_initial_guess = True
     supported_thresholds = False
+    supported_dimensions = 1
+    supported_priors = False
     
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
         """
@@ -77,7 +78,7 @@ class IAR_LU_biexp(OsipiBase):
             
             bvec = np.zeros((bvalues.size, 3))
             bvec[:,2] = 1
-            gtab = gradient_table(bvalues, bvec, b0_threshold=0)
+            gtab = gradient_table(bvalues, bvecs=bvec, b0_threshold=0)
             
             self.IAR_algorithm = IvimModelBiExp(gtab, bounds=self.bounds, initial_guess=self.initial_guess)
             
@@ -87,7 +88,8 @@ class IAR_LU_biexp(OsipiBase):
         results["f"] = fit_results.model_params[1]
         results["Dp"] = fit_results.model_params[2]
         results["D"] = fit_results.model_params[3]
-        
+        results = self.D_and_Ds_swap(results)
+
         return results
 
     def ivim_fit_full_volume(self, signals, bvalues, **kwargs):
@@ -109,15 +111,16 @@ class IAR_LU_biexp(OsipiBase):
             
             bvec = np.zeros((bvalues.size, 3))
             bvec[:,2] = 1
-            gtab = gradient_table(bvalues, bvec, b0_threshold=0)
+            gtab = gradient_table(bvalues, bvecs=bvec, b0_threshold=0)
             
             self.IAR_algorithm = IvimModelBiExp(gtab, bounds=self.bounds, initial_guess=self.initial_guess)
-            
-        fit_results = self.IAR_algorithm.fit(signals)
+        b0_index = np.where(bvalues == 0)[0][0]
+        mask = signals[...,b0_index]>0
+        fit_results = self.IAR_algorithm.fit(signals, mask=mask)
         
         results = {}
         results["f"] = fit_results.model_params[..., 1]
         results["Dp"] = fit_results.model_params[..., 2]
         results["D"] = fit_results.model_params[..., 3]
-        
+
         return results

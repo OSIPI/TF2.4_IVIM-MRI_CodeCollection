@@ -18,7 +18,8 @@ class IAR_LU_modified_topopro(OsipiBase):
     id_algorithm_type = "Bi-exponential fit"
     id_return_parameters = "f, D*, D"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
-    
+    id_ref = "https://doi.org/10.3389/fnins.2021.779025"
+
     # Algorithm requirements
     required_bvalues = 4
     required_thresholds = [0,0] # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
@@ -26,12 +27,13 @@ class IAR_LU_modified_topopro(OsipiBase):
     required_bounds_optional = True # Bounds may not be required but are optional
     required_initial_guess = False
     required_initial_guess_optional = True
-    accepted_dimensions = (1,1) #(min dimension, max dimension)
     
     # Supported inputs in the standardized class
     supported_bounds = True
     supported_initial_guess = False
     supported_thresholds = False
+    supported_dimensions = 1
+    supported_priors = False
     
     def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, weighting=None, stats=False):
         """
@@ -92,5 +94,6 @@ class IAR_LU_modified_topopro(OsipiBase):
         results["f"] = fit_results.model_params[1]
         results["Dp"] = fit_results.model_params[2]
         results["D"] = fit_results.model_params[3]
-        
+        results = self.D_and_Ds_swap(results)
+
         return results
