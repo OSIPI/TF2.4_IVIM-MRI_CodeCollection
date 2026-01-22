@@ -16,6 +16,7 @@ class TF_reference_IVIMfit(OsipiBase):
     id_algorithm_type = "Bi-exponential fit"
     id_return_parameters = "f, D*, D"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
+    id_ref = "code specially written for this repository, based on the IVIM consensus paper (Eric Sigmund, Susi Rauh, et al. 2026) which will appear in JMRI"
 
     # Algorithm requirements
     required_bvalues = 4

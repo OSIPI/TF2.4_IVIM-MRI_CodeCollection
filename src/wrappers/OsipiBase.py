@@ -131,6 +131,7 @@ class OsipiBase:
         self.osipi_bounds = self.bounds # Variable that stores the original bounds before they are passed to the algorithm
         self.osipi_initial_guess = self.initial_guess # Variable that stores the original initial guesses before they are passed to the algorithm
 
+        self.id_ref = None
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
@@ -534,3 +535,10 @@ class OsipiBase:
             results['D']=D
             results['f']=1-results['f']
         return results
+
+    def cite(self):
+        print("thank you for using our repository. If it was useful for your paper, please cite our upcoming paper in MRM.")
+        if self.id_ref is not None:
+            print("The current fit method you have loaded should be cited with: " + self.id_ref)
+        else:
+            print("The used fit code has not yet provided a code-speicific reference.")

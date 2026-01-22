@@ -17,6 +17,7 @@ class OJ_GU_segMATLAB(OsipiBase):
     id_algorithm_type = "Bi-exponential fit"
     id_return_parameters = "f, D*, D, S0"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
+    id_ref = "https://doi.org/10.1007/s10334-018-0697-5"
 
     # Algorithm requirements
     required_bvalues = 4

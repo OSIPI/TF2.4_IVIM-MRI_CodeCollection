@@ -18,6 +18,7 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
     id_algorithm_type = "Bi-exponential fit"
     id_return_parameters = "f, D*, D"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
+    id_ref = "https://doi.org/10.3389/fonc.2021.705964"
 
     # Algorithm requirements
     required_bvalues = 4

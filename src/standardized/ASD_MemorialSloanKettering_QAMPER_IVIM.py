@@ -17,7 +17,7 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
     id_algorithm_type = "Bi-exponential fit"
     id_return_parameters = "f, D*, D, S0"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
-
+    id_ref = "https://doi.org/10.3390/tomography9060161"
     # Algorithm requirements
     required_bvalues = 4
     required_thresholds = [0,
