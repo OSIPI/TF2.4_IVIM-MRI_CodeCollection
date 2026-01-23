@@ -69,8 +69,8 @@ class TCML_TechnionIIT_lsq_sls_BOBYQA(OsipiBase):
         """
         signals[signals<0]=0
         bvalues=np.array(bvalues)
-        #bounds = ([np.asarray(self.bounds["D"][0]).item(), np.asarray(self.bounds["Dp"][0]).item(), np.asarray(self.bounds["f"][0]).item(), np.asarray(self.bounds["S0"][0]).item()],
-                       #[np.asarray(self.bounds["D"][1]).item(), np.asarray(self.bounds["Dp"][1]).item(), np.asarray(self.bounds["f"][1]).item(), np.asarray(self.bounds["S0"][1]).item()])
+        bounds = ([self.bounds["D"][0], self.bounds["Dp"][0], self.bounds["f"][0], self.bounds["S0"][0]],
+                       [self.bounds["D"][1], self.bounds["Dp"][1], self.bounds["f"][1], self.bounds["S0"][1]])
         
         def get_scalar(val):
             """Convert value to Python scalar, handling numpy arrays."""
@@ -78,18 +78,18 @@ class TCML_TechnionIIT_lsq_sls_BOBYQA(OsipiBase):
                 return float(val.item())
             return float(val)
 
-        bounds = ([get_scalar(self.bounds["D"][0]), get_scalar(self.bounds["Dp"][0]), 
-                get_scalar(self.bounds["f"][0]), get_scalar(self.bounds["S0"][0])],
-                [get_scalar(self.bounds["D"][1]), get_scalar(self.bounds["Dp"][1]), 
-                get_scalar(self.bounds["f"][1]), get_scalar(self.bounds["S0"][1])])
+        #bounds = ([get_scalar(self.bounds["D"][0]), get_scalar(self.bounds["Dp"][0]), 
+                #get_scalar(self.bounds["f"][0]), get_scalar(self.bounds["S0"][0])],
+                #[get_scalar(self.bounds["D"][1]), get_scalar(self.bounds["Dp"][1]), 
+                #get_scalar(self.bounds["f"][1]), get_scalar(self.bounds["S0"][1])])
 
         fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, bounds,min_bval_high=self.thresholds)
 
         results = {}
         if fit_results[0].size > 0:
-            results["D"] = fit_results[0]
-            results["f"] = fit_results[2]
-            results["Dp"] = fit_results[1]
+            results["D"] = get_scalar(fit_results[0])
+            results["f"] = get_scalar(fit_results[2])
+            results["Dp"] = get_scalar(fit_results[1])
         else:
             results["D"] = 0
             results["f"] = 0
