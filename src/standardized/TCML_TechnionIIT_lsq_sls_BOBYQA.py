@@ -69,8 +69,8 @@ class TCML_TechnionIIT_lsq_sls_BOBYQA(OsipiBase):
         """
         signals[signals<0]=0
         bvalues=np.array(bvalues)
-        bounds = ([float(self.bounds["D"][0]), float(self.bounds["Dp"][0]), float(self.bounds["f"][0]), float(self.bounds["S0"][0])],
-                       [float(self.bounds["D"][1]), float(self.bounds["Dp"][1]), float(self.bounds["f"][1]), float(self.bounds["S0"][1])])
+        bounds = ([np.asarray(self.bounds["D"][0]).item(), np.asarray(self.bounds["Dp"][0]).item(), np.asarray(self.bounds["f"][0]).item(), np.asarray(self.bounds["S0"][0]).item()],
+                       [np.asarray(self.bounds["D"][1]).item(), np.asarray(self.bounds["Dp"][1]).item(), np.asarray(self.bounds["f"][1]).item(), np.asarray(self.bounds["S0"][1]).item()])
 
         fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, bounds,min_bval_high=self.thresholds)
 
