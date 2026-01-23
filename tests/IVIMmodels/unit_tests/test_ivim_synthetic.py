@@ -23,8 +23,11 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
     gd = GenerateData(rng=rng)
     name, data = ivim_data
     D_arr = rng.normal(data["D_mean"], data["D_std"], 1000)
+    D_arr = np.clip(D_arr, a_min=0, a_max=None)
     Dp_arr = rng.normal(data["Dp_mean"], data["Dp_std"], 1000)
+    Dp_arr = np.clip(Dp_arr, a_min=0, a_max=None)
     f_arr = rng.normal(data["f_mean"], data["f_std"], 1000)
+    f_arr = np.clip(f_arr, a_min=0, a_max=1)
     bvals = data["bvalues"]
     fit = OsipiBase(algorithm=ivim_algorithm)
     # here is a prior
