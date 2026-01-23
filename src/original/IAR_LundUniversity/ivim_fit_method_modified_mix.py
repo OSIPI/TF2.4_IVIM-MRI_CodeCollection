@@ -86,9 +86,9 @@ class IvimModelVP(ReconstModel):
                                     (bounds[0][1]*1000, bounds[1][1]*1000), \
                                     (bounds[0][2]*1000, bounds[1][2]*1000)])
         else: # Finally, if units if µm2/ms are already used
-            self.bounds = np.array([(bounds[0][0], bounds[1][0], \
+            self.bounds = np.array([(bounds[0][0], bounds[1][0]), \
                                     (bounds[0][1], bounds[1][1]), \
-                                    (bounds[0][2], bounds[1][2]))])
+                                    (bounds[0][2], bounds[1][2])])
             
     @multi_voxel_fit
     def fit(self, data, bounds_de=None):
