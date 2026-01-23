@@ -77,15 +77,22 @@ class TCML_TechnionIIT_lsqBOBYQA(OsipiBase):
 
         fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], bounds, initial_guess.copy())
 
+        def get_scalar(val):
+            """Convert value to Python scalar, handling numpy arrays."""
+            if isinstance(val, np.ndarray):
+                return float(val.item())
+            return float(val)
+
         results = {}
-        if fit_results[0].size == 0:
-            results["D"] = initial_guess[0]
-            results["f"] = initial_guess[2]
-            results["Dp"] = initial_guess[1]
+        if fit_results[0].size > 0:
+            results["D"] = get_scalar(fit_results[0])
+            results["f"] = get_scalar(fit_results[2])
+            results["Dp"] = get_scalar(fit_results[1])
         else:
-            results["D"] = fit_results[0]
-            results["f"] = fit_results[2]
-            results["Dp"] = fit_results[1]
+            results["D"] = 0
+            results["f"] = 0
+            results["Dp"] = 0
+
         results = self.D_and_Ds_swap(results)
 
         return results
