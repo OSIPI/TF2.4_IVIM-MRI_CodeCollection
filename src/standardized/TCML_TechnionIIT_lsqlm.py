@@ -71,15 +71,22 @@ class TCML_TechnionIIT_lsqlm(OsipiBase):
         initial_guess = [self.initial_guess["D"], self.initial_guess["Dp"], self.initial_guess["f"], self.initial_guess["S0"]]
         fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], initial_guess)
 
+        def get_scalar(val):
+            """Convert value to Python scalar, handling numpy arrays."""
+            if isinstance(val, np.ndarray):
+                return float(val.item())
+            return float(val)
+
         results = {}
-        if fit_results[0].size >0:
-            results["D"] = fit_results[0]
-            results["f"] = fit_results[2]
-            results["Dp"] = fit_results[1]
+        if fit_results[0].size > 0:
+            results["D"] = get_scalar(fit_results[0])
+            results["f"] = get_scalar(fit_results[2])
+            results["Dp"] = get_scalar(fit_results[1])
         else:
             results["D"] = 0
             results["f"] = 0
             results["Dp"] = 0
+
         results = self.D_and_Ds_swap(results)
 
         return results
