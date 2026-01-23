@@ -21,10 +21,11 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
     # random.seed(42)
     S0 = 1
     gd = GenerateData(rng=rng)
-    name, bvals, data = ivim_data
-    D_arr = rng.uniform(0.5e-3, 3e-3, 1000)
-    Dp_arr = rng.uniform(5e-3, 100e-3, 1000)
-    f_arr = rng.uniform(0.05, 0.95, 1000)
+    name, data = ivim_data
+    D_arr = rng.normal(data["D_mean"], data["D_std"], 1000)
+    Dp_arr = rng.normal(data["Dp_mean"], data["Dp_std"], 1000)
+    f_arr = rng.normal(data["f_mean"], data["f_std"], 1000)
+    bvals = data["bvalues"]
     fit = OsipiBase(algorithm=ivim_algorithm)
     # here is a prior
 #    if use_prior and hasattr(fit, "supported_priors") and fit.supported_priors:
