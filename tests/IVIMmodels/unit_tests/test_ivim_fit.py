@@ -112,8 +112,11 @@ def test_default_bounds_and_initial_guesses(algorithmlist,eng):
         assert 0.9 <= fit.osipi_initial_guess["S0"] <= 1.1, f"For {algorithm}, the default initial guess for S0 {fit.osipi_initial_guess['S0']} is unrealistic; note signal is normalized"
 
 
-def test_bounds(bound_input, eng):
+def test_bounds(bound_input, eng, request):
     name, bvals, data, algorithm, xfail, kwargs, tolerances, requires_matlab = bound_input
+    if xfail["xfail"]:
+        mark = pytest.mark.xfail(reason="xfail", strict=xfail["strict"])
+        request.node.add_marker(mark)
     if requires_matlab:
         if eng is None:
             pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")

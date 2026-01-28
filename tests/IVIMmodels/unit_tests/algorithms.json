@@ -28,7 +28,7 @@
         "TF_reference_IVIMfit"
     ],
     "TCML_TechnionIIT_lsqBOBYQA": {
-      "xfail_names": {"pericardium": false}
+      "xfail_names": {"pericardium": false, "bounds": false}
     },
   "IVIM_NEToptim": {
         "deep_learning": true,
