@@ -48,15 +48,13 @@ class TCML_TechnionIIT_lsqlm(OsipiBase):
         self.initialize(bounds, initial_guess, fitS0)
 
     def initialize(self, bounds, initial_guess, fitS0):
+        self.use_bounds = {"f": False, "Dp": False, "D": False}
+
         if initial_guess is None:
-            print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.1, 0.01, 1]')
-            self.initial_guess = [0.001, 0.1, 0.01, 1]
+            self.use_initial_guess = {"f": False, "Dp": False, "D": False}
         else:
-            self.initial_guess = initial_guess
-            self.use_initial_guess = True
+            self.use_initial_guess = {"f": True, "Dp": True, "D": True}
         self.fitS0=fitS0
-        self.use_initial_guess = True
-        self.use_bounds = False
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
@@ -70,19 +68,25 @@ class TCML_TechnionIIT_lsqlm(OsipiBase):
         """
 
         bvalues=np.array(bvalues)
-        initial_guess = np.array(self.initial_guess)
-        initial_guess = initial_guess[[0, 2, 1, 3]]
+        initial_guess = [self.initial_guess["D"], self.initial_guess["Dp"], self.initial_guess["f"], self.initial_guess["S0"]]
         fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], initial_guess)
 
+        def get_scalar(val):
+            """Convert value to Python scalar, handling numpy arrays."""
+            if isinstance(val, np.ndarray):
+                return float(val.item())
+            return float(val)
+
         results = {}
-        if fit_results[0].size >0:
-            results["D"] = fit_results[0]
-            results["f"] = fit_results[2]
-            results["Dp"] = fit_results[1]
+        if fit_results[0].size > 0:
+            results["D"] = get_scalar(fit_results[0])
+            results["f"] = get_scalar(fit_results[2])
+            results["Dp"] = get_scalar(fit_results[1])
         else:
             results["D"] = 0
             results["f"] = 0
             results["Dp"] = 0
+
         results = self.D_and_Ds_swap(results)
 
         return results

@@ -1,6 +1,7 @@
 from src.wrappers.OsipiBase import OsipiBase
 from super_ivim_dc.source.Classsic_ivim_fit import IVIM_fit_sls_lm
 import numpy as np
+import warnings
 
 class TCML_TechnionIIT_lsq_sls_lm(OsipiBase):
     """
@@ -48,21 +49,16 @@ class TCML_TechnionIIT_lsq_sls_lm(OsipiBase):
         self.initialize(bounds, fitS0,thresholds)
 
     def initialize(self, bounds, fitS0,thresholds):
-        if bounds is None:
-            print(
-                'warning, no bounds were defined, so default bounds are used of ([0.0003, 0.001, 0.009, 0],[0.008, 0.5,0.04, 3])')
-            self.bounds = ([0.0003, 0.001, 0.009, 0], [0.008, 0.5, 0.04, 3])
-        else:
-            bounds = bounds
-            self.bounds = bounds
+        self.use_bounds = {"f": False, "Dp": False, "D": False}
+        warnings.warn('bounds are only used for initialization fit')
+
         if thresholds is None:
             self.thresholds = 150
             print('warning, no thresholds were defined, so default bounds are used of  150')
         else:
             self.thresholds = thresholds
         self.fitS0=fitS0
-        self.use_bounds = False
-        self.use_initial_guess = False
+        self.use_initial_guess = {"f": False, "Dp": False, "D": False}
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
@@ -76,13 +72,21 @@ class TCML_TechnionIIT_lsq_sls_lm(OsipiBase):
         """
         signals[signals<0]=0
         bvalues=np.array(bvalues)
-        fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, self.bounds, min_bval_high=self.thresholds)
+        bounds = ([self.bounds["D"][0], self.bounds["Dp"][0], self.bounds["f"][0], self.bounds["S0"][0]],
+                       [self.bounds["D"][1], self.bounds["Dp"][1], self.bounds["f"][1], self.bounds["S0"][1]])
+        fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, bounds, min_bval_high=self.thresholds)
+
+        def get_scalar(val):
+            """Convert value to Python scalar, handling numpy arrays."""
+            if isinstance(val, np.ndarray):
+                return float(val.item())
+            return float(val)
 
         results = {}
         if fit_results[0].size > 0:
-            results["D"] = fit_results[0]
-            results["f"] = fit_results[2]
-            results["Dp"] = fit_results[1]
+            results["D"] = get_scalar(fit_results[0])
+            results["f"] = get_scalar(fit_results[2])
+            results["Dp"] = get_scalar(fit_results[1])
         else:
             results["D"] = 0
             results["f"] = 0
