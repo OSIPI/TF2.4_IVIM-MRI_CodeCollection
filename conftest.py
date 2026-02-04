@@ -95,6 +95,21 @@ def pytest_addoption(parser):
         help="Run MATLAB-dependent tests"
     )
 
+    parser.addoption(
+        "--selectData",
+        default=[""],
+        nargs="+",
+        type=str,
+        help="Select only these data from the list"
+    )
+
+    parser.addoption(
+        "--dropData",
+        default=[""],
+        nargs="+",
+        type=str,
+        help="Drop these data from the list"
+    )
 
 @pytest.fixture(scope="session")
 def eng(request):
@@ -118,11 +133,7 @@ def save_file(request):
         # filename.unlink(missing_ok=True)
         filename = filename.as_posix()
 
-        data = data_list(request.config.getoption("--dataFile"))  # TODO: clean up this hacky way to get bvalues
-        [_, data] = next(data)
-        bvalues = data['bvalues']
-        bvalue_string = ["bval_" + str(bvalue) for bvalue in bvalues]
-        # bvalue_string = ["b_0.0","b_1.0","b_2.0","b_5.0","b_10.0","b_20.0","b_30.0","b_50.0","b_75.0","b_100.0","b_150.0","b_250.0","b_350.0","b_400.0","b_550.0","b_700.0","b_850.0","b_1000.0"]
+        bvalue_string = ["b0","b1","b2","b3","b4","b5","b5"]
 
         with open(filename, "w") as csv_file:
             writer = csv.writer(csv_file, delimiter=',')
@@ -175,16 +186,17 @@ def use_prior(request):
 def pytest_generate_tests(metafunc):
     config = metafunc.config
     algorithms = load_filtered_algorithms(config)
+    data = load_filtered_data(config)
 
     if "SNR" in metafunc.fixturenames:
         metafunc.parametrize("SNR", config.getoption("SNR"))
 
     if "ivim_data" in metafunc.fixturenames:
-        data = data_list(config.getoption("dataFile"))
+        data = data_list(data)
         metafunc.parametrize("ivim_data", data)
 
     if "data_ivim_fit_saved" in metafunc.fixturenames:
-        args = data_ivim_fit_saved(config.getoption("dataFile"), algorithms)
+        args = data_ivim_fit_saved(data, algorithms)
         metafunc.parametrize("data_ivim_fit_saved", args)
 
     if "algorithmlist" in metafunc.fixturenames:
@@ -200,13 +212,9 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("deep_learning_algorithms", args)
 
 
-def data_list(filename):
-    current_folder = pathlib.Path.cwd()
-    data_path = current_folder / filename
-    with data_path.open() as f:
-        all_data = json.load(f)
-
-    for name, data in all_data.items():
+def data_list(all_data):
+    for name in all_data["data"]:
+        data = all_data.get(name, {})
         yield name, data
 
 def load_filtered_algorithms(config):
@@ -231,14 +239,29 @@ def load_filtered_algorithms(config):
         **{k: v for k, v in algorithm_info.items() if k != "algorithms"}
     }
 
+def load_filtered_data(config):
+    dataFile = config.getoption("dataFile")
+    selectData = config.getoption("selectData")
+    dropData = config.getoption("dropData")
 
-def data_ivim_fit_saved(datafile, algorithms):
-    # Find the algorithms from algorithms.json
     current_folder = pathlib.Path.cwd()
-    # Load generic test data generated from the included phantom: phantoms/MR_XCAT_qMRI
-    generic = current_folder / datafile
-    with generic.open() as f:
-        all_data = json.load(f)
+    data_path = current_folder / dataFile
+    with data_path.open() as f:
+        data_info = json.load(f)
+
+    data = data_info.keys()
+
+    if selectData and selectData != [""]:
+        data = [org for org in data if org in selectData]
+    else:
+        data = [org for org in data if org not in dropData]
+
+    return {
+        "data": data, **{k: v for k, v in data_info.items()}
+    }
+
+
+def data_ivim_fit_saved(all_data, algorithms):
     bvals = all_data.pop('config')
     bvals = bvals['bvalues']
     for algorithm in algorithms["algorithms"]:
