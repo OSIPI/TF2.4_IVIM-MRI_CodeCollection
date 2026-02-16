@@ -97,7 +97,7 @@ class IAR_LU_modified_mix(OsipiBase):
         try: 
             fit_results = self.IAR_algorithm.fit(signals)
         except np.linalg.LinAlgError as err:
-            if 'Singular mtrix' in str(err):
+            if 'Singular matrix' in str(err):
                 # We might have a stochastic error. Try to re-run the fit once.
                 fit_results = self.IAR_algorithm.fit(signals)
             else:
