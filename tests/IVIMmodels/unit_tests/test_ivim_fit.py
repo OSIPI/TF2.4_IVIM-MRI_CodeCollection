@@ -110,6 +110,76 @@ def test_default_bounds_and_initial_guesses(algorithmlist,eng):
         assert 0 <= fit.osipi_initial_guess["f"] <= 0.5, f"For {algorithm}, the default initial guess for f {fit.osipi_initial_guess['f']} is unrealistic"
         assert 0.003 <= fit.osipi_initial_guess["Dp"] <= 0.1, f"For {algorithm}, the default initial guess for Dp {fit.osipi_initial_guess['Dp']} is unrealistic"
         assert 0.9 <= fit.osipi_initial_guess["S0"] <= 1.1, f"For {algorithm}, the default initial guess for S0 {fit.osipi_initial_guess['S0']} is unrealistic; note signal is normalized"
+def test_init_bvalues(algorithmlist, eng):
+    """Regression test for Issue #86 — tests 4 explicit scenarios that were broken.
+
+    Bug A (PV_MUMC_biexp): ivim_fit() had an UnboundLocalError because the local `bounds`
+    variable was only assigned in one branch. When OsipiBase provided default bounds (always),
+    the variable was undefined and crashed.
+
+    Bug B (IAR_LU_* algorithms): When bvalues were passed at __init__, these wrappers passed
+    self.bounds (a Python dict) directly to dipy IvimModel constructors that expected a
+    list-of-lists. Indexing a dict by 0/1 returns keys, not bound values — silent garbage.
+    """
+    algorithm, requires_matlab, deep_learning = algorithmlist
+    if requires_matlab:
+        if eng is None:
+            pytest.skip(reason="Running without matlab")
+        kwargs = {'eng': eng}
+    elif deep_learning:
+        pytest.skip(reason="No bounds/initial_guess for DL algorithms")
+    else:
+        kwargs = {}
+
+    bvalues = np.array([0, 10, 20, 50, 100, 200, 500, 800])
+    test_bounds = {"S0": [0.7, 1.3], "f": [0, 1.0], "Dp": [0.01, 0.2], "D": [0, 0.005]}
+    initial_guess = {"S0": 1.0, "f": 0.1, "Dp": 0.05, "D": 0.001}
+    signal = np.exp(-bvalues * 0.001)  # Normalised mono-exp dummy signal, S0≈1
+
+    # --- Subtest 1: Initialising with bvalues + bounds dict must not crash (Bug B) ---
+    # Before fix: IAR_LU algorithms passed self.bounds dict directly to dipy IvimModel
+    # numpy indexed dict keys instead of numeric values causing TypeError or garbage result
+    try:
+        fit = OsipiBase(algorithm=algorithm, bvalues=bvalues,
+                        bounds=test_bounds, initial_guess=initial_guess, **kwargs)
+    except Exception as e:
+        pytest.fail(
+            f"[Bug B] {algorithm}: __init__ with bvalues + bounds dict crashed: {type(e).__name__}: {e}"
+        )
+
+    # --- Subtest 2: Calling osipi_fit must not crash (Bug A + Bug B end-to-end) ---
+    # Before fix: PV_MUMC_biexp.ivim_fit() crashed with UnboundLocalError
+    # because local `bounds` was never defined when OsipiBase provided default dict bounds
+    try:
+        result = fit.osipi_fit(signal, bvalues)
+    except Exception as e:
+        pytest.fail(
+            f"[Bug A/B] {algorithm}: osipi_fit() crashed after init-with-bvalues: {type(e).__name__}: {e}"
+        )
+
+    # --- Subtest 3: Result must contain required keys with numeric values ---
+    # Ensures error handling fallback paths don't silently return None or wrong types
+    for key in ("f", "D", "Dp"):
+        assert key in result, \
+            f"[Result] {algorithm}: key '{key}' missing from osipi_fit result dict"
+        val = result[key]
+        assert val is not None, f"[Result] {algorithm}: result['{key}'] is None"
+        assert not isinstance(val, str), f"[Result] {algorithm}: result['{key}'] is a string"
+
+    # --- Subtest 4: Calling osipi_fit a second time (repeated call stability test) ---
+    # Before the stale-model fix: IAR algorithms that were pre-initialised at __init__
+    # would silently keep using the stale gradient table from the first call even when
+    # the actual bvalues had changed. This checks that a second consecutive call with
+    # the same bvalues doesn't crash (guards against object state corruption).
+    try:
+        fit.osipi_fit(signal, bvalues)
+    except Exception as e:
+        pytest.fail(
+            f"[Repeated call] {algorithm}: osipi_fit() crashed on second consecutive call: "
+            f"{type(e).__name__}: {e}"
+        )
+
+
 
 
 def test_bounds(bound_input, eng, request):
