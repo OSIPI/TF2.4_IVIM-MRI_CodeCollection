@@ -77,3 +77,73 @@ jobs:
       - name: Cleanup Docker
         run: |
           docker system prune -a --force
+  build-dicom2niix-and-run-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generate input files
+        run: |
+          python -m Docker.generate_signal_docker_test --dicom
+
+      - name: Verify input files
+        run: |
+          IVIM_SIM_DIR="${{ github.workspace }}/ivim_simulation"
+          for file in ivim_simulation_0000.dcm ivim_simulation_0001.dcm ivim_simulation_0002.dcm ivim_simulation_0003.dcm ivim_simulation_0004.dcm; do
+            if [ ! -f "$IVIM_SIM_DIR/$file" ]; then
+              echo "Error: $IVIM_SIM_DIR/$file not found"
+              exit 1
+            fi
+          done
+          echo "All input files generated successfully"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t tf2.4_ivim-mri_codecollection -f Docker/dicom2nifti/Dockerfile .
+
+      - name: Run Docker container
+        run: |
+          docker run --rm --name TF2.4_IVIM-MRI_CodeCollection \
+            -v ${{ github.workspace }}:/usr/src/app \
+            tf2.4_ivim-mri_codecollection \
+            /usr/src/app/ivim_simulation
+
+      - name: Verify output files
+        run: |
+          for file in f.nii.gz dp.nii.gz d.nii.gz; do
+            if [ ! -f "$file" ]; then
+              echo "Error: $file not found"
+              exit 1
+            fi
+          done
+          echo "All output files generated successfully"
+
+      - name: Clean up artifacts and Docker image
+        run: |
+          docker rmi tf2.4_ivim-mri_codecollection || true
+          rm -f tf2.4_ivim-mri_codecollection.tar.gz
+          rm -f ${{ github.workspace }}/f.nii.gz
+          rm -f ${{ github.workspace }}/dp.nii.gz
+          rm -f ${{ github.workspace }}/d.nii.gz
+          rm -f ${{ github.workspace }}/ivim_simulation.nii.gz
+          rm -f ${{ github.workspace }}/ivim_simulation.bval
+          rm -f ${{ github.workspace }}/ivim_simulation.bvec
+          rm -r -f ${{ github.workspace }}/ivim_simulation || true
+      - name: Cleanup Docker
+        run: |
+          docker system prune -a --force
+
