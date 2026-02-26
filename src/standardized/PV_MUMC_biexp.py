@@ -43,7 +43,7 @@ class PV_MUMC_biexp(OsipiBase):
         self.use_bounds = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
         self.use_initial_guess = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
         
-    
+
     def ivim_fit(self, signals, bvalues=None):
         """Perform the IVIM fit
 
@@ -52,30 +52,51 @@ class PV_MUMC_biexp(OsipiBase):
             bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
-            _type_: _description_
+            dict: Fitted IVIM parameters f, Dp (D*), and D.
         """
-        if self.bounds is None:
-            self.bounds = ([0.9, 0.0001, 0.0, 0.0025], [1.1, 0.003, 1, 0.2])
+        # --- bvalues resolution ---
+        # Edge case: bvalues not passed here → fall back to the ones set at __init__ time
+        if bvalues is None:
+            if self.bvalues is None:
+                raise ValueError(
+                    "PV_MUMC_biexp: bvalues must be provided either at initialization or at fit time."
+                )
+            bvalues = self.bvalues
         else:
-            bounds = ([self.bounds["S0"][0], self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0]],
-                    [self.bounds["S0"][1], self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1]])
-        
+            bvalues = np.asarray(bvalues)
+
+        # --- Bounds resolution ---
+        # self.bounds is always a dict (OsipiBase force_default_settings=True).
+        # The underlying fit_least_squares expects: ([S0min, Dmin, fmin, Dpmin], [S0max, Dmax, fmax, Dpmax])
+        if isinstance(self.bounds, dict):
+            bounds = (
+                [self.bounds["S0"][0], self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0]],
+                [self.bounds["S0"][1], self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1]],
+            )
+        else:
+            # Fallback: already in list/tuple form (legacy)
+            bounds = self.bounds
+
         if self.thresholds is None:
             self.thresholds = 200
 
-        DEFAULT_PARAMS = [0.003,0.1,0.05]
+        # Default fallback parameters (D, f, Dp) used if the optimizer fails
+        DEFAULT_PARAMS = [0.001, 0.1, 0.01]
 
         try:
             fit_results = self.PV_algorithm(bvalues, signals, bounds=bounds, cutoff=self.thresholds)
         except RuntimeError as e:
-            if "maximum number of function evaluations" in str(e):
-                fit_results = DEFAULT_PARAMS
-            else:
-                raise
+            # curve_fit raises RuntimeError both for max-evaluations exceeded and other failures
+            print(f"PV_MUMC_biexp: optimizer failed ({e}). Returning default parameters.")
+            fit_results = DEFAULT_PARAMS
+        except Exception as e:
+            # Catch any other unexpected error (e.g. all-zero signal, NaNs in input)
+            print(f"PV_MUMC_biexp: unexpected error during fit ({type(e).__name__}: {e}). Returning default parameters.")
+            fit_results = DEFAULT_PARAMS
 
-        results = {} 
+        results = {}
         results["f"] = fit_results[1]
         results["Dp"] = fit_results[2]
         results["D"] = fit_results[0]
-        
+
         return results
