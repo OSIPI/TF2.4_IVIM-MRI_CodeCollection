@@ -92,5 +92,6 @@ class TCML_TechnionIIT_SLS(OsipiBase):
             results["D"] = 0
             results["f"] = 0
             results["Dp"] = 0
+        results = self.D_and_Ds_swap(results)
 
         return results

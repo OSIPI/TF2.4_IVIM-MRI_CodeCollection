@@ -73,5 +73,6 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
         results["D"] = fit_results[0][0,0,0]/1000
         results["f"] = fit_results[1][0,0,0]
         results["Dp"] = fit_results[2][0,0,0]/1000
+        results = self.D_and_Ds_swap(results)
 
         return results
