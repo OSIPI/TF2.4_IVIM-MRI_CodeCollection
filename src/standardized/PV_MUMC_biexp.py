@@ -77,5 +77,6 @@ class PV_MUMC_biexp(OsipiBase):
         results["f"] = fit_results[1]
         results["Dp"] = fit_results[2]
         results["D"] = fit_results[0]
+        results = self.D_and_Ds_swap(results)
         
         return results

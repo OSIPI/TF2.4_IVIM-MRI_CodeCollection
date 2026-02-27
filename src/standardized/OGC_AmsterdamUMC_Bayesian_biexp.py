@@ -101,6 +101,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         results["D"] = fit_results[0]
         results["f"] = fit_results[1]
         results["Dp"] = fit_results[2]
+        results = self.D_and_Ds_swap(results)
 
         return results
 

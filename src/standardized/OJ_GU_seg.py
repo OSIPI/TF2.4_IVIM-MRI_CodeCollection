@@ -76,5 +76,6 @@ class OJ_GU_seg(OsipiBase):
         results["f"] = fit_results['f']
         results["Dp"] = fit_results['Dstar']
         results["D"] = fit_results['D']
+        results = self.D_and_Ds_swap(results)
         
         return results

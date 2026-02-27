@@ -112,5 +112,6 @@ class IAR_LU_subtracted(OsipiBase):
         results["f"] = fit_results.model_params[1]
         results["Dp"] = fit_results.model_params[2]
         results["D"] = fit_results.model_params[3]
+        results = self.D_and_Ds_swap(results)
         
         return results
