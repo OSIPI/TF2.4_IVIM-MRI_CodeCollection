@@ -18,7 +18,8 @@ class IAR_LU_modified_mix(OsipiBase):
     id_algorithm_type = "Bi-exponential fit"
     id_return_parameters = "f, D*, D"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
-    
+    id_ref = "https://doi.org/10.1038/srep38927"
+
     # Algorithm requirements
     required_bvalues = 4
     required_thresholds = [0,0] # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
@@ -44,23 +45,25 @@ class IAR_LU_modified_mix(OsipiBase):
             the requirements.
         """
         super(IAR_LU_modified_mix, self).__init__(bvalues, thresholds, bounds, initial_guess)
-        if bounds is not None:
-            print('warning, bounds from wrapper are not (yet) used in this algorithm')
-        self.use_bounds = False
-        self.use_initial_guess = False
+
+        self.use_bounds = {"f": False, "Dp": False, "D": False} # This algorithm performs intermediate steps that generates initial guesses outside very constrainted bounds
+        self.use_initial_guess = {"f": False, "Dp": False, "D": False} # This algorithm does not use initial guesses
 
         # Additional options
         self.stochastic = True
 
         # Check the inputs
-        
+
         # Initialize the algorithm
         if self.bvalues is not None:
             bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
             
-            self.IAR_algorithm = IvimModelVP(gtab, bounds=self.bounds, rescale_results_to_mm2_s=True)
+            bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000], 
+                      [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
+
+            self.IAR_algorithm = IvimModelVP(gtab, bounds=bounds, rescale_units=False, rescale_results_to_mm2_s=True)
         else:
             self.IAR_algorithm = None
         
@@ -75,6 +78,9 @@ class IAR_LU_modified_mix(OsipiBase):
         Returns:
             _type_: _description_
         """
+
+        bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000], 
+                  [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
         
         if self.IAR_algorithm is None:
             if bvalues is None:
@@ -86,9 +92,18 @@ class IAR_LU_modified_mix(OsipiBase):
             bvec[:,2] = 1
             gtab = gradient_table(bvalues, bvec, b0_threshold=0)
             
-            self.IAR_algorithm = IvimModelVP(gtab, bounds=self.bounds, rescale_results_to_mm2_s=True)
-            
-        fit_results = self.IAR_algorithm.fit(signals)
+            self.IAR_algorithm = IvimModelVP(gtab, bounds=bounds, rescale_results_to_mm2_s=True)
+
+        try: 
+            fit_results = self.IAR_algorithm.fit(signals)
+        except np.linalg.LinAlgError as err:
+            if 'Singular matrix' in str(err):
+                # We might have a stochastic error. Try to re-run the fit once.
+                fit_results = self.IAR_algorithm.fit(signals)
+            else:
+                print(str(np.linalg.LinAlgError))
+
+        
         
         #f = fit_results.model_params[1]
         #Dstar = fit_results.model_params[2]

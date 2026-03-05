@@ -185,42 +185,36 @@ class GenerateData:
          - Noise is applied after generating noise-free IVIM signals, using either Gaussian or Rician noise.
          - Simulated signals are normalized by the mean S0 (b = 0) signal.
          """
-        test = self._rng.uniform(0, 1, (n, 1))
-        D = Drange[0] + (test * (Drange[1] - Drange[0]))
-        test = self._rng.uniform(0, 1, (n, 1))
-        f = frange[0] + (test * (frange[1] - frange[0]))
-        test = self._rng.uniform(0, 1, (n, 1))
-        Dp = Dprange[0] + (test * (Dprange[1] - Dprange[0]))
-        data_sim = np.zeros([len(D), len(bvalues)])
+        test = self._rng.uniform(0, 1, (n, 4))
+        D = Drange[0] + test[:, [0]] * (Drange[1] - Drange[0])
+        f = frange[0] + test[:, [1]] * (frange[1] - frange[0])
+        Dp = Dprange[0] + test[:, [2]] * (Dprange[1] - Dprange[0])
+        #data_sim = np.zeros([len(D), len(bvalues)])
         bvalues = np.array(bvalues)
         if type(SNR) == tuple:
-            test = self._rng.uniform(0, 1, (n, 1))
-            SNR = np.exp(np.log(SNR[1]) + (test * (np.log(SNR[0]) - np.log(SNR[1]))))
+            noise_std = 1/SNR[1] + test[:,3] * (1/SNR[0] - 1/SNR[1])
             addnoise = True
         elif SNR == 0:
             addnoise = False
+            noise_std = np.ones((n, 1))
         else:
-            SNR = SNR * np.ones_like(Dp)
+            noise_std = np.full((n, 1), 1/SNR)
             addnoise = True
+        noise_std = noise_std[:, np.newaxis]
         # loop over array to fill with simulated IVIM data
-        for aa in range(len(D)):
-            data_sim[aa, :] = self.ivim_signal(D[aa][0], Dp[aa][0], f[aa][0], 1, bvalues, snr=SNR[aa], rician_noise=rician_noise)
+        bvalues = np.array(bvalues).reshape(1, -1)
+        data_sim = 1 * (f * np.exp(-bvalues * Dp) + (1 - f) * np.exp(-bvalues * D))
+
         # if SNR is set to zero, don't add noise
         if addnoise:
-            # initialise noise arrays
-            noise_imag = np.zeros([n, len(bvalues)])
-            noise_real = np.zeros([n, len(bvalues)])
-            # fill arrays
-            for i in range(0, n - 1):
-                noise_real[i,] = self._rng.normal(0, 1 / SNR[i],(1,len(bvalues)))
-                noise_imag[i,] = self._rng.normal(0, 1 / SNR[i], (1, len(bvalues)))
+            noise_real = self._rng.normal(0, noise_std, data_sim.shape)
+            noise_imag = self._rng.normal(0, noise_std, data_sim.shape)
+
             if rician_noise:
-                # add Rician noise as the square root of squared gaussian distributed real signal + noise and imaginary noise
-                data_sim = np.sqrt(np.power(data_sim + noise_real, 2) + np.power(noise_imag, 2))
+                data_sim = np.sqrt((data_sim + noise_real) ** 2 + noise_imag ** 2)
             else:
-                # or add Gaussian noise
                 data_sim = data_sim + noise_real
-        S0_noisy = np.mean(data_sim[:, bvalues == 0], axis=1)
+        S0_noisy = np.mean(data_sim[:, bvalues.flatten() == 0], axis=1)
         data_sim = data_sim / S0_noisy[:, None]
         return data_sim, D, f, Dp
 

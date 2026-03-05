@@ -16,7 +16,8 @@ class OJ_GU_seg(OsipiBase):
     id_algorithm_type = "Segmented bi-exponential fit"
     id_return_parameters = "f, D*, D"
     id_units = "mm2/s"
-    
+    id_ref = "https://doi.org/10.1007/s10334-018-0697-5"
+
     # Algorithm requirements
     required_bvalues = 4
     required_thresholds = [0,0] # Interval from "at least" to "at most", in case submissions allow a custom number of thresholds
@@ -41,10 +42,8 @@ class OJ_GU_seg(OsipiBase):
             the requirements.
         """
         super(OJ_GU_seg, self).__init__(bvalues, thresholds, bounds, initial_guess)
-        if bounds is not None:
-            print('warning, bounds from wrapper are not (yet) used in this algorithm')
-        self.use_bounds = False
-        self.use_initial_guess = False
+        self.use_bounds = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
+        self.use_initial_guess = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
         # Check the inputs
         
         # Initialize the algorithm

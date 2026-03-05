@@ -16,7 +16,8 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
     if requires_matlab and eng is None:
         pytest.skip(reason="Running without matlab; if Matlab is available please run pytest --withmatlab")
     if deep_learning:
-        pytest.skip(reason="Slow drifting in performance not yet implmented for deep learning algorithms") #requieres training a network per b-value set and inferencing all data in 1 go. So not 1 data point per time, but all data in 1 go :). Otherwise network will be trained many many times...
+        pytest.skip(
+            reason="Slow drifting in performance not yet implmented for deep learning algorithms")  # requieres training a network per b-value set and inferencing all data in 1 go. So not 1 data point per time, but all data in 1 go :). Otherwise network will be trained many many times...
     rng = np.random.RandomState(42)
     # random.seed(42)
     S0 = 1
