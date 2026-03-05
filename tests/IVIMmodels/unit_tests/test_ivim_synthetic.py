@@ -30,7 +30,10 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
     f_arr = rng.normal(data["f_mean"], data["f_std"], fit_count)
     f_arr = np.clip(f_arr, a_min=0, a_max=1)
     bvals = data["bvalues"]
-    fit = OsipiBase(algorithm=ivim_algorithm)
+    bounds = data.get("bounds", None)
+    initial_guess = data.get("initial_guess", None)
+
+    fit = OsipiBase(algorithm=ivim_algorithm, bounds=bounds, initial_guess=initial_guess)
     # here is a prior
 #    if use_prior and hasattr(fit, "supported_priors") and fit.supported_priors:
 #        prior = [rng.normal(D, D/3, 10), rng.normal(f, f/3, 10), rng.normal(Dp, Dp/3, 10), rng.normal(1, 1/3, 10)]
