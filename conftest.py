@@ -136,11 +136,16 @@ def save_file(request):
         # filename.unlink(missing_ok=True)
         filename = filename.as_posix()
 
-        bvalue_string = ["b0","b1","b2","b3","b4","b5","b5"]
-
         with open(filename, "w") as csv_file:
             writer = csv.writer(csv_file, delimiter=',')
-            writer.writerow(("Algorithm", "Region", "SNR", "index", "f", "Dp", "D", "f_fitted", "Dp_fitted", "D_fitted", *bvalue_string))
+            writer.writerow(("Algorithm", "Region", "SNR", "index",
+                             "f", "Dp", "D",
+                             "f_fitted", "Dp_fitted", "D_fitted",
+                             "f_initial_guess", "Dp_initial_guess", "D_initial_guess",
+                             "f_use_initial_guess", "Dp_use_initial_guess", "D_use_initial_guess",
+                             "f_bounds", "Dp_bounds", "D_bounds",
+                             "f_use_bounds", "Dp_use_bounds", "D_use_bounds",
+                             "measured_signals"))
             yield writer
             # writer.writerow(["", datetime.datetime.now()])
     else:
