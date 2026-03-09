@@ -138,6 +138,11 @@ class IvimModelVP(ReconstModel):
         bounds_upper = (self.bounds[0][1], self.bounds[1][1], self.bounds[2][1])
         bounds = (bounds_lower, bounds_upper)
 
+        # clip the initial values for the least squares optimizer to be within the bounds
+        x_f[0] = np.clip(x_f[0], bounds[0][0], bounds[1][0])
+        x_f[1] = np.clip(x_f[1], bounds[0][1], bounds[1][1])
+        x_f[2] = np.clip(x_f[2], bounds[0][2], bounds[1][2])
+
         # Optimizer #3: Nonlinear-Least Squares
         res = least_squares(self.nlls_cost, x_f, bounds=bounds,
                             xtol=self.xtol, args=(data,))
