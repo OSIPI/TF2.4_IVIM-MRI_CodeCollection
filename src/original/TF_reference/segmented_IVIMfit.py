@@ -30,7 +30,7 @@ def segmented_IVIM_fit(bvalues, dw_data, b_cutoff = 200, bounds=([0.0001, 0.0, 0
     D, b0_intercept = d_fit_iterative_wls(bvalues_D, log_data_D)
 
     D = np.clip(D, bounds[0][0], bounds[1][0])
-    S0 = dw_data[bvalues == 0].item()
+    S0 = dw_data[bvalues == 0].mean()
     f = (S0 - b0_intercept) / S0
     f = np.clip(f, bounds[0][1], bounds[1][1])
 
