@@ -76,43 +76,31 @@ class IAR_LU_biexp(OsipiBase):
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used.
+            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
-            dict: Fitted IVIM parameters f, Dp (D*), and D.
+            _type_: _description_
         """
-        # --- bvalues resolution ---
-        if bvalues is None:
-            if self.bvalues is None:
-                raise ValueError(
-                    "IAR_LU_biexp: bvalues must be provided either at initialization or at fit time."
-                )
-            bvalues = self.bvalues
-        else:
-            bvalues = np.asarray(bvalues)
 
-        # Convert bounds and initial guess dicts to lists as expected by IvimModelBiExp
-        bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]],
-                  [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
+        # Make sure bounds and initial guess conform to the algorithm requirements
+        bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]], 
+                       [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
         initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
-
-        # Guard: reinitialise if not yet built, OR if bvalues have changed since last build
-        current_bvals = None if self.IAR_algorithm is None else self.IAR_algorithm.bvals
-        bvalues_changed = (current_bvals is not None) and not np.array_equal(current_bvals, bvalues)
-
-        if self.IAR_algorithm is None or bvalues_changed:
+        
+        if self.IAR_algorithm is None:
+            if bvalues is None:
+                bvalues = self.bvalues
+            else:
+                bvalues = np.asarray(bvalues)
+            
             bvec = np.zeros((bvalues.size, 3))
             bvec[:,2] = 1
             gtab = gradient_table(bvalues, bvecs=bvec, b0_threshold=0)
+            
             self.IAR_algorithm = IvimModelBiExp(gtab, bounds=bounds, initial_guess=initial_guess)
-
-        try:
-            fit_results = self.IAR_algorithm.fit(signals)
-        except Exception as e:
-            print(f"IAR_LU_biexp: fit failed ({type(e).__name__}: {e}). Returning default parameters.")
-            results = {"f": self.initial_guess["f"], "Dp": self.initial_guess["Dp"], "D": self.initial_guess["D"]}
-            return results
-
+            
+        fit_results = self.IAR_algorithm.fit(signals)
+        
         results = {}
         results["f"] = fit_results.model_params[1]
         results["Dp"] = fit_results.model_params[2]
@@ -120,6 +108,7 @@ class IAR_LU_biexp(OsipiBase):
         results = self.D_and_Ds_swap(results)
 
         return results
+
 
     def ivim_fit_full_volume(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
