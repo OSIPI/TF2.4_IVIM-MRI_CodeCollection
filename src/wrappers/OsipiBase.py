@@ -374,10 +374,12 @@ class OsipiBase:
 
             return results
 
-        except: 
+        except Exception as e:
             # Check if the problem is that full volume fitting is simply not supported in the standardized implementation
             if not hasattr(self, "ivim_fit_full_volume"): #and callable(getattr(self, "ivim_fit_full_volume")):
                 print("Full volume fitting not supported for this algorithm")
+            else:
+                print(f"Full volume fitting failed: {type(e).__name__}: {e}")
 
             return False
 
