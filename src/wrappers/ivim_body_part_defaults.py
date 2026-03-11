@@ -1,102 +1,81 @@
 """
 Body-part specific IVIM parameter defaults.
 
-Literature-based initial guesses, bounds, and thresholds for
-different anatomical regions. Used by OsipiBase when the user
-specifies a body_part parameter.
+Literature-based initial guesses for different anatomical regions,
+using expected healthy-tissue means from the upcoming Sigmund et al.
+IVIM consensus recommendations paper ("Towards Clinical Translation
+of Intravoxel Incoherent Motion MRI: Acquisition and Analysis
+Consensus Recommendations", JMRI).
+
+Bounds are intentionally set to broad physical limits for ALL organs
+to preserve sensitivity to lesions (which deviate from healthy tissue).
+The organ-specific bounds structure is retained so that organ-specific
+bounds can be introduced at a later stage by changing these numbers.
 
 References:
-    Brain:    Federau 2017 (DOI: 10.1002/nbm.3780)
-    Liver:    Dyvorne 2013 (DOI: 10.1016/j.ejrad.2013.03.003),
-              Guiu 2012 (DOI: 10.1002/jmri.23762)
-    Kidney:   Li 2017 (DOI: 10.1002/jmri.25571),
-              Ljimani 2020 (DOI: 10.1007/s10334-019-00802-0)
-    Prostate: Kuru 2014 (DOI: 10.1007/s00330-014-3165-y)
-    Pancreas: Barbieri 2020 (DOI: 10.1002/mrm.27910)
-    Head/Neck: Sumi 2012 (DOI: 10.1259/dmfr/15696758)
-    Breast:   Lee 2018 (DOI: 10.1097/RCT.0000000000000661)
-    Placenta: Zhu 2023 (DOI: 10.1002/jmri.28858)
+    [1] Vieni 2020 – Brain  (DOI: 10.1016/j.neuroimage.2019.116228)
+    [2] Ljimani 2020 – Kidney  (DOI: 10.1007/s10334-019-00790-y)
+    [3] Li 2017 – Liver  (DOI: 10.21037/qims.2017.02.03)
+    [4] Englund 2022 – Muscle  (DOI: 10.1002/jmri.27876)
+    [5] Liang 2020 – Breast  (DOI: 10.3389/fonc.2020.585486)
+    [6] Zhu 2021 – Pancreas  (DOI: 10.1007/s00330-021-07891-9)
 """
+
+import warnings
+import copy
+
+# Broad physical bounds applied to every organ.
+# These are intentionally wide to avoid restricting lesion contrast.
+_BROAD_BOUNDS = {
+    "S0": [0.5, 1.5],
+    "f": [0, 1.0],
+    "Dp": [0.005, 0.2],
+    "D": [0, 0.005],
+}
+
+def _broad_bounds():
+    """Return a fresh deep copy of the broad bounds dict."""
+    return copy.deepcopy(_BROAD_BOUNDS)
 
 IVIM_BODY_PART_DEFAULTS = {
     "brain": {
-        "initial_guess": {"S0": 1.0, "f": 0.05, "Dp": 0.01, "D": 0.0008},
-        "bounds": {
-            "S0": [0.7, 1.3],
-            "f": [0.0, 0.15],
-            "Dp": [0.005, 0.05],
-            "D": [0.0003, 0.002],
-        },
-        "thresholds": [200],
-    },
-    "liver": {
-        "initial_guess": {"S0": 1.0, "f": 0.12, "Dp": 0.06, "D": 0.001},
-        "bounds": {
-            "S0": [0.7, 1.3],
-            "f": [0.0, 0.40],
-            "Dp": [0.01, 0.15],
-            "D": [0.0003, 0.003],
-        },
+        "initial_guess": {"S0": 1.0, "f": 0.0764, "Dp": 0.01088, "D": 0.00083},
+        "bounds": _broad_bounds(),
         "thresholds": [200],
     },
     "kidney": {
-        "initial_guess": {"S0": 1.0, "f": 0.20, "Dp": 0.03, "D": 0.0019},
-        "bounds": {
-            "S0": [0.7, 1.3],
-            "f": [0.0, 0.50],
-            "Dp": [0.01, 0.08],
-            "D": [0.0005, 0.004],
-        },
+        "initial_guess": {"S0": 1.0, "f": 0.1888, "Dp": 0.04053, "D": 0.00189},
+        "bounds": _broad_bounds(),
         "thresholds": [200],
     },
-    "prostate": {
-        "initial_guess": {"S0": 1.0, "f": 0.08, "Dp": 0.025, "D": 0.0015},
-        "bounds": {
-            "S0": [0.7, 1.3],
-            "f": [0.0, 0.25],
-            "Dp": [0.005, 0.06],
-            "D": [0.0003, 0.003],
-        },
+    "liver": {
+        "initial_guess": {"S0": 1.0, "f": 0.2305, "Dp": 0.07002, "D": 0.00109},
+        "bounds": _broad_bounds(),
         "thresholds": [200],
     },
-    "pancreas": {
-        "initial_guess": {"S0": 1.0, "f": 0.18, "Dp": 0.02, "D": 0.0012},
-        "bounds": {
-            "S0": [0.7, 1.3],
-            "f": [0.0, 0.50],
-            "Dp": [0.005, 0.06],
-            "D": [0.0003, 0.003],
-        },
+    "muscle": {
+        "initial_guess": {"S0": 1.0, "f": 0.1034, "Dp": 0.03088, "D": 0.00147},
+        "bounds": _broad_bounds(),
         "thresholds": [200],
     },
-    "head_and_neck": {
-        "initial_guess": {"S0": 1.0, "f": 0.15, "Dp": 0.025, "D": 0.001},
-        "bounds": {
-            "S0": [0.7, 1.3],
-            "f": [0.0, 0.40],
-            "Dp": [0.005, 0.08],
-            "D": [0.0003, 0.003],
-        },
+    "breast_benign": {
+        "initial_guess": {"S0": 1.0, "f": 0.0700, "Dp": 0.05233, "D": 0.00143},
+        "bounds": _broad_bounds(),
         "thresholds": [200],
     },
-    "breast": {
-        "initial_guess": {"S0": 1.0, "f": 0.10, "Dp": 0.02, "D": 0.0014},
-        "bounds": {
-            "S0": [0.7, 1.3],
-            "f": [0.0, 0.30],
-            "Dp": [0.005, 0.06],
-            "D": [0.0004, 0.003],
-        },
+    "breast_malignant": {
+        "initial_guess": {"S0": 1.0, "f": 0.1131, "Dp": 0.03776, "D": 0.00097},
+        "bounds": _broad_bounds(),
         "thresholds": [200],
     },
-    "placenta": {
-        "initial_guess": {"S0": 1.0, "f": 0.28, "Dp": 0.04, "D": 0.0017},
-        "bounds": {
-            "S0": [0.7, 1.3],
-            "f": [0.05, 0.60],
-            "Dp": [0.01, 0.1],
-            "D": [0.0005, 0.004],
-        },
+    "pancreas_benign": {
+        "initial_guess": {"S0": 1.0, "f": 0.2003, "Dp": 0.02539, "D": 0.00141},
+        "bounds": _broad_bounds(),
+        "thresholds": [200],
+    },
+    "pancreas_malignant": {
+        "initial_guess": {"S0": 1.0, "f": 0.1239, "Dp": 0.02216, "D": 0.00140},
+        "bounds": _broad_bounds(),
         "thresholds": [200],
     },
 }
@@ -104,12 +83,7 @@ IVIM_BODY_PART_DEFAULTS = {
 # Keep the current universal defaults as "generic"
 IVIM_BODY_PART_DEFAULTS["generic"] = {
     "initial_guess": {"S0": 1.0, "f": 0.1, "Dp": 0.01, "D": 0.001},
-    "bounds": {
-        "S0": [0.7, 1.3],
-        "f": [0, 1.0],
-        "Dp": [0.005, 0.2],
-        "D": [0, 0.005],
-    },
+    "bounds": dict(_BROAD_BOUNDS),
     "thresholds": [200],
 }
 
@@ -120,7 +94,7 @@ def get_body_part_defaults(body_part):
     Args:
         body_part (str): Name of the body part (e.g., "brain", "liver", "kidney").
                          Case-insensitive. Spaces and hyphens are normalized to
-                         underscores (e.g., "head and neck" -> "head_and_neck").
+                         underscores (e.g., "breast benign" -> "breast_benign").
 
     Returns:
         dict: Dictionary with keys "initial_guess", "bounds", and "thresholds".
@@ -135,7 +109,20 @@ def get_body_part_defaults(body_part):
             f"Unknown body part '{body_part}'. "
             f"Available body parts: {available}"
         )
-    return IVIM_BODY_PART_DEFAULTS[key]
+
+    # Emit warning when organ-specific preset is selected (not for "generic")
+    if key != "generic":
+        warnings.warn(
+            f"Organ-specific preset '{body_part}' selected. "
+            "Initial guesses are based on healthy tissue means from the "
+            "IVIM consensus recommendations (Sigmund et al.) and references "
+            "therein. Fitting bounds are currently set to broad physical "
+            "limits and are not organ-specific.",
+            UserWarning,
+            stacklevel=2,
+        )
+
+    return copy.deepcopy(IVIM_BODY_PART_DEFAULTS[key])
 
 
 def get_available_body_parts():
