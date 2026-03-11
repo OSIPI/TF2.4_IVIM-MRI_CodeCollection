@@ -5,11 +5,49 @@ import pandas as pd
 import ast
 import os
 
+
+def filter_algorithms_by_harmonization(algo_categories, harmonization_step):
+    if harmonization_step == 'no_harmonization':
+        return [algo for algo, cat in algo_categories.items()]
+    elif harmonization_step == 'initialguess_harmonized':
+        return [algo for algo, cat in algo_categories.items() if cat in [2, 3]]
+    elif harmonization_step == 'bounds_and_initialguess_harmonized':
+        return [algo for algo, cat in algo_categories.items() if cat == 3]
+    else:
+        return [algo for algo, cat in algo_categories.items()]
+
+
+def categorize_algorithm(df_algo):
+    # Check if all bounds and all initial guesses are used
+    uses_all_bounds = df_algo[['D_use_bounds', 'Dp_use_bounds', 'f_use_bounds']].all().all()
+    uses_all_initial_guess = df_algo[['D_use_initial_guess', 'Dp_use_initial_guess', 'f_use_initial_guess']].all().all()
+    uses_any_initial_guess = df_algo[['D_use_initial_guess', 'Dp_use_initial_guess', 'f_use_initial_guess']].any().any()
+    uses_any_bounds = df_algo[['D_use_bounds', 'Dp_use_bounds', 'f_use_bounds']].any().any()
+
+    if uses_any_bounds and uses_all_initial_guess:
+        return 3
+    elif uses_any_initial_guess:
+        return 2
+    else:
+        return 1
+
+
 def add_category_bands(ax, algorithm_categories, algorithms_ordered, category_labels=False, rotation=45):
     """
     Draws background bands per category and labels them below the x-axis.
     Each category gets its own color. Category labels can be rotated.
     """
+
+    category_color_map = {
+        'Nonlinear LS': '#1f77b4',
+        'Variable Projection': '#ff7f0e',
+        'Linear LS': '#2ca02c',
+        'Segmented Linear LS ': '#d62728',
+        'Segmented Nonlinear LS': '#9467bd',
+        'Bayesian': '#8c564b',
+        'Neural network': '#e377c2'
+    }
+
     # 1. Set algorithm tick labels
     ax.set_xticks(range(len(algorithms_ordered)))
     ax.set_xticklabels(algorithms_ordered, fontsize=14)
@@ -28,8 +66,9 @@ def add_category_bands(ax, algorithm_categories, algorithms_ordered, category_la
     num_categories = len(cat_positions)
 
     for i, (cat, x0, x1) in enumerate(cat_positions):
-        color = cmap(i / num_categories)  # unique color per category
+        color = category_color_map.get(cat, '#cccccc')
         ax.axvspan(x0-0.5, x1+0.5, facecolor=color, alpha=0.3, zorder=-1)
+
         # Label category below x-axis with rotation
         if category_labels:
             ax.text((x0+x1)/2, -0.2, cat,
@@ -48,7 +87,7 @@ def add_category_bands(ax, algorithm_categories, algorithms_ordered, category_la
     ax.figure.subplots_adjust(bottom=0.3)
 
 
-def create_boxplot(df, y_map, main_title, y_label, log=False):
+def create_boxplot(df, y_map, main_title, y_label, log=False, harmonization_step='no_harmonization'):
     # Define algorithm categories and which algorithms belong to each
     df = df.dropna(how='all')
 
@@ -90,10 +129,30 @@ def create_boxplot(df, y_map, main_title, y_label, log=False):
         'Neural network': [25, 26]
     }
 
-    # Flatten ordered list for x-axis
+    # Categorize algorithms
+    algo_categories = {}
+    for algo in df['Algorithm'].unique():
+        df_algo = df[df['Algorithm'] == algo]
+        algo_categories[algo] = categorize_algorithm(df_algo)
+
+    # Filter algorithms
+    algorithms_filtered = filter_algorithms_by_harmonization(algo_categories, harmonization_step)
+
+    # Update algorithm_categories and algorithms_ordered
+    # Filter algorithms per category, keeping original membership
+    algorithm_categories_filtered = {
+        cat: [algo for algo in algos if algo in algorithms_filtered]
+        for cat, algos in algorithm_categories.items()
+    }
+    # Remove empty categories
+    algorithm_categories_filtered = {cat: algos for cat, algos in algorithm_categories_filtered.items() if algos}
+
     algorithms_ordered = []
-    for cat, algos in algorithm_categories.items():
+    for cat, algos in algorithm_categories_filtered.items():
         algorithms_ordered.extend(algos)
+
+    # Filter df
+    df = df[df['Algorithm'].isin(algorithms_ordered)]
 
     # Unique regions
     regions = df['Region'].unique()
@@ -132,9 +191,9 @@ def create_boxplot(df, y_map, main_title, y_label, log=False):
 
             # Add category bands below x-axis
             if param == 'D' or param == 'f':
-                add_category_bands(ax, algorithm_categories, algorithms_ordered, category_labels=False)
+                add_category_bands(ax, algorithm_categories_filtered, algorithms_ordered, category_labels=False)
             elif param == 'Dp':
-                add_category_bands(ax, algorithm_categories, algorithms_ordered, category_labels=True)
+                add_category_bands(ax, algorithm_categories_filtered, algorithms_ordered, category_labels=True)
 
             # Adjust y-limits **per subplot** based on whiskers
             adjust_ylim_to_box_from_data(
@@ -293,10 +352,28 @@ def adjust_ylim_to_box_from_data(ax, df, y_col, x_col, x_order, showfliers=False
 
 # Load the CSV (update the path if needed)
 region = "Brain"
-SNR = 20
-file_path = rf'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection/test_output_SNR{str(SNR)}.csv'
+SNR = 50
+harmonized_bounds = False
+harmonized_initialguess = True
+if harmonized_bounds and harmonized_initialguess:
+    harmonization_string = "bounds_and_initialguess_harmonized"
+    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_bounds_and_initialguess_harmonized_SNR50.csv'
+elif not harmonized_bounds and harmonized_initialguess:
+    harmonization_string = "initialguess_harmonized"
+    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_initialguess_harmonized_SNR50.csv'
+elif not harmonized_bounds and not harmonized_initialguess:
+    harmonization_string = "no_harmonization"
+    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_no_harmonization_SNR50.csv'
+
 df = pd.read_csv(file_path)
-df= df[df["Region"] == region]
+region = region + '_' + harmonization_string
+algo_categories = {}
+for algo in df['Algorithm'].unique():
+    df_algo = df[df['Algorithm'] == algo]
+    algo_categories[algo] = categorize_algorithm(df_algo)
+
+df = df[df["Region"] == region]
+
 # Convert relevant columns to numeric, coercing errors to NaN
 numeric_columns = ['f', 'Dp', 'D', 'f_fitted', 'Dp_fitted', 'D_fitted']
 for col in ['D_fitted', 'f_fitted', 'Dp_fitted']:
@@ -335,10 +412,11 @@ df['D_squared_error'] = np.square(df['D_error'])
 
 # 1. Boxplot of errors
 e_y_map = {'f': 'f_error', 'Dp': 'Dp_error', 'D': 'D_error'}
-fig1 = create_boxplot(df, e_y_map, 'Error vs Estimation Method (grouped by category)', 'error', log=False)
-save_folder = rf'C:\TF_IVIM_OSIPI/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/nobounds_noinitialguess/{region}'
+fig1 = create_boxplot(df, e_y_map, 'Error vs Estimation Method (grouped by category)', 'error', log=False, harmonization_step=harmonization_string)
+save_folder = f'/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/{harmonization_string}/{region}/'
 os.makedirs(save_folder, exist_ok=True)
-plt.savefig(os.path.join(save_folder,rf'e_map_{region}_SNR{str(SNR)}.png'))
+print(f"Saving figure to {os.path.join(save_folder,rf'e_map_{region}_SNR{str(SNR)}_{harmonization_string}.png')}")
+plt.savefig(os.path.join(save_folder,rf'e_map_{region}_SNR{str(SNR)}_{harmonization_string}.png'))
 
 # 1. Boxplot of estimates
 # e_y_map = {'f': 'f_fitted', 'Dp': 'Dp_fitted', 'D': 'D_fitted'}

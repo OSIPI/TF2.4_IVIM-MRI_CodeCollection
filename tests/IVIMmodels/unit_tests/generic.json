@@ -1,5 +1,5 @@
 {
-    "Brain": {
+    "Brain_bounds_and_initialguess_harmonized": {
         "D_mean": 0.00083,
         "D_std": 0.00007,
         "f_mean": 0.0764,
@@ -23,6 +23,43 @@
             "f": 0.08,
             "Dp": 0.01,
             "S0": 1.0}
+    },
+
+        "Brain_initialguess_harmonized": {
+        "D_mean": 0.00083,
+        "D_std": 0.00007,
+        "f_mean": 0.0764,
+        "f_std": 0.0316,
+        "Dp_mean": 0.01088,
+        "Dp_std": 0.00478,
+        "bvalues": [
+            0.0,
+            0.0,
+            70.0,
+            300.0,
+            400.0,
+            1000.0],
+        "initial_guess": {
+            "D": 0.0008,
+            "f": 0.08,
+            "Dp": 0.01,
+            "S0": 1.0}
+    },
+
+    "Brain_no_harmonization": {
+        "D_mean": 0.00083,
+        "D_std": 0.00007,
+        "f_mean": 0.0764,
+        "f_std": 0.0316,
+        "Dp_mean": 0.01088,
+        "Dp_std": 0.00478,
+        "bvalues": [
+            0.0,
+            0.0,
+            70.0,
+            300.0,
+            400.0,
+            1000.0]
     },
 
     "Brain_full": {

@@ -52,6 +52,10 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
         fit_result = fit.osipi_fit(signal, bvals) #, prior_in=prior
         time_delta += datetime.datetime.now() - start_time
         if save_file is not None:
+            if bounds is None:
+                bounds = {'f': None, 'Dp': None, 'D': None}
+            if initial_guess is None:
+                initial_guess = {'f': None, 'Dp': None, 'D': None}
             save_file.writerow([ivim_algorithm, name, SNR, idx,
                                 f, Dp, D,
                                 fit_result["f"], fit_result["Dp"], fit_result["D"],
