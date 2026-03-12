@@ -5,11 +5,15 @@ import numpy as np
 
 class DT_IIITN_WLS(OsipiBase):
     """
-    Weighted Least Squares IVIM fitting using statsmodels Robust Linear Model.
+    Segmented IVIM fitting with selectable regression method.
+
+    Two methods are available:
+    - WLS: Weighted Least Squares with Veraart S² weights (default)
+    - RLM: Robust Linear Model with Huber's T norm (statsmodels)
 
     Segmented approach:
-    1. Estimate D from high b-values using robust linear regression on log-signal
-    2. Estimate D* from residuals at low b-values using robust linear regression
+    1. Estimate D from high b-values using linear regression on log-signal
+    2. Estimate D* from residuals at low b-values using linear regression
 
     Author: Devguru Tiwari, IIIT Nagpur
 
@@ -22,7 +26,7 @@ class DT_IIITN_WLS(OsipiBase):
 
     # Algorithm identification
     id_author = "Devguru Tiwari, IIIT Nagpur"
-    id_algorithm_type = "Weighted least squares segmented fit"
+    id_algorithm_type = "Weighted least squares / robust linear model segmented fit"
     id_return_parameters = "f, D*, D"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
     id_ref = "https://doi.org/10.1016/j.neuroimage.2013.05.028"
@@ -43,9 +47,9 @@ class DT_IIITN_WLS(OsipiBase):
     supported_priors = False
 
     def __init__(self, bvalues=None, thresholds=None,
-                 bounds=None, initial_guess=None):
+                 bounds=None, initial_guess=None, method="WLS"):
         """
-        Initialize the WLS IVIM fitting algorithm.
+        Initialize the IVIM fitting algorithm.
 
         Args:
             bvalues (array-like, optional): b-values for the fitted signals.
@@ -54,14 +58,16 @@ class DT_IIITN_WLS(OsipiBase):
                 and low b-values. Default: 200 s/mm².
             bounds (dict, optional): Not used by this algorithm.
             initial_guess (dict, optional): Not used by this algorithm.
+            method (str): Regression method — "WLS" (default) or "RLM".
         """
         super(DT_IIITN_WLS, self).__init__(
             bvalues=bvalues, bounds=bounds,
             initial_guess=initial_guess, thresholds=thresholds
         )
+        self.method = method.upper()
 
     def ivim_fit(self, signals, bvalues, **kwargs):
-        """Perform the IVIM fit using WLS.
+        """Perform the IVIM fit using the selected method (WLS or RLM).
 
         Args:
             signals (array-like): Signal intensities at each b-value.
@@ -77,7 +83,8 @@ class DT_IIITN_WLS(OsipiBase):
         if self.thresholds is not None and len(self.thresholds) > 0:
             cutoff = self.thresholds[0]
 
-        D, f, Dp = wls_ivim_fit(bvalues, signals, cutoff=cutoff)
+        D, f, Dp = wls_ivim_fit(bvalues, signals, cutoff=cutoff,
+                                method=self.method)
 
         results = {}
         results["D"] = D
