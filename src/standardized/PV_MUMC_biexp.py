@@ -81,7 +81,7 @@ class PV_MUMC_biexp(OsipiBase):
             self.thresholds = 200
 
         # Default fallback parameters (D, f, Dp) used if the optimizer fails
-        DEFAULT_PARAMS = [0.001, 0.1, 0.01]
+        DEFAULT_PARAMS = [0.003, 0.1, 0.05]
 
         try:
             fit_results = self.PV_algorithm(bvalues, signals, bounds=bounds, cutoff=self.thresholds)
