@@ -60,12 +60,14 @@ class IAR_LU_subtracted(OsipiBase):
             bvec[:,2] = 1
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
 
-            # Convert dict bounds/initial_guess to list-of-lists as expected by IvimModelSubtracted
-            bounds_list = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]],
-                           [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
-            initial_guess_list = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
-
-            self.IAR_algorithm = IvimModelSubtracted(gtab, bounds=bounds_list, initial_guess=initial_guess_list)
+            # Adapt the bounds to the format needed for the algorithm
+            bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]], \
+                        [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
+            
+            # Adapt the initial guess to the format needed for the algorithm
+            initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
+            
+            self.IAR_algorithm = IvimModelSubtracted(gtab, bounds=bounds, initial_guess=initial_guess)
         else:
             self.IAR_algorithm = None
         
