@@ -110,8 +110,6 @@ def test_default_bounds_and_initial_guesses(algorithmlist,eng):
         assert 0 <= fit.osipi_initial_guess["f"] <= 0.5, f"For {algorithm}, the default initial guess for f {fit.osipi_initial_guess['f']} is unrealistic"
         assert 0.003 <= fit.osipi_initial_guess["Dp"] <= 0.1, f"For {algorithm}, the default initial guess for Dp {fit.osipi_initial_guess['Dp']} is unrealistic"
         assert 0.9 <= fit.osipi_initial_guess["S0"] <= 1.1, f"For {algorithm}, the default initial guess for S0 {fit.osipi_initial_guess['S0']} is unrealistic; note signal is normalized"
-
-
 def test_bounds(bound_input, eng, request):
     name, bvals, data, algorithm, xfail, kwargs, tolerances, requires_matlab = bound_input
     if xfail["xfail"]:
