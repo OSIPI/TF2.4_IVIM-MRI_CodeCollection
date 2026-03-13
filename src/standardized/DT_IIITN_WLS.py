@@ -35,9 +35,9 @@ class DT_IIITN_WLS(OsipiBase):
     required_bvalues = 4
     required_thresholds = [0, 0]
     required_bounds = False
-    required_bounds_optional = True
+    required_bounds_optional = False
     required_initial_guess = False
-    required_initial_guess_optional = True
+    required_initial_guess_optional = False
 
     # Supported inputs
     supported_bounds = False
