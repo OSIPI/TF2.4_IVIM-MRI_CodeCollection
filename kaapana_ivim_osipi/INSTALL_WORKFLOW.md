@@ -95,6 +95,19 @@ Helm chart configuration for Kubernetes deployment:
 - **`values.yaml`**: Default configuration values
 - **`requirements.yaml`**: Chart dependencies
 
+#### DAG Installer Chart
+
+The **DAG Installer Chart** can be found in the Kaapana repository under:
+[services/utils/dag-installer-chart](https://github.com/kaapana/kaapana/tree/develop/services/utils/dag-installer-chart)
+
+It is referenced in `requirements.yaml` as:
+
+```yaml
+repository: "file:///home/usman/kaapana/services/utils/dag-installer-chart/"
+```
+
+Users must download the chart and ensure the path in `requirements.yaml` points to the correct local directory before installing the workflow.
+
 ## Workflow Features
 
 ### Input Flexibility
