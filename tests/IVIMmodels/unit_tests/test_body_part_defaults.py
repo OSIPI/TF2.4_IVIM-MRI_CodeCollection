@@ -32,34 +32,32 @@ class TestBodyPartDefaults:
     """Tests for get_body_part_defaults() and the lookup table."""
 
     def test_brain_initial_guess(self):
-        """Brain defaults should return literature-sourced values."""
+        """Brain defaults should return consensus-based values (Sigmund et al.)."""
         bp = get_body_part_defaults("brain")
-        assert bp["initial_guess"]["f"] == 0.05
-        assert bp["initial_guess"]["D"] == 0.0008
-        assert bp["initial_guess"]["Dp"] == 0.01
+        assert bp["initial_guess"]["f"] == 0.0764
+        assert bp["initial_guess"]["D"] == 0.00083
+        assert bp["initial_guess"]["Dp"] == 0.01088
 
     def test_liver_initial_guess(self):
-        """Liver defaults should return literature-sourced values."""
+        """Liver defaults should return consensus-based values (Sigmund et al.)."""
         bp = get_body_part_defaults("liver")
-        assert bp["initial_guess"]["f"] == 0.12
-        assert bp["initial_guess"]["D"] == 0.001
-        assert bp["initial_guess"]["Dp"] == 0.06
+        assert bp["initial_guess"]["f"] == 0.2305
+        assert bp["initial_guess"]["D"] == 0.00109
+        assert bp["initial_guess"]["Dp"] == 0.07002
 
     def test_kidney_initial_guess(self):
-        """Kidney defaults should return literature-sourced values."""
+        """Kidney defaults should return consensus-based values (Sigmund et al.)."""
         bp = get_body_part_defaults("kidney")
-        assert bp["initial_guess"]["f"] == 0.20
-        assert bp["initial_guess"]["D"] == 0.0019
-        assert bp["initial_guess"]["Dp"] == 0.03
+        assert bp["initial_guess"]["f"] == 0.1888
+        assert bp["initial_guess"]["D"] == 0.00189
+        assert bp["initial_guess"]["Dp"] == 0.04053
 
-    def test_liver_bounds_differ_from_generic(self):
-        """Liver bounds should be tighter than generic bounds."""
-        liver = get_body_part_defaults("liver")
-        generic = get_body_part_defaults("generic")
-        # Liver D upper bound should be tighter than generic
-        assert liver["bounds"]["D"][1] < generic["bounds"]["D"][1]
-        # Liver Dp lower bound should be higher than generic
-        assert liver["bounds"]["Dp"][0] >= generic["bounds"]["Dp"][0]
+    def test_all_organs_use_broad_physical_bounds(self):
+        """All organs should use the same broad physical bounds."""
+        broad = {"S0": [0.5, 1.5], "f": [0, 1.0], "Dp": [0.005, 0.2], "D": [0, 0.005]}
+        for bp_name in get_available_body_parts():
+            bp = get_body_part_defaults(bp_name)
+            assert bp["bounds"] == broad, f"{bp_name} bounds differ from broad physical bounds"
 
     def test_unknown_body_part_raises_valueerror(self):
         """Unknown body part should raise ValueError with available list."""
@@ -75,9 +73,9 @@ class TestBodyPartDefaults:
 
     def test_spaces_and_hyphens_normalized(self):
         """Spaces and hyphens should be normalized to underscores."""
-        bp1 = get_body_part_defaults("head_and_neck")
-        bp2 = get_body_part_defaults("head and neck")
-        bp3 = get_body_part_defaults("head-and-neck")
+        bp1 = get_body_part_defaults("breast_benign")
+        bp2 = get_body_part_defaults("breast benign")
+        bp3 = get_body_part_defaults("breast-benign")
         assert bp1 == bp2 == bp3
 
     def test_all_body_parts_have_required_keys(self):
@@ -139,14 +137,14 @@ class TestOsipiBaseBodyPart:
     def test_body_part_sets_initial_guess(self):
         """body_part='brain' should set brain-specific initial guess."""
         fit = OsipiBase(bvalues=[0, 50, 200, 800], body_part="brain")
-        assert fit.initial_guess["f"] == 0.05
-        assert fit.initial_guess["D"] == 0.0008
+        assert fit.initial_guess["f"] == 0.0764
+        assert fit.initial_guess["D"] == 0.00083
 
     def test_body_part_sets_bounds(self):
-        """body_part='liver' should set liver-specific bounds."""
+        """body_part='liver' should set broad physical bounds."""
         fit = OsipiBase(bvalues=[0, 50, 200, 800], body_part="liver")
-        assert fit.bounds["Dp"] == [0.01, 0.15]
-        assert fit.bounds["D"] == [0.0003, 0.003]
+        assert fit.bounds["Dp"] == [0.005, 0.2]
+        assert fit.bounds["D"] == [0, 0.005]
 
     def test_body_part_none_uses_generic(self):
         """body_part=None (default) should use original generic defaults."""
@@ -164,8 +162,8 @@ class TestOsipiBaseBodyPart:
             initial_guess=custom,
         )
         assert fit.initial_guess["f"] == 0.99  # User value, not brain default
-        # But bounds should still be brain-specific
-        assert fit.bounds["D"] == [0.0003, 0.002]
+        # But bounds should still be from body_part (broad physical)
+        assert fit.bounds["D"] == [0, 0.005]
 
     def test_user_bounds_overrides_body_part(self):
         """Explicit bounds dict should take priority over body_part."""
@@ -176,15 +174,15 @@ class TestOsipiBaseBodyPart:
             bounds=custom_bounds,
         )
         assert fit.bounds["D"] == [0, 0.01]  # User value, not liver default
-        # But initial_guess should still be liver-specific
-        assert fit.initial_guess["f"] == 0.12
+        # But initial_guess should still be liver-specific (consensus)
+        assert fit.initial_guess["f"] == 0.2305
 
     def test_initial_guess_as_string(self):
         """Passing initial_guess='liver' should work like body_part='liver'."""
         fit = OsipiBase(bvalues=[0, 50, 200, 800], initial_guess="liver")
-        assert fit.initial_guess["f"] == 0.12
-        assert fit.initial_guess["Dp"] == 0.06
-        assert fit.bounds["D"] == [0.0003, 0.003]
+        assert fit.initial_guess["f"] == 0.2305
+        assert fit.initial_guess["Dp"] == 0.07002
+        assert fit.bounds["D"] == [0, 0.005]
 
     def test_body_part_stored_as_attribute(self):
         """The body_part should be stored on the instance for reference."""
