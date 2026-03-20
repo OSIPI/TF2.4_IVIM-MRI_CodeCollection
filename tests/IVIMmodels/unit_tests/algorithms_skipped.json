@@ -1,0 +1,63 @@
+{
+    "algorithms": [
+        "ASD_MemorialSloanKettering_QAMPER_IVIM",
+        "OJ_GU_segMATLAB",
+        "IVIM_NEToptim",
+        "Super_IVIM_DC",
+        "OJ_GU_bayesMATLAB"
+    ],
+    "TCML_TechnionIIT_lsqBOBYQA": {
+      "xfail_names": {"pericardium": false, "bounds": false}
+    },
+  "IVIM_NEToptim": {
+        "deep_learning": true,
+        "n":3000000
+    },
+    "Super_IVIM_DC": {
+        "deep_learning": true
+    },
+    "ASD_MemorialSloanKettering_QAMPER_IVIM": {
+        "requires_matlab": true
+    },
+    "OJ_GU_segMATLAB": {
+        "requires_matlab": true
+    },
+    "OJ_GU_bayesMATLAB": {
+        "requires_matlab": true
+    },
+    "IAR_LU_biexp": {
+        "fail_first_time": true
+    },
+    "ETP_SRI_LinearFitting": {
+        "options": {
+            "thresholds": [500]
+        },
+        "tolerances": {
+            "rtol": {
+                "f": 5,
+                "D": 5,
+                "Dp": 25
+            },
+            "atol": {
+                "f": 0,
+                "D": 0,
+                "Dp": 0
+            },
+            "dynamic_rtol": {
+                "offset": 0.001,
+                "noise": 200,
+                "f": 2,
+                "D": 1,
+                "Dp": 3
+            },
+            "dynamic_atol": {
+                "offset": 5e-2,
+                "noise": 10,
+                "f": 1,
+                "D": 0.001,
+                "Dp": 2
+            }
+        },
+        "test_bounds": false
+    }
+}
