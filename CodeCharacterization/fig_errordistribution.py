@@ -354,10 +354,10 @@ def adjust_ylim_to_box_from_data(ax, df, y_col, x_col, x_order, showfliers=False
 region = "Brain"
 SNR = 50
 harmonized_bounds = False
-harmonized_initialguess = True
+harmonized_initialguess = False
 if harmonized_bounds and harmonized_initialguess:
     harmonization_string = "bounds_and_initialguess_harmonized"
-    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_bounds_and_initialguess_harmonized_SNR50.csv'
+    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_harmonized_SNR50.csv'
 elif not harmonized_bounds and harmonized_initialguess:
     harmonization_string = "initialguess_harmonized"
     file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_initialguess_harmonized_SNR50.csv'
@@ -366,7 +366,6 @@ elif not harmonized_bounds and not harmonized_initialguess:
     file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_no_harmonization_SNR50.csv'
 
 df = pd.read_csv(file_path)
-region = region + '_' + harmonization_string
 algo_categories = {}
 for algo in df['Algorithm'].unique():
     df_algo = df[df['Algorithm'] == algo]

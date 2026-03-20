@@ -199,7 +199,7 @@ elif not harmonized_bounds and harmonized_initialguess:
 elif not harmonized_bounds and not harmonized_initialguess:
     harmonization_step = "no_harmonization"
     file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_no_harmonization_SNR20.csv'
-region = region + "_" + harmonization_step
+
 df = pd.read_csv(file_path)
 df= df[df["Region"] == region]
 for col in ['D_fitted', 'f_fitted', 'Dp_fitted']:

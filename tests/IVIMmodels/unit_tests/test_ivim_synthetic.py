@@ -10,7 +10,8 @@ from utilities.data_simulation.GenerateData import GenerateData
 #run using pytest <path_to_this_file> --saveFileName test_output.txt --SNR 50 100 200
 #e.g. pytest -m slow tests/IVIMmodels/unit_tests/test_ivim_synthetic.py  --saveFileName test_output.csv --SNR 10 50 100 200 --fitCount 20
 @pytest.mark.slow
-def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_noise, save_file, save_duration_file, use_prior,eng):
+def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_noise, save_file, save_duration_file,
+                   use_prior,eng, use_initial_guess, use_bounds, use_fullbvalues):
     # assert save_file == "test"
     ivim_algorithm, requires_matlab, deep_learning = algorithmlist
     if requires_matlab and eng is None:
@@ -29,9 +30,21 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
     Dp_arr = np.clip(Dp_arr, a_min=0, a_max=None)
     f_arr = rng.normal(data["f_mean"], data["f_std"], fit_count)
     f_arr = np.clip(f_arr, a_min=0, a_max=1)
-    bvals = data["bvalues"]
-    bounds = data.get("bounds", None)
-    initial_guess = data.get("initial_guess", None)
+
+    if use_fullbvalues:
+        bvals = data["bvalues_full"]
+    else:
+        bvals = data["bvalues"]
+
+    if use_initial_guess:
+        initial_guess = data.get("initial_guess", None)
+    else:
+        initial_guess = None
+
+    if use_bounds:
+        bounds = data.get("bounds", None)
+    else:
+        bounds = None
 
     fit = OsipiBase(algorithm=ivim_algorithm, bounds=bounds, initial_guess=initial_guess)
     # here is a prior

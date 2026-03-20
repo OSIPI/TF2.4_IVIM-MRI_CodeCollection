@@ -114,6 +114,27 @@ def pytest_addoption(parser):
         help="Drop these data from the list"
     )
 
+    parser.addoption(
+        "--useInitialGuess",
+        default=False,
+        type=bool,
+        help="Whether to use initial guess"
+    )
+
+    parser.addoption(
+        "--useBounds",
+        default=False,
+        type=bool,
+        help="Whether to use bounds"
+    )
+
+    parser.addoption(
+        "--useFullBValues",
+        default=False,
+        type=bool,
+        help="Whether to use full b-values"
+    )
+
 @pytest.fixture(scope="session")
 def eng(request):
     """Start and return a MATLAB engine session if --withmatlab is set."""
@@ -190,6 +211,17 @@ def rician_noise(request):
 def use_prior(request):
     return request.config.getoption("--usePrior")
 
+@pytest.fixture(scope="session")
+def use_initial_guess(request):
+    return request.config.getoption("--useInitialGuess")
+
+@pytest.fixture(scope="session")
+def use_bounds(request):
+    return request.config.getoption("--useBounds")
+
+@pytest.fixture(scope="session")
+def use_fullbvalues(request):
+    return request.config.getoption("--useFullBValues")
 
 def pytest_generate_tests(metafunc):
     config = metafunc.config
