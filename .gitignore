@@ -40,5 +40,10 @@ coverage.xml
 *.pyc
 phantoms/MR_XCAT_qMRI/*.json
 phantoms/MR_XCAT_qMRI/*.txt
+phantoms/brain/data/*.nii.gz
+phantoms/brain/ground_truth/*.nii.gz
 tests/IVIMmodels/unit_tests/models
 models
+temp
+.vscode
+.env
