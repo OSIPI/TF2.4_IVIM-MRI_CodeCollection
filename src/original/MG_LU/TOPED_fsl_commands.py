@@ -28,8 +28,7 @@ class TOPED:
         """ Run a generic FSL command through WSL.
         Parameters:
             command : str                           The FSL command to execute.
-        Returns:
-            subprocess.CompletedProcess             The completed process.
+            workdir : str                           The working directory in the Linux filesystem where the command should be executed.
         """
         # print the full command in the IDE output when running the fsl_runner.
         print(f" command: {command}")
@@ -50,11 +49,11 @@ class TOPED:
         acq_parameter_path: str,
         config_file_path: Optional[str] = None,
         nthr: Optional[int] = None,
-        logout: Optional[str] = None, # new
-        dfout: Optional[str] = None, # new
-        jacout: Optional[str] = None, # new
+        logout: Optional[str] = None, 
+        dfout: Optional[str] = None, 
+        jacout: Optional[str] = None, 
         patient_id: Optional[str] = None,
-        output_dir: Optional[str] = None # iout mandatory bruh!
+        output_dir: Optional[str] = None 
     ) -> str:
         """ Run FSL TOPUP on a stack of b0 images.
         Parameters:
@@ -84,7 +83,7 @@ class TOPED:
             config_filename = self.copy_to_wsl(config_file_path, workdir)
             config_arg = f"--config={config_filename} "
         else:
-            # Force FSL default config
+            # FSL default config
             config_arg = "--config=b02b0.cnf "
 
         # Build command
@@ -93,9 +92,7 @@ class TOPED:
             f"--imain={b0_name} "
             f"--datain={acqparam} "
             f"--out={b0_basename} "
-            #f"--dfout={self.get_fieldmap_name(b0_basename)} "
             f"--iout={self.get_corrected_name(b0_basename)} "
-            #f"--jacout={self.get_jacobian_name(b0_basename)} "
         )
 
         if logout is not None: cmd += f"--logout={self.get_log_name(b0_basename)} "
@@ -139,7 +136,7 @@ class TOPED:
         mporder: Optional[int] = None,
         patient_id: Optional[str] = None,
         output_dir: Optional[str] = None,
-        json_path: Optional[str] = None, # new from here.
+        json_path: Optional[str] = None, 
         interp: Optional[str] = None,
         nvoxhp: Optional[int] = None,
         ff: Optional[float] = None,
@@ -199,7 +196,7 @@ class TOPED:
         slspec = self.copy_to_wsl(slspec_path, workdir) if slspec_path else None
         json_file = self.copy_to_wsl(json_path, workdir)   if json_path   else None
 
-        # Build command dynamically
+        # Build command
         cmd = (
             f"eddy "
             f"--imain={dwi_name} "
