@@ -50,13 +50,13 @@ Supported file inputs:
 # │   └── ... (other patient-specific files)    
 # └── common_files (optional)
 #     ├── acqparams.txt 
-#     ├── bvecs
-#     ├── bvals
+#     ├── bvecs.txt
+#     ├── bvals.txt
 #     ├── index.txt
 #     ├── slspec.txt
 #     └── config.cnf
 
-# Note: 'patient_1' etc. are examples and can be any suitable name. 
+# names of folders are arbitrary. 
 # The names of these folders are copied into the linux working directory and are used to identify the respective entries.
 # a 'common_files' folder is optional. The purpose is is you e.g. have the same config file or acqparams/bvecs/bvals/index/slspec files for all patients.
 
@@ -198,7 +198,13 @@ def resolve_file(patient_dir, common_dir, key):
 
 
 # main loops start HERE - runs TOPUP and Eddy for each patient folder in main_dir
-common_dir = (os.path.join(MAIN_DIR, COMMON_FOLDER_NAME) if COMMON_FOLDER_NAME else None)
+common_dir = None
+if COMMON_FOLDER_NAME:
+    _common_path = os.path.join(MAIN_DIR, COMMON_FOLDER_NAME)
+    if os.path.isdir(_common_path):
+        common_dir = _common_path
+    else:
+        print("note: no common folder found -> checking compulsory files in remaining folders...")
 
 # Input file check - check all of main_dir, do the files exist for all patients?
 # this is so that you wont leeave this overnight and come back to some shit error that could have been prevented. 
@@ -224,7 +230,7 @@ for patient in os.listdir(MAIN_DIR):
 
     # TOPUP compulsory inputs
     if not b0_path:   issues.append("TOPUP: cannot find b0 file")
-    if not acqp_path: issues.append("TOPUP: cannot find acqisition parameters file")
+    if not acqp_path: issues.append("TOPUP: cannot find acquisition parameters file")
 
     # EDDY compulsory (only warn if b0 exists, i.e. TOPUP would run)
     if b0_path:
@@ -247,7 +253,7 @@ if not file_check:
     "\n Consider renaming your files to contain the specified keyword or adjust the IDENTIFIERS dict accordingly. " \
     "\n TOPUP/Eddy will run only for the 'OK' cases.")
 else:
-    print("\n File check passed — all patients have all compulosry inputs.")
+    print("\n File check passed — all patients have all compulsory inputs.")
 
 
 for patient in os.listdir(MAIN_DIR):

@@ -98,8 +98,7 @@ class TOPED:
         if logout is not None: cmd += f"--logout={self.get_log_name(b0_basename)} "
         if dfout is not None: cmd += f"--dfout={self.get_warpfig_name(b0_basename)} "
         if jacout is not None: cmd += f"--jacout={self.get_jacobian_name(b0_basename)} "
-        if nthr is not None:
-            cmd += f"--nthr={nthr} "
+        if nthr is not None: cmd += f"--nthr={nthr} "
         cmd += config_arg
 
         # Run
@@ -145,7 +144,7 @@ class TOPED:
         ol_nstd: Optional[float] = None,
         ol_nvox: Optional[int] = None,
         ol_type: Optional[str] = None,
-        ol_ss: Optional[int] = None,
+        ol_ss: Optional[str] = None,
         ol_pos: Optional[bool] = None,
         ol_sqr: Optional[bool] = None,
         s2v_niter: Optional[int] = None,
@@ -220,34 +219,33 @@ class TOPED:
         if niter is not None: cmd += f"--niter={niter} "
         if interp is not None: cmd += f"--interp={interp} "
         if resamp is not None: cmd += f"--resamp={resamp} "
-        if fep is not None: cmd += f"--fep "
+        if fep: cmd += f"--fep "
         if nvoxhp is not None: cmd += f"--nvoxhp={nvoxhp} "
         if ff is not None: cmd += f"--ff={ff} "
-        if dont_sep_offs_move is not None: cmd += f"--dont_sep_offs_move "
-        if dont_peas is not None: cmd += f"--dont_peas "
+        if dont_sep_offs_move: cmd += f"--dont_sep_offs_move "
+        if dont_peas: cmd += f"--dont_peas "
 
-        if repol is not None: cmd += f"--repol "
+        if repol: cmd += f"--repol "
         if ol_nstd is not None: cmd += f"--ol_nstd={ol_nstd} "
         if ol_nvox is not None: cmd += f"--ol_nvox={ol_nvox} "
         if ol_type is not None: cmd += f"--ol_type={ol_type} " 
         if ol_ss is not None: cmd += f"--ol_ss={ol_ss} "
-        if ol_pos is not None: cmd += f"--ol_pos "
-        if ol_sqr is not None: cmd += f"--ol_sqr "
+        if ol_pos: cmd += f"--ol_pos "
+        if ol_sqr: cmd += f"--ol_sqr "
 
         if mporder is not None: cmd += f"--mporder={mporder} "
         if s2v_niter is not None: cmd += f"--s2v_niter={s2v_niter} "
         if s2v_lambda is not None: cmd += f"--s2v_lambda={s2v_lambda} "
         if s2v_interp is not None: cmd += f"--s2v_interp={s2v_interp} "
         
-        if estimate_move_by_susceptibility is not None:
-            cmd += f"--estimate_move_by_susceptibility={int(estimate_move_by_susceptibility)} "
+        if estimate_move_by_susceptibility: cmd += f"--estimate_move_by_susceptibility "
         if mbs_niter is not None: cmd += f"--mbs_niter={mbs_niter} "
         if mbs_lambda is not None: cmd += f"--mbs_lambda={mbs_lambda} "
         if mbs_ksp is not None: cmd += f"--mbs_ksp={mbs_ksp} "
 
-        if cnr_maps is not None: cmd += f"--cnr_maps "
-        if residuals is not None: cmd += f"--residuals "
-        if data_is_shelled is not None: cmd += f"--data_is_shelled "
+        if cnr_maps: cmd += f"--cnr_maps "
+        if residuals: cmd += f"--residuals "
+        if data_is_shelled: cmd += f"--data_is_shelled "
         if nthr is not None: cmd += f"--nthr={nthr} "   
 
 
