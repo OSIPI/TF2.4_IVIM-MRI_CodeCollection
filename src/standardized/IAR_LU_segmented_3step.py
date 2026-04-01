@@ -69,7 +69,7 @@ class IAR_LU_segmented_3step(OsipiBase):
             # Adapt the initial guess to the format needed for the algorithm
             initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
             
-            self.IAR_algorithm = IvimModelSegmented3Step(gtab, bounds=self.bounds, initial_guess=self.initial_guess)
+            self.IAR_algorithm = IvimModelSegmented3Step(gtab, bounds=bounds, initial_guess=initial_guess)
         else:
             self.IAR_algorithm = None
         
