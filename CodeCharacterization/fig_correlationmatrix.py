@@ -29,7 +29,7 @@ def filter_algorithms_by_harmonization(df, harmonization_step):
     if harmonization_step == 'no_harmonization':
         algorithms_filtered = [algo for algo, cat in algo_categories.items()]
     elif harmonization_step == 'initialguess_harmonized':
-        algorithms_filtered = [algo for algo, cat in algo_categories.items() if cat in [2, 3]]
+        algorithms_filtered = [algo for algo, cat in algo_categories.items() if cat in [2, 4]]
     elif harmonization_step == 'bounds_harmonized':
         algorithms_filtered = [algo for algo, cat in algo_categories.items() if cat in [3, 4]]
     elif harmonization_step == 'bounds_and_initialguess_harmonized':
