@@ -7,10 +7,11 @@ from utilities.data_simulation.Download_data import download_data
 import json
 from src.wrappers.OsipiBase import OsipiBase
 import matlab.engine
+import ast
 
 SNR = 20
 data_path = '../'
-data_filename = rf"test_output_SNR{SNR}_complete_bounds.csv"
+data_filename = rf"test_output_SNR{SNR}_complete_bounds_initialguess_fullbvalues.csv"
 data = pd.read_csv(os.path.join(data_path, data_filename))
 data = data.dropna(how="all")
 single_algorithm = data['Algorithm'].iloc[0]
@@ -33,27 +34,45 @@ for name in config["algorithms"]:
 	algorithmlist.append((name, requires_matlab, deep_learning))
 
 eng = matlab.engine.start_matlab()
-signal_cols = [c for c in single_dataset.columns if c.startswith("b")]
 results_rows = []
 
 for name in algorithmlist:
 	print(f"Starting analysis for algorithm: {name}")
 	for anatomy in single_dataset["Region"].unique():
 		print(f"Working on region: {anatomy}")
-		bvals = data_json[anatomy]["bvalues"]
+		bvals = data_json[anatomy]["bvalues_full"]
 		data_region = single_dataset[single_dataset["Region"] == anatomy]
-		fit = OsipiBase(algorithm=name[0], bvalues=bvals)
+
+		initial_guess_f = np.fromstring(single_dataset["f_initial_guess"][0])[0]
+		initial_guess_D = np.fromstring(single_dataset["D_initial_guess"][0])[0]
+		initial_guess_Dp = np.fromstring(single_dataset["Dp_initial_guess"][0])[0]
+		initial_guess = {
+            "D": initial_guess_D,
+            "f": initial_guess_f,
+            "Dp": initial_guess_f,
+            "S0": 1.0}
+
+		bounds_f = np.fromstring(single_dataset["f_bounds"][0].strip("[]"), sep=", ")
+		bounds_D = np.fromstring(single_dataset["D_bounds"][0].strip("[]"), sep=", ")
+		bounds_Dp = np.fromstring(single_dataset["Dp_bounds"][0].strip("[]"), sep=", ")
+		bounds = {
+			"D": bounds_D,
+			"f": bounds_f,
+			"Dp": bounds_Dp,
+			"S0": [0.5, 1.5]}
+
+		fit = OsipiBase(algorithm=name[0], bvalues=bvals, initial_guess=initial_guess, bounds=bounds)
 		fit_results = []
 		for i in range(len(data_region)):
 			row = data_region.iloc[i].copy()
 			row["Algorithm"] = name
-			signals = data_region.iloc[i][signal_cols].values.astype(float)
-			data_norm = signals[~np.isnan(signals)]
-			maps = fit.osipi_fit(data_norm, bvals)
+			signals = data_region.iloc[i]["measured_signals"]
+			signals = np.fromstring(signals.strip("[]"), sep=" ")
+			maps = fit.osipi_fit(signals, bvals, initial_guess=initial_guess, bounds=bounds)
 			row["f_fitted"] = maps["f"]
 			row["Dp_fitted"] = maps["Dp"]
 			row["D_fitted"] = maps["D"]
 			results_rows.append(row)
 df_fitted = pd.DataFrame(results_rows)
-save_filename = rf"test_output_skippedalgorithms_SNR{SNR}_complete_bounds.csv"
+save_filename = rf"test_output_skippedalgorithms_SNR{SNR}_complete_bounds_initialguess.csv"
 df_fitted.to_csv(os.path.join(data_path,save_filename), index=False)

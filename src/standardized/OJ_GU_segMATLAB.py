@@ -58,6 +58,7 @@ class OJ_GU_segMATLAB(OsipiBase):
         Y = matlab.double(Y.tolist())
         b = matlab.double(b.tolist())
         lim = matlab.double(lim.tolist())
+        blim = [[float(x)] for x in blim]
         blim = matlab.double(blim)
         self.eng.addpath(r'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\src\original\OJ_GU', nargout=0)
         results = self.eng.IVIM_seg(Y, b, lim, blim, False,nargout=3)

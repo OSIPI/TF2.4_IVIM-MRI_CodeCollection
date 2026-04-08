@@ -2,58 +2,17 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import pandas as pd
-import ast
 import os
 
-
-def filter_algorithms_by_harmonization(algo_categories, harmonization_step):
-    if harmonization_step == 'no_harmonization':
-        return [algo for algo, cat in algo_categories.items()]
-    elif harmonization_step == 'initialguess_harmonized':
-        return [algo for algo, cat in algo_categories.items() if cat in [2, 3]]
-    elif harmonization_step == 'bounds_and_initialguess_harmonized':
-        return [algo for algo, cat in algo_categories.items() if cat == 3]
-    else:
-        return [algo for algo, cat in algo_categories.items()]
-
-
-def categorize_algorithm(df_algo):
-    # Check if all bounds and all initial guesses are used
-    uses_all_bounds = df_algo[['D_use_bounds', 'Dp_use_bounds', 'f_use_bounds']].all().all()
-    uses_all_initial_guess = df_algo[['D_use_initial_guess', 'Dp_use_initial_guess', 'f_use_initial_guess']].all().all()
-    uses_any_initial_guess = df_algo[['D_use_initial_guess', 'Dp_use_initial_guess', 'f_use_initial_guess']].any().any()
-    uses_any_bounds = df_algo[['D_use_bounds', 'Dp_use_bounds', 'f_use_bounds']].any().any()
-
-    if uses_any_bounds and uses_all_initial_guess:
-        return 3
-    elif uses_any_initial_guess:
-        return 2
-    else:
-        return 1
-
+# ========================================
+# 1. Helper: Category bands
+# ========================================
 
 def add_category_bands(ax, algorithm_categories, algorithms_ordered, category_labels=False, rotation=45):
-    """
-    Draws background bands per category and labels them below the x-axis.
-    Each category gets its own color. Category labels can be rotated.
-    """
-
-    category_color_map = {
-        'Nonlinear LS': '#1f77b4',
-        'Variable Projection': '#ff7f0e',
-        'Linear LS': '#2ca02c',
-        'Segmented Linear LS ': '#d62728',
-        'Segmented Nonlinear LS': '#9467bd',
-        'Bayesian': '#8c564b',
-        'Neural network': '#e377c2'
-    }
-
-    # 1. Set algorithm tick labels
     ax.set_xticks(range(len(algorithms_ordered)))
     ax.set_xticklabels(algorithms_ordered, fontsize=14)
     ax.tick_params(axis='y', labelsize=14)
 
-    # 2. Compute category spans
     start_pos = 0
     cat_positions = []
     for cat, algos in algorithm_categories.items():
@@ -61,37 +20,42 @@ def add_category_bands(ax, algorithm_categories, algorithms_ordered, category_la
         cat_positions.append((cat, start_pos, end_pos))
         start_pos = end_pos + 1
 
-    # 3. Assign one distinct color per category
     cmap = plt.get_cmap('tab20')
     num_categories = len(cat_positions)
 
     for i, (cat, x0, x1) in enumerate(cat_positions):
-        color = category_color_map.get(cat, '#cccccc')
-        ax.axvspan(x0-0.5, x1+0.5, facecolor=color, alpha=0.3, zorder=-1)
+        color = cmap(i / num_categories)
+        ax.axvspan(x0 - 0.5, x1 + 0.5, facecolor=color, alpha=0.3, zorder=-1)
 
-        # Label category below x-axis with rotation
         if category_labels:
-            ax.text((x0+x1)/2, -0.2, cat,
-                    ha='right' if rotation != 0 else 'center', va='top',
-                    rotation=rotation,
-                    transform=ax.get_xaxis_transform(),
-                    fontsize=14, fontweight='bold')
+            ax.text(
+                (x0 + x1) / 2, -0.2, cat,
+                ha='right' if rotation != 0 else 'center',
+                va='top',
+                rotation=rotation,
+                transform=ax.get_xaxis_transform(),
+                fontsize=14,
+                fontweight='bold'
+            )
 
-    # 4. Add vertical separators (optional)
+    # separators
     start_pos = 0
     for cat, algos in list(algorithm_categories.items())[:-1]:
         start_pos += len(algos)
         ax.axvline(start_pos - 0.5, color='gray', linestyle='--', linewidth=1)
 
-    # 5. Adjust bottom margin to fit rotated category labels
     ax.figure.subplots_adjust(bottom=0.3)
 
 
-def create_boxplot(df, y_map, main_title, y_label, log=False, harmonization_step='no_harmonization'):
-    # Define algorithm categories and which algorithms belong to each
+# ========================================
+# 2. Boxplot function
+# ========================================
+
+def create_boxplot(df, y_map, main_title, y_label, log=False):
+
     df = df.dropna(how='all')
 
-    algorithm_categories = {
+    algorithm_categories_names = {
         'Nonlinear LS': [
             'TCML_TechnionIIT_lsqlm', 'TCML_TechnionIIT_lsqtrf', 'TCML_TechnionIIT_lsq_sls_lm',
             'TCML_TechnionIIT_lsqBOBYQA', 'TCML_TechnionIIT_lsq_sls_trf', 'TCML_TechnionIIT_lsq_sls_BOBYQA',
@@ -102,17 +66,18 @@ def create_boxplot(df, y_map, main_title, y_label, log=False, harmonization_step
         'Linear LS': ['ETP_SRI_LinearFitting'],
         'Segmented Linear LS ': ["TF_reference_IVIMfit", 'PvH_KB_NKI_IVIMfit'],
         'Segmented Nonlinear LS': [
-                      'TCML_TechnionIIT_SLS', "IAR_LU_segmented_2step", "IAR_LU_segmented_3step",
-                      "IAR_LU_subtracted", 'OGC_AmsterdamUMC_biexp_segmented', 'PV_MUMC_biexp',
-                      "OJ_GU_seg", 'OJ_GU_segMATLAB'],
+            'TCML_TechnionIIT_SLS', "IAR_LU_segmented_2step", "IAR_LU_segmented_3step",
+            "IAR_LU_subtracted", 'OGC_AmsterdamUMC_biexp_segmented', 'PV_MUMC_biexp',
+            "OJ_GU_seg", 'OJ_GU_segMATLAB'
+        ],
         'Bayesian': ['OGC_AmsterdamUMC_Bayesian_biexp', 'OJ_GU_bayesMATLAB'],
         'Neural network': ['IVIM_NEToptim', 'Super_IVIM_DC']
     }
 
-    # Step 1: Map algorithm names to integer IDs
+    # Map to IDs
     mapping = {}
     counter = 1
-    for cat, algos in algorithm_categories.items():
+    for cat, algos in algorithm_categories_names.items():
         for algo in algos:
             mapping[algo] = counter
             counter += 1
@@ -120,45 +85,21 @@ def create_boxplot(df, y_map, main_title, y_label, log=False, harmonization_step
     df = df.replace(mapping)
 
     algorithm_categories = {
-        'Nonlinear LS': [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        'Nonlinear LS': list(range(1, 10)),
         'Variable Projection': [10, 11],
         'Linear LS': [12],
         'Segmented Linear LS ': [13, 14],
-        'Segmented Nonlinear LS': [15, 16, 17, 18, 19, 20, 21, 22],
+        'Segmented Nonlinear LS': list(range(15, 23)),
         'Bayesian': [23, 24],
         'Neural network': [25, 26]
     }
 
-    # Categorize algorithms
-    algo_categories = {}
-    for algo in df['Algorithm'].unique():
-        df_algo = df[df['Algorithm'] == algo]
-        algo_categories[algo] = categorize_algorithm(df_algo)
+    algorithms_ordered = [a for group in algorithm_categories.values() for a in group]
 
-    # Filter algorithms
-    algorithms_filtered = filter_algorithms_by_harmonization(algo_categories, harmonization_step)
-
-    # Update algorithm_categories and algorithms_ordered
-    # Filter algorithms per category, keeping original membership
-    algorithm_categories_filtered = {
-        cat: [algo for algo in algos if algo in algorithms_filtered]
-        for cat, algos in algorithm_categories.items()
-    }
-    # Remove empty categories
-    algorithm_categories_filtered = {cat: algos for cat, algos in algorithm_categories_filtered.items() if algos}
-
-    algorithms_ordered = []
-    for cat, algos in algorithm_categories_filtered.items():
-        algorithms_ordered.extend(algos)
-
-    # Filter df
-    df = df[df['Algorithm'].isin(algorithms_ordered)]
-
-    # Unique regions
     regions = df['Region'].unique()
     n_regions = len(regions)
 
-    fig, axes = plt.subplots(3, n_regions, figsize=(10, 12), squeeze=False)
+    fig, axes = plt.subplots(3, n_regions, figsize=(12*n_regions, 10), squeeze=False)
 
     for i, region in enumerate(regions):
         df_region = df[df['Region'] == region]
@@ -174,28 +115,28 @@ def create_boxplot(df, y_map, main_title, y_label, log=False, harmonization_step
                 order=algorithms_ordered,
                 showfliers=False
             )
+
             if log:
                 ax.set_yscale('log')
 
             if param == 'D':
-                ax.set_ylabel(f'error in $D$' + ' (mm²/s)', fontsize=14)
-                ax.set_title(f'$D$')
-            if param == 'Dp':
-                ax.set_ylabel(f'error in $D^*$' + ' (mm²/s)', fontsize=14)
-                ax.set_title(f'$D^*$')
-            if param == 'f':
-                ax.set_ylabel(f'error in $f$' + ' (a.u.)', fontsize=14)
-                ax.set_title(f'$f$')
+                ax.set_ylabel('error in $D$ (mm²/s)', fontsize=12)
+                ax.set_title('$D$')
+            elif param == 'Dp':
+                ax.set_ylabel('error in $D^*$ (mm²/s)', fontsize=12)
+                ax.set_title('$D^*$')
+            else:
+                ax.set_ylabel('error in $f$ (a.u.)', fontsize=12)
+                ax.set_title('$f$')
+
             ax.set_xlabel('')
             ax.axhline(0, color='gray', linestyle='--', linewidth=1)
 
-            # Add category bands below x-axis
-            if param == 'D' or param == 'f':
-                add_category_bands(ax, algorithm_categories_filtered, algorithms_ordered, category_labels=False)
-            elif param == 'Dp':
-                add_category_bands(ax, algorithm_categories_filtered, algorithms_ordered, category_labels=True)
+            if param in ['D', 'f']:
+                add_category_bands(ax, algorithm_categories, algorithms_ordered, category_labels=False)
+            else:
+                add_category_bands(ax, algorithm_categories, algorithms_ordered, category_labels=True)
 
-            # Adjust y-limits **per subplot** based on whiskers
             adjust_ylim_to_box_from_data(
                 ax,
                 df_region,
@@ -204,220 +145,109 @@ def create_boxplot(df, y_map, main_title, y_label, log=False, harmonization_step
                 x_order=algorithms_ordered,
                 showfliers=False
             )
-            # Remove legend if present
+
             if ax.legend_:
                 ax.legend_.remove()
 
-    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.tight_layout()
     return fig
 
+
+# ========================================
+# 3. Y-limit helper
+# ========================================
+
 def adjust_ylim_to_box_from_data(ax, df, y_col, x_col, x_order, showfliers=False):
-    """
-    Adjust y-limits based on the actual data used in the boxplot.
-    - df: DataFrame filtered for current region/SNR
-    - y_col: column used for y-axis
-    - x_col: column used for x-axis
-    - x_order: list of x-axis values in order
-    - showfliers: if False, ignore outliers beyond 1.5*IQR
-    """
-    y_min = np.inf
-    y_max = -np.inf
+
+    y_min, y_max = np.inf, -np.inf
 
     for x_val in x_order:
         y_data = df[df[x_col] == x_val][y_col].dropna()
+
         if len(y_data) == 0:
-            continue  # skip if no data for this algorithm
+            continue
 
         if not showfliers:
             q1 = np.percentile(y_data, 25)
             q3 = np.percentile(y_data, 75)
             iqr = q3 - q1
-            lower = q1 - 1.5 * iqr
-            upper = q3 + 1.5 * iqr
-            y_data = y_data[(y_data >= lower) & (y_data <= upper)]
+            y_data = y_data[(y_data >= q1 - 1.5 * iqr) & (y_data <= q3 + 1.5 * iqr)]
 
         if len(y_data) > 0:
             y_min = min(y_min, y_data.min())
             y_max = max(y_max, y_data.max())
 
-    if y_min == np.inf or y_max == -np.inf:
-        # fallback if all data is empty
-        y_min, y_max = ax.get_ylim()
+    if y_min == np.inf:
+        return
 
     padding = (y_max - y_min) * 0.05 if y_max != y_min else 0.1
     ax.set_ylim(y_min - padding, y_max + padding)
 
 
-# Load the CSV (update the path if needed)
-# file_path = '/home/rnga/dkuppens/test_output_SNR20.csv'
-# df = pd.read_csv(file_path)
-#
-# # Convert relevant columns to numeric, coercing errors to NaN
-# for col in ['D_fitted', 'f_fitted', 'Dp_fitted']:
-#     df[col] = (
-#         df[col]
-#         .astype(str)
-#         .str.replace('[\[\]]', '', regex=True)  # remove [ and ]
-#         .replace('nan', np.nan)                 # clean up textual nan
-#         .astype(float)
-#     )
-# numeric_columns = ['f', 'Dp', 'D', 'f_fitted', 'Dp_fitted', 'D_fitted']
-#
-# for col in numeric_columns:
-#     df[col] = pd.to_numeric(df[col], errors='coerce')
-#
-#
-# # Create a category column for grouping by SNR/region
-# # df['category'] = df['Region'] + ' SNR:' + df['SNR'].astype(str)
-#
-# # Compute errors
-# df['f_error'] = df['f_fitted'] - df['f']
-# df['Dp_error'] = df['Dp_fitted'] - df['Dp']
-# df['D_error'] = df['D_fitted'] - df['D']
-#
-# # Compute bias per group (using transform to broadcast back to rows)
-# df['f_bias'] = df.groupby(['Algorithm', 'Region', 'SNR'])['f_error'].transform('mean')
-# df['Dp_bias'] = df.groupby(['Algorithm', 'Region', 'SNR'])['Dp_error'].transform('mean')
-# df['D_bias'] = df.groupby(['Algorithm', 'Region', 'SNR'])['D_error'].transform('mean')
-#
-# # Compute squared deviations for variance boxplots
-# df['f_var'] = (df['f_error'] - df['f_bias']) ** 2
-# df['Dp_var'] = (df['Dp_error'] - df['Dp_bias']) ** 2
-# df['D_var'] = (df['D_error'] - df['D_bias']) ** 2
-#
-# # Compute absolute errors for RMSE boxplots (individual contributions)
-# df['f_squared_error'] = np.square(df['f_error'])
-# df['Dp_squared_error'] = np.square(df['Dp_error'])
-# df['D_squared_error'] = np.square(df['D_error'])
-#
-# # 1. Boxplot of errors
-# e_y_map = {'f': 'f_error', 'Dp': 'Dp_error', 'D': 'D_error'}
-# fig1 = create_boxplot(df, e_y_map, 'Error vs Estimation Method (grouped by category)', 'error', log=False)
-# plt.savefig('/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/nobounds_noinitialguess/e_map_20.png')
-#
-# # 1. Boxplot of estimates
-# e_y_map = {'f': 'f_fitted', 'Dp': 'Dp_fitted', 'D': 'D_fitted'}
-# fig2 = create_boxplot(df, e_y_map, 'Estimate vs Estimation Method (grouped by category)', 'error', log=False)
-# plt.savefig('/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/nobounds_noinitialguess/estimates_map_20.png')
+# ========================================
+# 4. Load + preprocess
+# ========================================
 
-# Load the CSV (update the path if needed)
-# file_path = '/home/rnga/dkuppens/test_output_SNR100.csv'
-# df = pd.read_csv(file_path)
-#
-# # Convert relevant columns to numeric, coercing errors to NaN
-# numeric_columns = ['f', 'Dp', 'D', 'f_fitted', 'Dp_fitted', 'D_fitted']
-# for col in ['D_fitted', 'f_fitted', 'Dp_fitted']:
-#     df[col] = (
-#         df[col]
-#         .astype(str)
-#         .str.replace('[\[\]]', '', regex=True)  # remove [ and ]
-#         .replace('nan', np.nan)                 # clean up textual nan
-#         .astype(float)
-#     )
-# for col in numeric_columns:
-#     df[col] = pd.to_numeric(df[col], errors='coerce')
-#
-# # Create a category column for grouping by SNR/region
-# # df['category'] = df['Region'] + ' SNR:' + df['SNR'].astype(str)
-#
-# # Compute errors
-# df['f_error'] = df['f_fitted'] - df['f']
-# df['Dp_error'] = df['Dp_fitted'] - df['Dp']
-# df['D_error'] = df['D_fitted'] - df['D']
-#
-# # Compute bias per group (using transform to broadcast back to rows)
-# df['f_bias'] = df.groupby(['Algorithm', 'Region', 'SNR'])['f_error'].transform('mean')
-# df['Dp_bias'] = df.groupby(['Algorithm', 'Region', 'SNR'])['Dp_error'].transform('mean')
-# df['D_bias'] = df.groupby(['Algorithm', 'Region', 'SNR'])['D_error'].transform('mean')
-#
-# # Compute squared deviations for variance boxplots
-# df['f_var'] = (df['f_error'] - df['f_bias']) ** 2
-# df['Dp_var'] = (df['Dp_error'] - df['Dp_bias']) ** 2
-# df['D_var'] = (df['D_error'] - df['D_bias']) ** 2
-#
-# # Compute absolute errors for RMSE boxplots (individual contributions)
-# df['f_squared_error'] = np.square(df['f_error'])
-# df['Dp_squared_error'] = np.square(df['Dp_error'])
-# df['D_squared_error'] = np.square(df['D_error'])
-#
-# # 1. Boxplot of errors
-# e_y_map = {'f': 'f_error', 'Dp': 'Dp_error', 'D': 'D_error'}
-# fig1 = create_boxplot(df, e_y_map, 'Error vs Estimation Method (grouped by category)', 'error', log=False)
-# plt.savefig(r'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/nobounds_noinitialguess/e_map_100.png')
-
-# 1. Boxplot of estimates
-# e_y_map = {'f': 'f_fitted', 'Dp': 'Dp_fitted', 'D': 'D_fitted'}
-# fig2 = create_boxplot(df, e_y_map, 'Estimate vs Estimation Method (grouped by category)', 'error', log=False)
-# plt.savefig('/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/nobounds_noinitialguess/estimates_map_100.png')
-
-# Load the CSV (update the path if needed)
-region = "Brain"
-SNR = 50
-harmonized_bounds = False
-harmonized_initialguess = False
-if harmonized_bounds and harmonized_initialguess:
-    harmonization_string = "bounds_and_initialguess_harmonized"
-    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_harmonized_SNR50.csv'
-elif not harmonized_bounds and harmonized_initialguess:
-    harmonization_string = "initialguess_harmonized"
-    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_initialguess_harmonized_SNR50.csv'
-elif not harmonized_bounds and not harmonized_initialguess:
-    harmonization_string = "no_harmonization"
-    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_no_harmonization_SNR50.csv'
+SNR = 20
+file_path = rf'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\test_output_SNR{SNR}_complete_bounds_initialguess.csv'
 
 df = pd.read_csv(file_path)
-algo_categories = {}
-for algo in df['Algorithm'].unique():
-    df_algo = df[df['Algorithm'] == algo]
-    algo_categories[algo] = categorize_algorithm(df_algo)
 
-df = df[df["Region"] == region]
-
-# Convert relevant columns to numeric, coercing errors to NaN
-numeric_columns = ['f', 'Dp', 'D', 'f_fitted', 'Dp_fitted', 'D_fitted']
 for col in ['D_fitted', 'f_fitted', 'Dp_fitted']:
     df[col] = (
         df[col]
         .astype(str)
-        .str.replace('[\[\]]', '', regex=True)  # remove [ and ]
-        .replace('nan', np.nan)                 # clean up textual nan
+        .str.replace('[\[\]]', '', regex=True)
+        .replace('nan', np.nan)
         .astype(float)
     )
+
+numeric_columns = ['f', 'Dp', 'D', 'f_fitted', 'Dp_fitted', 'D_fitted']
 for col in numeric_columns:
     df[col] = pd.to_numeric(df[col], errors='coerce')
 
-# Create a category column for grouping by SNR/region
-# df['category'] = df['Region'] + ' SNR:' + df['SNR'].astype(str)
-
-# Compute errors
+# Errors
 df['f_error'] = df['f_fitted'] - df['f']
 df['Dp_error'] = df['Dp_fitted'] - df['Dp']
 df['D_error'] = df['D_fitted'] - df['D']
 
-# Compute bias per group (using transform to broadcast back to rows)
+# Bias
 df['f_bias'] = df.groupby(['Algorithm', 'Region', 'SNR'])['f_error'].transform('mean')
 df['Dp_bias'] = df.groupby(['Algorithm', 'Region', 'SNR'])['Dp_error'].transform('mean')
 df['D_bias'] = df.groupby(['Algorithm', 'Region', 'SNR'])['D_error'].transform('mean')
 
-# Compute squared deviations for variance boxplots
-df['f_var'] = (df['f_error'] - df['f_bias']) ** 2
-df['Dp_var'] = (df['Dp_error'] - df['Dp_bias']) ** 2
-df['D_var'] = (df['D_error'] - df['D_bias']) ** 2
+# ========================================
+# 5. LOOP OVER ALL REGIONS
+# ========================================
 
-# Compute absolute errors for RMSE boxplots (individual contributions)
-df['f_squared_error'] = np.square(df['f_error'])
-df['Dp_squared_error'] = np.square(df['Dp_error'])
-df['D_squared_error'] = np.square(df['D_error'])
+regions = df['Region'].dropna().unique()
 
-# 1. Boxplot of errors
-e_y_map = {'f': 'f_error', 'Dp': 'Dp_error', 'D': 'D_error'}
-fig1 = create_boxplot(df, e_y_map, 'Error vs Estimation Method (grouped by category)', 'error', log=False, harmonization_step=harmonization_string)
-save_folder = f'/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/{harmonization_string}/{region}/'
-os.makedirs(save_folder, exist_ok=True)
-print(f"Saving figure to {os.path.join(save_folder,rf'e_map_{region}_SNR{str(SNR)}_{harmonization_string}.png')}")
-plt.savefig(os.path.join(save_folder,rf'e_map_{region}_SNR{str(SNR)}_{harmonization_string}.png'))
+base_folder = r'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\CodeCharacterization\bounds_initialguess'
 
-# 1. Boxplot of estimates
-# e_y_map = {'f': 'f_fitted', 'Dp': 'Dp_fitted', 'D': 'D_fitted'}
-# fig2 = create_boxplot(df, e_y_map, 'Estimate vs Estimation Method (grouped by category)', 'error', log=False)
-# plt.savefig('/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/nobounds_noinitialguess/estimates_map_1000.png')
+y_map = {'f': 'f_error', 'Dp': 'Dp_error', 'D': 'D_error'}
+
+for region in regions:
+    print(f"Processing region: {region}")
+
+    df_region = df[df['Region'] == region]
+
+    if df_region.empty:
+        continue
+
+    fig = create_boxplot(
+        df_region,
+        y_map,
+        'Error vs Estimation Method',
+        'error',
+        log=False
+    )
+
+    save_folder = os.path.join(base_folder, region)
+    os.makedirs(save_folder, exist_ok=True)
+
+    save_path = os.path.join(save_folder, f'e_map_{region}_SNR{SNR}.png')
+    fig.savefig(save_path, dpi=300, bbox_inches='tight')
+
+    plt.close(fig)
+
+print("Done!")

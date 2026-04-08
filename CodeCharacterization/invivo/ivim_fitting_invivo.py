@@ -76,11 +76,11 @@ def run_algorithms(algorithm_name, requires_matlab, deep_learning, data_norm, bv
     # Save results to CSV
     suffix = f'_slice{slice_idx}' if slice_idx is not None else ''
     df = pd.DataFrame({"f": f_map, "D*": Dstar_map, "D": D_map})
-    df.to_csv(fr'{base_dir}/IVIM_{anatomy}_{name}{suffix}.csv', index=False)
+    df.to_csv(fr'{base_dir}/IVIM_{anatomy}_{name}{suffix}_bounds_initialguess.csv', index=False)
     print(f'Saved results for {name} ({anatomy})')
-    output_file_f = base_dir + rf"\{algorithm_name}_{anatomy}{suffix}_fit_f.nii"
-    output_file_D = base_dir + rf"\{algorithm_name}_{anatomy}{suffix}_fit_D.nii"
-    output_file_Dp = base_dir + rf"\{algorithm_name}_{anatomy}{suffix}_fit_Dp.nii"
+    output_file_f = base_dir + rf"\{algorithm_name}_{anatomy}{suffix}_bounds_initialguess_fit_f.nii"
+    output_file_D = base_dir + rf"\{algorithm_name}_{anatomy}{suffix}_bounds_initialguess_fit_D.nii"
+    output_file_Dp = base_dir + rf"\{algorithm_name}_{anatomy}{suffix}_bounds_initialguess_fit_Dp.nii"
     nib.save(nib.Nifti1Image(f_map.reshape(sx,sy,sz), nii.affine),
              output_file_f)
     nib.save(nib.Nifti1Image(D_map.reshape(sx,sy,sz), nii.affine),
@@ -92,7 +92,7 @@ def run_algorithms(algorithm_name, requires_matlab, deep_learning, data_norm, bv
 
 
 if __name__ == "__main__":
-    slice_idx = 12
+    slice_idx = None
     use_bounds = True
     use_initial_guess = True
 

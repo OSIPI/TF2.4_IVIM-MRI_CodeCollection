@@ -274,6 +274,8 @@ class OsipiBase:
             def parfun(ijk):
                 single_voxel_data = np.array(data[ijk], copy=True)
                 if not np.isnan(single_voxel_data[0]):
+                    if self.deep_learning and single_voxel_data.ndim == 1:
+                        single_voxel_data = single_voxel_data[None, :]
                     fit = self.ivim_fit(single_voxel_data, use_bvalues, **kwargs)
                 else:
                     fit={'D':0,'f':0,'Dp':0}
@@ -291,18 +293,30 @@ class OsipiBase:
             # Populate results after parallel loop
             for ijk, fit in results_list:
                 for key in fit:
-                    results[key][ijk] = fit[key]
+                    val = np.ravel(fit[key])
+
+                    if val.size == 0:
+                        results[key][ijk] = np.nan
+                    else:
+                        results[key][ijk] = val[0]
         else:
             for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1]), mininterval=60):
                 # Normalize array
                 single_voxel_data = data[ijk]
                 if not np.isnan(single_voxel_data[0]):
+                    if self.deep_learning and single_voxel_data.ndim == 1:
+                        single_voxel_data = single_voxel_data[None, :]
                     args = [single_voxel_data, use_bvalues]
                     fit = self.ivim_fit(*args, **kwargs)
                 else:
                     fit={'D':0,'f':0,'Dp':0}
                 for key in list(fit.keys()):
-                    results[key][ijk] = fit[key]
+                    val = np.ravel(fit[key])
+
+                    if val.size == 0:
+                        results[key][ijk] = np.nan
+                    else:
+                        results[key][ijk] = val[0]
         #self.parameter_estimates = self.ivim_fit(data, bvalues)
         return results
 
