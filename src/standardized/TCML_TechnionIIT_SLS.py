@@ -47,7 +47,7 @@ class TCML_TechnionIIT_SLS(OsipiBase):
         self.initialize(bounds, fitS0,thresholds)
 
     def initialize(self, bounds, fitS0,thresholds):
-        self.use_bounds = {"f": False, "Dp": False, "D": False}
+        self.use_bounds = {"f": False, "Dp": True, "D": False}
         warnings.warn('bounds are only used for initialization fit')
 
         self.use_initial_guess = {"f": False, "Dp": False, "D": False}

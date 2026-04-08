@@ -46,7 +46,8 @@ class IAR_LU_modified_mix(OsipiBase):
         """
         super(IAR_LU_modified_mix, self).__init__(bvalues, thresholds, bounds, initial_guess)
 
-        self.use_bounds = {"f": False, "Dp": False, "D": False} # This algorithm performs intermediate steps that generates initial guesses outside very constrainted bounds
+        # TODO: check with Ivan why initially use_bounds was set to False
+        self.use_bounds = {"f": True, "Dp": True, "D": True} # This algorithm performs intermediate steps that generates initial guesses outside very constrainted bounds
         self.use_initial_guess = {"f": False, "Dp": False, "D": False} # This algorithm does not use initial guesses
 
         # Additional options
