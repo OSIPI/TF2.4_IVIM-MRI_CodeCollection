@@ -21,8 +21,8 @@ def load_data(anatomy):
 def load_mask(anatomy):
     """Load the corresponding mask for the given anatomy."""
     mask_paths = {
-        "brain_gray_matter": '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/download/Data/brain_mask_gray_matter.nii.gz',
-        "brain_white_matter": '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/download/Data/brain_mask_white_matter.nii.gz',
+        "brain_gray_matter": '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/download/Data/Brain_mask_gray_matter.nii.gz',
+        "brain_white_matter": '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/download/Data/Brain_mask_white_matter.nii.gz',
         "abdomen": '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/download/Data/mask_abdomen_homogeneous.nii.gz'
     }
     masks = {}
@@ -151,8 +151,8 @@ def run_algorithms(algorithm_name, requires_matlab, deep_learning, data_norm, bv
 
 
 if __name__ == "__main__":
-    slice_idx = None
-    use_bounds = False
+    slice_idx = 12
+    use_bounds = True
     use_initial_guess = False
 
     base_dir = os.path.join(os.path.dirname(__file__), 'results')
@@ -171,7 +171,7 @@ if __name__ == "__main__":
         requires_matlab = settings.get("requires_matlab", False)
         deep_learning = settings.get("deep_learning", False)
         algorithmlist.append((name, requires_matlab, deep_learning))
-    for anatomy in ["brain"]:
+    for anatomy in ["Brain"]:
         bval, data, nifti = load_data(anatomy)
         if use_initial_guess:
             initial_guess = generic[anatomy].get("initial_guess", None)

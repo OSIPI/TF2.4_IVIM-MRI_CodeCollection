@@ -40,7 +40,6 @@ def filter_algorithms_by_harmonization(df, harmonization_step):
     return algorithms_filtered
 
 
-
 def add_category_bands_heatmap(ax, algorithm_categories, orientation='x'):
     import matplotlib.patches as patches
     n_algos = sum(len(v) for v in algorithm_categories.values())
@@ -192,18 +191,18 @@ algorithm_categories = {
 # 2. Load and preprocess data
 # ========================================
 region = "Brain"
-SNR = 20
-harmonized_bounds = True
+SNR = 50
+harmonized_bounds = False
 harmonized_initialguess = True
 if harmonized_bounds and harmonized_initialguess:
     harmonization_step = "bounds_and_initialguess_harmonized"
-    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_bounds_and_initialguess_harmonized_SNR20.csv'
+    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_bounds_and_initialguess_harmonized_SNR50.csv'
 elif not harmonized_bounds and harmonized_initialguess:
     harmonization_step = "initialguess_harmonized"
-    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_initialguess_harmonized_SNR20.csv'
+    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_initialguess_harmonized_SNR50.csv'
 elif not harmonized_bounds and not harmonized_initialguess:
     harmonization_step = "no_harmonization"
-    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_no_harmonization_SNR20.csv'
+    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_no_harmonization_SNR50.csv'
 
 df = pd.read_csv(file_path)
 df= df[df["Region"] == region]
@@ -246,7 +245,7 @@ algorithms_ordered = []
 for cat, algos in algorithm_categories_filtered.items():
     algorithms_ordered.extend(algos)
 
-output_path = f'/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/{harmonization_step}/Brain_{harmonization_step}/correlationmatrices_{region}_SNR{str(SNR)}.png'
+output_path = f'/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/{harmonization_step}/Brain/correlationmatrices_{region}_SNR{str(SNR)}.png'
 plot_all_correlation_matrices(df, region, SNR, algorithm_categories_filtered, output_path)
 print(f"Saved combined correlation matrix figure for SNR {int(SNR)}")
 
