@@ -116,22 +116,22 @@ def pytest_addoption(parser):
 
     parser.addoption(
         "--useInitialGuess",
+        action="store_true",
         default=False,
-        type=bool,
         help="Whether to use initial guess"
     )
 
     parser.addoption(
         "--useBounds",
+        action="store_true",
         default=False,
-        type=bool,
         help="Whether to use bounds"
     )
 
     parser.addoption(
         "--useFullBValues",
+        action="store_true",
         default=False,
-        type=bool,
         help="Whether to use full b-values"
     )
 
