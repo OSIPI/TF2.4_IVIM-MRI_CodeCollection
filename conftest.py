@@ -19,14 +19,14 @@ def pytest_addoption(parser):
     )
     parser.addoption(
         "--ricianNoise",
+        action="store_true",
         default=False,
-        type=bool,
         help="Use Rician noise, non-rician is gaussian",
     )
     parser.addoption(
         "--usePrior",
+        action="store_true",
         default=False,
-        type=bool,
         help="Use a prior where accepted",
     )
     parser.addoption(
