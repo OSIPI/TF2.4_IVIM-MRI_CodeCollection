@@ -25,14 +25,18 @@
         "OJ_GU_seg",
         "OJ_GU_segMATLAB",
         "OJ_GU_bayesMATLAB",
-        "TF_reference_IVIMfit"
+        "TF_reference_IVIMfit",
+        "DT_IIITN_WLS"
     ],
     "TCML_TechnionIIT_lsqBOBYQA": {
-      "xfail_names": {"pericardium": false, "bounds": false}
+        "xfail_names": {
+            "pericardium": false,
+            "bounds": false
+        }
     },
-  "IVIM_NEToptim": {
+    "IVIM_NEToptim": {
         "deep_learning": true,
-        "n":3000000
+        "n": 3000000
     },
     "Super_IVIM_DC": {
         "deep_learning": true
@@ -51,7 +55,9 @@
     },
     "ETP_SRI_LinearFitting": {
         "options": {
-            "thresholds": [500]
+            "thresholds": [
+                500
+            ]
         },
         "tolerances": {
             "rtol": {
