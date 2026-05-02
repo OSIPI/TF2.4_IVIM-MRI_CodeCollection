@@ -60,7 +60,7 @@ class IAR_LU_segmented_2step(OsipiBase):
         if self.bvalues is not None:
             bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
-            gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
+            gtab = gradient_table(self.bvalues, bvecs=bvec, b0_threshold=0)
             bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]], \
                       [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
         
@@ -97,7 +97,7 @@ class IAR_LU_segmented_2step(OsipiBase):
             
             bvec = np.zeros((bvalues.size, 3))
             bvec[:,2] = 1
-            gtab = gradient_table(bvalues, bvec, b0_threshold=0)
+            gtab = gradient_table(bvalues, bvecs=bvec, b0_threshold=0)
 
             if self.thresholds is None:
                 self.thresholds = 200
