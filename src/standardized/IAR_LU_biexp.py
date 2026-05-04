@@ -59,7 +59,7 @@ class IAR_LU_biexp(OsipiBase):
         if self.bvalues is not None:
             bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
-            gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
+            gtab = gradient_table(self.bvalues, bvecs=bvec, b0_threshold=0)
             
             self.IAR_algorithm = IvimModelBiExp(gtab, bounds=self.bounds, initial_guess=self.initial_guess)
         else:
