@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.PvH_KB_NKI.DWI_functions_standalone import generate_IVIMmaps_standalone, generate_ADC_standalone
+from src.original.fitting.PvH_KB_NKI.DWI_functions_standalone import generate_IVIMmaps_standalone, generate_ADC_standalone
 import numpy as np
 import warnings
 warnings.simplefilter('once', UserWarning)
@@ -48,8 +48,8 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
         self.NKI_algorithm = generate_IVIMmaps_standalone
         if bounds is not None:
             print('warning, bounds from wrapper are not (yet) used in this algorithm')
-        self.use_bounds = False
-        self.use_initial_guess = False
+        self.use_bounds = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
+        self.use_initial_guess = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
 
 
     def ivim_fit(self, signals, bvalues=None):

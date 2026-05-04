@@ -7,33 +7,35 @@ from dipy.reconst.multi_voxel import multi_voxel_fit
 from dipy.utils.optpkg import optional_package
 
 
-class IvimModelSegmented2Step(ReconstModel):
+class IvimModelSubtracted(ReconstModel):
 
-    def __init__(self, gtab, b_threshold=200, \
-        initial_guess=None, perf_initial_guess=None, bounds=None, rescale_units=False):
-        """The conventional 2-step segmented fit.
-            1. Fit mono-expoential to large b-values above a b-threshold
-            2. Fix D in a NLLS fit to the diffusive bi-exponential IVIM model.
+    def __init__(self, gtab, b_threshold_upper=100, b_threshold_lower=200, \
+        initial_guess=None, bounds=None, rescale_units=False):
+        """The subtracted method described by Le Bihan in
+        What can we see with IVIM MRI? NeuroImage. 2019 Feb 15;187:56–67. 
 
         Args:
             gtab (DIPY gtab class): 
-                Object that holds the diffusion encoding information. In this
-                case, the b-values.
-            b_threshold (float, optional): 
-                The threshold for the 2-step fit. Defaults to 200.
-            perf_initial_guess (array-like, optional): 
-                The initial guess for the fit. Defaults to None.
+                Object that holds the b-values.
+            b_threshold_upper (int, optional): 
+                The upper threshold for the D* fit. Defaults to 100.
+            b_threshold_lower (int, optional): 
+                The lower threshold of the D fit. Defaults to 200.
+            initial_guess (array-like, optional): 
+                Initial guesses for f, D*, D repsectively. Defaults to None.
             bounds (array-like, optional): 
-                Bounds for f, D*, and D (in that order), input as a tuple of 
-                lower bounds and upper bounds. Defaults to None.
-            rescale_units (bool, optional): Set to true if you are inputting
-            bounds and initial guesses in mm2/s but want the returned values to
-            be in units of µm2/ms. Make sure the b-values are already in the
-            latter units if set to True. Defaults to False.
+                Tupple of (lower bounds, upper bounds) for f, D*, D respectively. 
+                Defaults to None.
+            rescale_units (bool, optional): 
+                Rescales the guesses and bounds to units of um2/ms. Make sure
+                the b-values are already in these units if used. 
+                Defaults to False.
         """
         
+        
         self.bvals = gtab.bvals
-        self.diff_b_threshold_lower = b_threshold
+        self.perf_b_threshold_upper = b_threshold_upper
+        self.diff_b_threshold_lower = b_threshold_lower
         
         self.set_bounds(bounds)
         self.set_initial_guess(initial_guess)
@@ -50,7 +52,7 @@ class IvimModelSegmented2Step(ReconstModel):
             data = data / data_max
         
         ### Fit the diffusion signal to bvals >= diff_b_threshold_lower
-        diff_bounds = [(self.bounds[0][0], self.bounds[0][3]), \
+        diff_bounds = [(0, self.bounds[0][3]), \
             (self.bounds[1][0], self.bounds[1][3])] # Bounds for S0 and D
         
         diff_bval_indices = np.where(self.bvals >= self.diff_b_threshold_lower)[0]
@@ -60,17 +62,25 @@ class IvimModelSegmented2Step(ReconstModel):
         S0_diff_est, D_est = curve_fit(self.diffusion_signal, diff_bvals, diff_data, \
             bounds=diff_bounds, p0=np.take(self.initial_guess, [0, 3]), maxfev=10000)[0]
         
-        # Fit to the full bi-exponential, D fixed
-        full_initial_guess = np.array(self.initial_guess[:-1])
         
-        full_bounds_lower = self.bounds[0][:-1]
-        full_bounds_upper = self.bounds[1][:-1]
-        full_bounds = (full_bounds_lower, full_bounds_upper)
+        ### Fit the perfusion signal to bvals <= perf_b_threshold_upper
+        perf_bounds = [(0, self.bounds[0][2]), \
+            (self.bounds[1][0], self.bounds[1][2])] # Bounds for S0 and D*
         
-        S0_est, f_est, D_star_est = curve_fit(lambda b, S0, f, D_star: self.ivim_signal(b, S0, f, D_star, D_est), self.bvals, data, bounds=full_bounds, p0=full_initial_guess, maxfev=10000)[0]
+        perf_bvals = self.bvals[self.bvals <= self.perf_b_threshold_upper]
+        diff_data_to_be_removed = self.diffusion_signal(perf_bvals, S0_diff_est, D_est)
+        perf_bval_indices = np.where(self.bvals <= self.perf_b_threshold_upper)[0]
+        perf_bvals = self.bvals[perf_bval_indices]
+        perf_data = data[perf_bval_indices] - diff_data_to_be_removed # Subtract the diffusion signal from the total to get the perfusion signal
+        
+        S0_perf_est, D_star_est = curve_fit(self.perfusion_signal, perf_bvals, perf_data, \
+            bounds=perf_bounds, p0=np.take(self.initial_guess, [0, 2]), maxfev=10000)[0]
+        
+        # Calculate the estimation of f based on the two S0 estimates
+        f_est = S0_perf_est/(S0_perf_est + S0_diff_est)
         
         # Set the results and rescale S0
-        result = np.array([S0_est, f_est, D_star_est, D_est])
+        result = np.array([S0_perf_est+S0_diff_est, f_est, D_star_est, D_est])
         result[0] *= data_max
 
         return IvimFit(self, result)
@@ -80,9 +90,6 @@ class IvimModelSegmented2Step(ReconstModel):
     
     def perfusion_signal(self, b, S0, D_star):
         return S0*np.exp(-b*D_star)
-    
-    def ivim_signal(self, b, S0, f, D_star, D):
-        return S0*(f*np.exp(-b*D_star) + (1-f)*np.exp(-b*D))
     
     def set_bounds(self, bounds):
         # Use this function for fits that uses curve_fit

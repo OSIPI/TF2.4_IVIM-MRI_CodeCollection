@@ -10,7 +10,7 @@ import numpy as np
 from phantoms.brain.sim_brain_phantom_preproc import simulate_brain_phantom
 import nibabel as nib
 import matplotlib.pyplot as plt
-from src.original.EP_GU.brain_pipeline import denoise_wrap
+from src.original.preprocessing.EP_GU.brain_pipeline import denoise_wrap
 
 
 def test_denoise_wrap():

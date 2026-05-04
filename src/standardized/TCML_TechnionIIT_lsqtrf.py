@@ -49,20 +49,16 @@ class TCML_TechnionIIT_lsqtrf(OsipiBase):
 
     def initialize(self, bounds, initial_guess, fitS0):
         if bounds is None:
-            print('warning, no bounds were defined, so default bounds are used of ([0.0003, 0.001, 0.009, 0],[0.008, 0.5,0.04, 3])')
-            self.bounds = ([0.0003, 0.001, 0.009, 0],[0.008, 0.5,0.04, 3])
+            self.use_bounds = {"f": False, "Dp": False, "D": False}
         else:
-            bounds=bounds
-            self.bounds = bounds
+            self.use_bounds = {"f": True, "Dp": True, "D": True}
+
         if initial_guess is None:
-            print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.1, 0.01, 1]')
-            self.initial_guess = [0.001, 0.1, 0.01, 1]  # D, Dp, f, S0
+            self.use_initial_guess = {"f": False, "Dp": False, "D": False}
         else:
-            self.initial_guess = initial_guess
-            self.use_initial_guess = True
+            self.use_initial_guess = {"f": True, "Dp": True, "D": True}
+
         self.fitS0=fitS0
-        self.use_initial_guess = True
-        self.use_bounds = True
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
@@ -74,18 +70,29 @@ class TCML_TechnionIIT_lsqtrf(OsipiBase):
         Returns:
             _type_: _description_
         """
+        bounds = ([self.bounds["D"][0], self.bounds["Dp"][0], self.bounds["f"][0], self.bounds["S0"][0]],
+                       [self.bounds["D"][1], self.bounds["Dp"][1], self.bounds["f"][1], self.bounds["S0"][1]])
+        initial_guess = [self.initial_guess["D"], self.initial_guess["Dp"], self.initial_guess["f"], self.initial_guess["S0"]]
 
         bvalues=np.array(bvalues)
-        bounds=np.array(self.bounds)
-        bounds=[bounds[0][[0, 2, 1, 3]], bounds[1][[0, 2, 1, 3]]]
-        initial_guess = np.array(self.initial_guess)
-        initial_guess = initial_guess[[0, 2, 1, 3]]
         fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], bounds,initial_guess)
 
+        def get_scalar(val):
+            """Convert value to Python scalar, handling numpy arrays."""
+            if isinstance(val, np.ndarray):
+                return float(val.item())
+            return float(val)
+
         results = {}
-        results["D"] = fit_results[0]
-        results["f"] = fit_results[2]
-        results["Dp"] = fit_results[1]
+        if fit_results[0].size > 0:
+            results["D"] = get_scalar(fit_results[0])
+            results["f"] = get_scalar(fit_results[2])
+            results["Dp"] = get_scalar(fit_results[1])
+        else:
+            results["D"] = 0
+            results["f"] = 0
+            results["Dp"] = 0
+
         results = self.D_and_Ds_swap(results)
 
         return results
