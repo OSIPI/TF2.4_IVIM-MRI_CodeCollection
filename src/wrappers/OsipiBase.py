@@ -145,6 +145,10 @@ class OsipiBase:
 
         Args:
             algorithm (string): The name of the algorithm, should be the same as the file in the src/standardized folder without the .py extension.
+        
+        Raises:
+            ValueError: If the algorithm name does not correspond to any .py file
+                        in ``src/standardized/``.
         """
         
         # Import the algorithm
@@ -152,12 +156,47 @@ class OsipiBase:
         if str(root_path) not in sys.path:
             print("Root folder not in PYTHONPATH")
             return False
-            
+
+        # ------------------------------------------------------------------
+        # Validate algorithm name against available modules in src/standardized/
+        # ------------------------------------------------------------------
+        standardized_dir = root_path / "src" / "standardized"
+        available_algorithms = sorted(
+            p.stem
+            for p in standardized_dir.glob("*.py")
+            if p.stem != "__init__"
+        )
+
+        if algorithm not in available_algorithms:
+            raise ValueError(
+                f"Algorithm '{algorithm}' not found. "
+                f"Available algorithms are:\n  "
+                + "\n  ".join(available_algorithms)
+            )
+
         import_base_path = "src.standardized"
         import_path = import_base_path + "." + algorithm
-        #Algorithm = getattr(importlib.import_module(import_path), algorithm)
+
+        # Secondary safety net: catch import / attribute errors that could
+        # occur if the file exists but is broken or missing the class.
+        try:
+            module = importlib.import_module(import_path)
+        except ImportError as exc:
+            raise ImportError(
+                f"Failed to import module for algorithm '{algorithm}': {exc}"
+            ) from exc
+
+        try:
+            algorithm_class = getattr(module, algorithm)
+        except AttributeError as exc:
+            raise AttributeError(
+                f"Module '{import_path}' was imported but does not contain "
+                f"a class named '{algorithm}'. "
+                f"Available names: {[n for n in dir(module) if not n.startswith('_')]}"
+            ) from exc
+
         # Change the class from OsipiBase to the specified algorithm
-        self.__class__ = getattr(importlib.import_module(import_path), algorithm)
+        self.__class__ = algorithm_class
         self.__init__(**kwargs)
     
     def initialize(**kwargs):
