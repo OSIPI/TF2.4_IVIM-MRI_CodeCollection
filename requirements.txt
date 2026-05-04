@@ -21,3 +21,4 @@ ivimnet
 nlopt
 nipype
 itk
+ivim-mri
