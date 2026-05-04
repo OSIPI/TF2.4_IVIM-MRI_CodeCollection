@@ -7,7 +7,7 @@
 import numpy as np
 
 # from utils.data_simulation.GenerateData import GenerateData
-from src.original.ETP_SRI.LinearFitting import LinearFit
+from src.original.fitting.ETP_SRI.LinearFitting import LinearFit
 
 author_lookup = {
     'ETP_SRI': LinearFit

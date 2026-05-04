@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_least_squares, fit_least_squares_array
+from src.original.fitting.OGC_AmsterdamUMC.LSQ_fitting import fit_least_squares, fit_least_squares_array
 import numpy as np
 
 class OGC_AmsterdamUMC_biexp(OsipiBase):

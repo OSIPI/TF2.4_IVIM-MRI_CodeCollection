@@ -1,7 +1,7 @@
 import numpy as np
 from dipy.core.gradients import gradient_table
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.IAR_LundUniversity.ivim_fit_method_modified_topopro import IvimModelTopoPro
+from src.original.fitting.IAR_LundUniversity.ivim_fit_method_modified_topopro import IvimModelTopoPro
 
 
 class IAR_LU_modified_topopro(OsipiBase):

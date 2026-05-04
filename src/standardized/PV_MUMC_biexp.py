@@ -1,6 +1,6 @@
 import numpy as np
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.PV_MUMC.two_step_IVIM_fit import fit_least_squares
+from src.original.fitting.PV_MUMC.two_step_IVIM_fit import fit_least_squares
 
 
 class PV_MUMC_biexp(OsipiBase):
