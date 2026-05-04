@@ -48,23 +48,8 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         self.OGC_algorithm = fit_least_squares
         self.OGC_algorithm_array = fit_least_squares_array
         self.fitS0=fitS0
-        self.initialize(bounds, initial_guess, fitS0)
-
-    def initialize(self, bounds, initial_guess, fitS0):
-        if bounds is None:
-            print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
-            self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
-        else:
-            self.bounds=bounds
-        if initial_guess is None:
-            print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
-            self.initial_guess = [0.001, 0.1, 0.01, 1]
-        else:
-            self.initial_guess = initial_guess
-            self.use_initial_guess = True
-        self.fitS0=fitS0
-        self.use_initial_guess = True
-        self.use_bounds = True
+        self.use_initial_guess = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
+        self.use_bounds = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
@@ -76,9 +61,13 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
+        bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                  [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
+
+        initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
         bvalues=np.array(bvalues)
-        fit_results = self.OGC_algorithm(bvalues, signals, p0=self.initial_guess, bounds=self.bounds, fitS0=self.fitS0)
+        fit_results = self.OGC_algorithm(bvalues, signals, p0=initial_guess, bounds=bounds, fitS0=self.fitS0)
 
         results = {}
         results["D"] = fit_results[0]

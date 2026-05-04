@@ -44,7 +44,10 @@ class OJ_GU_bayesMATLAB(OsipiBase):
         """
         #super(OGC_AmsterdamUMC_biexp, self).__init__(bvalues, bounds, initial_guess, fitS0)
         super(OJ_GU_bayesMATLAB, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
-        self.initialize(bounds, initial_guess)
+
+        self.use_initial_guess =  {"f" : True, "D" : True, "Dp" : True, "S0" : True}
+        self.use_bounds = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
+
         if eng is None:
             print('initiating matlab; this may take some time. For repeated testing one could use the optional input eng as an already initiated matlab engine')
             self.eng=matlab.engine.start_matlab()
@@ -53,31 +56,16 @@ class OJ_GU_bayesMATLAB(OsipiBase):
             self.eng = eng
             self.keep_alive=True
 
-    def algorithm(self, Y, b, lim, blim):
+    def algorithm(self, Y, b, lim, blim, initial_guess):
         Y = matlab.double(Y.tolist())
-        f = matlab.double(self.initial_guess[1])
-        D = matlab.double(self.initial_guess[0])
-        Dstar = matlab.double(self.initial_guess[2])
-        S0 = matlab.double(self.initial_guess[3])
+        f = matlab.double(initial_guess[1])
+        D = matlab.double(initial_guess[0])
+        Dstar = matlab.double(initial_guess[2])
+        S0 = matlab.double(initial_guess[3])
         b = matlab.double(b.tolist())
         lim = matlab.double(lim.tolist())
         out = self.eng.IVIM_bayes(Y, f, D, Dstar, S0, b, lim, nargout=1)
         return out['D']['mode'], out['f']['mode'], out['Dstar']['mode'], out['S0']['mode']
-
-    def initialize(self, bounds,initial_guess):
-        if bounds is None:
-            print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
-            self.bounds=([0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3])
-        else:
-            self.bounds=bounds
-        if initial_guess is None:
-            print('warning, no initial guesses were defined, so default bounds are used of  [0.001, 0.001, 0.01, 1]')
-            self.initial_guess = [0.001, 0.1, 0.01, 1]
-        else:
-            self.initial_guess = initial_guess
-            self.use_initial_guess = True
-        self.use_initial_guess = True
-        self.use_bounds = True
 
     def ivim_fit(self, signals, bvalues, **kwargs):
         """Perform the IVIM fit
@@ -89,11 +77,16 @@ class OJ_GU_bayesMATLAB(OsipiBase):
         Returns:
             _type_: _description_
         """
+        bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                  [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
+
+        initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
         fit_results = self.algorithm(np.array(signals)[:,np.newaxis], 
                                      np.array(bvalues), 
-                                     np.array(self.bounds)[:,[1,0,2,3]], 
-                                     self.thresholds)
+                                     np.array(bounds)[:,[1,0,2,3]], 
+                                     self.thresholds,
+                                     initial_guess)
 
         results = {}
         results["D"] = fit_results[0]

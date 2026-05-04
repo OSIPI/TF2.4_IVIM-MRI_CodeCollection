@@ -10,7 +10,13 @@
 # 4. For the algorithm "IAR_LU_modified_mix" and "TCML_TechnionIIT_lsqtrf", replace the "f_f_alpha, Dp_f_alpha, D_f_alpha, f_t_alpha, Dp_t_alpha, D_t_alpha" columns with "0.01,0.01,0.01,0.0,0.0,0.0"
 
 # Exclude certain algorithms
-exclude_algorithms <- c("IAR_LU_modified_mix", "TCML_TechnionIIT_lsqtrf")
+exclude_algorithms <- c("ETP_SRI_LinearFitting", "IAR_LU_biexp", "IAR_LU_modified_topopro",
+ "IAR_LU_segmented_2step", "IAR_LU_segmented_3step", "IAR_LU_subtracted",
+ "OGC_AmsterdamUMC_Bayesian_biexp", "OGC_AmsterdamUMC_biexp",
+ "OGC_AmsterdamUMC_biexp_segmented", "PV_MUMC_biexp",
+ "TCML_TechnionIIT_lsq_sls_BOBYQA", "TCML_TechnionIIT_lsq_sls_lm",
+ "TCML_TechnionIIT_lsq_sls_trf", "TCML_TechnionIIT_lsqBOBYQA",
+ "TCML_TechnionIIT_lsqlm", "TCML_TechnionIIT_SLS")
 
 args = commandArgs(trailingOnly=TRUE)
 # Define file paths

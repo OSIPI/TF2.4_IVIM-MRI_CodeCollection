@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "osipi-ivim"
+version = "0.1.0"
+description = "OSIPI TF2.4 IVIM-MRI Code Collection"
+license = {text = "Apache-2.0"}
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    {name = "Oscar Jalnefjord",       email = "oscar.jalnefjord@gu.se"},
+    {name = "Ivan A. Rashid"},
+    {name = "Daan Kuppens"},
+    {name = "Merel M. van der Thiel"},
+    {name = "Petra J. van Houdt"},
+    {name = "Paulien H.M. Voorter"},
+    {name = "Eric T. Peterson"},
+    {name = "Oliver J. Gurney-Champion", email = "o.j.gurney-champion@amsterdamumc.nl"},
+]
+dependencies = [
+    "numpy",
+    "scipy",
+    "nibabel",
+    "torch",
+    "torchio",
+    "joblib",
+    "dipy",
+    "cvxpy",
+    "nlopt",
+    "tqdm",
+    "pandas",
+    "statsmodels",
+    "ivimnet",
+    "super-ivim-dc>1.0.0",
+    "zenodo-get",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-json-report",
+]
+docs = [
+    "sphinx",
+    "sphinx_rtd_theme",
+]
+plot = [
+    "matplotlib",
+    "scienceplots",
+]
+all = [
+    "osipi-ivim[test,docs,plot]",
+]
+
+[project.urls]
+Repository = "https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection"
+
+[tool.setuptools.packages.find]
+where = ["src"]

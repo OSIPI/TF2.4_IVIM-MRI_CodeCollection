@@ -1,0 +1,56 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "OSIPI TF2.4 IVIM-MRI Code Collection"
+version: 0.1.0
+date-released: 2026
+license: Apache-2.0
+repository-code: "https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection"
+authors:
+  - family-names: Jalnefjord
+    given-names: Oscar
+    orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"
+    affiliation: "University of Gothenburg"
+  - family-names: Rashid
+    given-names: Ivan A.
+    affiliation: "Lund University"
+  - family-names: Kuppens
+    given-names: Daan
+    affiliation: "Amsterdam University Medical Center"
+  - family-names: van der Thiel
+    given-names: Merel M.
+    affiliation: "Maastricht University Medical Center"
+  - family-names: van Houdt
+    given-names: Petra J.
+    affiliation: "Netherlands Cancer Institute"
+  - family-names: Voorter
+    given-names: Paulien H.M.
+    affiliation: "Maastricht University Medical Center"
+  - family-names: Peterson
+    given-names: Eric T.
+    affiliation: "SRI International"
+  - family-names: Gurney-Champion
+    given-names: Oliver J.
+    affiliation: "Amsterdam University Medical Center"
+preferred-citation:
+  type: article
+  title: "An open-source code repository for intravoxel incoherent motion analysis: ISMRM Open Science Initiative for Perfusion Imaging (OSIPI)"
+  authors:
+    - family-names: Jalnefjord
+      given-names: Oscar
+    - family-names: Rashid
+      given-names: Ivan A.
+    - family-names: Kuppens
+      given-names: Daan
+    - family-names: van der Thiel
+      given-names: Merel M.
+    - family-names: van Houdt
+      given-names: Petra J.
+    - family-names: Voorter
+      given-names: Paulien H.M.
+    - family-names: Peterson
+      given-names: Eric T.
+    - family-names: Gurney-Champion
+      given-names: Oliver J.
+  journal: "Magnetic Resonance in Medicine"
+  year: 2026
+  doi: "10.XXXX/XXXXXXX"  # fill in once published
