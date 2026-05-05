@@ -154,8 +154,10 @@ class OsipiBase:
         # Import the algorithm
         root_path = pathlib.Path(__file__).resolve().parents[2]
         if str(root_path) not in sys.path:
-            print("Root folder not in PYTHONPATH")
-            return False
+            raise RuntimeError(
+                "Root folder not found in PYTHONPATH. "
+                "Please ensure the project root is in sys.path."
+            )
 
         # ------------------------------------------------------------------
         # Validate algorithm name against available modules in src/standardized/
