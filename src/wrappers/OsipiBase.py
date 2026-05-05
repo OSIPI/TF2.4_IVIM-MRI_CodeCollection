@@ -3,6 +3,7 @@ import importlib
 from scipy.stats import norm
 import pathlib
 import sys
+import warnings
 from tqdm import tqdm
 from joblib import Parallel, delayed
 
@@ -149,12 +150,12 @@ class OsipiBase:
             else:
                 # Generic defaults (original behavior)
                 if self.bounds is None:
-                    print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
+                    warnings.warn('No bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]', UserWarning, stacklevel=2)
                     self.bounds = {"S0" : [0.7, 1.3], "f" : [0, 1.0], "Dp" : [0.005, 0.2], "D" : [0, 0.005]} # These are defined as [lower, upper]
                     self.forced_default_bounds = True
 
                 if self.initial_guess is None:
-                    print('warning, no initial guesses were defined, so default initial guesses are used of  [0.001, 0.001, 0.01, 1]')
+                    warnings.warn('No initial guesses were defined, so default initial guesses are used of [0.001, 0.001, 0.01, 1]', UserWarning, stacklevel=2)
                     self.initial_guess = {"S0" : 1, "f" : 0.1, "Dp" : 0.01, "D" : 0.001}
                     self.forced_default_initial_guess = True
 
