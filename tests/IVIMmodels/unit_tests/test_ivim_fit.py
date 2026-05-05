@@ -300,3 +300,28 @@ def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
     if errors:
         all_errors = "\n".join(errors)
         raise AssertionError(f"Some tests failed:\n{all_errors}")
+
+
+def test_invalid_algorithm_name():
+    """Regression test for bug_7: invalid algorithm names must raise a clear
+    ValueError instead of a confusing ModuleNotFoundError / AttributeError.
+    """
+    # A clearly wrong name should raise ValueError
+    with pytest.raises(ValueError, match="not found"):
+        OsipiBase(algorithm="IAR_LU_biepx")  # typo: 'biepx' instead of 'biexp'
+
+    # The error message should list at least one known valid algorithm
+    try:
+        OsipiBase(algorithm="totally_fake_algorithm")
+    except ValueError as exc:
+        error_msg = str(exc)
+        assert "Available algorithms are:" in error_msg
+        # Check a few known algorithms appear in the suggestion list
+        assert "IAR_LU_biexp" in error_msg
+        assert "PV_MUMC_biexp" in error_msg
+    else:
+        pytest.fail("ValueError was not raised for a completely invalid algorithm name")
+
+    # A valid algorithm should still work without errors
+    fit = OsipiBase(algorithm="IAR_LU_biexp")
+    assert fit is not None
