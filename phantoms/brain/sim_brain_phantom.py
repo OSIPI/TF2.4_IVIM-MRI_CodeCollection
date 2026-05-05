@@ -13,7 +13,7 @@ def simulate_brain_phantom(regime=DIFFUSIVE_REGIME, snr=100, sim_relaxation=True
     '''
     Simulation parameters can be set by changing the default values of the function arguments. 
     The default values are chosen to be suitable for a diffusive regime phantom, but can be changed to simulate a ballistic regime phantom as well. 
-    The simulated image is saved in phantoms/brain/data with the name 'diffusive_sn{snr}_relax.nii.gz' or 'ballistic_sn{snr}_relax.nii.gz' depending on the regime. 
+    The simulated image is saved in phantoms/brain/data with the name 'diffusive_sn{snr}.nii.gz' or 'ballistic_sn{snr}.nii.gz' depending on the regime. 
     The corresponding bvals and cvals (if applicable) are also saved in the same folder.
     
     regime: 'diffusive' or 'ballistic' to choose the type of phantom to simulate
