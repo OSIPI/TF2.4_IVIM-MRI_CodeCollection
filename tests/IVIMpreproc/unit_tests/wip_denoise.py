@@ -7,7 +7,7 @@
 import os
 
 import numpy as np
-from phantoms.brain.sim_brain_phantom_preproc import simulate_brain_phantom
+from phantoms.brain.sim_brain_phantom import simulate_brain_phantom
 import nibabel as nib
 import matplotlib.pyplot as plt
 from src.original.preprocessing.EP_GU.brain_pipeline import denoise_wrap
@@ -19,13 +19,13 @@ def test_denoise_wrap():
     simulate_brain_phantom(snr = snr)
     
     # Denoising
-    im_file = 'phantoms/brain/data/diffusive_snr{}_relax.nii.gz'.format(snr)
+    im_file = 'phantoms/brain/data/diffusive_snr{}.nii.gz'.format(snr)
     im_file_denoised = denoise_wrap(im_file)
     S_denoised = nib.load(im_file_denoised).get_fdata()
 
     # Compute sum of squared residuals before denoising
-    mask = nib.load(os.path.join('phantoms','brain','data','diffusive_snr{}_relax_mask.nii.gz'.format(snr))).get_fdata()
-    ref_file = 'phantoms/brain/data/diffusive_reference_relax.nii.gz'
+    mask = nib.load(os.path.join('phantoms','brain','data','diffusive_snr{}_mask.nii.gz'.format(snr))).get_fdata()
+    ref_file = 'phantoms/brain/data/diffusive_reference.nii.gz'
     S = nib.load(im_file).get_fdata()
     S_ref = nib.load(ref_file).get_fdata()
     ssr_before = np.sum((S[mask!=0,:]-S_ref[mask!=0,:])**2)
