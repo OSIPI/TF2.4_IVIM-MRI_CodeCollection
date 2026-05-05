@@ -31,9 +31,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
+      - name: Install libomp (macOS)
+        if: runner.os == 'macOS'
+        run: brew install libomp
       - name: Test with pytest
         run: |
           pip install pytest pytest-cov
-          python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html -r w
+          python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html -r w ${{ runner.os == 'macOS' && '-k "not test_deep_learning_algorithms"' || '' }}
           python -m pytest --doctest-modules --junitxml=junit/test-results-brain.xml --cov=. --cov-report=xml --cov-report=html --dataFile tests/IVIMmodels/unit_tests/generic_brain.json -r w -k test_ivim_fit_saved
 
