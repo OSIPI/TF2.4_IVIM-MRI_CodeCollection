@@ -54,7 +54,7 @@ class TCML_TechnionIIT_lsq_sls_lm(OsipiBase):
 
         if thresholds is None:
             self.thresholds = 150
-            print('warning, no thresholds were defined, so default bounds are used of  150')
+            warnings.warn('No thresholds were defined, so default threshold of 150 is used', UserWarning, stacklevel=2)
         else:
             self.thresholds = thresholds
         self.fitS0=fitS0

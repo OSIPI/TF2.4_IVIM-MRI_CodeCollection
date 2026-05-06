@@ -1,3 +1,4 @@
+import warnings
 import numpy as np
 from dipy.core.gradients import gradient_table
 from src.wrappers.OsipiBase import OsipiBase
@@ -53,7 +54,7 @@ class IAR_LU_modified_topopro(OsipiBase):
 
         # Check the inputs
         if self.bounds["Dp"][0] == self.bounds["D"][1]:
-            print('warning, bounds for D* and D are equal, this will likely cause fitting errors. Setting D_upper to 99 percent of D_upper')
+            warnings.warn('Bounds for D* and D are equal, this will likely cause fitting errors. Setting D_upper to 99 percent of D_upper', UserWarning, stacklevel=2)
             self.bounds["D"][1] = self.bounds["D"][1]*0.99
         # Check the inputs
         

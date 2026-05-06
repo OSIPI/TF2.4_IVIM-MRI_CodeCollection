@@ -1,5 +1,6 @@
 from src.wrappers.OsipiBase import OsipiBase
 from src.original.fitting.TF_reference.segmented_IVIMfit import segmented_IVIM_fit
+import warnings
 import numpy as np
 
 class TF_reference_IVIMfit(OsipiBase):
@@ -51,7 +52,7 @@ class TF_reference_IVIMfit(OsipiBase):
         self.use_bounds = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
         if self.thresholds is None:
             self.thresholds = 200
-            print('warning, no thresholds were defined, so default threshold are used of 200')
+            warnings.warn('No thresholds were defined, so default threshold of 200 is used', UserWarning, stacklevel=2)
         else:
             self.thresholds = thresholds
 
@@ -73,7 +74,7 @@ class TF_reference_IVIMfit(OsipiBase):
 
         if np.any(signals < 0):
             signals = np.clip(signals,0.01, None)
-            print('warning, negative values in signal: values clipped to 0.01')
+            warnings.warn('Negative values in signal: values clipped to 0.01', UserWarning, stacklevel=2)
 
 
         fit_results = self.TF_reference_algorithm(bvalues,signals,b_cutoff=self.thresholds, bounds=bounds)

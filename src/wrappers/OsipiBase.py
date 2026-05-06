@@ -3,6 +3,7 @@ import importlib
 from scipy.stats import norm
 import pathlib
 import sys
+import warnings
 from tqdm import tqdm
 from joblib import Parallel, delayed
 
@@ -29,10 +30,14 @@ class OsipiBase:
         Parameter bounds for constrained optimization. Should be a dict with keys
         like "S0", "f", "Dp", "D" and values as [lower, upper] lists or arrays.
         E.g. {"S0" : [0.7, 1.3], "f" : [0, 1], "Dp" : [0.005, 0.2], "D" : [0, 0.005]}.
-    initial_guess : dict, optional
-        Initial parameter estimates for the IVIM fit. Should be a dict with keys
-        like "S0", "f", "Dp", "D" and float values. 
-        E.g. {"S0" : 1, "f" : 0.1, "Dp" : 0.01, "D" : 0.001}.
+    initial_guess : dict or str, optional
+        Initial parameter estimates for the IVIM fit. Can be:
+        - A dict with keys like "S0", "f", "Dp", "D" and float values.
+          E.g. {"S0" : 1, "f" : 0.1, "Dp" : 0.01, "D" : 0.001}.
+        - A string naming a body part (e.g., "brain", "liver", "kidney").
+          The string is looked up in the body-part defaults table and
+          replaced with the corresponding dict. If bounds are not provided,
+          body-part-specific bounds are also applied.
     algorithm : str, optional
         Name of an algorithm module in ``src/standardized`` to load dynamically.
         If supplied, the instance is immediately converted to that algorithm’s
@@ -43,6 +48,14 @@ class OsipiBase:
         "Dp":[0.005, 0.2], "D":[0, 0.005]}. 
         To prevent this, set this bool to False. Default initial guess 
         {"S0" : 1, "f": 0.1, "Dp": 0.01, "D": 0.001}.
+    body_part : str, optional
+        Name of the anatomical region being scanned (e.g., "brain", "liver",
+        "kidney", "prostate", "pancreas", "head_and_neck", "breast",
+        "placenta"). When provided, body-part-specific initial guesses,
+        bounds, and thresholds are used as defaults instead of the generic
+        ones. User-provided bounds/initial_guess always take priority.
+        See :mod:`src.wrappers.ivim_body_part_defaults` for available
+        body parts and their literature-sourced parameter values.
     **kwargs
         Additional keyword arguments forwarded to the selected algorithm’s
         initializer if ``algorithm`` is provided.
@@ -102,7 +115,14 @@ class OsipiBase:
     f_map = results["f"]
     """
     
-    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, algorithm=None, force_default_settings=True, **kwargs):
+    def __init__(self, bvalues=None, thresholds=None, bounds=None, initial_guess=None, algorithm=None, force_default_settings=True, body_part=None, **kwargs):
+        from src.wrappers.ivim_body_part_defaults import get_body_part_defaults
+
+        # If initial_guess is a string, treat it as a body part name
+        if isinstance(initial_guess, str):
+            body_part = initial_guess
+            initial_guess = None
+
         # Define the attributes as numpy arrays only if they are not None
         self.bvalues = np.asarray(bvalues) if bvalues is not None else None
         self.thresholds = np.asarray(thresholds) if thresholds is not None else None
@@ -113,20 +133,34 @@ class OsipiBase:
         self.deep_learning = False
         self.supervised = False
         self.stochastic = False
+        self.body_part = body_part  # Store for reference
         
         if force_default_settings:
-            if self.bounds is None:
-                print('warning, no bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]')
-                self.bounds = {"S0" : [0.7, 1.3], "f" : [0, 1.0], "Dp" : [0.005, 0.2], "D" : [0, 0.005]} # These are defined as [lower, upper]
-                self.forced_default_bounds = True
+            if body_part is not None:
+                # Use body-part-specific defaults from the literature-sourced lookup table
+                bp_defaults = get_body_part_defaults(body_part)
+                if self.bounds is None:
+                    self.bounds = bp_defaults["bounds"]
+                    self.forced_default_bounds = True
+                if self.initial_guess is None:
+                    self.initial_guess = bp_defaults["initial_guess"]
+                    self.forced_default_initial_guess = True
+                if self.thresholds is None:
+                    self.thresholds = np.array(bp_defaults["thresholds"])
+            else:
+                # Generic defaults (original behavior)
+                if self.bounds is None:
+                    warnings.warn('No bounds were defined, so default bounds are used of [0, 0, 0.005, 0.7],[0.005, 1.0, 0.2, 1.3]', UserWarning, stacklevel=2)
+                    self.bounds = {"S0" : [0.7, 1.3], "f" : [0, 1.0], "Dp" : [0.005, 0.2], "D" : [0, 0.005]} # These are defined as [lower, upper]
+                    self.forced_default_bounds = True
 
-            if self.initial_guess is None:
-                print('warning, no initial guesses were defined, so default initial guesses are used of  [0.001, 0.001, 0.01, 1]')
-                self.initial_guess = {"S0" : 1, "f" : 0.1, "Dp" : 0.01, "D" : 0.001}
-                self.forced_default_initial_guess = True
+                if self.initial_guess is None:
+                    warnings.warn('No initial guesses were defined, so default initial guesses are used of [0.001, 0.001, 0.01, 1]', UserWarning, stacklevel=2)
+                    self.initial_guess = {"S0" : 1, "f" : 0.1, "Dp" : 0.01, "D" : 0.001}
+                    self.forced_default_initial_guess = True
 
-            if self.thresholds is None:
-                self.thresholds = np.array([200])
+                if self.thresholds is None:
+                    self.thresholds = np.array([200])
 
         self.osipi_bounds = self.bounds # Variable that stores the original bounds before they are passed to the algorithm
         self.osipi_initial_guess = self.initial_guess # Variable that stores the original initial guesses before they are passed to the algorithm
@@ -145,19 +179,60 @@ class OsipiBase:
 
         Args:
             algorithm (string): The name of the algorithm, should be the same as the file in the src/standardized folder without the .py extension.
+        
+        Raises:
+            ValueError: If the algorithm name does not correspond to any .py file
+                        in ``src/standardized/``.
         """
         
         # Import the algorithm
         root_path = pathlib.Path(__file__).resolve().parents[2]
         if str(root_path) not in sys.path:
-            print("Root folder not in PYTHONPATH")
-            return False
-            
+            raise RuntimeError(
+                "Root folder not found in PYTHONPATH. "
+                "Please ensure the project root is in sys.path."
+            )
+
+        # ------------------------------------------------------------------
+        # Validate algorithm name against available modules in src/standardized/
+        # ------------------------------------------------------------------
+        standardized_dir = root_path / "src" / "standardized"
+        available_algorithms = sorted(
+            p.stem
+            for p in standardized_dir.glob("*.py")
+            if p.stem != "__init__"
+        )
+
+        if algorithm not in available_algorithms:
+            raise ValueError(
+                f"Algorithm '{algorithm}' not found. "
+                f"Available algorithms are:\n  "
+                + "\n  ".join(available_algorithms)
+            )
+
         import_base_path = "src.standardized"
         import_path = import_base_path + "." + algorithm
-        #Algorithm = getattr(importlib.import_module(import_path), algorithm)
+
+        # Secondary safety net: catch import / attribute errors that could
+        # occur if the file exists but is broken or missing the class.
+        try:
+            module = importlib.import_module(import_path)
+        except ImportError as exc:
+            raise ImportError(
+                f"Failed to import module for algorithm '{algorithm}': {exc}"
+            ) from exc
+
+        try:
+            algorithm_class = getattr(module, algorithm)
+        except AttributeError as exc:
+            raise AttributeError(
+                f"Module '{import_path}' was imported but does not contain "
+                f"a class named '{algorithm}'. "
+                f"Available names: {[n for n in dir(module) if not n.startswith('_')]}"
+            ) from exc
+
         # Change the class from OsipiBase to the specified algorithm
-        self.__class__ = getattr(importlib.import_module(import_path), algorithm)
+        self.__class__ = algorithm_class
         self.__init__(**kwargs)
     
     def initialize(**kwargs):
