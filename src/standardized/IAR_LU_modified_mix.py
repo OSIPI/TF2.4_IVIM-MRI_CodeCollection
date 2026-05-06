@@ -1,7 +1,7 @@
 import numpy as np
 from dipy.core.gradients import gradient_table
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.IAR_LundUniversity.ivim_fit_method_modified_mix import IvimModelVP
+from src.original.fitting.IAR_LundUniversity.ivim_fit_method_modified_mix import IvimModelVP
 
 
 class IAR_LU_modified_mix(OsipiBase):

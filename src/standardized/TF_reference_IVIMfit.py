@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.TF_reference.segmented_IVIMfit import segmented_IVIM_fit
+from src.original.fitting.TF_reference.segmented_IVIMfit import segmented_IVIM_fit
 import warnings
 import numpy as np
 

@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_segmented, fit_segmented_array
+from src.original.fitting.OGC_AmsterdamUMC.LSQ_fitting import fit_segmented, fit_segmented_array
 import warnings
 import numpy as np
 

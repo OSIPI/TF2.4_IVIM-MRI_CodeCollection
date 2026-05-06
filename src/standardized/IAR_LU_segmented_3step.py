@@ -1,7 +1,7 @@
 import numpy as np
 from dipy.core.gradients import gradient_table
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.IAR_LundUniversity.ivim_fit_method_segmented_3step import IvimModelSegmented3Step
+from src.original.fitting.IAR_LundUniversity.ivim_fit_method_segmented_3step import IvimModelSegmented3Step
 
 
 class IAR_LU_segmented_3step(OsipiBase):

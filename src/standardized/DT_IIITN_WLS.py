@@ -1,5 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.DT_IIITN.wls_ivim_fitting import wls_ivim_fit
+from src.original.fitting.DT_IIITN.wls_ivim_fitting import wls_ivim_fit
 import numpy as np
 
 

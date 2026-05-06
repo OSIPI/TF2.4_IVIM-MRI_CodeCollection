@@ -1,6 +1,6 @@
 import numpy as np
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.OJ_GU.ivim_seg import seg
+from src.original.fitting.OJ_GU.ivim_seg import seg
 
 class OJ_GU_seg(OsipiBase):
     """
