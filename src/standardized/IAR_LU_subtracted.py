@@ -98,7 +98,7 @@ class IAR_LU_subtracted(OsipiBase):
             bvec = np.zeros((bvalues.size, 3))
             bvec[:,2] = 1
             gtab = gradient_table(bvalues, bvecs=bvec, b0_threshold=0)
-            
+
             self.IAR_algorithm = IvimModelSubtracted(gtab, bounds=bounds, initial_guess=initial_guess)
             
         fit_results = self.IAR_algorithm.fit(signals)
