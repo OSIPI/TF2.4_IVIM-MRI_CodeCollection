@@ -47,7 +47,7 @@ class ETP_SRI_LinearFitting(OsipiBase):
 
         super(ETP_SRI_LinearFitting, self).__init__(bvalues, thresholds, bounds, initial_guess)
         if bounds is not None:
-            print('warning, bounds from wrapper are not (yet) used in this algorithm')
+            warnings.warn('Bounds from wrapper are not (yet) used in this algorithm', UserWarning, stacklevel=2)
         self.use_bounds = {"f": False, "Dp": False, "D": False, "S0": False}
         self.use_initial_guess = {"f": False, "Dp": False, "D": False, "S0": False}
 

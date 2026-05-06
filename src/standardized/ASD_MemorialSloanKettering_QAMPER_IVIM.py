@@ -1,4 +1,5 @@
 from src.wrappers.OsipiBase import OsipiBase
+import warnings
 import numpy as np
 import matlab.engine
 
@@ -47,7 +48,7 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         self.use_initial_guess = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
 
         if eng is None:
-            print('initiating matlab; this may take some time. For repeated testing one could use the optional input eng as an already initiated matlab engine')
+            warnings.warn('Initiating MATLAB; this may take some time. For repeated testing one could use the optional input eng as an already initiated MATLAB engine', UserWarning, stacklevel=2)
             self.eng=matlab.engine.start_matlab()
             self.keep_alive=False
         else:
@@ -100,7 +101,7 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
                 try:
                     self.eng.quit()
                 except Exception as e:
-                    print(f"Warning: Failed to quit MATLAB engine cleanly: {e}")
+                    warnings.warn(f"Failed to quit MATLAB engine cleanly: {e}", UserWarning, stacklevel=2)
 
     def __del__(self):
         self.clean()

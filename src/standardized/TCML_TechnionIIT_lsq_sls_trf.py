@@ -1,5 +1,6 @@
 from src.wrappers.OsipiBase import OsipiBase
 from super_ivim_dc.source.Classsic_ivim_fit import IVIM_fit_sls_trf
+import warnings
 import numpy as np
 
 class TCML_TechnionIIT_lsq_sls_trf(OsipiBase):
@@ -56,7 +57,7 @@ class TCML_TechnionIIT_lsq_sls_trf(OsipiBase):
 
         if thresholds is None:
             self.thresholds = 200
-            print('warning, no thresholds were defined, so default bounds are used of  200')
+            warnings.warn('No thresholds were defined, so default threshold of 200 is used', UserWarning, stacklevel=2)
         else:
             self.thresholds = thresholds
         self.fitS0=fitS0

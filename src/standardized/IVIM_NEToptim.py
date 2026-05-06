@@ -66,7 +66,7 @@ class IVIM_NEToptim(OsipiBase):
                 SNR = (5, 100)
             self.training_data(self.bvalues,n=n,SNR=SNR)
         self.arg=Arg()
-        print('note that the bounds in the network are soft bounds and implemented by a sigmoid transform. In order for the network to be sensitive over the range, we extend the bounds ny 30%')
+        warnings.warn('Note that the bounds in the network are soft bounds and implemented by a sigmoid transform. In order for the network to be sensitive over the range, we extend the bounds by 30%', UserWarning, stacklevel=2)
         if bounds is not None:
             self.bounds = bounds
         else:

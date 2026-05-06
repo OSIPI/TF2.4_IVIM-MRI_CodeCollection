@@ -1,5 +1,6 @@
 from src.wrappers.OsipiBase import OsipiBase
 from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_segmented, fit_segmented_array
+import warnings
 import numpy as np
 
 class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
@@ -53,7 +54,7 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
 
         if self.thresholds is None:
             self.thresholds = 150
-            print('warning, no thresholds were defined, so default threshold of 150 was used')
+            warnings.warn('No thresholds were defined, so default threshold of 150 was used', UserWarning, stacklevel=2)
         else:
             self.thresholds = thresholds
 

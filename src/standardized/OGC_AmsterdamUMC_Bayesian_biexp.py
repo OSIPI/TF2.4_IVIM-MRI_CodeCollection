@@ -1,5 +1,6 @@
 from src.wrappers.OsipiBase import OsipiBase
 from src.original.OGC_AmsterdamUMC.LSQ_fitting import flat_neg_log_prior, fit_bayesian, empirical_neg_log_prior, fit_segmented, fit_bayesian_array, fit_segmented_array
+import warnings
 import numpy as np
 
 class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
@@ -62,10 +63,10 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         self.thresholds = thresholds
 
         if prior_in is None:
-            print('using a flat prior between bounds')
+            warnings.warn('Using a flat prior between bounds', UserWarning, stacklevel=2)
             self.neg_log_prior=flat_neg_log_prior([self.bounds["D"][0],self.bounds["D"][1]],[self.bounds["f"][0],self.bounds["f"][1]],[self.bounds["Dp"][0],self.bounds["Dp"][1]],[self.bounds["S0"][0],self.bounds["S0"][1]])
         else:
-            print('warning, bounds are not used, as a prior is used instead')
+            warnings.warn('Bounds are not used, as a prior is used instead', UserWarning, stacklevel=2)
             if len(prior_in) == 4:
                 self.neg_log_prior = empirical_neg_log_prior(prior_in[0], prior_in[1], prior_in[2],prior_in[3])
             else:
