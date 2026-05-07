@@ -1,3 +1,6 @@
+"""
+Script that plots the parameter maps for all implementations
+"""
 import os
 import numpy as np
 import nibabel as nib
@@ -9,7 +12,7 @@ import matplotlib.colors as mcolors
 # ==========================================
 # 1. Setup
 # ==========================================
-base_dir = r"C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\CodeCharacterization\invivo\results\bounds_initialguess"
+base_dir = r"C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\CodeCharacterization\invivo\results"
 
 parameters = ['D', 'f', 'Dp']
 param_file_map = {'D': 'D', 'f': 'f', 'Dp': 'Dp'}
@@ -66,7 +69,7 @@ def load_all_volumes(base_dir, algorithms, parameters):
         data_dict[algo] = {}
         for param in parameters:
             file_param = param_file_map[param]
-            nii_path = os.path.join(base_dir, f"{algo}_brain_bounds_initialguess_fit_{file_param}.nii")
+            nii_path = os.path.join(base_dir, f"no_harmonization_{algo}_brain_slice12_fit_{file_param}.nii")
             if os.path.exists(nii_path):
                 data = nib.load(nii_path).get_fdata()
                 data_dict[algo][param] = data
@@ -256,10 +259,10 @@ def plot_3col_grid(volumes, slice_index=None, orientation='axial'):
 
     plt.draw()
     color_subplot_backgrounds(fig, axes_all, algorithm_categories, algorithm_numbers)
-    plt.savefig(os.path.join(base_dir, "IVIM_ParameterMaps_3ColumnGrid_FixedScale_NaNsBlack_bounds_initialguess.png"), dpi=300)
+    plt.savefig(os.path.join(base_dir, "IVIM_ParameterMaps_3ColumnGrid_FixedScale_NaNsBlack_no_harmonization.png"), dpi=300)
     plt.show()
 
 # ==========================================
 # 5. Run
 # ==========================================
-plot_3col_grid(volumes, slice_index=15, orientation='axial')
+plot_3col_grid(volumes, slice_index=0, orientation='axial')

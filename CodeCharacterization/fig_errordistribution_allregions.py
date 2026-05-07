@@ -1,5 +1,5 @@
 """
-Script that plots the error distribution for a certain harmonization and for a single region.
+Script that plots the error distribution for a certain harmonization and for all regions.
 """
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -32,7 +32,7 @@ def categorize_algorithm(df_algo):
     elif uses_any_initial_guess:
         return 2
     else:
-        return 2
+        return 3
 
 
 def add_category_bands(ax, algorithm_categories, algorithms_ordered, category_labels=False, rotation=45):
@@ -261,30 +261,25 @@ def adjust_ylim_to_box_from_data(ax, df, y_col, x_col, x_order, showfliers=False
 # plt.savefig('/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/nobounds_noinitialguess/estimates_map_100.png')
 
 # Load the CSV (update the path if needed)
-region = "Brain"
 SNR = 20
 harmonized_bounds = False
-harmonized_initialguess = True
+harmonized_initialguess = False
 if harmonized_bounds and harmonized_initialguess:
     harmonization_string = "bounds_and_initialguess_harmonized"
-    file_path = rf'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection/test_output_bounds_and_initialguess_harmonized_SNR{SNR}.csv'
+    file_path = rf'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection/test_output_bounds_and_initialguess_harmonized_SNR{SNR}_corrected.csv'
 elif not harmonized_bounds and harmonized_initialguess:
     harmonization_string = "initialguess_harmonized"
     file_path = rf'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection/test_output_initialguess_harmonized_SNR{SNR}_corrected.csv'
-elif harmonized_bounds and not harmonized_initialguess:
-    harmonization_string = "bounds_harmonized"
-    file_path = rf'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection/test_output_bounds_harmonized_SNR{SNR}_corrected.csv'
 elif not harmonized_bounds and not harmonized_initialguess:
     harmonization_string = "no_harmonization"
     file_path = rf'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection/test_output_no_harmonization_SNR{SNR}_corrected.csv'
 
 df = pd.read_csv(file_path)
+df = df.dropna(subset=["Region"])
 algo_categories = {}
 for algo in df['Algorithm'].unique():
     df_algo = df[df['Algorithm'] == algo]
     algo_categories[algo] = categorize_algorithm(df_algo)
-
-df = df[df["Region"] == region]
 
 # Convert relevant columns to numeric, coercing errors to NaN
 numeric_columns = ['f', 'Dp', 'D', 'f_fitted', 'Dp_fitted', 'D_fitted']
@@ -323,12 +318,38 @@ df['Dp_squared_error'] = np.square(df['Dp_error'])
 df['D_squared_error'] = np.square(df['D_error'])
 
 # 1. Boxplot of errors
+regions = df["Region"].unique()
 e_y_map = {'f': 'f_error', 'Dp': 'Dp_error', 'D': 'D_error'}
-fig1 = create_boxplot(df, e_y_map, 'Error vs Estimation Method (grouped by category)', 'error', log=False, harmonization_step=harmonization_string)
-save_folder = fr'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/{harmonization_string}/{region}/'
-os.makedirs(save_folder, exist_ok=True)
-print(f"Saving figure to {os.path.join(save_folder,rf'e_map_{region}_SNR{str(SNR)}_{harmonization_string}_corrected.png')}")
-plt.savefig(os.path.join(save_folder,rf'e_map_{region}_SNR{str(SNR)}_{harmonization_string}_corrected.png'))
+
+for region in regions:
+    print(f"Processing region: {region}")
+
+    # ✅ EXACT line you requested
+    df_region = df[df["Region"] == region].copy()
+
+    fig = create_boxplot(
+        df_region,
+        e_y_map,
+        f'Error vs Estimation Method ({region})',
+        'error',
+        log=False,
+        harmonization_step=harmonization_string
+    )
+
+    # Safe folder name
+    safe_region = region.replace(" ", "_").replace("/", "_")
+
+    save_folder = fr'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/{harmonization_string}/{safe_region}/'
+    os.makedirs(save_folder, exist_ok=True)
+
+    save_path = os.path.join(
+        save_folder,
+        rf'e_map_{safe_region}_SNR{str(SNR)}_{harmonization_string}_corrected.png'
+    )
+
+    print(f"Saving figure to {save_path}")
+    fig.savefig(save_path)
+    plt.close(fig)
 
 # 1. Boxplot of estimates
 # e_y_map = {'f': 'f_fitted', 'Dp': 'Dp_fitted', 'D': 'D_fitted'}

@@ -1,10 +1,6 @@
 {
     "algorithms": [
-        "ASD_MemorialSloanKettering_QAMPER_IVIM",
-        "OJ_GU_segMATLAB",
-        "IVIM_NEToptim",
-        "Super_IVIM_DC",
-        "OJ_GU_bayesMATLAB"
+        "IVIM_NEToptim"
     ],
     "TCML_TechnionIIT_lsqBOBYQA": {
       "xfail_names": {"pericardium": false, "bounds": false}

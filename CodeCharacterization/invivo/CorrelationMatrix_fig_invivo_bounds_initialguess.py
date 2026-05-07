@@ -1,3 +1,6 @@
+"""
+Script that plots a correlation matrix based on the harmonized in-vivo results of the whole volume.
+"""
 import numpy as np
 import pandas as pd
 import seaborn as sns

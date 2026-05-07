@@ -1,3 +1,6 @@
+"""
+Script that plots a correlation matrix based on the in-vivo results of a single slice.
+"""
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -28,10 +31,11 @@ def load_mask(anatomy):
 masks = load_mask('brain')
 
 # Load masks
-mask_gray = nib.load(r'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\download\Data\brain_mask_gray_matter.nii.gz').get_fdata().astype(bool)
-mask_white = nib.load(r'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\download\Data\brain_mask_white_matter.nii.gz').get_fdata().astype(bool)
+mask_gray = nib.load(r'C:\TF_IVIM_OSIPI/TF2.4_IVIM-MRI_CodeCollection/download/Data/Brain_mask_gray_matter.nii.gz').get_fdata().astype(bool)
+mask_white = nib.load(r'C:\TF_IVIM_OSIPI/TF2.4_IVIM-MRI_CodeCollection/download/Data/Brain_mask_white_matter.nii.gz').get_fdata().astype(bool)
 
 masks = {'gray': mask_gray, 'white': mask_white}
+
 
 # ========================================
 # 1. Define algorithm categories & IDs
@@ -66,13 +70,13 @@ algorithm_categories = {
 # ========================================
 datasets = {}
 slice_nr = 12
-for algo in all_algorithms:
-    csv_path = os.path.join(base_dir, f'IVIM_brain_{algo}_slice{slice_nr}_bounds_initialguess.csv')
-    if os.path.exists(csv_path):
-        datasets[algo] = pd.read_csv(csv_path)
-    else:
-        datasets[algo] = None
-        print(f"Missing CSV for algorithm: {algo}")
+harmonization_string = 'no_harmonization'
+anatomy = 'Brain'
+
+# read csv
+csv_path = os.path.join(base_dir, f'{harmonization_string}_{anatomy}_slice{slice_nr}.csv')
+if os.path.exists(csv_path):
+    datasets = pd.read_csv(csv_path)
 
 # ========================================
 # 3. Helper: draw category bands
@@ -117,7 +121,8 @@ def plot_correlation_matrices_tissue(tissue_mask, tissue_name,slice_idx):
     """
     Plot 3 correlation matrices (D, f, D*) side by side for a given tissue.
     """
-    parameters = ['D', 'f', 'D*']
+    parameters = ['D_fit', 'f_fit', 'Dp_fit']
+    parameters_label = ['D', 'f', 'D*']
     n_algos = len(all_algorithms)
     algorithms_ordered = all_algorithms
 
@@ -126,19 +131,27 @@ def plot_correlation_matrices_tissue(tissue_mask, tissue_name,slice_idx):
     vmin, vmax = 0, 1
     last_heatmap = None
 
+
+    dataset_algospecific = {}
+    for alg in all_algorithms:
+        dataset_algospecific[alg] = datasets[datasets['ivim_algorithm'] == alg]
+        if dataset_algospecific[alg].empty:
+            dataset_algospecific[alg] = None
+            print(f"No data for algorithm: {alg}")
+            continue
+
     for ax, param in zip(axes, parameters):
         corr_matrix = pd.DataFrame(index=algorithms_ordered, columns=algorithms_ordered, dtype=float)
         # Compute correlation matrix
         for alg1 in all_algorithms:
-            if datasets[alg1] is None:
+            if dataset_algospecific[alg1] is None:
                 continue
-            D1_full = np.array(datasets[alg1][param]).flatten()[tissue_mask.flatten()]
-            D1_full = np.array(datasets[alg1][param]).flatten()[tissue_mask.flatten()]
+            D1_full = np.array(dataset_algospecific[alg1][param]).flatten()[tissue_mask.flatten()]
             D1_full = np.where(np.isnan(D1_full), np.nan, D1_full)
             for alg2 in all_algorithms:
-                if datasets[alg2] is None:
+                if dataset_algospecific[alg2] is None:
                     continue
-                D2_full = np.array(datasets[alg2][param]).flatten()[tissue_mask.flatten()]
+                D2_full = np.array(dataset_algospecific[alg2][param]).flatten()[tissue_mask.flatten()]
                 valid_mask = ~np.isnan(D1_full) & ~np.isnan(D2_full)
                 if np.any(valid_mask):
                     if param == 'f':
@@ -149,7 +162,8 @@ def plot_correlation_matrices_tissue(tissue_mask, tissue_name,slice_idx):
                 else:
                     corr_matrix.loc[alg1, alg2] = np.nan
 
-        # Plot heatmap (no colorbar per subplot)
+        np.fill_diagonal(corr_matrix.values, np.nan)
+
         hm = sns.heatmap(
             corr_matrix.astype(float),
             annot=False,
@@ -157,7 +171,8 @@ def plot_correlation_matrices_tissue(tissue_mask, tissue_name,slice_idx):
             square=True,
             vmin=vmin, vmax=vmax,
             cbar=False,
-            ax=ax
+            ax=ax,
+            mask=corr_matrix.isna()  # <- ensures diagonal is white
         )
         last_heatmap = hm
 
@@ -170,7 +185,13 @@ def plot_correlation_matrices_tissue(tissue_mask, tissue_name,slice_idx):
         ax.set_yticklabels([mapping[a] for a in algorithms_ordered], rotation=0, fontsize=18)
 
         # Subplot title
-        ax.set_title(param if param != 'Dp' else 'D*', fontsize=20, weight='bold')
+        title_map = {
+            'D_fit': 'D',
+            'f_fit': 'f',
+            'Dp_fit': 'D*'
+        }
+
+        ax.set_title(title_map[param], fontsize=20, weight='bold')
 
         # Category bands
         add_category_bands_heatmap(ax, algorithm_categories, orientation='x')
@@ -186,7 +207,7 @@ def plot_correlation_matrices_tissue(tissue_mask, tissue_name,slice_idx):
     fig.subplots_adjust(left=0.03, right=1, top=0.85, bottom=0.2, wspace=0)
 
     # Save and show
-    save_path = rf"C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\codecharacterization\invivo\CorrelationMatrix_{tissue_name.replace(' ', '')}_3params_clipped.png"
+    save_path = rf"C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection\codecharacterization\invivo\results\CorrelationMatrix_{anatomy}_{tissue_name}_{harmonization_string}_3params_clipped_whitediagonal.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 

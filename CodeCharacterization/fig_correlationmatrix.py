@@ -1,3 +1,6 @@
+"""
+Script that plots a correlation matrix for a single region. The correlation matrix shows the correlations without harmonization.
+"""
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -192,13 +195,13 @@ harmonized_bounds = True
 harmonized_initialguess = True
 if harmonized_bounds and harmonized_initialguess:
     harmonization_step = "bounds_and_initialguess_harmonized"
-    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_bounds_and_initialguess_harmonized_SNR20.csv'
+    file_path = r'C:\TF_IVIM_OSIPI/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_bounds_and_initialguess_harmonized_SNR20.csv'
 elif not harmonized_bounds and harmonized_initialguess:
     harmonization_step = "initialguess_harmonized"
-    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_initialguess_harmonized_SNR20.csv'
+    file_path = r'C:\TF_IVIM_OSIPI/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_initialguess_harmonized_SNR20.csv'
 elif not harmonized_bounds and not harmonized_initialguess:
     harmonization_step = "no_harmonization"
-    file_path = '/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_no_harmonization_SNR20.csv'
+    file_path = r'C:\TF_IVIM_OSIPI/TF2.4_IVIM-MRI_CodeCollection/test_output_brain_no_harmonization_SNR20.csv'
 
 df = pd.read_csv(file_path)
 df= df[df["Region"] == region]
@@ -241,7 +244,7 @@ algorithms_ordered = []
 for cat, algos in algorithm_categories_filtered.items():
     algorithms_ordered.extend(algos)
 
-output_path = f'/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/{harmonization_step}/Brain_{harmonization_step}/correlationmatrices_{region}_SNR{str(SNR)}.png'
+output_path = rf'C:\TF_IVIM_OSIPI/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/{harmonization_step}/Brain_{harmonization_step}/correlationmatrices_{region}_SNR{str(SNR)}.png'
 plot_all_correlation_matrices(df, region, SNR, algorithm_categories_filtered, output_path)
 print(f"Saved combined correlation matrix figure for SNR {int(SNR)}")
 
