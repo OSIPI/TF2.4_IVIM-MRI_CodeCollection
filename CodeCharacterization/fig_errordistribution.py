@@ -13,9 +13,11 @@ def filter_algorithms_by_harmonization(algo_categories, harmonization_step):
     if harmonization_step == 'no_harmonization':
         return [algo for algo, cat in algo_categories.items()]
     elif harmonization_step == 'initialguess_harmonized':
-        return [algo for algo, cat in algo_categories.items() if cat in [2, 3]]
+        return [algo for algo, cat in algo_categories.items() if cat in [2, 4]]
+    elif harmonization_step == 'bounds_harmonized':
+        algorithms_filtered = [algo for algo, cat in algo_categories.items() if cat in [3, 4]]
     elif harmonization_step == 'bounds_and_initialguess_harmonized':
-        return [algo for algo, cat in algo_categories.items() if cat == 3]
+        return [algo for algo, cat in algo_categories.items() if cat == 4]
     else:
         return [algo for algo, cat in algo_categories.items()]
 
@@ -23,11 +25,13 @@ def filter_algorithms_by_harmonization(algo_categories, harmonization_step):
 def categorize_algorithm(df_algo):
     # Check if all bounds and all initial guesses are used
     uses_all_bounds = df_algo[['D_use_bounds', 'Dp_use_bounds', 'f_use_bounds']].all().all()
+    uses_any_bounds = df_algo[['D_use_bounds', 'Dp_use_bounds', 'f_use_bounds']].any().any()
     uses_all_initial_guess = df_algo[['D_use_initial_guess', 'Dp_use_initial_guess', 'f_use_initial_guess']].all().all()
     uses_any_initial_guess = df_algo[['D_use_initial_guess', 'Dp_use_initial_guess', 'f_use_initial_guess']].any().any()
-    uses_any_bounds = df_algo[['D_use_bounds', 'Dp_use_bounds', 'f_use_bounds']].any().any()
 
-    if uses_any_bounds and uses_all_initial_guess:
+    if uses_any_bounds and uses_any_initial_guess:
+        return 4
+    elif uses_any_bounds:
         return 3
     elif uses_any_initial_guess:
         return 2
