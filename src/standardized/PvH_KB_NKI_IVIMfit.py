@@ -52,18 +52,17 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
         self.use_initial_guess = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
 
 
-    def ivim_fit(self, signals, bvalues=None):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
         """
         #bvalues = np.array(bvalues)
-        bvalues = bvalues.tolist() #NKI code expects a list instead of nparray
+        bvalues = np.asarray(self.bvalues).tolist() #NKI code expects a list instead of nparray
         # reshape signal as the NKI code expects a 4D array
         signals[signals<0.00001]=0.00001
         signals = np.reshape(signals, (1, 1, 1, len(signals)))  # assuming that in this test the signals are always single voxel

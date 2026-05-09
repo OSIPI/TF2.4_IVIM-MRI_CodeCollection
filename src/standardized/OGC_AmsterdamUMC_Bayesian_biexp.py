@@ -73,12 +73,11 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
                 self.neg_log_prior = empirical_neg_log_prior(prior_in[0], prior_in[1], prior_in[2])
         self.fitS0=fitS0
 
-    def ivim_fit(self, signals, bvalues, initial_guess=None, **kwargs):
+    def ivim_fit(self, signals, initial_guess=None, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
@@ -88,7 +87,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
 
         initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
-        bvalues=np.array(bvalues)
+        bvalues=np.array(self.bvalues)
 
         epsilon = 0.000001
         fit_results = fit_segmented(bvalues, signals, bounds=bounds, cutoff=self.thresholds, p0=initial_guess)
@@ -105,11 +104,10 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
 
         return results
 
-    def ivim_fit_full_volume(self, signals, bvalues, njobs=4, **kwargs):
+    def ivim_fit_full_volume(self, signals, njobs=4, **kwargs):
         """Perform the IVIM fit
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
         Returns:
             _type_: _description_
         """
@@ -122,6 +120,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         # Get index of b=0
         shape=np.shape(signals)
 
+        bvalues=np.array(self.bvalues)
         b0_index = np.where(bvalues == 0)[0][0]
         # Mask of voxels where signal at b=0 >= 0.5
         valid_mask = signals[..., b0_index] >= 0
@@ -133,7 +132,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         normalization_factor = np.mean(signals[..., b0_indices],axis=-1)
         signals = signals / np.repeat(normalization_factor[...,np.newaxis],np.shape(signals)[-1],-1)
 
-        bvalues=np.array(bvalues)
+        bvalues=np.array(self.bvalues)
 
         epsilon = 0.000001
         fit_results = np.array(fit_segmented_array(bvalues, signals, bounds=bounds, cutoff=self.thresholds, p0=initial_guess))

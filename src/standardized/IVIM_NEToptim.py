@@ -89,18 +89,15 @@ class IVIM_NEToptim(OsipiBase):
         self.algorithm =lambda data: deep.predict_IVIM(data, self.bvalues, self.net, self.arg)
 
 
-    def ivim_fit(self, signals, bvalues, **kwargs):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
         """
-        if not np.array_equal(bvalues, self.bvalues):
-            raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
 
         paramsNN = deep.predict_IVIM(signals, self.bvalues, self.net, self.arg)
 
@@ -112,18 +109,15 @@ class IVIM_NEToptim(OsipiBase):
         return results
 
 
-    def ivim_fit_full_volume(self, signals, bvalues, retrain_on_input_data=False, **kwargs):
+    def ivim_fit_full_volume(self, signals, retrain_on_input_data=False, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
         """
-        if not np.array_equal(bvalues, self.bvalues):
-            raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
         minimum_bvalue = np.min(self.bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
         b0_indices = np.where(self.bvalues == minimum_bvalue)[0]
         normalization_factor = np.mean(signals[..., b0_indices],axis=-1)

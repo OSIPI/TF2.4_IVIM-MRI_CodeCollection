@@ -56,18 +56,17 @@ class TCML_TechnionIIT_lsqlm(OsipiBase):
             self.use_initial_guess = {"f": True, "Dp": True, "D": True}
         self.fitS0=fitS0
 
-    def ivim_fit(self, signals, bvalues, **kwargs):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
         """
 
-        bvalues=np.array(bvalues)
+        bvalues=np.array(self.bvalues)
         initial_guess = [self.initial_guess["D"], self.initial_guess["Dp"], self.initial_guess["f"], self.initial_guess["S0"]]
         fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], initial_guess)
 

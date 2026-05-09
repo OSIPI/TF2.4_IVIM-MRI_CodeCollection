@@ -58,12 +58,11 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
         else:
             self.thresholds = thresholds
 
-    def ivim_fit(self, signals, bvalues, **kwargs):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
@@ -73,7 +72,7 @@ class OGC_AmsterdamUMC_biexp_segmented(OsipiBase):
 
         initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
-        bvalues=np.array(bvalues)
+        bvalues = np.array(self.bvalues)
         fit_results = self.OGC_algorithm(bvalues, signals, bounds=bounds, cutoff=self.thresholds, p0=initial_guess)
 
         results = {}

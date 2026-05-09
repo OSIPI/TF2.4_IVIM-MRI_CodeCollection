@@ -66,17 +66,16 @@ class DT_IIITN_WLS(OsipiBase):
         )
         self.method = method.upper()
 
-    def ivim_fit(self, signals, bvalues, **kwargs):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit using the selected method (WLS or RLM).
 
         Args:
             signals (array-like): Signal intensities at each b-value.
-            bvalues (array-like, optional): b-values for the signals.
 
         Returns:
             dict: Dictionary with keys "D", "f", "Dp".
         """
-        bvalues = np.array(bvalues)
+        bvalues = np.array(self.bvalues)
 
         # Use threshold as cutoff if available
         cutoff = 200
