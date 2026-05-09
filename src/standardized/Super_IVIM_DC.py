@@ -88,18 +88,15 @@ class Super_IVIM_DC(OsipiBase):
         )
 
 
-    def ivim_fit(self, signals, bvalues, **kwargs):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             results: a dictionary containing "d", "f", and "Dp".
         """
-        if not np.array_equal(bvalues, self.bvalues):
-            raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
 
         Dp, Dt, f, S0_superivimdc = infer_from_signal(
             signal=signals,
@@ -115,18 +112,15 @@ class Super_IVIM_DC(OsipiBase):
         return results
 
 
-    def ivim_fit_full_volume(self, signals, bvalues, retrain_on_input_data=False, **kwargs):
+    def ivim_fit_full_volume(self, signals, retrain_on_input_data=False, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
         """
-        if not np.array_equal(bvalues, self.bvalues):
-            raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
 
         nanmask = np.any(np.isnan(signals),axis=-1)
         signals,shape = self.reshape_to_voxelwise(signals)

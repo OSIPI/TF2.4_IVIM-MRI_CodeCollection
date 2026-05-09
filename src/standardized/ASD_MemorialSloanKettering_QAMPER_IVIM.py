@@ -66,12 +66,11 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         (f_arr, D_arr, Dx_arr, s0_arr, fitted_dwi_arr, RSS, rms_val, chi, AIC, BIC, R_sq) = results
         return D_arr/1000, f_arr, Dx_arr/1000, s0_arr
 
-    def ivim_fit(self, signals, bvalues, **kwargs):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
@@ -81,7 +80,7 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
 
         initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
-        bvalues=np.array(bvalues)
+        bvalues=np.array(self.bvalues)
         LB = np.array(bounds[0])[[1,0,2,3]]
         UB = np.array(bounds[1])[[1,0,2,3]]
 

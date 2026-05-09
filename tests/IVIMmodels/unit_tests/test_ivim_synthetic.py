@@ -26,7 +26,7 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
     D = data["D"]
     f = data["f"]
     Dp = data["Dp"]
-    fit = OsipiBase(algorithm=ivim_algorithm)
+    fit = OsipiBase(algorithm=ivim_algorithm, bvalues=bvals)
     # here is a prior
     if use_prior and hasattr(fit, "supported_priors") and fit.supported_priors:
         prior = [rng.normal(D, D/3, 10), rng.normal(f, f/3, 10), rng.normal(Dp, Dp/3, 10), rng.normal(1, 1/3, 10)]
@@ -39,7 +39,7 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
         # else:
         #     signal = data["data"]
         start_time = datetime.datetime.now()
-        fit_result = fit.osipi_fit(signal, bvals) #, prior_in=prior
+        fit_result = fit.osipi_fit(signal) #, prior_in=prior
         time_delta += datetime.datetime.now() - start_time
         if save_file is not None:
             save_file.writerow([ivim_algorithm, name, SNR, idx, f, Dp, D, fit_result["f"], fit_result["Dp"], fit_result["D"], *signal])

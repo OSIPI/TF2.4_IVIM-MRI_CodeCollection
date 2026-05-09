@@ -127,7 +127,7 @@ if __name__ == "__main__":
         affine = np.array(affine_override).reshape(4, 4)
 
     # Initialize model
-    fit = OsipiBase(algorithm=algorithm)
+    fit = OsipiBase(algorithm=algorithm, bvalues=bvals)
 
     # Preallocate output arrays
     shape = data.shape[:data.ndim - 1]
@@ -142,7 +142,7 @@ if __name__ == "__main__":
         loop_over_first_n_minus_1_dimensions(data),
         desc="Fitting IVIM model", dynamic_ncols=True, total=total_iteration
     ):
-        fit_result = fit.osipi_fit(view, bvals)
+        fit_result = fit.osipi_fit(view)
         f_image[idx] = fit_result["f"]
         Dp_image[idx] = fit_result["Dp"]
         D_image[idx] = fit_result["D"]

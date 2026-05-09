@@ -51,9 +51,9 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         test_bounds = {"S0" : [0.7, 1.3], "f" : [0, 1.0], "Dp" : [0.01, 0.2], "D" : [0, 0.005]}
     else:
         test_bounds = {"S0" : [0.7, 1.3], "f" : [0, 1.0], "Dp" : [0.005, 0.2], "D" : [0, 0.005]}
-    fit = OsipiBase(algorithm=algorithm, bounds=test_bounds, **kwargs)
+    fit = OsipiBase(algorithm=algorithm, bvalues=bvals, bounds=test_bounds, **kwargs)
     start_time = time.time()  # Record the start time
-    fit_result = fit.osipi_fit(signal, bvals)
+    fit_result = fit.osipi_fit(signal)
     elapsed_time = time.time() - start_time  # Calculate elapsed time
     def to_list_if_needed(value):
         return value.tolist() if isinstance(value, np.ndarray) else value
@@ -123,10 +123,10 @@ def test_bounds(bound_input, eng, request):
     #bounds = ([0.0008, 0.2, 0.01, 1.1], [0.0012, 0.3, 0.02, 1.3])
     bounds = {"S0" : [1.1, 1.3], "f" : [0.2, 0.3], "Dp" : [0.01, 0.02], "D" : [0.0008, 0.0012]}
     # deliberately have silly bounds to see whether they are used
-    fit = OsipiBase(algorithm=algorithm, bounds=bounds, initial_guess={"S0" : 1.2, "f" : 0.25, "Dp" : 0.015, "D" : 0.001}, **kwargs)
+    fit = OsipiBase(algorithm=algorithm, bvalues=bvals, bounds=bounds, initial_guess={"S0" : 1.2, "f" : 0.25, "Dp" : 0.015, "D" : 0.001}, **kwargs)
     if fit.use_bounds["f"] or fit.use_bounds["D"] or fit.use_bounds["Dp"]:
         signal = signal_helper(data["data"])
-        fit_result = fit.osipi_fit(signal, bvals)
+        fit_result = fit.osipi_fit(signal)
         eps=1e-10 # without this margin it can cause floating point failures on mac systems
         if fit.use_bounds["D"]:
             assert bounds["D"][0]-eps <= fit_result['D'] <= bounds["D"][1]+eps,  f"Result {fit_result['D']} out of bounds for data: {name}"
@@ -185,10 +185,10 @@ def test_volume(algorithmlist,eng, threeddata):
         kwargs = {'bvalues': bvals}
     else:
         kwargs={}
-    fit = OsipiBase(algorithm=algorithm,**kwargs)
+    fit = OsipiBase(algorithm=algorithm, bvalues=bvals, **kwargs)
     if hasattr(fit, 'ivim_fit_full_volume') and callable(getattr(fit, 'ivim_fit_full_volume')):
         start_time = time.time()  # Record the start time
-        fit_result = fit.osipi_fit_full_volume(data, bvals)
+        fit_result = fit.osipi_fit_full_volume(data)
         elapsed_time2 = time.time() - start_time  # Calculate elapsed time
         print('time elaapsed is '+str(elapsed_time2))
         assert np.shape(fit_result['D'])[0] == np.shape(data)[0]
@@ -218,17 +218,17 @@ def test_parallel(algorithmlist,eng,threeddata):
     data[invalid_mask,:] = np.nan
     print('testing ' + str(np.sum(~invalid_mask)) + ' voxels of a matrix size ' + str(np.shape(data)))
 
-    fit = OsipiBase(algorithm=algorithm,**kwargs)
+    fit = OsipiBase(algorithm=algorithm, bvalues=bvals, **kwargs)
 
     def dummy_task(x):
         return x
 
     start_time = time.time()  # Record the start time
-    fit_result = fit.osipi_fit(data, bvals,njobs=1)
+    fit_result = fit.osipi_fit(data, njobs=1)
     time_serial = time.time() - start_time  # Calculate elapsed time
     Parallel(n_jobs=2)(delayed(dummy_task)(i) for i in range(8)) #github actions only supports 2 cores
     start_time = time.time()  # Record the start time
-    fit_result2 = fit.osipi_fit(data, bvals,njobs=2)
+    fit_result2 = fit.osipi_fit(data, njobs=2)
     time_parallel= time.time() - start_time  # Calculate elapsed time
 
     print('singular took '+str(time_serial)+' seconds, and parallel took '+str(time_parallel)+' seconds')
@@ -259,7 +259,7 @@ def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
     fit = OsipiBase(bvalues=bvals, algorithm=algorithm, bounds={"S0" : [0, 2], "f" : [0, 1], "Dp" : [0.005, 0.2], "D" : [0, 0.005]}, **kwargs)
 
     array_2d = np.array([dat["data"] for _, dat in data.items()])
-    fit_result = fit.osipi_fit_full_volume(array_2d, bvals)
+    fit_result = fit.osipi_fit_full_volume(array_2d)
 
     errors = []  # Collect all assertion errors
 

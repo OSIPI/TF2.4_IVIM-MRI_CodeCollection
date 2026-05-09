@@ -59,20 +59,18 @@ class ETP_SRI_LinearFitting(OsipiBase):
         # Check the inputs
         
     
-    def ivim_fit(self, signals, bvalues=None, linear_fit_option=False, **kwargs):
+    def ivim_fit(self, signals, linear_fit_option=False, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
             linear_fit_option (bool, optional): This fit has an option to only run a linear fit. Defaults to False.
 
         Returns:
             _type_: _description_
         """
         signals[signals<0.0000001]=0.0000001
-        if bvalues is None:
-            bvalues = self.bvalues
+        bvalues = self.bvalues
         
         if self.thresholds is None:
             ETP_object = LinearFit()

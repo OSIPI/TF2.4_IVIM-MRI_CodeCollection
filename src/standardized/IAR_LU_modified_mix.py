@@ -68,12 +68,11 @@ class IAR_LU_modified_mix(OsipiBase):
             self.IAR_algorithm = None
         
     
-    def ivim_fit(self, signals, bvalues, **kwargs):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
@@ -83,10 +82,7 @@ class IAR_LU_modified_mix(OsipiBase):
                   [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
         
         if self.IAR_algorithm is None:
-            if bvalues is None:
-                bvalues = self.bvalues
-            else:
-                bvalues = np.asarray(bvalues)
+            bvalues = np.asarray(self.bvalues)
             
             bvec = np.zeros((bvalues.size, 3))
             bvec[:,2] = 1

@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
         # Pass additional arguments to the algorithm
 
-        fit = OsipiBase(algorithm=args.algorithm)
+        fit = OsipiBase(algorithm=args.algorithm, bvalues=bvals)
         f_image = []
         Dp_image = []
         D_image = []
@@ -109,7 +109,7 @@ if __name__ == "__main__":
         n = data.ndim
         total_iteration = np.prod(data.shape[:n-1])
         for idx, view in tqdm(loop_over_first_n_minus_1_dimensions(data), desc=f"{args.algorithm} is fitting", dynamic_ncols=True, total=total_iteration):
-            fit_result = fit.osipi_fit(view, bvals)
+            fit_result = fit.osipi_fit(view)
             f_image.append(fit_result["f"])
             Dp_image.append(fit_result["Dp"])
             D_image.append(fit_result["D"])

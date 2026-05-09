@@ -68,12 +68,11 @@ class OJ_GU_bayesMATLAB(OsipiBase):
         out = self.eng.IVIM_bayes(Y, f, D, Dstar, S0, b, lim, nargout=1)
         return out['D']['mode'], out['f']['mode'], out['Dstar']['mode'], out['S0']['mode']
 
-    def ivim_fit(self, signals, bvalues, **kwargs):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
@@ -84,7 +83,7 @@ class OJ_GU_bayesMATLAB(OsipiBase):
         initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
         fit_results = self.algorithm(np.array(signals)[:,np.newaxis], 
-                                     np.array(bvalues), 
+                                     np.array(self.bvalues), 
                                      np.array(bounds)[:,[1,0,2,3]], 
                                      self.thresholds,
                                      initial_guess)
