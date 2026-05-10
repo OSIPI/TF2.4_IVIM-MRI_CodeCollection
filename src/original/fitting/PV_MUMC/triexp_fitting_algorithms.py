@@ -196,7 +196,7 @@ def fit_NNLS(bvalues, dw_data, IR=False,
 
         return Dpar, Fmv, Dmv, Dint, Fint, S0
 
-    except:
+    except Exception:
         return 0, 0, 0, 0, 0, 0
 
         
