@@ -89,11 +89,10 @@ class IAR_LU_subtracted(OsipiBase):
         initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
         
         if self.IAR_algorithm is None:
-            bvalues = self.bvalues
             
-            bvec = np.zeros((bvalues.size, 3))
+            bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
-            gtab = gradient_table(bvalues, bvecs=bvec, b0_threshold=0)
+            gtab = gradient_table(self.bvalues, bvecs=bvec, b0_threshold=0)
 
             self.IAR_algorithm = IvimModelSubtracted(gtab, bounds=bounds, initial_guess=initial_guess)
             

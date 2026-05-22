@@ -59,14 +59,12 @@ class OJ_GU_seg(OsipiBase):
             _type_: _description_
         """
         
-        bvalues = self.bvalues
-
         if self.thresholds is None:
             bthr = 200
         else:
             bthr = self.thresholds[0]
         signals[signals<0.00001]=0.00001
-        fit_results = seg(signals, bvalues, bthr)
+        fit_results = seg(signals, self.bvalues, bthr)
 
         results = {} 
         results["f"] = fit_results['f']

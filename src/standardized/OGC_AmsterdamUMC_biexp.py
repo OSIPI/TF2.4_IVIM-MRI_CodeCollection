@@ -65,8 +65,7 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
 
         initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
-        bvalues=self.bvalues
-        fit_results = self.OGC_algorithm(bvalues, signals, p0=initial_guess, bounds=bounds, fitS0=self.fitS0)
+        fit_results = self.OGC_algorithm(self.bvalues, signals, p0=initial_guess, bounds=bounds, fitS0=self.fitS0)
 
         results = {}
         results["D"] = fit_results[0]

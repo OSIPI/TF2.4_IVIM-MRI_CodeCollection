@@ -87,11 +87,10 @@ class IAR_LU_biexp(OsipiBase):
         initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
         
         if self.IAR_algorithm is None:
-            bvalues = self.bvalues
             
-            bvec = np.zeros((bvalues.size, 3))
+            bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
-            gtab = gradient_table(bvalues, bvecs=bvec, b0_threshold=0)
+            gtab = gradient_table(self.bvalues, bvecs=bvec, b0_threshold=0)
             
             self.IAR_algorithm = IvimModelBiExp(gtab, bounds=bounds, initial_guess=initial_guess)
             
@@ -120,15 +119,13 @@ class IAR_LU_biexp(OsipiBase):
                        [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
         initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
         if self.IAR_algorithm is None:
-            bvalues = self.bvalues
             
-            bvec = np.zeros((bvalues.size, 3))
+            bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
-            gtab = gradient_table(bvalues, bvecs=bvec, b0_threshold=0)
+            gtab = gradient_table(self.bvalues, bvecs=bvec, b0_threshold=0)
             
             self.IAR_algorithm = IvimModelBiExp(gtab, bounds=bounds, initial_guess=initial_guess)
-        bvalues = self.bvalues
-        b0_index = np.where(bvalues == 0)[0][0]
+        b0_index = np.where(self.bvalues == 0)[0][0]
         mask = signals[...,b0_index]>0
         fit_results = self.IAR_algorithm.fit(signals, mask=mask)
         

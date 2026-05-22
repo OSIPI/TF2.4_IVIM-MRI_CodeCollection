@@ -69,14 +69,12 @@ class TF_reference_IVIMfit(OsipiBase):
         bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
                   [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
 
-        bvalues = self.bvalues
 
         if np.any(signals < 0):
             signals = np.clip(signals,0.01, None)
             warnings.warn('Negative values in signal: values clipped to 0.01', UserWarning, stacklevel=2)
 
-
-        fit_results = self.TF_reference_algorithm(bvalues,signals,b_cutoff=self.thresholds, bounds=bounds)
+        fit_results = self.TF_reference_algorithm(self.bvalues,signals,b_cutoff=self.thresholds, bounds=bounds)
 
         results = {}
         results["D"] = fit_results[0]

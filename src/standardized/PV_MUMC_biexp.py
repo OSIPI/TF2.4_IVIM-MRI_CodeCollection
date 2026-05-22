@@ -53,7 +53,6 @@ class PV_MUMC_biexp(OsipiBase):
         Returns:
             dict: Fitted IVIM parameters f, Dp (D*), and D.
         """
-        bvalues = self.bvalues
 
         # --- Bounds resolution ---
         # self.bounds is always a dict (OsipiBase force_default_settings=True).
@@ -74,7 +73,7 @@ class PV_MUMC_biexp(OsipiBase):
         DEFAULT_PARAMS = [0, 0, 0]
 
         try:
-            fit_results = self.PV_algorithm(bvalues, signals, bounds=bounds, cutoff=self.thresholds)
+            fit_results = self.PV_algorithm(self.bvalues, signals, bounds=bounds, cutoff=self.thresholds)
         except RuntimeError as e:
             # curve_fit raises RuntimeError both for max-evaluations exceeded and other failures
             print(f"PV_MUMC_biexp: optimizer failed ({e}). Returning default parameters.")

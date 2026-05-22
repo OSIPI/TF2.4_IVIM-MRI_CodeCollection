@@ -70,7 +70,6 @@ class ETP_SRI_LinearFitting(OsipiBase):
             _type_: _description_
         """
         signals[signals<0.0000001]=0.0000001
-        bvalues = self.bvalues
         
         if self.thresholds is None:
             ETP_object = LinearFit()
@@ -79,14 +78,14 @@ class ETP_SRI_LinearFitting(OsipiBase):
         
         results = {}
         if linear_fit_option:
-            f, Dstar = ETP_object.linear_fit(bvalues, signals, self.ETP_weighting, self.ETP_stats)
+            f, Dstar = ETP_object.linear_fit(self.bvalues, signals, self.ETP_weighting, self.ETP_stats)
 
             results["f"] = f
             results["Dp"] = Dstar
 
             return results
         else: 
-            f, D, Dstar = ETP_object.ivim_fit(bvalues, signals)
+            f, D, Dstar = ETP_object.ivim_fit(self.bvalues, signals)
 
             results["f"] = f
             results["Dp"] = Dstar

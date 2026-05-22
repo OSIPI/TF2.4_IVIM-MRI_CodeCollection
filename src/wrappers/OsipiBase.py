@@ -286,8 +286,7 @@ class OsipiBase:
                 "b-values must be provided at initialization (__init__), not at fit-time. "
                 "Pass bvalues to the constructor: OsipiBase(bvalues=..., algorithm=...)"
             )
-        use_bvalues = self.bvalues
-
+        
         # Check if there is an attribute that defines the result dictionary keys
         if hasattr(self, "result_keys"):
             # result_keys is a list of strings of parameter names, e.g. "S0", "f1", "f2", etc.
@@ -303,11 +302,11 @@ class OsipiBase:
         # Assuming the last dimension of the data is the signal values of each b-value
         # results = np.empty(list(data.shape[:-1])+[3]) # Create an array with the voxel dimensions + the ones required for the fit
         #for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
-            #args = [data[ijk], use_bvalues]
+            #args = [data[ijk], self.bvalues]
             #fit = list(self.ivim_fit(*args, **kwargs))
             #results[ijk] = fit
-        minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
-        b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
+        minimum_bvalue = np.min(self.bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
+        b0_indices = np.where(self.bvalues == minimum_bvalue)[0]
         normalization_factor = np.mean(data[..., b0_indices],axis=-1)
         data = data / np.repeat(normalization_factor[...,np.newaxis],np.shape(data)[-1],-1)
         if np.shape(data.shape)[0] == 1:
@@ -547,8 +546,7 @@ class OsipiBase:
     
     def osipi_simple_bias_and_RMSE_test(self, SNR, f, Dstar, D, noise_realizations=100):
         # Generate signal using b-values from initialization
-        bvalues = self.bvalues
-        signals = f*np.exp(-bvalues*Dstar) + (1-f)*np.exp(-bvalues*D)
+        signals = f*np.exp(-self.bvalues*Dstar) + (1-f)*np.exp(-self.bvalues*D)
         
         f_estimates = np.zeros(noise_realizations)
         Dstar_estimates = np.zeros(noise_realizations)

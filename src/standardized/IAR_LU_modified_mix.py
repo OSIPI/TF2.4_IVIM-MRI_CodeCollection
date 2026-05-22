@@ -82,11 +82,10 @@ class IAR_LU_modified_mix(OsipiBase):
                   [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
         
         if self.IAR_algorithm is None:
-            bvalues = self.bvalues
             
-            bvec = np.zeros((bvalues.size, 3))
+            bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
-            gtab = gradient_table(bvalues, bvecs=bvec, b0_threshold=0)
+            gtab = gradient_table(self.bvalues, bvecs=bvec, b0_threshold=0)
             
             self.IAR_algorithm = IvimModelVP(gtab, bounds=bounds, rescale_results_to_mm2_s=True)
 

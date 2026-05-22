@@ -80,11 +80,10 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
 
         initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
-        bvalues=self.bvalues
         LB = np.array(bounds[0])[[1,0,2,3]]
         UB = np.array(bounds[1])[[1,0,2,3]]
 
-        fit_results = self.algorithm(np.array(signals)[:,np.newaxis], bvalues, LB, UB, np.array(initial_guess)[[1,0,2,3]])
+        fit_results = self.algorithm(np.array(signals)[:,np.newaxis], self.bvalues, LB, UB, np.array(initial_guess)[[1,0,2,3]])
 
         results = {}
         results["D"] = fit_results[0]

@@ -75,14 +75,12 @@ class DT_IIITN_WLS(OsipiBase):
         Returns:
             dict: Dictionary with keys "D", "f", "Dp".
         """
-        bvalues = self.bvalues
-
         # Use threshold as cutoff if available
         cutoff = 200
         if self.thresholds is not None and len(self.thresholds) > 0:
             cutoff = self.thresholds[0]
 
-        D, f, Dp = wls_ivim_fit(bvalues, signals, cutoff=cutoff,
+        D, f, Dp = wls_ivim_fit(self.bvalues, signals, cutoff=cutoff,
                                 method=self.method)
 
         results = {}
