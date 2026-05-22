@@ -83,7 +83,7 @@ class OJ_GU_bayesMATLAB(OsipiBase):
         initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
         fit_results = self.algorithm(np.array(signals)[:,np.newaxis], 
-                                     np.array(self.bvalues), 
+                                     self.bvalues, 
                                      np.array(bounds)[:,[1,0,2,3]], 
                                      self.thresholds,
                                      initial_guess)

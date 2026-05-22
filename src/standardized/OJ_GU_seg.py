@@ -59,7 +59,7 @@ class OJ_GU_seg(OsipiBase):
             _type_: _description_
         """
         
-        bvalues = np.asarray(self.bvalues)
+        bvalues = self.bvalues
 
         if self.thresholds is None:
             bthr = 200

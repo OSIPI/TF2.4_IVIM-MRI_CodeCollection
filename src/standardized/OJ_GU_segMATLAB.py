@@ -78,7 +78,7 @@ class OJ_GU_segMATLAB(OsipiBase):
                   [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
 
         fit_results = self.algorithm(np.array(signals)[:,np.newaxis], 
-                                     np.array(self.bvalues), 
+                                     self.bvalues, 
                                      np.array(bounds)[:,[0,3,1,2]], 
                                      self.thresholds)
 

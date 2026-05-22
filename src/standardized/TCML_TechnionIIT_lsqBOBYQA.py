@@ -69,7 +69,7 @@ class TCML_TechnionIIT_lsqBOBYQA(OsipiBase):
             _type_: _description_
         """
 
-        bvalues=np.array(self.bvalues)
+        bvalues=self.bvalues
         bounds = ([self.bounds["D"][0], self.bounds["Dp"][0], self.bounds["f"][0], self.bounds["S0"][0]],
                        [self.bounds["D"][1], self.bounds["Dp"][1], self.bounds["f"][1], self.bounds["S0"][1]])
         initial_guess = [self.initial_guess["D"], self.initial_guess["Dp"], self.initial_guess["f"], self.initial_guess["S0"]]

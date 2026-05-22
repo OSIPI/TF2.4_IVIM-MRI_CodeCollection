@@ -62,7 +62,7 @@ class PvH_KB_NKI_IVIMfit(OsipiBase):
             _type_: _description_
         """
         #bvalues = np.array(bvalues)
-        bvalues = np.asarray(self.bvalues).tolist() #NKI code expects a list instead of nparray
+        bvalues = self.bvalues.tolist() #NKI code expects a list instead of nparray
         # reshape signal as the NKI code expects a 4D array
         signals[signals<0.00001]=0.00001
         signals = np.reshape(signals, (1, 1, 1, len(signals)))  # assuming that in this test the signals are always single voxel

@@ -286,7 +286,7 @@ class OsipiBase:
                 "b-values must be provided at initialization (__init__), not at fit-time. "
                 "Pass bvalues to the constructor: OsipiBase(bvalues=..., algorithm=...)"
             )
-        use_bvalues = np.asarray(self.bvalues)
+        use_bvalues = self.bvalues
 
         # Check if there is an attribute that defines the result dictionary keys
         if hasattr(self, "result_keys"):
@@ -547,7 +547,7 @@ class OsipiBase:
     
     def osipi_simple_bias_and_RMSE_test(self, SNR, f, Dstar, D, noise_realizations=100):
         # Generate signal using b-values from initialization
-        bvalues = np.asarray(self.bvalues)
+        bvalues = self.bvalues
         signals = f*np.exp(-bvalues*Dstar) + (1-f)*np.exp(-bvalues*D)
         
         f_estimates = np.zeros(noise_realizations)

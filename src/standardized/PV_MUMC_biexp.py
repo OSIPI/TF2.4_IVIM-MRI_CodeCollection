@@ -53,7 +53,7 @@ class PV_MUMC_biexp(OsipiBase):
         Returns:
             dict: Fitted IVIM parameters f, Dp (D*), and D.
         """
-        bvalues = np.asarray(self.bvalues)
+        bvalues = self.bvalues
 
         # --- Bounds resolution ---
         # self.bounds is always a dict (OsipiBase force_default_settings=True).

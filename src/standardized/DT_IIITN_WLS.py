@@ -75,7 +75,7 @@ class DT_IIITN_WLS(OsipiBase):
         Returns:
             dict: Dictionary with keys "D", "f", "Dp".
         """
-        bvalues = np.array(self.bvalues)
+        bvalues = self.bvalues
 
         # Use threshold as cutoff if available
         cutoff = 200

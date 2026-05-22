@@ -87,7 +87,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
 
         initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
-        bvalues=np.array(self.bvalues)
+        bvalues=self.bvalues
 
         epsilon = 0.000001
         fit_results = fit_segmented(bvalues, signals, bounds=bounds, cutoff=self.thresholds, p0=initial_guess)
@@ -120,7 +120,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         # Get index of b=0
         shape=np.shape(signals)
 
-        bvalues=np.array(self.bvalues)
+        bvalues=self.bvalues
         b0_index = np.where(bvalues == 0)[0][0]
         # Mask of voxels where signal at b=0 >= 0.5
         valid_mask = signals[..., b0_index] >= 0
@@ -132,7 +132,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         normalization_factor = np.mean(signals[..., b0_indices],axis=-1)
         signals = signals / np.repeat(normalization_factor[...,np.newaxis],np.shape(signals)[-1],-1)
 
-        bvalues=np.array(self.bvalues)
+        bvalues=self.bvalues
 
         epsilon = 0.000001
         fit_results = np.array(fit_segmented_array(bvalues, signals, bounds=bounds, cutoff=self.thresholds, p0=initial_guess))

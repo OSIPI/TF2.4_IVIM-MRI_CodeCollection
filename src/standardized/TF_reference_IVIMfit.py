@@ -69,7 +69,7 @@ class TF_reference_IVIMfit(OsipiBase):
         bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
                   [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
 
-        bvalues = np.array(self.bvalues)
+        bvalues = self.bvalues
 
         if np.any(signals < 0):
             signals = np.clip(signals,0.01, None)

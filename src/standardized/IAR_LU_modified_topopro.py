@@ -85,7 +85,7 @@ class IAR_LU_modified_topopro(OsipiBase):
                   [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
         
         if self.IAR_algorithm is None:
-            bvalues = np.asarray(self.bvalues)
+            bvalues = self.bvalues
             
             bvec = np.zeros((bvalues.size, 3))
             bvec[:,2] = 1

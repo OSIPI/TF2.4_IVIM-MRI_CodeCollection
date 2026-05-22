@@ -92,7 +92,7 @@ class IAR_LU_segmented_3step(OsipiBase):
         initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
         
         if self.IAR_algorithm is None:
-            bvalues = np.asarray(self.bvalues)
+            bvalues = self.bvalues
             
             bvec = np.zeros((bvalues.size, 3))
             bvec[:,2] = 1

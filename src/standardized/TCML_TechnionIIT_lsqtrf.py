@@ -73,7 +73,7 @@ class TCML_TechnionIIT_lsqtrf(OsipiBase):
                        [self.bounds["D"][1], self.bounds["Dp"][1], self.bounds["f"][1], self.bounds["S0"][1]])
         initial_guess = [self.initial_guess["D"], self.initial_guess["Dp"], self.initial_guess["f"], self.initial_guess["S0"]]
 
-        bvalues = np.array(self.bvalues)
+        bvalues = self.bvalues
         fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], bounds,initial_guess)
 
         def get_scalar(val):
