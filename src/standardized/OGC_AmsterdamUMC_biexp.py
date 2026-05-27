@@ -51,12 +51,11 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
         self.use_initial_guess = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
         self.use_bounds = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
 
-    def ivim_fit(self, signals, bvalues, **kwargs):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
@@ -66,8 +65,7 @@ class OGC_AmsterdamUMC_biexp(OsipiBase):
 
         initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
-        bvalues=np.array(bvalues)
-        fit_results = self.OGC_algorithm(bvalues, signals, p0=initial_guess, bounds=bounds, fitS0=self.fitS0)
+        fit_results = self.OGC_algorithm(self.bvalues, signals, p0=initial_guess, bounds=bounds, fitS0=self.fitS0)
 
         results = {}
         results["D"] = fit_results[0]

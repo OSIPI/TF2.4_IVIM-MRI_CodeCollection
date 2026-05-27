@@ -80,10 +80,10 @@ class OsipiBase:
     osipi_initiate_algorithm(algorithm, **kwargs)
         Dynamically replace the current instance with the specified
         algorithm subclass.
-    osipi_fit(data, bvalues=None, njobs=1, **kwargs)
+    osipi_fit(data, njobs=1, **kwargs)
         Voxel-wise IVIM fitting with optional parallel processing and
         automatic signal normalization.
-    osipi_fit_full_volume(data, bvalues=None, **kwargs)
+    osipi_fit_full_volume(data, **kwargs)
         Full-volume fitting for algorithms that support it.
     osipi_print_requirements()
         Display algorithm requirements such as needed b-values or bounds.
@@ -91,7 +91,7 @@ class OsipiBase:
         Query acceptable input dimensionalities.
     osipi_check_required_*()
         Validate that provided inputs meet algorithm requirements.
-    osipi_simple_bias_and_RMSE_test(SNR, bvalues, f, Dstar, D, noise_realizations)
+    osipi_simple_bias_and_RMSE_test(SNR, f, Dstar, D, noise_realizations)
         Monte-Carlo bias/RMSE evaluation of the current fitting method.
     D_and_Ds_swap(results)
         Ensure consistency of D and D* estimates by swapping if necessary.
@@ -239,8 +239,7 @@ class OsipiBase:
         """Placeholder for subclass initialization"""
         pass
 
-    #def osipi_fit(self, data=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, **kwargs):
-    def osipi_fit(self, data, bvalues=None, njobs=1, **kwargs):
+    def osipi_fit(self, data, njobs=1, **kwargs):
         """
         Fit multi-b-value diffusion MRI data using the IVIM model.
 
@@ -253,9 +252,6 @@ class OsipiBase:
         data : np.ndarray
             Multi-dimensional array containing the signal intensities. The last dimension must correspond
             to the b-values (diffusion weightings).
-        bvalues : array-like, optional
-            Array of b-values corresponding to the last dimension of `data`. If not provided, the method
-            uses `self.bvalues` set during object initialization.
         njobs : int, optional, default=1
             Number of parallel jobs to use for voxel-wise fitting. If `njobs` > 1, the fitting will be
             distributed across multiple processes. -1 will use all available cpus
@@ -279,41 +275,18 @@ class OsipiBase:
 
         Example
         -------
-        >>> results = instance.osipi_fit(data, bvalues=[0, 50, 200, 800], njobs=4)
+        >>> results = instance.osipi_fit(data, njobs=4)
         >>> f_map = results['f']
         >>> D_map = results['D']
         """
         
-        # We should first check whether the attributes in the __init__ are not None
-        # Then check if they are input here, if they are, these should overwrite the attributes
-        use_bvalues = bvalues if bvalues is not None else self.bvalues
-        #use_thresholds = thresholds if self.thresholds is None else self.thresholds
-        #use_bounds = bounds if self.bounds is None else self.bounds
-        #use_initial_guess = initial_guess if self.initial_guess is None else self.initial_guess
-
-        # Make sure we don't make arrays of None's
-        if use_bvalues is not None: use_bvalues = np.asarray(use_bvalues) 
-        #if use_thresholds is not None: use_thresholds = np.asarray(use_thresholds) 
-        #if use_bounds is not None: use_bounds = np.asarray(use_bounds) 
-        #if use_initial_guess is not None: use_initial_guess = np.asarray(use_initial_guess) 
-        #kwargs["bvalues"] = use_bvalues
+        # b-values must be provided at initialization, not at fit-time.
+        if self.bvalues is None:
+            raise ValueError(
+                "b-values must be provided at initialization (__init__), not at fit-time. "
+                "Pass bvalues to the constructor: OsipiBase(bvalues=..., algorithm=...)"
+            )
         
-        #args = [data, use_bvalues, use_thresholds]
-        #if self.required_bounds or self.required_bounds_optional:
-            #args.append(use_bounds)
-        #if self.required_initial_guess or self.required_initial_guess_optional:
-            #args.append(use_initial_guess)
-            
-        # Run a check_requirements method that makes sure that these inputs fulfil the requirements
-        
-        
-        # Then we check which inputs are required for the algorithm using the requirements attributes in the template 
-        
-        # Then we pass everything into the ivim_fit method which performs the fit according to the algorithm
-        
-        #args = [data, use_bvalues, use_initial_guess, use_bounds, use_thresholds]
-        #args = [arg for arg in args if arg is not None]
-
         # Check if there is an attribute that defines the result dictionary keys
         if hasattr(self, "result_keys"):
             # result_keys is a list of strings of parameter names, e.g. "S0", "f1", "f2", etc.
@@ -329,11 +302,11 @@ class OsipiBase:
         # Assuming the last dimension of the data is the signal values of each b-value
         # results = np.empty(list(data.shape[:-1])+[3]) # Create an array with the voxel dimensions + the ones required for the fit
         #for ijk in tqdm(np.ndindex(data.shape[:-1]), total=np.prod(data.shape[:-1])):
-            #args = [data[ijk], use_bvalues]
+            #args = [data[ijk], self.bvalues]
             #fit = list(self.ivim_fit(*args, **kwargs))
             #results[ijk] = fit
-        minimum_bvalue = np.min(use_bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
-        b0_indices = np.where(use_bvalues == minimum_bvalue)[0]
+        minimum_bvalue = np.min(self.bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
+        b0_indices = np.where(self.bvalues == minimum_bvalue)[0]
         normalization_factor = np.mean(data[..., b0_indices],axis=-1)
         data = data / np.repeat(normalization_factor[...,np.newaxis],np.shape(data)[-1],-1)
         if np.shape(data.shape)[0] == 1:
@@ -349,7 +322,7 @@ class OsipiBase:
             def parfun(ijk):
                 single_voxel_data = np.array(data[ijk], copy=True)
                 if not np.isnan(single_voxel_data[0]):
-                    fit = self.ivim_fit(single_voxel_data, use_bvalues, **kwargs)
+                    fit = self.ivim_fit(single_voxel_data, **kwargs)
                 else:
                     fit={'D':0,'f':0,'Dp':0}
                 return ijk, fit
@@ -372,8 +345,7 @@ class OsipiBase:
                 # Normalize array
                 single_voxel_data = data[ijk]
                 if not np.isnan(single_voxel_data[0]):
-                    args = [single_voxel_data, use_bvalues]
-                    fit = self.ivim_fit(*args, **kwargs)
+                    fit = self.ivim_fit(single_voxel_data, **kwargs)
                 else:
                     fit={'D':0,'f':0,'Dp':0}
                 for key in list(fit.keys()):
@@ -382,7 +354,7 @@ class OsipiBase:
         return results
 
 
-    def osipi_fit_full_volume(self, data, bvalues=None, **kwargs):
+    def osipi_fit_full_volume(self, data, **kwargs):
         """
         Fit an entire volume of multi-b-value diffusion MRI data in a single call using the IVIM model.
 
@@ -394,9 +366,6 @@ class OsipiBase:
         data : np.ndarray
             2D (data x b-values), 3D (single slice), or 4D (multi-slice) diffusion-weighted imaging (DWI) data.
             The last dimension must correspond to the b-values.
-        bvalues : array-like, optional
-            Array of b-values corresponding to the last dimension of `data`. If not provided, the method
-            uses `self.bvalues` set during object initialization.
         **kwargs : dict, optional
             Additional keyword arguments to be passed to `ivim_fit_full_volume`.
 
@@ -414,7 +383,7 @@ class OsipiBase:
         Example
         -------
         # Standard usage:
-        results = instance.osipi_fit_full_volume(data, bvalues=[0, 50, 200, 800])
+        results = instance.osipi_fit_full_volume(data)
         f_map = results['f']
         D_map = results['D']
         Dp_map = results['Dp']
@@ -426,8 +395,12 @@ class OsipiBase:
         """
         
         try:
-            use_bvalues = bvalues if bvalues is not None else self.bvalues
-            if use_bvalues is not None: use_bvalues = np.asarray(use_bvalues) 
+            # b-values must be provided at initialization, not at fit-time.
+            if self.bvalues is None:
+                raise ValueError(
+                    "b-values must be provided at initialization (__init__), not at fit-time. "
+                    "Pass bvalues to the constructor: OsipiBase(bvalues=..., algorithm=...)"
+                )
 
             # Check if there is an attribute that defines the result dictionary keys
             if hasattr(self, "result_keys"):
@@ -442,8 +415,7 @@ class OsipiBase:
             for key in self.result_keys:
                 results[key] = np.empty(list(data.shape[:-1]))
             # no normalisation as volume algorithms may not want normalized signals...
-            args = [data, use_bvalues]
-            fit = self.ivim_fit_full_volume(*args, **kwargs) # Assume this is a dict with an array per key representing the parametric maps
+            fit = self.ivim_fit_full_volume(data, **kwargs) # Assume this is a dict with an array per key representing the parametric maps
             for key in list(fit.keys()):
                 results[key] = fit[key]
 
@@ -572,10 +544,9 @@ class OsipiBase:
         """Author identification"""
         return ''
     
-    def osipi_simple_bias_and_RMSE_test(self, SNR, bvalues, f, Dstar, D, noise_realizations=100):
-        # Generate signal
-        bvalues = np.asarray(bvalues)
-        signals = f*np.exp(-bvalues*Dstar) + (1-f)*np.exp(-bvalues*D)
+    def osipi_simple_bias_and_RMSE_test(self, SNR, f, Dstar, D, noise_realizations=100):
+        # Generate signal using b-values from initialization
+        signals = f*np.exp(-self.bvalues*Dstar) + (1-f)*np.exp(-self.bvalues*D)
         
         f_estimates = np.zeros(noise_realizations)
         Dstar_estimates = np.zeros(noise_realizations)
@@ -587,7 +558,7 @@ class OsipiBase:
             
             # Perform fit with the noised signal
             # f_estimates[i], Dstar_estimates[i], D_estimates[i] = self.D_and_Ds_swap(self.ivim_fit(noised_signal, bvalues))
-            result = self.ivim_fit(noised_signal, bvalues)
+            result = self.ivim_fit(noised_signal)
             f_estimates[i], Dstar_estimates[i], D_estimates[i] = result['f'], result['Dp'], result['D']
             
         # Calculate bias

@@ -73,12 +73,11 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
                 self.neg_log_prior = empirical_neg_log_prior(prior_in[0], prior_in[1], prior_in[2])
         self.fitS0=fitS0
 
-    def ivim_fit(self, signals, bvalues, initial_guess=None, **kwargs):
+    def ivim_fit(self, signals, initial_guess=None, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
@@ -88,15 +87,13 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
 
         initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
-        bvalues=np.array(bvalues)
-
         epsilon = 0.000001
-        fit_results = fit_segmented(bvalues, signals, bounds=bounds, cutoff=self.thresholds, p0=initial_guess)
+        fit_results = fit_segmented(self.bvalues, signals, bounds=bounds, cutoff=self.thresholds, p0=initial_guess)
         fit_results=np.array(fit_results+(1,))
         for i in range(4):
             if fit_results[i] < bounds[0][i] : fit_results[0] = bounds[0][i]+epsilon
             if fit_results[i] > bounds[1][i] : fit_results[0] = bounds[1][i]-epsilon
-        fit_results = self.OGC_algorithm(bvalues, signals, self.neg_log_prior, x0=fit_results, fitS0=self.fitS0, bounds=bounds)
+        fit_results = self.OGC_algorithm(self.bvalues, signals, self.neg_log_prior, x0=fit_results, fitS0=self.fitS0, bounds=bounds)
 
         results = {}
         results["D"] = fit_results[0]
@@ -105,11 +102,10 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
 
         return results
 
-    def ivim_fit_full_volume(self, signals, bvalues, njobs=4, **kwargs):
+    def ivim_fit_full_volume(self, signals, njobs=4, **kwargs):
         """Perform the IVIM fit
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
         Returns:
             _type_: _description_
         """
@@ -122,21 +118,19 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         # Get index of b=0
         shape=np.shape(signals)
 
-        b0_index = np.where(bvalues == 0)[0][0]
+        b0_index = np.where(self.bvalues == 0)[0][0]
         # Mask of voxels where signal at b=0 >= 0.5
         valid_mask = signals[..., b0_index] >= 0
         # Select only valid voxels for fitting
         signals = signals[valid_mask]
 
-        minimum_bvalue = np.min(bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
-        b0_indices = np.where(bvalues == minimum_bvalue)[0]
+        minimum_bvalue = np.min(self.bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
+        b0_indices = np.where(self.bvalues == minimum_bvalue)[0]
         normalization_factor = np.mean(signals[..., b0_indices],axis=-1)
         signals = signals / np.repeat(normalization_factor[...,np.newaxis],np.shape(signals)[-1],-1)
 
-        bvalues=np.array(bvalues)
-
         epsilon = 0.000001
-        fit_results = np.array(fit_segmented_array(bvalues, signals, bounds=bounds, cutoff=self.thresholds, p0=initial_guess))
+        fit_results = np.array(fit_segmented_array(self.bvalues, signals, bounds=bounds, cutoff=self.thresholds, p0=initial_guess))
         #fit_results=np.array(fit_results+(1,))
         # Loop over parameters (rows)
 
@@ -150,7 +144,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
                 fit_results[i, below] = bounds[0][i] + epsilon
                 fit_results[i, above] = bounds[1][i] - epsilon
         self.jobs=njobs
-        fit_results = self.OGC_algorithm_array(bvalues, signals,fit_results, self)
+        fit_results = self.OGC_algorithm_array(self.bvalues, signals,fit_results, self)
 
         D=np.zeros(shape[0:-1])
         D[valid_mask]=fit_results[0]

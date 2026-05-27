@@ -60,21 +60,19 @@ class TCML_TechnionIIT_lsq_sls_lm(OsipiBase):
         self.fitS0=fitS0
         self.use_initial_guess = {"f": False, "Dp": False, "D": False}
 
-    def ivim_fit(self, signals, bvalues, **kwargs):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
         """
         signals[signals<0]=0
-        bvalues=np.array(bvalues)
         bounds = ([self.bounds["D"][0], self.bounds["Dp"][0], self.bounds["f"][0], self.bounds["S0"][0]],
                        [self.bounds["D"][1], self.bounds["Dp"][1], self.bounds["f"][1], self.bounds["S0"][1]])
-        fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],bvalues, bounds, min_bval_high=self.thresholds)
+        fit_results = self.fit_least_squares(np.array(signals)[:,np.newaxis],self.bvalues, bounds, min_bval_high=self.thresholds)
 
         def get_scalar(val):
             """Convert value to Python scalar, handling numpy arrays."""

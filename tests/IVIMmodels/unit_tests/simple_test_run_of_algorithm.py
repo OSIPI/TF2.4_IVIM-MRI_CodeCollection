@@ -29,14 +29,14 @@ def dev_test_run(model, **kwargs):
 
     #model = ETP_SRI_LinearFitting(thresholds=[200])
     if kwargs:
-        results = model.osipi_fit(signals, bvalues, **kwargs)
+        results = model.osipi_fit(signals, **kwargs)
     else:
-        results = model.osipi_fit(signals, bvalues)
+        results = model.osipi_fit(signals)
     print(results)
     #test = model.osipi_simple_bias_and_RMSE_test(SNR=20, bvalues=bvalues, f=0.1, Dstar=0.03, D=0.001, noise_realizations=10)
     
 #model1 = ETP_SRI_LinearFitting(thresholds=[200])
-model2 = IAR_LU_biexp()
+model2 = IAR_LU_biexp(bvalues=np.array([0, 50, 0, 100, 0, 150, 200, 500, 0, 800]))
 #model2 = IAR_LU_modified_mix()
 #model2 = OGC_AmsterdamUMC_biexp()
 

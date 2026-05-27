@@ -65,12 +65,11 @@ class OJ_GU_segMATLAB(OsipiBase):
         return pars['D'], pars['f'], pars['Dstar'], pars['S0']
 
 
-    def ivim_fit(self, signals, bvalues, **kwargs):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
@@ -79,7 +78,7 @@ class OJ_GU_segMATLAB(OsipiBase):
                   [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
 
         fit_results = self.algorithm(np.array(signals)[:,np.newaxis], 
-                                     np.array(bvalues), 
+                                     self.bvalues, 
                                      np.array(bounds)[:,[0,3,1,2]], 
                                      self.thresholds)
 

@@ -75,12 +75,11 @@ class IAR_LU_segmented_3step(OsipiBase):
             self.IAR_algorithm = None
         
     
-    def ivim_fit(self, signals, bvalues, **kwargs):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
@@ -93,14 +92,10 @@ class IAR_LU_segmented_3step(OsipiBase):
         initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
         
         if self.IAR_algorithm is None:
-            if bvalues is None:
-                bvalues = self.bvalues
-            else:
-                bvalues = np.asarray(bvalues)
             
-            bvec = np.zeros((bvalues.size, 3))
+            bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
-            gtab = gradient_table(bvalues, bvecs=bvec, b0_threshold=0)
+            gtab = gradient_table(self.bvalues, bvecs=bvec, b0_threshold=0)
 
             self.IAR_algorithm = IvimModelSegmented3Step(gtab, bounds=bounds, initial_guess=initial_guess)
             

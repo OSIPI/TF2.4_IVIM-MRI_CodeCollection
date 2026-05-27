@@ -49,28 +49,22 @@ class OJ_GU_seg(OsipiBase):
         # Initialize the algorithm
         
     
-    def ivim_fit(self, signals, bvalues=None):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             _type_: _description_
         """
         
-        if bvalues is None:
-            bvalues = self.bvalues
-        else:
-            bvalues = np.asarray(bvalues)
-
         if self.thresholds is None:
             bthr = 200
         else:
             bthr = self.thresholds[0]
         signals[signals<0.00001]=0.00001
-        fit_results = seg(signals, bvalues, bthr)
+        fit_results = seg(signals, self.bvalues, bthr)
 
         results = {} 
         results["f"] = fit_results['f']

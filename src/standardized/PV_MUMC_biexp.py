@@ -44,26 +44,15 @@ class PV_MUMC_biexp(OsipiBase):
         self.use_initial_guess = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
         
 
-    def ivim_fit(self, signals, bvalues=None):
+    def ivim_fit(self, signals, **kwargs):
         """Perform the IVIM fit
 
         Args:
             signals (array-like)
-            bvalues (array-like, optional): b-values for the signals. If None, self.bvalues will be used. Default is None.
 
         Returns:
             dict: Fitted IVIM parameters f, Dp (D*), and D.
         """
-        # --- bvalues resolution ---
-        # Edge case: bvalues not passed here → fall back to the ones set at __init__ time
-        if bvalues is None:
-            if self.bvalues is None:
-                raise ValueError(
-                    "PV_MUMC_biexp: bvalues must be provided either at initialization or at fit time."
-                )
-            bvalues = self.bvalues
-        else:
-            bvalues = np.asarray(bvalues)
 
         # --- Bounds resolution ---
         # self.bounds is always a dict (OsipiBase force_default_settings=True).
@@ -84,7 +73,7 @@ class PV_MUMC_biexp(OsipiBase):
         DEFAULT_PARAMS = [0, 0, 0]
 
         try:
-            fit_results = self.PV_algorithm(bvalues, signals, bounds=bounds, cutoff=self.thresholds)
+            fit_results = self.PV_algorithm(self.bvalues, signals, bounds=bounds, cutoff=self.thresholds)
         except RuntimeError as e:
             # curve_fit raises RuntimeError both for max-evaluations exceeded and other failures
             print(f"PV_MUMC_biexp: optimizer failed ({e}). Returning default parameters.")
