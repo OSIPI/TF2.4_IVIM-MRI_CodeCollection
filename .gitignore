@@ -47,3 +47,19 @@ models
 temp
 .vscode
 .env
+
+# Virtual environment
+.venv/
+
+# Local run/benchmark files (logs and data)
+calib_w1.csv
+diag_conv_output.txt
+diag_result.txt
+ivim_benchmark_results.csv
+ivim_raw_v2.npz
+ivim_summary_v2.csv
+rgv2_output.txt
+run_p2_result.txt
+run_p3_result.txt
+runw1_output.txt
+smoke_output.txt
