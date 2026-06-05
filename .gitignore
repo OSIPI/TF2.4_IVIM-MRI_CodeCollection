@@ -58,6 +58,9 @@ diag_result.txt
 ivim_benchmark_results.csv
 ivim_raw_v2.npz
 ivim_summary_v2.csv
+ivim_raw_v3.npz
+ivim_summary_v3.csv
+calib_w3.csv
 rgv2_output.txt
 run_p2_result.txt
 run_p3_result.txt
