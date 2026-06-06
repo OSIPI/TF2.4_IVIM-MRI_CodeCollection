@@ -33,7 +33,7 @@ from __future__ import annotations
 import warnings
 import numpy as np
 
-from ivim_fit import fit_batch
+from .ivim_fit import fit_batch
 
 # --- locate the method's own posterior pieces (probe-confirmed module) --------
 _NLP_MODULE = "src.original.fitting.OGC_AmsterdamUMC.LSQ_fitting"

@@ -21,7 +21,7 @@ sys.path.insert(0, os.getcwd())            # repo root -> import src.* and the s
 warnings.filterwarnings("ignore")          # the benign bounds/D* warnings you saw
 
 from src.wrappers.OsipiBase import OsipiBase
-from ivim_simulator import simulate_repeats, B_SCHEMES, ANCHOR_TRUTHS
+from .ivim_simulator import simulate_repeats, B_SCHEMES, ANCHOR_TRUTHS
 
 # --- config ---------------------------------------------------------------
 ALGORITHMS = [

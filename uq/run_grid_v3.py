@@ -38,8 +38,8 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 warnings.filterwarnings("ignore")
 
-from ivim_fit import make_model, fit_batch
-from ivim_simulator import simulate_repeats, B_SCHEMES, ANCHOR_TRUTHS
+from .ivim_fit import make_model, fit_batch
+from .ivim_simulator import simulate_repeats, B_SCHEMES, ANCHOR_TRUTHS
 
 ALL_METHODS = [
     "OGC_AmsterdamUMC_biexp_segmented", "IAR_LU_segmented_2step",

@@ -66,3 +66,16 @@ run_p2_result.txt
 run_p3_result.txt
 runw1_output.txt
 smoke_output.txt
+
+# --- uq analysis layer artifacts ---------------------------------------------
+# make_figures.py writes to cwd by default; ignore stray root-level copies so
+# only the curated headline figures under figures/ are committed.
+/fig_reliability.png
+/fig_calibration_heatmap.png
+/reliability_diagrams.jsx
+/calibration_heatmap.jsx
+# Keep the small committed headline figures; never commit bulky raw artifacts.
+figures/*.npz
+figures/*.csv
+!figures/*.png
+!figures/*.jsx

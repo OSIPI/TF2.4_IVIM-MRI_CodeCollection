@@ -14,7 +14,7 @@ import numpy as np
 
 sys.path.insert(0, os.getcwd())
 from src.wrappers.OsipiBase import OsipiBase
-from ivim_simulator import simulate_repeats, B_SCHEMES, ANCHOR_TRUTHS
+from .ivim_simulator import simulate_repeats, B_SCHEMES, ANCHOR_TRUTHS
 
 METHODS = ["OGC_AmsterdamUMC_biexp", "IVIM_NEToptim"]   # classical, DL
 BVALS = B_SCHEMES["clinical_sparse"]

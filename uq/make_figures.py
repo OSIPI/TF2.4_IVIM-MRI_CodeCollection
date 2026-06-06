@@ -28,6 +28,13 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
 CSV = sys.argv[1] if len(sys.argv) > 1 else "calib_w3.csv"
+# Where to write the PNG / JSX outputs. argv[2] > $FIG_OUTDIR > cwd.
+OUTDIR = (sys.argv[2] if len(sys.argv) > 2 else os.environ.get("FIG_OUTDIR", "."))
+os.makedirs(OUTDIR, exist_ok=True)
+
+
+def _out(name):
+    return os.path.join(OUTDIR, name)
 
 # --- Project Fashion palette --------------------------------------------------
 PAL = dict(bg="#0a0e14", panel="#11161f", ink="#e7e3d8", amber="#e8a33d",
@@ -130,9 +137,9 @@ def fig_reliability(df):
              "MCMC quantile interval recovers it.",
              ha="center", color=PAL["mute"], fontsize=8)
     fig.tight_layout(rect=[0, 0.03, 1, 0.96])
-    fig.savefig("fig_reliability.png", dpi=300)
+    fig.savefig(_out("fig_reliability.png"), dpi=300)
     plt.close(fig)
-    print("wrote fig_reliability.png", flush=True)
+    print("wrote " + _out("fig_reliability.png"), flush=True)
 
 
 # ============================ heatmap PNG ====================================
@@ -178,9 +185,9 @@ def fig_heatmap(df):
     fig.suptitle("Calibration heatmap — coverage gap at nominal 0.95 "
                  "(red = under-covers, blue = over-covers)",
                  color=PAL["ink"], fontsize=13)
-    fig.savefig("fig_calibration_heatmap.png", dpi=300, bbox_inches="tight")
+    fig.savefig(_out("fig_calibration_heatmap.png"), dpi=300, bbox_inches="tight")
     plt.close(fig)
-    print("wrote fig_calibration_heatmap.png", flush=True)
+    print("wrote " + _out("fig_calibration_heatmap.png"), flush=True)
 
 
 # ============================ JSX emitters ===================================
@@ -333,9 +340,9 @@ export default function CalibrationHeatmap() {
 def emit_jsx(df):
     rel = json.dumps(_reliability_data(df))
     heat = json.dumps(_heatmap_data(df))
-    with open("reliability_diagrams.jsx", "w") as f:
+    with open(_out("reliability_diagrams.jsx"), "w") as f:
         f.write(JSX_RELIABILITY.replace("__DATA__", rel))
-    with open("calibration_heatmap.jsx", "w") as f:
+    with open(_out("calibration_heatmap.jsx"), "w") as f:
         f.write(JSX_HEATMAP.replace("__DATA__", heat))
     print("wrote reliability_diagrams.jsx + calibration_heatmap.jsx", flush=True)
 

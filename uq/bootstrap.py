@@ -20,8 +20,8 @@ Parametric and wild bootstrap are the natural comparison variants.
 """
 from __future__ import annotations
 import numpy as np
-from ivim_fit import fit_batch
-from ivim_simulator import ivim_signal
+from .ivim_fit import fit_batch
+from .ivim_simulator import ivim_signal
 
 
 def _fit_one(model, signal_1d):

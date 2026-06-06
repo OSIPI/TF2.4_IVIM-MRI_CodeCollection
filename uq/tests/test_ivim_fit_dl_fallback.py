@@ -15,8 +15,10 @@ import os, sys
 import numpy as np
 import pytest
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from ivim_fit import fit_batch
+# repo root (parent of the uq package) on sys.path so `import uq.*` resolves and
+# uq/__init__ adds the root for the upstream `src` reach-through.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from uq.ivim_fit import fit_batch
 
 
 class _MockDLWrapper:

@@ -14,8 +14,8 @@ Run from repo root with calib.py + ivim_simulator.py alongside and ivim_raw_v2.n
 from __future__ import annotations
 import numpy as np
 import pandas as pd
-from calib import coverage, ece, sharpness_rel
-from ivim_simulator import ANCHOR_TRUTHS
+from .calib import coverage, ece, sharpness_rel
+from .ivim_simulator import ANCHOR_TRUTHS
 
 PARAMS = ["D", "Dstar", "f"]
 

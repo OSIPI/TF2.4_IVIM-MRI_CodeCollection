@@ -26,8 +26,8 @@ from __future__ import annotations
 import os, sys, random, contextlib
 import numpy as np
 
-from ivim_fit import make_model, fit_batch
-from ivim_simulator import ivim_signal
+from .ivim_fit import make_model, fit_batch
+from .ivim_simulator import ivim_signal
 
 
 @contextlib.contextmanager

@@ -42,12 +42,12 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 warnings.filterwarnings("ignore")
 
-import calib
-from ivim_fit import make_model
-from ivim_simulator import simulate_repeats, B_SCHEMES, ANCHOR_TRUTHS
-from bootstrap import bootstrap_cell
-from bayesian import laplace_uncertainty, mcmc_uncertainty
-from dl_uncertainty import ensemble_uncertainty, input_perturbation_uncertainty
+from . import calib
+from .ivim_fit import make_model
+from .ivim_simulator import simulate_repeats, B_SCHEMES, ANCHOR_TRUTHS
+from .bootstrap import bootstrap_cell
+from .bayesian import laplace_uncertainty, mcmc_uncertainty
+from .dl_uncertainty import ensemble_uncertainty, input_perturbation_uncertainty
 
 PARAMS = ("D", "Dstar", "f")
 NOMINALS = [0.50, 0.80, 0.90, 0.95]
