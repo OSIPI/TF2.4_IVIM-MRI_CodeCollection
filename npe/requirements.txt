@@ -1,0 +1,18 @@
+# Phase-E NPE scaffold -- isolated environment.
+# Python 3.10+ required (built and verified on CPython 3.12.13).
+#
+# This environment is deliberately INDEPENDENT of the repo's .venv: the existing
+# OSIPI/DL stack pins numpy<2 / scipy<1.13, which the current `sbi` cannot coexist
+# with. Install into ~/ProjectFashion/.venv-npe:
+#
+#   /opt/homebrew/bin/python3.12 -m venv ~/ProjectFashion/.venv-npe
+#   ~/ProjectFashion/.venv-npe/bin/pip install -r npe/requirements.txt
+#
+# Versions below are the ones resolved and verified when the scaffold was built.
+sbi==0.26.1
+torch==2.12.0
+numpy==2.4.6
+scipy==1.17.1
+
+# test-only
+pytest==9.0.3

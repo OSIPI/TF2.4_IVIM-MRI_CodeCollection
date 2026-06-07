@@ -79,3 +79,4 @@ figures/*.npz
 figures/*.csv
 !figures/*.png
 !figures/*.jsx
+.venv-npe/
