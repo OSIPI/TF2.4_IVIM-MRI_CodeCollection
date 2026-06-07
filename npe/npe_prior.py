@@ -32,6 +32,7 @@ simulator or the prior -- ``to_display`` is a one-way reporting convenience.
 """
 from __future__ import annotations
 
+import numpy as np
 import torch
 from sbi.utils import BoxUniform, process_prior
 
@@ -49,20 +50,56 @@ DISPLAY_SCALE = (1000.0, 1000.0, 1.0)
 DISPLAY_UNITS = ("D [1e-3 mm^2/s]", "Dstar [1e-3 mm^2/s]", "f [-]")
 
 
-def get_prior(device: str = "cpu") -> BoxUniform:
-    """The ``BoxUniform`` prior over ``theta = [D, Dstar, f]`` in absolute units."""
-    low = torch.as_tensor(PRIOR_LOW, dtype=torch.float32, device=device)
-    high = torch.as_tensor(PRIOR_HIGH, dtype=torch.float32, device=device)
-    return BoxUniform(low=low, high=high)
+def get_prior(device: str = "cpu", log_dstar: bool = False) -> BoxUniform:
+    """The ``BoxUniform`` prior over ``theta = [D, Dstar, f]`` (or log-transformed Dstar if log_dstar is True) in prior units."""
+    if log_dstar:
+        low = (PRIOR_LOW[0], np.log10(PRIOR_LOW[1]), PRIOR_LOW[2])
+        high = (PRIOR_HIGH[0], np.log10(PRIOR_HIGH[1]), PRIOR_HIGH[2])
+    else:
+        low = PRIOR_LOW
+        high = PRIOR_HIGH
+    low_t = torch.as_tensor(low, dtype=torch.float32, device=device)
+    high_t = torch.as_tensor(high, dtype=torch.float32, device=device)
+    return BoxUniform(low=low_t, high=high_t)
 
 
-def get_processed_prior(device: str = "cpu"):
+def get_processed_prior(device: str = "cpu", log_dstar: bool = False):
     """Prior passed through sbi's ``process_prior``, ready for the inference object.
 
     Returns the sbi triple ``(prior, num_parameters, prior_returns_numpy)``;
     ``num_parameters`` is 3 here. Hand this straight to ``NPE(prior=...)`` etc.
     """
-    return process_prior(get_prior(device=device))
+    return process_prior(get_prior(device=device, log_dstar=log_dstar))
+
+
+def transform_theta(theta, log_dstar: bool = True):
+    """Converts theta from absolute [D, Dstar, f] to prior space [D, log10(Dstar), f] if log_dstar=True."""
+    if not log_dstar:
+        return theta
+    
+    # Handle both torch.Tensor and numpy array
+    if isinstance(theta, torch.Tensor):
+        theta_transformed = theta.clone()
+        theta_transformed[..., 1] = torch.log10(theta[..., 1])
+    else:
+        theta_transformed = np.copy(theta)
+        theta_transformed[..., 1] = np.log10(theta[..., 1])
+    return theta_transformed
+
+
+def invert_theta(theta, log_dstar: bool = True):
+    """Converts theta from prior space [D, log10(Dstar), f] to absolute [D, Dstar, f] if log_dstar=True."""
+    if not log_dstar:
+        return theta
+        
+    # Handle both torch.Tensor and numpy array
+    if isinstance(theta, torch.Tensor):
+        theta_inverted = theta.clone()
+        theta_inverted[..., 1] = 10 ** theta[..., 1]
+    else:
+        theta_inverted = np.copy(theta)
+        theta_inverted[..., 1] = 10 ** theta[..., 1]
+    return theta_inverted
 
 
 def to_display(theta) -> torch.Tensor:

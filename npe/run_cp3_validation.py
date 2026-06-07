@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 from sbi.diagnostics import run_sbc, check_sbc, run_tarp
 from sbi.analysis import sbc_rank_plot
 
-from npe_prior import get_processed_prior, DISPLAY_UNITS, DISPLAY_SCALE, to_display
+from npe_prior import get_processed_prior, DISPLAY_UNITS, DISPLAY_SCALE, to_display, invert_theta
 from npe_simulator import IVIMNPESimulator, B_SCHEMES
 from train_npe import pack_x, SNRWrapperEmbedding
 from ivim_simulator import add_rician_noise
@@ -102,6 +102,12 @@ def fit_biexp_nlls(bvals: np.ndarray, signal: np.ndarray, S0: float = 1.0) -> np
 # --------------------------------------------------------------------------- #
 
 def main() -> None:
+    import argparse
+    parser = argparse.ArgumentParser(description="Run CP3 validation.")
+    parser.add_argument("--model", type=str, default="npe/npe_posterior_setB.pt", help="Path to model file.")
+    parser.add_argument("--suffix", type=str, default="_v2", help="Suffix for output files.")
+    args = parser.parse_args()
+
     seed = 42
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -110,30 +116,41 @@ def main() -> None:
     print("Phase E - Checkpoint 3: Calibration Validation")
     print("=" * 80)
 
-    model_path = "npe_posterior_setB.pt"
+    model_path = args.model
     if not os.path.exists(model_path):
-        # Fallback if run from repo root
-        model_path = "npe/npe_posterior_setB.pt"
-        if not os.path.exists(model_path):
-            raise FileNotFoundError("Could not find npe_posterior_setB.pt. Train it first!")
+        # Fallback if run from repo root or vice versa
+        alt_path = "npe/" + os.path.basename(model_path) if not model_path.startswith("npe/") else os.path.basename(model_path)
+        if os.path.exists(alt_path):
+            model_path = alt_path
+        else:
+            raise FileNotFoundError(f"Could not find model at {model_path}")
 
     # Resolve pickling namespace dynamically
     import sys
     sys.modules['__main__'].SNRWrapperEmbedding = SNRWrapperEmbedding
 
-    print(f"Loading setB model from {model_path}...")
+    print(f"Loading model from {model_path}...")
     posterior = torch.load(model_path, map_location="cpu", weights_only=False)
 
-    prior, n_params, _ = get_processed_prior(device="cpu")
+    log_dstar = bool(posterior.prior.support.base_constraint.lower_bound[1] < 0)
+    print(f"Auto-detected log_dstar = {log_dstar}")
+
+    prior, n_params, _ = get_processed_prior(device="cpu", log_dstar=log_dstar)
     sim = IVIMNPESimulator(representation="set", clean=False, seed=seed)
     active_bvals = sim.active_bvals
+
+    model_dir = os.path.dirname(model_path)
+    if not model_dir:
+        model_dir = "."
 
     # -- 1. Generate Validation Dataset (1000 samples) --
     n_val = 1000
     print(f"Generating {n_val} validation samples...")
     thetas_val = prior.sample((n_val,))
     snrs_val = sim.sample_snr(n_val, rng=np.random.default_rng(seed))
-    obs_val, snr_ctx_val = sim(thetas_val, snr=snrs_val)
+    # Convert validation parameters to absolute units for simulator
+    thetas_val_abs = invert_theta(thetas_val, log_dstar=log_dstar)
+    obs_val, snr_ctx_val = sim(thetas_val_abs, snr=snrs_val)
     x_val = pack_x(obs_val, snr_ctx_val, "set")
 
     # Define bins
@@ -218,7 +235,7 @@ def main() -> None:
         axes_sbc[row_idx, 0].set_ylabel(f"{bin_name.upper()} SNR\n\nDensity", fontsize=12)
 
     # Save SBC stats to CSV
-    csv_sbc_path = "cp3_sbc_stats.csv"
+    csv_sbc_path = os.path.join(model_dir, f"cp3_sbc_stats{args.suffix}.csv")
     with open(csv_sbc_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["snr_bin", "parameter", "ks_pval", "c2st_ranks", "c2st_dap"])
         writer.writeheader()
@@ -228,9 +245,10 @@ def main() -> None:
     # Finalize and save SBC plot
     fig_sbc.suptitle("Simulation-Based Calibration (SBC) Rank Histograms per SNR Bin", fontsize=16, y=0.98)
     fig_sbc.tight_layout()
-    fig_sbc.savefig("cp3_sbc_ranks.png", dpi=300)
+    sbc_png_path = os.path.join(model_dir, f"cp3_sbc_ranks{args.suffix}.png")
+    fig_sbc.savefig(sbc_png_path, dpi=300)
     plt.close(fig_sbc)
-    print("SBC rank histograms saved to cp3_sbc_ranks.png")
+    print(f"SBC rank histograms saved to {sbc_png_path}")
 
     # -- 3. Coverage Analysis --
     print("\nRunning Expected Coverage checks...")
@@ -261,16 +279,19 @@ def main() -> None:
         with torch.no_grad():
             samples_bin = posterior.sample_batched((1000,), x=x_bin) # (1000, M_bin, 3)
             
+        thetas_bin_abs = invert_theta(thetas_bin, log_dstar=log_dstar)
+        samples_bin_abs = invert_theta(samples_bin, log_dstar=log_dstar)
+            
         for lvl in nominal_levels:
             alpha = 1.0 - lvl
             q_low = alpha / 2.0
             q_high = 1.0 - alpha / 2.0
             
             # Compute credible intervals per validation run
-            low_quantiles = torch.quantile(samples_bin, q_low, dim=0) # (M_bin, 3)
-            high_quantiles = torch.quantile(samples_bin, q_high, dim=0) # (M_bin, 3)
+            low_quantiles = torch.quantile(samples_bin_abs, q_low, dim=0) # (M_bin, 3)
+            high_quantiles = torch.quantile(samples_bin_abs, q_high, dim=0) # (M_bin, 3)
             
-            inside = (thetas_bin >= low_quantiles) & (thetas_bin <= high_quantiles) # (M_bin, 3)
+            inside = (thetas_bin_abs >= low_quantiles) & (thetas_bin_abs <= high_quantiles) # (M_bin, 3)
             empirical = inside.float().mean(dim=0).numpy() # (3,)
             
             for i, name in enumerate(["D", "Dstar", "f"]):
@@ -297,9 +318,9 @@ def main() -> None:
                 dense_empirical[idx, :] = 1.0
             else:
                 alpha = 1.0 - lvl
-                low_q = torch.quantile(samples_bin, alpha / 2.0, dim=0)
-                high_q = torch.quantile(samples_bin, 1.0 - alpha / 2.0, dim=0)
-                inside = (thetas_bin >= low_q) & (thetas_bin <= high_q)
+                low_q = torch.quantile(samples_bin_abs, alpha / 2.0, dim=0)
+                high_q = torch.quantile(samples_bin_abs, 1.0 - alpha / 2.0, dim=0)
+                inside = (thetas_bin_abs >= low_q) & (thetas_bin_abs <= high_q)
                 dense_empirical[idx, :] = inside.float().mean(dim=0).numpy()
                 
         for i, name in enumerate(["D", "Dstar", "f"]):
@@ -320,12 +341,13 @@ def main() -> None:
 
     fig_cov.suptitle("Direct Quantile Coverage Curves", fontsize=16, y=0.98)
     fig_cov.tight_layout()
-    fig_cov.savefig("cp3_coverage_curves.png", dpi=300)
+    cov_png_path = os.path.join(model_dir, f"cp3_coverage_curves{args.suffix}.png")
+    fig_cov.savefig(cov_png_path, dpi=300)
     plt.close(fig_cov)
-    print("Coverage curves plot saved to cp3_coverage_curves.png")
+    print(f"Coverage curves plot saved to {cov_png_path}")
 
     # Save coverage table
-    csv_cov_path = "cp3_coverage.csv"
+    csv_cov_path = os.path.join(model_dir, f"cp3_coverage{args.suffix}.csv")
     with open(csv_cov_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["snr_bin", "parameter", "nominal_level", "empirical_coverage", "deviation", "flagged"])
         writer.writeheader()
@@ -392,8 +414,9 @@ def main() -> None:
                 # 1000 samples per repeat
                 samples_npe = posterior.sample_batched((1000,), x=x_torch) # (1000, n_repeats, 3)
                 
-            # Convert to display scale
-            samples_npe_disp = to_display(samples_npe).numpy() # (1000, n_repeats, 3)
+            # Convert to absolute and display scale
+            samples_npe_abs = invert_theta(samples_npe, log_dstar=log_dstar)
+            samples_npe_disp = to_display(samples_npe_abs).numpy() # (1000, n_repeats, 3)
             # Standard deviation per repeat, then average
             npe_sds_per_repeat = np.std(samples_npe_disp, axis=0) # (n_repeats, 3)
             npe_sd_disp = np.mean(npe_sds_per_repeat, axis=0) # (3,)
@@ -436,12 +459,13 @@ def main() -> None:
 
     fig_crlb.suptitle("Efficiency Benchmark Comparison: NPE SD vs NLLS SD vs CRLB", fontsize=16, y=0.98)
     fig_crlb.tight_layout()
-    fig_crlb.savefig("cp3_crlb_compare.png", dpi=300)
+    crlb_png_path = os.path.join(model_dir, f"cp3_crlb_compare{args.suffix}.png")
+    fig_crlb.savefig(crlb_png_path, dpi=300)
     plt.close(fig_crlb)
-    print("CRLB compare plot saved to cp3_crlb_compare.png")
+    print(f"CRLB compare plot saved to {crlb_png_path}")
 
     # Save CRLB stats to CSV
-    csv_crlb_path = "cp3_crlb_compare.csv"
+    csv_crlb_path = os.path.join(model_dir, f"cp3_crlb_compare{args.suffix}.csv")
     with open(csv_crlb_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["anchor_case", "snr", "parameter", "true_value", "crlb_sd", "nlls_empirical_sd", "npe_posterior_sd"])
         writer.writeheader()

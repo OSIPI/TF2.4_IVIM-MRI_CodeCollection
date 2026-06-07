@@ -105,6 +105,10 @@ def main() -> None:
                         help="Hidden features for Neural Spline Flow (NSF).")
     parser.add_argument("--num-transforms", type=int, default=5,
                         help="Number of transforms for NSF.")
+    parser.add_argument("--log-dstar", action="store_true",
+                        help="Use log10(Dstar) reparameterization.")
+    parser.add_argument("--device", type=str, default="cpu",
+                        help="Device to train on (e.g. cpu, mps, cuda).")
     args = parser.parse_args()
 
     print("=" * 70)
@@ -115,8 +119,8 @@ def main() -> None:
     torch.manual_seed(args.seed)
     
     # 1. Prior
-    prior, n_params, _ = get_processed_prior(device="cpu")
-    print(f"Loaded {n_params}-D prior [D, Dstar, f]")
+    prior, n_params, _ = get_processed_prior(device="cpu", log_dstar=args.log_dstar)
+    print(f"Loaded {n_params}-D prior [D, {'log10(Dstar)' if args.log_dstar else 'Dstar'}, f]")
 
     # 2. Simulator
     print(f"Initializing simulator with representation={args.mode}...")
@@ -128,7 +132,9 @@ def main() -> None:
     print(f"Simulating {args.budget} samples from prior...")
     t_sim_start = time.perf_counter()
     theta = prior.sample((args.budget,))
-    obs, snr_ctx = sim(theta)
+    from npe_prior import invert_theta
+    theta_abs = invert_theta(theta, log_dstar=args.log_dstar)
+    obs, snr_ctx = sim(theta_abs)
     x = pack_x(obs, snr_ctx, args.mode)
     t_sim_end = time.perf_counter()
     print(f"Simulation took {t_sim_end - t_sim_start:.4f} seconds ({(t_sim_end - t_sim_start)/args.budget*1e6:.2f} us/sim)")
@@ -176,10 +182,22 @@ def main() -> None:
     )
 
     # 6. Initialize NPE and train
+    from torch.utils.tensorboard import SummaryWriter
+    class DummySummaryWriter(SummaryWriter):
+        def __init__(self, *args, **kwargs):
+            pass
+        def add_scalar(self, *args, **kwargs):
+            pass
+        def flush(self, *args, **kwargs):
+            pass
+        def close(self, *args, **kwargs):
+            pass
+
     inference = NPE(
         prior=prior,
         density_estimator=density_estimator_builder,
-        device="cpu"
+        device=args.device,
+        summary_writer=DummySummaryWriter()
     )
     inference.append_simulations(theta, x)
 

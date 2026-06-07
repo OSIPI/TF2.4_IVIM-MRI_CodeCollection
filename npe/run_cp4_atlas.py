@@ -18,7 +18,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from npe_prior import get_processed_prior, PRIOR_LOW, PRIOR_HIGH, to_display, DISPLAY_SCALE
+from npe_prior import get_processed_prior, PRIOR_LOW, PRIOR_HIGH, to_display, DISPLAY_SCALE, invert_theta
 from npe_simulator import IVIMNPESimulator
 from train_npe import pack_x, SNRWrapperEmbedding
 from run_cp3_validation import compute_crlb
@@ -72,6 +72,12 @@ def classify_point(shrinkage_Dstar: float, correlation: float, collapse_indicato
 
 
 def main() -> None:
+    import argparse
+    parser = argparse.ArgumentParser(description="Run CP4 Identifiability Atlas.")
+    parser.add_argument("--model", type=str, default="npe/npe_posterior_setB.pt", help="Path to model file.")
+    parser.add_argument("--suffix", type=str, default="_v2", help="Suffix for output files.")
+    args = parser.parse_args()
+
     seed = 12345
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -80,11 +86,14 @@ def main() -> None:
     print("Phase E - Checkpoint 4: Identifiability Atlas")
     print("=" * 80)
 
-    model_path = "npe_posterior_setB.pt"
+    model_path = args.model
     if not os.path.exists(model_path):
-        model_path = "npe/npe_posterior_setB.pt"
-        if not os.path.exists(model_path):
-            raise FileNotFoundError("Could not find npe_posterior_setB.pt. Train it first!")
+        # Fallback if run from repo root or vice versa
+        alt_path = "npe/" + os.path.basename(model_path) if not model_path.startswith("npe/") else os.path.basename(model_path)
+        if os.path.exists(alt_path):
+            model_path = alt_path
+        else:
+            raise FileNotFoundError(f"Could not find model at {model_path}")
 
     # Resolve pickling namespace dynamically
     import sys
@@ -93,7 +102,10 @@ def main() -> None:
     print(f"Loading setB model from {model_path}...")
     posterior = torch.load(model_path, map_location="cpu", weights_only=False)
 
-    prior, _, _ = get_processed_prior(device="cpu")
+    log_dstar = bool(posterior.prior.support.base_constraint.lower_bound[1] < 0)
+    print(f"Auto-detected log_dstar = {log_dstar}")
+
+    prior, _, _ = get_processed_prior(device="cpu", log_dstar=log_dstar)
     # Clean simulator for the atlas ground truths
     sim_clean = IVIMNPESimulator(representation="set", clean=True, seed=seed)
     active_bvals = sim_clean.active_bvals
@@ -142,9 +154,12 @@ def main() -> None:
             theta_j = theta_grid[j]
             samples_j = samples[:, j, :]
             
+            # Invert log-transform if needed
+            samples_j_abs = invert_theta(samples_j, log_dstar=log_dstar)
+            
             # Compute metrics
             shrinkage, correlation, collapse = compute_metrics(
-                samples_j,
+                samples_j_abs,
                 prior_low_t,
                 prior_high_t
             )
@@ -168,9 +183,13 @@ def main() -> None:
                 "classification": classification
             })
 
+    model_dir = os.path.dirname(model_path)
+    if not model_dir:
+        model_dir = "."
+
     # -- 3. Save Machine-Readable Products --
     # Save to NPZ
-    npz_path = "atlas.npz"
+    npz_path = os.path.join(model_dir, f"atlas{args.suffix}.npz")
     npz_dict = {
         "D_true": np.array([r["D_true"] for r in atlas_data]),
         "Dstar_true": np.array([r["Dstar_true"] for r in atlas_data]),
@@ -187,7 +206,7 @@ def main() -> None:
     print(f"Saved machine-readable atlas to {npz_path}")
 
     # Save to CSV (with header documentation)
-    csv_path = "atlas.csv"
+    csv_path = os.path.join(model_dir, f"atlas{args.suffix}.csv")
     with open(csv_path, "w", newline="") as f:
         # Header documentation
         f.write("# Identifiability Atlas for Biexponential IVIM model\n")
@@ -276,9 +295,10 @@ def main() -> None:
     
     fig_atlas.suptitle(f"Identifiability Atlas Map (D slice ≈ {D_slice_val * 1000:.1f} um^2/ms)", fontsize=16, y=0.98)
     fig_atlas.tight_layout()
-    fig_atlas.savefig("cp4_identifiability_atlas.png", dpi=300)
+    img_path = os.path.join(model_dir, f"cp4_identifiability_atlas{args.suffix}.png")
+    fig_atlas.savefig(img_path, dpi=300)
     plt.close(fig_atlas)
-    print("Identifiability atlas figure saved to cp4_identifiability_atlas.png")
+    print(f"Identifiability atlas figure saved to {img_path}")
     print("Done!")
 
 
