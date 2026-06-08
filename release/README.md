@@ -144,8 +144,7 @@ acceptance.
 @article{karlin_ivim_uncertainty_INSUBMISSION,
   author  = {Karlin, Avery},
   title   = {{IVIM uncertainty calibration and CRLB efficiency benchmark}},
-  journal = {Magnetic Resonance in Medicine},
-  note    = {In submission; DOI and year to be updated on acceptance},
+  journal = {in submission to MRM},
   year    = {2026}
 }
 ```
