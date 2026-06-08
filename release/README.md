@@ -42,7 +42,7 @@ algorithm.
 │   ├── f1_misspecification.csv      # committed data product (Fig 4, F1)
 │   ├── f2_realdata.csv              # committed data product (Fig 4, F2)
 │   └── requirements.txt             # isolated .venv-npe pins
-├── make_manuscript_figures.py       # builds Figs 1-3 + regime_fractions.csv
+├── make_manuscript_figures.py       # builds Figs 1-4 + regime_fractions.csv
 ├── figures/manuscript/              # committed figures + regime_fractions.csv
 ├── utilities/data_simulation/Download_data.py   # fetches OSIPI TF2.4 data (Zenodo)
 ├── Makefile                         # one-command reproduction targets
@@ -102,20 +102,23 @@ is listed. Artifacts marked **(committed)** are present in the repo.
 | (NPE prerequisite) — train posterior | `.venv-npe` | `cd npe && PYTHONPATH=. ../.venv-npe/bin/python train_npe.py --mode set --output npe/npe_posterior_setB.pt --loss-output npe/loss_setB.json` | `npe/npe_posterior_setB.pt`, `npe/loss_setB.json` | model regenerated; loss committed |
 | **Table 2** — efficiency map (claimed / empirical / NLLS vs CRLB) | `.venv-npe` | `cd npe && PYTHONPATH=. ../.venv-npe/bin/python run_e_efficiency.py` | `npe/efficiency_map.csv`, `npe/efficiency_map.png` | committed |
 | **Figure 3** — efficiency audit | matplotlib+pandas | `python make_manuscript_figures.py` (needs `calib_w3.csv` + `npe/efficiency_map.csv`) | `figures/manuscript/fig3_efficiency_audit.{png,pdf}` | committed |
-| **Figure 4 (F1)** — held-out-b misspecification | `.venv-npe` | `cd npe && PYTHONPATH=. ../.venv-npe/bin/python run_f_robustness.py` (needs `npe_posterior_setB.pt`) | `npe/f1_misspecification.csv`, `npe/f1_misspecification.png` | committed |
-| **Figure 4 (F2)** — real-data overconfidence demo | `.venv-npe` | `cd npe && PYTHONPATH=. ../.venv-npe/bin/python run_f_realdata.py` (needs `npe_posterior_setB.pt` + brain data) | `npe/f2_realdata.csv`, `npe/f2_realdata.png` | committed |
+| **F1 data** — held-out-b misspecification (Figure 4 input) | `.venv-npe` | `cd npe && PYTHONPATH=. ../.venv-npe/bin/python run_f_robustness.py` (needs `npe_posterior_setB.pt`) | `npe/f1_misspecification.csv`, `npe/f1_misspecification.png` | committed |
+| **F2 data** — real-data overconfidence demo (Figure 4 input) | `.venv-npe` | `cd npe && PYTHONPATH=. ../.venv-npe/bin/python run_f_realdata.py` (needs `npe_posterior_setB.pt` + brain data) | `npe/f2_realdata.csv`, `npe/f2_realdata.png` | committed |
 | `regime_fractions.csv` (manuscript SI) | matplotlib+pandas | `python make_manuscript_figures.py` | `figures/manuscript/regime_fractions.csv` | committed |
+| **Figure 4** — robustness + real-data | matplotlib+pandas | `python make_manuscript_figures.py` (needs `npe/f1_misspecification.csv`, `npe/f2_realdata.csv`, `figures/manuscript/regime_fractions.csv`) | `figures/manuscript/fig4_robustness.{png,pdf}` | committed |
 
 Notes:
 
-- **Figure 4 has no single combined generator.** It is the pair of committed
-  panels `npe/f1_misspecification.png` (F1) and `npe/f2_realdata.png` (F2), each
-  emitted directly by its own script. `make_manuscript_figures.py` builds only
-  Figures 1–3 and `regime_fractions.csv`.
+- **`make_manuscript_figures.py` builds all four figures** (Figures 1–4) plus
+  `regime_fractions.csv` from the committed CSVs, using only `matplotlib` +
+  `pandas`. Figure 4 is the combined three-panel `fig4_robustness.{png,pdf}`
+  (held-out-b coverage on simulated and real data, plus the acquisition-shift
+  regime comparison); the per-panel source artifacts `npe/f1_misspecification.png`
+  and `npe/f2_realdata.png` remain committed as the upstream F1/F2 outputs.
 - The trained model `npe/npe_posterior_setB.pt` is **gitignored** (`*.pt`); the
   efficiency/robustness/real-data scripts default to that path, so train it first.
 - `calib_w3.csv`, `ivim_summary_v3.csv`, and the `*.npz` grid artifacts are
-  **gitignored**; the committed Figures 1–3 are the verifiable outputs.
+  **gitignored**; the committed Figures 1–4 are the verifiable outputs.
 - A fast non-DL check is available: `make smoke`.
 
 ## Data provenance

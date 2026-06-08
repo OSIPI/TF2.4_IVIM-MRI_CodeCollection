@@ -1,13 +1,15 @@
 """
 make_manuscript_figures.py
 ==========================
-Phase E close-out script. Generates publication-style figures (Figures 1, 2, 3)
-and the regime fractions CSV from calib_w3.csv and npe/efficiency_map.csv.
+Phase E close-out script. Generates publication-style figures (Figures 1-4)
+and the regime fractions CSV from calib_w3.csv, npe/efficiency_map.csv,
+npe/f1_misspecification.csv, and npe/f2_realdata.csv.
 
 Usage:
     python3 make_manuscript_figures.py
 """
 from __future__ import annotations
+import io
 import os
 import sys
 import numpy as np
@@ -20,6 +22,10 @@ from matplotlib.lines import Line2D
 CALIB_CSV = "calib_w3.csv"
 EFF_CSV = "npe/efficiency_map.csv"
 OUT_DIR = "figures/manuscript"
+# Figure 4 (robustness + real-data) inputs — committed data products
+F1_CSV = "npe/f1_misspecification.csv"
+F2_CSV = "npe/f2_realdata.csv"
+REGIME_CSV = os.path.join(OUT_DIR, "regime_fractions.csv")
 os.makedirs(OUT_DIR, exist_ok=True)
 
 def load_data():
@@ -412,6 +418,144 @@ def export_regime_fractions(df_eff: pd.DataFrame):
     print(f"Saved regime fractions to {csv_path}")
     return fractions
 
+def load_f1_misspecification(path: str):
+    """Parse the two-part F1 CSV.
+
+    Part A — held-out-b coverage rows (header
+    ``condition,nominal_level,npe_coverage,nlls_coverage,npe_deviation,nlls_deviation``)
+    for the three conditions; Part B — alternative-b-scheme regime counts
+    (header ``parameter,overconfident_pct,efficient_pct,inefficient_pct``).
+    The two tables are split on the ``# Part B`` comment marker and parsed
+    independently (comment lines starting with ``#`` are ignored within each).
+    """
+    with open(path) as fh:
+        lines = fh.readlines()
+    split_idx = next((i for i, ln in enumerate(lines) if ln.lstrip().startswith("# Part B")), None)
+    if split_idx is None:
+        sys.exit(f"Error: '# Part B' marker not found in {path}.")
+    part_a = pd.read_csv(io.StringIO("".join(lines[:split_idx])), comment="#")
+    part_a = part_a[part_a["condition"].isin(["baseline", "triexp", "noise_misspec"])].copy()
+    part_b = pd.read_csv(io.StringIO("".join(lines[split_idx + 1:])), comment="#")
+    return part_a, part_b
+
+# Figure 4 estimator / acquisition-scheme colors (reuse manuscript palette)
+COLOR_NPE = COLOR_NPE_ACHIEVED          # Magenta — NPE estimator
+COLOR_NLLS = COLOR_NLLS_ACHIEVED        # Orange  — NLLS baseline
+COLOR_SCHEME_BASE = COLOR_NPE_CLAIMED   # Purple  — baseline (clinical) b-scheme
+COLOR_SCHEME_ALT = COLOR_NPE_ACHIEVED   # Magenta — alternative (optimized) b-scheme
+
+def make_figure4():
+    """Figure 4 — Robustness + real-data confirmation of NPE overconfidence.
+
+    Three panels (matplotlib + pandas only; reads committed CSVs):
+      (A) Held-out-b coverage on simulated data across three misspecification
+          conditions (npe/f1_misspecification.csv, Part A).
+      (B) Held-out-b coverage on real data, N=500 (npe/f2_realdata.csv).
+      (C) Acquisition shift: baseline vs alternative-scheme overconfident %
+          (regime_fractions.csv mean-over-SNR vs f1_misspecification.csv Part B).
+    """
+    for label, path in (("F1", F1_CSV), ("F2", F2_CSV), ("regime_fractions", REGIME_CSV)):
+        if not os.path.exists(path):
+            sys.exit(f"Error: {path} not found ({label} input for Figure 4).")
+
+    part_a, part_b = load_f1_misspecification(F1_CSV)
+    df_real = pd.read_csv(F2_CSV, comment="#").sort_values("nominal_level")
+    df_regime = pd.read_csv(REGIME_CSV)
+
+    fig, (axA, axB, axC) = plt.subplots(1, 3, figsize=(16, 5), dpi=300)
+    for ax in (axA, axB, axC):
+        ax.set_facecolor("white")
+
+    # ===== Panel A — Held-out-b coverage (simulated) =====
+    axA.grid(True, which="both", ls="--", color="#e5e5e5", lw=0.5, zorder=0)
+    axA.plot([0, 1], [0, 1], color="#777777", ls="--", lw=1.2, zorder=1)
+    cond_styles = [("baseline", "-"), ("triexp", "--"), ("noise_misspec", ":")]
+    for cond, ls in cond_styles:
+        sub = part_a[part_a["condition"] == cond].sort_values("nominal_level")
+        axA.plot(sub["nominal_level"], sub["npe_coverage"], ls=ls, marker="o",
+                 color=COLOR_NPE, ms=5, lw=2, zorder=4)
+        axA.plot(sub["nominal_level"], sub["nlls_coverage"], ls=ls, marker="s",
+                 color=COLOR_NLLS, ms=5, lw=2, zorder=3)
+    axA.set_xlim(0.45, 1.0)
+    axA.set_ylim(0.0, 1.0)
+    axA.set_xlabel("Nominal Credibility Level", fontsize=10)
+    axA.set_ylabel("Empirical Held-out-b Coverage", fontsize=10)
+    axA.tick_params(labelsize=9)
+    axA.set_title("Held-out-b coverage (simulated)", fontsize=11, fontweight="bold", pad=10)
+    axA.text(-0.13, 1.03, "(A)", transform=axA.transAxes, fontsize=12,
+             fontweight="bold", va="top", ha="right")
+    handles_A = [
+        Line2D([0], [0], color=COLOR_NPE, lw=2, marker="o", label="NPE"),
+        Line2D([0], [0], color=COLOR_NLLS, lw=2, marker="s", label="NLLS"),
+        Line2D([0], [0], color="#555555", lw=1.5, ls="-", label="baseline"),
+        Line2D([0], [0], color="#555555", lw=1.5, ls="--", label="triexp"),
+        Line2D([0], [0], color="#555555", lw=1.5, ls=":", label="noise_misspec"),
+        Line2D([0], [0], color="#777777", lw=1.2, ls="--", label="ideal (y = x)"),
+    ]
+    axA.legend(handles=handles_A, loc="upper left", frameon=True, facecolor="white",
+               edgecolor="#cccccc", fontsize=8)
+
+    # ===== Panel B — Held-out-b coverage (real data, N=500) =====
+    axB.grid(True, which="both", ls="--", color="#e5e5e5", lw=0.5, zorder=0)
+    axB.plot([0, 1], [0, 1], color="#777777", ls="--", lw=1.2, zorder=1, label="ideal (y = x)")
+    axB.plot(df_real["nominal_level"], df_real["npe_coverage"], ls="-", marker="o",
+             color=COLOR_NPE, ms=6, lw=2, zorder=4, label="NPE")
+    axB.plot(df_real["nominal_level"], df_real["nlls_coverage"], ls="-", marker="s",
+             color=COLOR_NLLS, ms=6, lw=2, zorder=3, label="NLLS")
+    axB.set_xlim(0.45, 1.0)
+    axB.set_ylim(0.0, 1.0)  # full [0,1] so the NPE collapse (~0.01-0.03) is visible
+    axB.set_xlabel("Nominal Credibility Level", fontsize=10)
+    axB.set_ylabel("Empirical Held-out-b Coverage", fontsize=10)
+    axB.tick_params(labelsize=9)
+    axB.set_title("Held-out-b coverage (real data, N=500)", fontsize=11, fontweight="bold", pad=10)
+    axB.text(-0.13, 1.03, "(B)", transform=axB.transAxes, fontsize=12,
+             fontweight="bold", va="top", ha="right")
+    axB.legend(loc="upper left", frameon=True, facecolor="white",
+               edgecolor="#cccccc", fontsize=9)
+
+    # ===== Panel C — Acquisition shift =====
+    params = ["D", "Dstar", "f"]
+    labels = [PARAM_LABELS[p] for p in params]
+    baseline_over = [df_regime.loc[df_regime["parameter"] == p, "overconfident"].mean() * 100
+                     for p in params]
+    pb_over = part_b.set_index("parameter")["overconfident_pct"]
+    alt_over = [float(pb_over.loc[p]) for p in params]
+    x = np.arange(len(params))
+    width = 0.38
+    axC.grid(True, axis="y", ls="--", color="#e5e5e5", lw=0.5, zorder=0)
+    axC.set_axisbelow(True)
+    bars_base = axC.bar(x - width / 2, baseline_over, width, color=COLOR_SCHEME_BASE,
+                        edgecolor="white", zorder=3, label="Baseline (clinical) b-scheme")
+    bars_alt = axC.bar(x + width / 2, alt_over, width, color=COLOR_SCHEME_ALT,
+                       edgecolor="white", zorder=3, label="Alternative (optimized) b-scheme")
+    for bars in (bars_base, bars_alt):
+        for b in bars:
+            h = b.get_height()
+            axC.text(b.get_x() + b.get_width() / 2, h + 1.5, f"{h:.1f}",
+                     ha="center", va="bottom", fontsize=8.5, fontweight="bold")
+    axC.set_xticks(x)
+    axC.set_xticklabels(labels)
+    # Headroom above the ~100% bars so the legend sits clear of bars/annotations.
+    axC.set_ylim(0, 130)
+    axC.set_yticks([0, 20, 40, 60, 80, 100])
+    axC.set_xlabel("Parameter", fontsize=10)
+    axC.set_ylabel("Overconfident grid points (%)", fontsize=10)
+    axC.tick_params(labelsize=9)
+    axC.set_title("Acquisition shift", fontsize=11, fontweight="bold", pad=10)
+    axC.text(-0.13, 1.03, "(C)", transform=axC.transAxes, fontsize=12,
+             fontweight="bold", va="top", ha="right")
+    axC.legend(loc="upper center", frameon=True, facecolor="white",
+               edgecolor="#cccccc", fontsize=8.5)
+
+    fig.suptitle("Robustness and Real-Data Confirmation of NPE Overconfidence",
+                 fontsize=14, fontweight="bold", y=0.99)
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
+
+    fig.savefig(os.path.join(OUT_DIR, "fig4_robustness.png"), dpi=300, bbox_inches="tight")
+    fig.savefig(os.path.join(OUT_DIR, "fig4_robustness.pdf"), bbox_inches="tight")
+    plt.close(fig)
+    print("Saved Figure 4 to figures/manuscript/fig4_robustness.[png/pdf]")
+
 def print_summary(df_calib: pd.DataFrame, df_eff: pd.DataFrame, fractions: pd.DataFrame):
     """Print verification details to stdout."""
     print("\n" + "="*80)
@@ -424,6 +568,8 @@ def print_summary(df_calib: pd.DataFrame, df_eff: pd.DataFrame, fractions: pd.Da
     print(f"  - fig2_calibration_heatmap.pdf")
     print(f"  - fig3_efficiency_audit.png")
     print(f"  - fig3_efficiency_audit.pdf")
+    print(f"  - fig4_robustness.png")
+    print(f"  - fig4_robustness.pdf")
     print(f"  - regime_fractions.csv")
     
     # 1. Sanity check: Figure 3 plotted medians
@@ -457,7 +603,8 @@ def main():
     make_figure2(df_calib)
     make_figure3(df_eff)
     fractions = export_regime_fractions(df_eff)
-    
+    make_figure4()
+
     print_summary(df_calib, df_eff, fractions)
     print("Figure generation and verification completed successfully.")
 
