@@ -52,12 +52,7 @@ algorithm.
 
 ## Environment setup
 
-Two interpreters are required; they are deliberately separate because of a
-**Python-version conflict**. The NPE stack (`sbi==0.26.1`, `torch==2.12.0`) needs
-**Python ≥ 3.10** (both declare `Requires-Python: >=3.10`), whereas the main
-OSIPI/DL fitting stack runs on **Python 3.9** — so `sbi` cannot be installed into
-the main environment at all. Both environments otherwise run NumPy 2.x; the split
-is about the interpreter version, not a NumPy major-version conflict.
+Two interpreters are required because the NPE stack (`sbi` 0.26.1, `torch` 2.12.0) requires Python ≥ 3.10, while the main OSIPI/DL fitting stack runs on Python 3.9 — so the NPE stack cannot be installed in the main environment. The split is due to Python version constraints, not numpy compatibility.
 
 ### 1. Main environment `.venv` — calibration grid + 24-method fitting
 
@@ -66,12 +61,7 @@ python -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Targets the OSIPI/DL stack on **Python 3.9**. The packages in `requirements.txt`
-are unpinned; the currently resolved versions in this environment are
-**`numpy==2.0.2`, `scipy==1.13.1`, `torch==2.8.0`**. Key packages:
-`super-ivim-dc>1.0.0`, `torch`, `ivimnet`, `dipy`, `nlopt`, `nipype`, `scipy`,
-`numpy`, `matplotlib`, `pandas`. (This stack does **not** install `sbi`, which
-requires Python ≥ 3.10 — see `.venv-npe` below.)
+Targets the OSIPI/DL stack on **Python 3.9.6**. Key packages (from `requirements.txt`): `super-ivim-dc>1.0.0`, `torch`, `ivimnet`, `dipy`, `nlopt`, `nipype`, `scipy`, `numpy`, `matplotlib`, `pandas`. Verified resolved versions in this environment are **Python 3.9.6, numpy 2.0.2, scipy 1.13.1**. (This environment does not install `sbi` due to the Python version requirements — see `.venv-npe` below.)
 
 ### 2. Isolated environment `.venv-npe` — NPE / efficiency map / robustness
 
@@ -80,26 +70,15 @@ python3.12 -m venv .venv-npe
 .venv-npe/bin/pip install -r npe/requirements.txt
 ```
 
-Verified resolved versions (from `npe/requirements.txt`, CPython 3.12.13):
-**`sbi==0.26.1`, `torch==2.12.0`, `numpy==2.4.6`, `scipy==1.17.1`**. The `npe/`
-directory carries its own numpy-only copy of `ivim_simulator.py`, so this venv
-never imports the OSIPI/DL stack. All `npe/` commands are run **from the repo
-root** (consistent with the reproduction table below): the `run_*` scripts add
-their own directory to `sys.path`, so they import the local modules regardless of
-working directory, while `train_npe.py` is invoked with `PYTHONPATH=npe`. The test
-suite uses `npe/conftest.py` for imports.
+Verified resolved versions (from `npe/requirements.txt`, CPython 3.12.13): **Python 3.12.13, sbi==0.26.1, torch==2.12.0, numpy==2.4.6, scipy==1.17.1**. The `npe/` directory carries its own numpy-only copy of `ivim_simulator.py`, so this venv never imports the OSIPI/DL stack. The `npe/` scripts self-insert their directory on `sys.path` and use repository-root-relative defaults, so they are run directly from the repo root. The test suite uses `npe/conftest.py` for imports.
 
 ### Figures only
 
-Regenerating figures from existing CSVs needs only **`matplotlib` + `pandas`**;
-either environment satisfies this.
+Regenerating figures from existing CSVs needs only **`matplotlib` + `pandas`**; either environment satisfies this.
 
 ## Reproduction table
 
-Each paper Table/Figure, the exact command that regenerates it, and the output
-file. Run from the repo root unless noted. Artifacts marked **(regenerated)** are
-gitignored and not committed — the command regenerates them, and any prerequisite
-is listed. Artifacts marked **(committed)** are present in the repo.
+Each paper Table/Figure, the exact command that regenerates it, and the output file. Run from the repo root unless noted. Artifacts marked **(regenerated)** are gitignored and not committed — the command regenerates them, and any prerequisite is listed. Artifacts marked **(committed)** are present in the repo.
 
 | Paper artifact | Environment | Command | Output | Status |
 |---|---|---|---|---|
@@ -107,7 +86,7 @@ is listed. Artifacts marked **(committed)** are present in the repo.
 | **Table 1** — calibration coverage / ECE / sharpness | `.venv` | `make calib` (`python -m uq.run_w3_calib`) | `calib_w3.csv` | regenerated |
 | **Figure 1** — reliability diagrams | `.venv` (or matplotlib+pandas) | `python make_manuscript_figures.py` (needs `calib_w3.csv`) | `figures/manuscript/fig1_reliability_diagrams.{png,pdf}` | committed |
 | **Figure 2** — calibration heatmap | `.venv` (or matplotlib+pandas) | `python make_manuscript_figures.py` (needs `calib_w3.csv`) | `figures/manuscript/fig2_calibration_heatmap.{png,pdf}` | committed |
-| (NPE prerequisite) — train posterior | `.venv-npe` | `PYTHONPATH=npe .venv-npe/bin/python npe/train_npe.py --mode set --output npe/npe_posterior_setB.pt --loss-output npe/loss_setB.json` | `npe/npe_posterior_setB.pt`, `npe/loss_setB.json` | model regenerated; loss committed |
+| (NPE prerequisite) — train posterior | `.venv-npe` | `.venv-npe/bin/python npe/train_npe.py --mode set --output npe/npe_posterior_setB.pt --loss-output npe/loss_setB.json` | `npe/npe_posterior_setB.pt`, `npe/loss_setB.json` | model regenerated; loss committed |
 | **Table 2** — efficiency map (claimed / empirical / NLLS vs CRLB) | `.venv-npe` | `.venv-npe/bin/python npe/run_e_efficiency.py` | `npe/efficiency_map.csv`, `npe/efficiency_map.png` | committed |
 | **Figure 3** — efficiency audit | matplotlib+pandas | `python make_manuscript_figures.py` (needs `calib_w3.csv` + `npe/efficiency_map.csv`) | `figures/manuscript/fig3_efficiency_audit.{png,pdf}` | committed |
 | **F1 data** — held-out-b misspecification (Figure 4 input) | `.venv-npe` | `.venv-npe/bin/python npe/run_f_robustness.py` (needs `npe/npe_posterior_setB.pt`) | `npe/f1_misspecification.csv`, `npe/f1_misspecification.png` | committed |
@@ -131,22 +110,8 @@ Notes:
 
 ## Data provenance
 
-- **OSIPI TF2.4 open data** — Zenodo record **14605039**
-  (`OSIPI_TF24_data_phantoms.zip`). Fetched by
-  `utilities/data_simulation/Download_data.py` (via `zenodo_get`) into
-  `download/Data/` (gitignored): <https://zenodo.org/records/14605039>.
-- **F2 multi-b dataset** — the in-vivo **brain** acquisition from the same OSIPI
-  TF2.4 Zenodo record: `download/Data/brain.nii.gz`, `brain.bval`,
-  `brain_mask_gray_matter.nii.gz` (referenced in `npe/run_f_realdata.py`). Per
-  `download/Data/brain_readme.txt` it was *"Scanned on a Philips 3T system"* (15
-  unique b-values, 0–1000 s/mm²) — a real acquisition, not a digital phantom, and
-  not a separate external dataset.
-- **Note on the archive name.** Despite being named `..._phantoms.zip`, the Zenodo
-  record bundles two distinct data types: digital phantoms under
-  `download/Phantoms/` (e.g. the ICBM-atlas brain phantom and the XCAT set) and
-  real in-vivo scans under `download/Data/`. The F2 demo uses the real
-  `download/Data/brain` acquisition, **not** the `download/Phantoms/brain` digital
-  phantom.
+- **OSIPI TF2.4 open data** — Zenodo record **14605039** (`OSIPI_TF24_data_phantoms.zip`). Note that Zenodo 14605039 is the DOI of the **TF2.4 IVIM code-collection archive**, which bundles both `Data/` (real scans) and `Phantoms/` (digital phantoms); the archive name emphasizes phantoms but is not phantom-only. The archive is fetched by `utilities/data_simulation/Download_data.py` (via `zenodo_get`) into `download/Data/` (gitignored): <https://zenodo.org/records/14605039>.
+- **F2 multi-b dataset** — the **brain** acquisition from the same OSIPI TF2.4 Zenodo record. Specifically, F2 uses `download/Data/brain.nii.gz` (with associated b-values `brain.bval` and gray matter mask `brain_mask_gray_matter.nii.gz`, referenced in `npe/run_f_realdata.py`). This is a Philips 3T in-vivo brain acquisition (multi-b, b = 0–1000, 15 values, with tissue masks), **not** a phantom. The digital phantoms under `download/Phantoms/` are a separate tree that F2 never touches.
 
 ## License
 
@@ -155,15 +120,13 @@ Collection. This module is additive and released under the same license.
 
 ## Citation
 
-The related publication is **in submission to *Magnetic Resonance in Medicine*
-(MRM)**; there is no preprint. The block below is a placeholder to be updated on
-acceptance.
+The related publication is **in submission to *Magnetic Resonance in Medicine* (MRM)**; there is no preprint. The block below is a placeholder to be updated on acceptance.
 
 ```bibtex
 @article{karlin_ivim_uncertainty_INSUBMISSION,
   author  = {Karlin, Avery},
-  title   = {{Calibration and Efficiency of Uncertainty Estimates in Intravoxel Incoherent Motion Imaging: Quantile Intervals, Cross-Paradigm Comparison, and a Cram\'er--Rao Audit of Amortized Posteriors}},
-  journal = {in submission to MRM},
+  title   = {{Calibration and Efficiency of Uncertainty Estimates in Intravoxel Incoherent Motion Imaging: Quantile Intervals, Cross-Paradigm Comparison, and a Cramér–Rao Audit of Amortized Posteriors}},
+  journal = {in submission to Magnetic Resonance in Medicine},
   year    = {2026}
 }
 ```

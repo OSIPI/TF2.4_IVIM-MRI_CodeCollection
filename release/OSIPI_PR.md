@@ -43,7 +43,7 @@ tree, referencing `src/` rather than extending it.
 | `src/original/Initials_Institution/` algorithm folder | **N/A** | No new fit algorithm; the module wraps existing `src/` fitters. |
 | `src/wrappers/` `OsipiBase` wrapper | **N/A** | No new fit method to harmonize; `uq/` consumes the existing `OsipiBase` interface. |
 | Row in `doc/code_contributions_record.csv` | **N/A** | That record enumerates fit algorithms; this is an analysis/benchmark module. |
-| Test file | **Yes** | Analysis-layer tests under `uq/tests/` and `npe/tests/` (isolated from the upstream test tree). |
+| Test file | **Yes** | Tests included and passing — 20 total (6 in `uq/`, 14 in `npe/`), isolated from the upstream suite; run via `make test` / `make smoke`. |
 | Contributor names + affiliations in PR | **Yes** | Listed above. |
 | Brief statement of purpose | **Yes** | See Summary. |
 | Reproduction instructions | **Yes** | See `release/README.md` reproduction table. |
@@ -59,10 +59,7 @@ algorithm registry accurate while still being fully reproducible.
 - [x] PR message states the purpose of the contribution.
 - [x] Upstream fitting code under `src/` is unmodified.
 - [x] Additive change on a dedicated branch; one reviewable PR; no auto-merge.
-- [x] Tests included for the new analysis code, isolated from the upstream test
-      suite: `uq/tests/` (6 tests — `.venv/bin/python -m pytest uq`, or
-      `make test`) and `npe/tests/` (14 tests —
-      `PYTHONPATH=npe .venv-npe/bin/python -m pytest npe/tests`).
+- [x] Tests included and passing — 20 total (6 in `uq/`, 14 in `npe/`), isolated from the upstream suite; run via `make test` / `make smoke`.
 - [x] Reproduction documented with exact commands and output files
       (`release/README.md`).
 - [x] Environments documented (main `.venv` and isolated `.venv-npe`) with pinned
@@ -72,8 +69,7 @@ algorithm registry accurate while still being fully reproducible.
 - [ ] `code_contributions_record.csv` row — intentionally omitted (N/A; not a fit
       algorithm).
 - [ ] `OsipiBase` wrapper — intentionally omitted (N/A; no new fit algorithm).
-- [ ] Publication DOI — pending; manuscript in submission to MRM (placeholder in
-      `CITATION.cff` / `release/README.md`, to update on acceptance).
+- [ ] Publication DOI — pending; manuscript in submission to Magnetic Resonance in Medicine (placeholder in `release/README.md` only, to update on acceptance).
 
 ## Links
 
