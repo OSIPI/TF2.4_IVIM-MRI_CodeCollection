@@ -43,6 +43,8 @@ def main() -> None:
     parser.add_argument("--suffix", type=str, default="_v2", help="Suffix for output files.")
     parser.add_argument("--n-repeats", type=int, default=50, help="Number of noise realizations (N).")
     parser.add_argument("--n-noisy-samples", type=int, default=200, help="Number of posterior samples to draw per noisy realization.")
+    parser.add_argument("--out-tag", type=str, default="", help="Filename tag for outputs: efficiency_map{tag}.csv/.png. Default '' writes the canonical NSF path; use e.g. '_maf' for the ablation.")
+    parser.add_argument("--skip-anchor-validation", action="store_true", help="Skip the anchor-case validation against the NSF cp3 reference CSV (the anchors are NSF-specific; the ablation model is expected to deviate).")
     args = parser.parse_args()
 
     seed = 42
@@ -224,7 +226,7 @@ def main() -> None:
 
     # Save to CSV
     model_dir = os.path.dirname(model_path) or "."
-    csv_path = os.path.join(model_dir, "efficiency_map.csv")
+    csv_path = os.path.join(model_dir, f"efficiency_map{args.out_tag}.csv")
     print(f"\nSaving efficiency map CSV to {csv_path}...")
     with open(csv_path, "w", newline="") as f:
         f.write("# Efficiency Map for Biexponential IVIM model (Phase E)\n")
@@ -280,7 +282,9 @@ def main() -> None:
 
     # Validation against cp3_crlb_compare_v2.csv
     cp3_csv_path = os.path.join(model_dir, "cp3_crlb_compare_v2.csv")
-    if os.path.exists(cp3_csv_path):
+    if args.skip_anchor_validation:
+        print("\nSkipping anchor-case validation (--skip-anchor-validation).")
+    elif os.path.exists(cp3_csv_path):
         print(f"\nValidating anchor cases against {cp3_csv_path}...")
         anchor_truths = [
             {"name": "Parenchyma typical", "D": 1.1e-3, "Dstar": 30.0e-3, "f": 0.15},
@@ -394,7 +398,7 @@ def main() -> None:
         print(f"Reference file {cp3_csv_path} not found. Skipping validation.")
 
     # 6. Generate static faceted plot
-    png_path = os.path.join(model_dir, "efficiency_map.png")
+    png_path = os.path.join(model_dir, f"efficiency_map{args.out_tag}.png")
     print(f"\nGenerating 3x4 panel grid plot to {png_path}...")
     
     # Select representative D closest to typical parenchyma (1.1e-3)

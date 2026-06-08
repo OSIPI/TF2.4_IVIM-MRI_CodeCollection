@@ -102,9 +102,15 @@ def main() -> None:
     parser.add_argument("--embed-out-dim", type=int, default=20,
                         help="Output dimension of the base embedding net.")
     parser.add_argument("--hidden-features", type=int, default=50,
-                        help="Hidden features for Neural Spline Flow (NSF).")
+                        help="Hidden features for the flow transforms.")
     parser.add_argument("--num-transforms", type=int, default=5,
-                        help="Number of transforms for NSF.")
+                        help="Number of flow transforms (NSF coupling blocks / MAF MADE layers).")
+    parser.add_argument("--density-estimator", type=str, default="nsf",
+                        choices=["nsf", "maf"],
+                        help="Normalizing-flow family for the posterior density estimator: "
+                             "'nsf' (neural spline flow, default — the main-result model) or "
+                             "'maf' (masked autoregressive flow, for the architecture ablation). "
+                             "Only this swaps; embedding, prior, conditioning and training loop are identical.")
     parser.add_argument("--log-dstar", action="store_true",
                         help="Use log10(Dstar) reparameterization.")
     parser.add_argument("--device", type=str, default="cpu",
@@ -112,7 +118,8 @@ def main() -> None:
     args = parser.parse_args()
 
     print("=" * 70)
-    print(f"Training IVIM NPE: mode={args.mode}, budget={args.budget}, seed={args.seed}")
+    print(f"Training IVIM NPE: mode={args.mode}, density_estimator={args.density_estimator}, "
+          f"budget={args.budget}, seed={args.seed}")
     print("=" * 70)
 
     # Set seeds for reproducibility
@@ -175,7 +182,7 @@ def main() -> None:
 
     # 5. Density estimator
     density_estimator_builder = posterior_nn(
-        model="nsf",
+        model=args.density_estimator,
         embedding_net=wrapper_embedding,
         hidden_features=args.hidden_features,
         num_transforms=args.num_transforms
@@ -224,6 +231,11 @@ def main() -> None:
     
     logs = {
         "mode": args.mode,
+        "density_estimator": args.density_estimator,
+        "hidden_features": args.hidden_features,
+        "num_transforms": args.num_transforms,
+        "log_dstar": args.log_dstar,
+        "seed": args.seed,
         "budget": args.budget,
         "epochs_trained": epochs_trained,
         "wall_clock_sec": wall_clock,
