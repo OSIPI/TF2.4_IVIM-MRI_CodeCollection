@@ -59,8 +59,10 @@ algorithm registry accurate while still being fully reproducible.
 - [x] PR message states the purpose of the contribution.
 - [x] Upstream fitting code under `src/` is unmodified.
 - [x] Additive change on a dedicated branch; one reviewable PR; no auto-merge.
-- [x] Tests included for the new analysis code (`uq/tests/`, `npe/tests/`),
-      isolated from the upstream test suite.
+- [x] Tests included for the new analysis code, isolated from the upstream test
+      suite: `uq/tests/` (6 tests — `.venv/bin/python -m pytest uq`, or
+      `make test`) and `npe/tests/` (14 tests —
+      `PYTHONPATH=npe .venv-npe/bin/python -m pytest npe/tests`).
 - [x] Reproduction documented with exact commands and output files
       (`release/README.md`).
 - [x] Environments documented (main `.venv` and isolated `.venv-npe`) with pinned

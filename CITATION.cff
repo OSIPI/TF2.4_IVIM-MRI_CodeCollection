@@ -1,56 +1,25 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
-title: "OSIPI TF2.4 IVIM-MRI Code Collection"
+message: >-
+  If you use this analysis module, please cite the manuscript below. Please also
+  cite the upstream OSIPI TF2.4 IVIM-MRI Code Collection (see the "Citing" section
+  of README_upstream.md) when using the fitting engines under src/.
+title: "Calibration and Efficiency of Uncertainty Estimates in Intravoxel Incoherent Motion Imaging: Quantile Intervals, Cross-Paradigm Comparison, and a Cramér–Rao Audit of Amortized Posteriors"
 version: 0.1.0
 date-released: 2026
 license: AGPL-3.0-only
 repository-code: "https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection"
 authors:
-  - family-names: Jalnefjord
-    given-names: Oscar
-    orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"
-    affiliation: "University of Gothenburg"
-  - family-names: Rashid
-    given-names: Ivan A.
-    affiliation: "Lund University"
-  - family-names: Kuppens
-    given-names: Daan
-    affiliation: "Amsterdam University Medical Center"
-  - family-names: van der Thiel
-    given-names: Merel M.
-    affiliation: "Maastricht University Medical Center"
-  - family-names: van Houdt
-    given-names: Petra J.
-    affiliation: "Netherlands Cancer Institute"
-  - family-names: Voorter
-    given-names: Paulien H.M.
-    affiliation: "Maastricht University Medical Center"
-  - family-names: Peterson
-    given-names: Eric T.
-    affiliation: "SRI International"
-  - family-names: Gurney-Champion
-    given-names: Oliver J.
-    affiliation: "Amsterdam University Medical Center"
+  - family-names: Karlin
+    given-names: Avery
+    affiliation: "Independent Researcher"
+    email: averykarlin3@gmail.com
 preferred-citation:
   type: article
-  title: "An open-source code repository for intravoxel incoherent motion analysis: ISMRM Open Science Initiative for Perfusion Imaging (OSIPI)"
+  title: "Calibration and Efficiency of Uncertainty Estimates in Intravoxel Incoherent Motion Imaging: Quantile Intervals, Cross-Paradigm Comparison, and a Cramér–Rao Audit of Amortized Posteriors"
   authors:
-    - family-names: Jalnefjord
-      given-names: Oscar
-    - family-names: Rashid
-      given-names: Ivan A.
-    - family-names: Kuppens
-      given-names: Daan
-    - family-names: van der Thiel
-      given-names: Merel M.
-    - family-names: van Houdt
-      given-names: Petra J.
-    - family-names: Voorter
-      given-names: Paulien H.M.
-    - family-names: Peterson
-      given-names: Eric T.
-    - family-names: Gurney-Champion
-      given-names: Oliver J.
+    - family-names: Karlin
+      given-names: Avery
+      affiliation: "Independent Researcher"
   journal: "in submission to MRM"
   year: 2026
   doi: "10.XXXX/XXXXXXX"  # fill in once published
