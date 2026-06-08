@@ -3,7 +3,7 @@ message: "If you use this software, please cite it as below."
 title: "OSIPI TF2.4 IVIM-MRI Code Collection"
 version: 0.1.0
 date-released: 2026
-license: Apache-2.0
+license: AGPL-3.0-only
 repository-code: "https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection"
 authors:
   - family-names: Jalnefjord

@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "osipi-ivim"
 version = "0.1.0"
 description = "OSIPI TF2.4 IVIM-MRI Code Collection"
-license = {text = "Apache-2.0"}
+license = {text = "AGPL-3.0-only"}
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [
