@@ -50,6 +50,15 @@ def main() -> None:
                         help="Acquisition b-value scheme to evaluate on. Must match the scheme the "
                              "model was trained on. 'dense' (16-point) is the acquisition-density "
                              "supplementary experiment; default 'clinical_sparse' (8-point).")
+    parser.add_argument("--log-dstar", dest="log_dstar", default=None,
+                        action="store_true",
+                        help="Force log10(Dstar) reparameterization instead of auto-detecting "
+                             "it from the prior support. Needed for priors whose support is not "
+                             "a simple box (e.g. the tissue_dstar ablation's MultipleIndependent "
+                             "prior, where auto-detection cannot read a lower bound). Default: "
+                             "auto-detect (unchanged for setB/MAF/dense).")
+    parser.add_argument("--no-log-dstar", dest="log_dstar", action="store_false",
+                        help="Force linear Dstar (override auto-detection).")
     args = parser.parse_args()
 
     seed = 42
@@ -74,8 +83,12 @@ def main() -> None:
     print(f"Loading model from {model_path}...")
     posterior = torch.load(model_path, map_location="cpu", weights_only=False)
 
-    log_dstar = bool(posterior.prior.support.base_constraint.lower_bound[1] < 0)
-    print(f"Auto-detected log_dstar = {log_dstar}")
+    if args.log_dstar is None:
+        log_dstar = bool(posterior.prior.support.base_constraint.lower_bound[1] < 0)
+        print(f"Auto-detected log_dstar = {log_dstar}")
+    else:
+        log_dstar = bool(args.log_dstar)
+        print(f"Using forced log_dstar = {log_dstar} (CLI override)")
 
     prior, _, _ = get_processed_prior(device="cpu", log_dstar=log_dstar)
     

@@ -17,6 +17,7 @@ from sbi.neural_nets import posterior_nn
 from sbi.neural_nets.embedding_nets import FCEmbedding
 
 from npe_prior import get_processed_prior
+from npe_prior_alt import get_alt_processed_prior
 from npe_simulator import IVIMNPESimulator, build_set_embedding
 from ivim_simulator import B_SCHEMES
 
@@ -114,6 +115,14 @@ def main() -> None:
                              "Only this swaps; embedding, prior, conditioning and training loop are identical.")
     parser.add_argument("--log-dstar", action="store_true",
                         help="Use log10(Dstar) reparameterization.")
+    parser.add_argument("--prior", type=str, default="boxuniform",
+                        choices=["boxuniform", "tissue_dstar"],
+                        help="Prior over [D, Dstar, f]: 'boxuniform' (default — the "
+                             "log-uniform-style setB prior) or 'tissue_dstar' (the "
+                             "prior-sensitivity ablation: D and f identical uniforms, but "
+                             "log10(Dstar) ~ truncated Normal centered on a physiological "
+                             "Dstar; requires --log-dstar). Only the prior changes; "
+                             "architecture, budget, seed and b-scheme are untouched.")
     parser.add_argument("--b-scheme", type=str, default="clinical_sparse",
                         choices=sorted(B_SCHEMES.keys()),
                         help="Acquisition b-value scheme to train on (default: clinical_sparse, "
@@ -132,8 +141,15 @@ def main() -> None:
     torch.manual_seed(args.seed)
     
     # 1. Prior
-    prior, n_params, _ = get_processed_prior(device="cpu", log_dstar=args.log_dstar)
-    print(f"Loaded {n_params}-D prior [D, {'log10(Dstar)' if args.log_dstar else 'Dstar'}, f]")
+    if args.prior == "tissue_dstar":
+        if not args.log_dstar:
+            parser.error("--prior tissue_dstar requires --log-dstar (its D* marginal is on log10(D*)).")
+        prior, n_params, _ = get_alt_processed_prior(device="cpu", log_dstar=True)
+        print(f"Loaded {n_params}-D TISSUE-INFORMED prior "
+              f"[D~U, log10(Dstar)~TruncNormal, f~U]")
+    else:
+        prior, n_params, _ = get_processed_prior(device="cpu", log_dstar=args.log_dstar)
+        print(f"Loaded {n_params}-D prior [D, {'log10(Dstar)' if args.log_dstar else 'Dstar'}, f]")
 
     # 2. Simulator
     active_bvals = B_SCHEMES[args.b_scheme]
@@ -241,6 +257,8 @@ def main() -> None:
     logs = {
         "mode": args.mode,
         "density_estimator": args.density_estimator,
+        "prior": args.prior,
+        "b_scheme": args.b_scheme,
         "hidden_features": args.hidden_features,
         "num_transforms": args.num_transforms,
         "log_dstar": args.log_dstar,
