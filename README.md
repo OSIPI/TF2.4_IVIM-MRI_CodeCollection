@@ -1,5 +1,7 @@
 # Do IVIM fitting methods report *honest* uncertainty?
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20649669.svg)](https://doi.org/10.5281/zenodo.20649669)
+
 An uncertainty-quantification & **calibration** study for intravoxel incoherent
 motion (IVIM) diffusion-MRI fitting. The question is not "how accurate is the
 point estimate?" but the harder one a clinician actually relies on: **when a
