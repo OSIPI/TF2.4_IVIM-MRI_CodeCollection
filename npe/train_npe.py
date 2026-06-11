@@ -18,6 +18,7 @@ from sbi.neural_nets.embedding_nets import FCEmbedding
 
 from npe_prior import get_processed_prior
 from npe_simulator import IVIMNPESimulator, build_set_embedding
+from ivim_simulator import B_SCHEMES
 
 
 class SNRWrapperEmbedding(nn.Module):
@@ -113,6 +114,11 @@ def main() -> None:
                              "Only this swaps; embedding, prior, conditioning and training loop are identical.")
     parser.add_argument("--log-dstar", action="store_true",
                         help="Use log10(Dstar) reparameterization.")
+    parser.add_argument("--b-scheme", type=str, default="clinical_sparse",
+                        choices=sorted(B_SCHEMES.keys()),
+                        help="Acquisition b-value scheme to train on (default: clinical_sparse, "
+                             "the 8-point clinical protocol). 'dense' is the 16-point protocol used "
+                             "for the acquisition-density supplementary experiment.")
     parser.add_argument("--device", type=str, default="cpu",
                         help="Device to train on (e.g. cpu, mps, cuda).")
     args = parser.parse_args()
@@ -130,8 +136,11 @@ def main() -> None:
     print(f"Loaded {n_params}-D prior [D, {'log10(Dstar)' if args.log_dstar else 'Dstar'}, f]")
 
     # 2. Simulator
-    print(f"Initializing simulator with representation={args.mode}...")
-    sim = IVIMNPESimulator(representation=args.mode, clean=False, seed=args.seed)
+    active_bvals = B_SCHEMES[args.b_scheme]
+    print(f"Initializing simulator with representation={args.mode}, b_scheme={args.b_scheme} "
+          f"({active_bvals.size} b-values)...")
+    sim = IVIMNPESimulator(representation=args.mode, clean=False,
+                           active_bvals=active_bvals, seed=args.seed)
     obs_shape = sim.observation_shape
     print(f"Individual observation shape: {obs_shape}")
 

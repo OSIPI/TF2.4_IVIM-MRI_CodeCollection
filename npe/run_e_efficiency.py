@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from npe_prior import get_processed_prior, DISPLAY_UNITS, DISPLAY_SCALE, to_display, invert_theta, PRIOR_LOW, PRIOR_HIGH
 from npe_simulator import IVIMNPESimulator
 from train_npe import pack_x, SNRWrapperEmbedding
-from ivim_simulator import add_rician_noise
+from ivim_simulator import add_rician_noise, B_SCHEMES
 from run_cp3_validation import compute_crlb, fit_biexp_nlls
 
 
@@ -45,6 +45,11 @@ def main() -> None:
     parser.add_argument("--n-noisy-samples", type=int, default=200, help="Number of posterior samples to draw per noisy realization.")
     parser.add_argument("--out-tag", type=str, default="", help="Filename tag for outputs: efficiency_map{tag}.csv/.png. Default '' writes the canonical NSF path; use e.g. '_maf' for the ablation.")
     parser.add_argument("--skip-anchor-validation", action="store_true", help="Skip the anchor-case validation against the NSF cp3 reference CSV (the anchors are NSF-specific; the ablation model is expected to deviate).")
+    parser.add_argument("--b-scheme", type=str, default="clinical_sparse",
+                        choices=sorted(B_SCHEMES.keys()),
+                        help="Acquisition b-value scheme to evaluate on. Must match the scheme the "
+                             "model was trained on. 'dense' (16-point) is the acquisition-density "
+                             "supplementary experiment; default 'clinical_sparse' (8-point).")
     args = parser.parse_args()
 
     seed = 42
@@ -75,8 +80,12 @@ def main() -> None:
     prior, _, _ = get_processed_prior(device="cpu", log_dstar=log_dstar)
     
     # Simulators
-    sim_clean = IVIMNPESimulator(representation="set", clean=True, seed=seed)
-    sim_noisy = IVIMNPESimulator(representation="set", clean=False, seed=seed)
+    scheme_bvals = B_SCHEMES[args.b_scheme]
+    print(f"Evaluating on b-scheme '{args.b_scheme}' ({scheme_bvals.size} b-values).")
+    sim_clean = IVIMNPESimulator(representation="set", clean=True,
+                                 active_bvals=scheme_bvals, seed=seed)
+    sim_noisy = IVIMNPESimulator(representation="set", clean=False,
+                                 active_bvals=scheme_bvals, seed=seed)
     active_bvals = sim_clean.active_bvals
 
     # Define the 2048-point dense grid

@@ -93,6 +93,8 @@ Each paper Table/Figure, the exact command that regenerates it, and the output f
 | **F2 data** — real-data overconfidence demo (Figure 4 input) | `.venv-npe` | `.venv-npe/bin/python npe/run_f_realdata.py` (needs `npe/npe_posterior_setB.pt` + `download/Data/brain.*`) | `npe/f2_realdata.csv`, `npe/f2_realdata.png` | committed |
 | `regime_fractions.csv` (manuscript SI) | matplotlib+pandas | `python make_manuscript_figures.py` | `figures/manuscript/regime_fractions.csv` | committed |
 | **Figure 4** — robustness + real-data | matplotlib+pandas | `python make_manuscript_figures.py` (needs `npe/f1_misspecification.csv`, `npe/f2_realdata.csv`, `figures/manuscript/regime_fractions.csv`) | `figures/manuscript/fig4_robustness.{png,pdf}` | committed |
+| **Supp. Fig. S2** — dense-acquisition control (16-b NPE, train+eval in-distribution) | `.venv-npe` | train: `.venv-npe/bin/python npe/train_npe.py --mode set --b-scheme dense --budget 500000 --epochs 200 --log-dstar --seed 0 --output npe/npe_posterior_dense.pt --loss-output npe/loss_dense.json`; audit: `.venv-npe/bin/python npe/run_e_efficiency.py --model npe/npe_posterior_dense.pt --b-scheme dense --out-tag _dense --skip-anchor-validation`; figure: `.venv-npe/bin/python npe/run_s2_figure.py` | `npe/efficiency_map_dense.{csv,png}`, `npe/loss_dense.json`, `figures/manuscript/figS2_dense_acquisition.{png,pdf,csv}` | committed; `.pt` gitignored |
+| **G1 data + Supp. Fig. S3** — OOD-gate operating characteristic (in-vivo) | `.venv-npe` | `.venv-npe/bin/python npe/run_g_ood_gating.py --n-voxels 2000 --n-samples 200 --seed 42` (needs `npe/npe_posterior_setB.pt` + `download/Data/brain.*`) | `npe/g_ood_gating.{csv,png,pdf}`, `npe/g_ood_gating_voxels.csv`, `figures/manuscript/figS3_ood_gating.{png,pdf,csv}` | committed |
 
 Notes:
 
@@ -106,6 +108,14 @@ Notes:
   efficiency/robustness/real-data scripts default to that path, so train it first.
 - `calib_w3.csv`, `ivim_summary_v3.csv`, and the `*.npz` grid artifacts are
   **gitignored**; the committed Figures 1–4 are the verifiable outputs.
+- **Supplementary analyses (reviewer revisions).** `train_npe.py` and
+  `run_e_efficiency.py` take a `--b-scheme {clinical_sparse,dense,optimized}` flag
+  (default `clinical_sparse`, the main-result scheme); the dense 16-point control
+  (Supp. Fig. S2) is the only thing the flag changes, isolating acquisition density
+  from the estimator. `run_g_ood_gating.py` operationalizes the deployment-time OOD
+  gate on the in-vivo brain data (Supp. Fig. S3), reporting the ROC of a deployable
+  per-voxel score against held-out-b miscalibration and the gate-threshold /
+  calibration-recovery trade-off. See `REVIEWER_RESPONSE.md` for the full write-up.
 - A fast non-DL check is available: `make smoke`.
 
 ## Data provenance
