@@ -1,0 +1,6 @@
+estimator,implementation,seconds_per_1000_voxels,ms_per_1000_voxels
+NPE_amortized_NSF,"steady-state (warm), min of 3; batched 100-sample draw",2.538497,2538.497
+NLLS_SciPy_TRF,"1 least_squares(TRF) fit/voxel, serial",2.976856,2976.856
+MCMC_emcee_OGC_Bayesian,"32 walkers x 1500 steps, 500 burn, thin 5; projected from 50 voxels",2077.182841,2077182.841
+
+hardware_provenance,macOS-26.3.1-arm64-arm-64bit; CPU=arm; cores=10; torch_threads=10; torch=2.8.0; numpy=1.26.4; python=3.9.6,,
