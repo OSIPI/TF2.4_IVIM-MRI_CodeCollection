@@ -11,15 +11,16 @@ repository-code: "https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection"
 authors:
   - family-names: Karlin
     given-names: Avery
-    affiliation: "Independent Researcher"
-    email: averykarlin3@gmail.com
+    affiliation: "Columbia University, Department of Applied Physics and Applied Mathematics; University of Colorado Boulder, Department of Computer Science"
+    email: ak5232@columbia.edu
 preferred-citation:
   type: article
   title: "Calibration and Efficiency of Uncertainty Estimates in Intravoxel Incoherent Motion Imaging: Quantile Intervals, Cross-Paradigm Comparison, and a Cramér–Rao Audit of Amortized Posteriors"
   authors:
     - family-names: Karlin
       given-names: Avery
-      affiliation: "Independent Researcher"
+      affiliation: "Columbia University, Department of Applied Physics and Applied Mathematics; University of Colorado Boulder, Department of Computer Science"
+      email: ak5232@columbia.edu
   journal: "in submission to MRM"
   year: 2026
   doi: "10.XXXX/XXXXXXX"  # fill in once published

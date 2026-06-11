@@ -25,7 +25,7 @@ manuscript figures.
 
 ## Contributors
 
-- Avery Karlin — Independent Researcher — averykarlin3@gmail.com (sole author).
+- Avery Karlin — Columbia University, Department of Applied Physics and Applied Mathematics; University of Colorado Boulder, Department of Computer Science — ak5232@columbia.edu (sole author).
 
 ## Relationship to the OSIPI contribution template
 

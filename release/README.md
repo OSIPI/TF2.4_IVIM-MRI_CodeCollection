@@ -148,4 +148,4 @@ Please **also** cite the upstream OSIPI TF2.4 IVIM-MRI Code Collection (see the
 
 ## Contact
 
-Avery Karlin — Independent Researcher — <averykarlin3@gmail.com>
+Avery Karlin — Columbia University, Department of Applied Physics and Applied Mathematics; University of Colorado Boulder, Department of Computer Science — <ak5232@columbia.edu>
