@@ -94,7 +94,7 @@ def fit_segmented_array(bvalues, dw_data, njobs=4, bounds=([0, 0, 0.005],[0.005,
 
             output = Parallel(n_jobs=njobs)(delayed(parfun)(i) for i in tqdm(range(len(dw_data)), position=0, leave=True))
             Dt, Fp, Dp = np.transpose(output)
-        except:
+        except Exception:
             # if fails, retry using single core
             single = True
     else:
@@ -147,7 +147,7 @@ def fit_segmented(bvalues, dw_data, bounds=([0, 0, 0.005],[0.005, 0.7, 0.2]), cu
         params, _ = curve_fit(lambda b, Dp: Fp * np.exp(-b * Dp), bvalues, dw_data_remaining, p0=(p0[2]), bounds=bounds2)
         Dp = params[0]
         return Dt, Fp, Dp
-    except:
+    except (RuntimeError, ValueError, FloatingPointError):
         # if fit fails, return zeros
         # print('segmented fit failed')
         return 0., 0., 0.
@@ -183,7 +183,7 @@ def fit_least_squares_array(bvalues, dw_data, S0_output=True, fitS0=True, njobs=
 
                 output = Parallel(n_jobs=njobs)(delayed(parfun)(i) for i in tqdm(range(len(dw_data)), position=0, leave=True))
                 Dt, Fp, Dp, S0 = np.transpose(output)
-            except:
+            except Exception:
                 single = True
         else:
             single = True
@@ -207,7 +207,7 @@ def fit_least_squares_array(bvalues, dw_data, S0_output=True, fitS0=True, njobs=
 
                 output = Parallel(n_jobs=njobs)(delayed(parfun)(i) for i in tqdm(range(len(dw_data)), position=0, leave=True))
                 Dt, Fp, Dp = np.transpose(output)
-            except:
+            except Exception:
                 single = True
         else:
             single = True
@@ -257,7 +257,7 @@ def fit_least_squares(bvalues, dw_data, S0_output=False, fitS0=True,
             return order(Dt, Fp, Dp, S0)
         else:
             return order(Dt, Fp, Dp)
-    except:
+    except (RuntimeError, ValueError, FloatingPointError):
         # if fit fails, then do a segmented fit instead
         # print('lsq fit failed, trying segmented')
         if S0_output:
@@ -297,7 +297,7 @@ def fit_least_squares_array_tri_exp(bvalues, dw_data, S0_output=True, fitS0=True
 
             output = Parallel(n_jobs=njobs)(delayed(parfun)(i) for i in tqdm(range(len(dw_data)), position=0, leave=True))
             Fp0, Dt, Fp1, Dp1, Fp2, Dp2 = np.transpose(output)
-        except:
+        except Exception:
             single = True
     else:
         single = True
@@ -357,7 +357,7 @@ def fit_least_squares_tri_exp(bvalues, dw_data, S0_output=False, fitS0=True,
             return Fp0, Dt, Fp1, Dp1, Fp2, Dp2
         else:
             return Dt, Fp1, Dp1, Fp2, Dp2
-    except:
+    except (RuntimeError, ValueError, FloatingPointError):
         # if fit fails, then do a segmented fit instead
         # print('lsq fit failed, trying segmented')
         if S0_output:
@@ -396,7 +396,7 @@ def fit_segmented_array_tri_exp(bvalues, dw_data, njobs=4, bounds=([0, 0, 0, 0.0
 
             output = Parallel(n_jobs=njobs)(delayed(parfun)(i) for i in tqdm(range(len(dw_data)), position=0, leave=True))
             Dt, Fp, Dp, Fp0, Fp2, Dp2 = np.transpose(output)
-        except:
+        except Exception:
             # if fails, retry using single core
             single = True
     else:
@@ -463,7 +463,7 @@ def fit_segmented_tri_exp(bvalues, dw_data, bounds=([0, 0, 0, 0.005, 0, 0.06], [
         params, _ = curve_fit(lambda b, Dp: Fp2 * np.exp(-b * Dp), bvalueslow, dw_data, p0=(0.1), bounds=bounds1)
         Dp2 = params[0]
         return Fp0, Dt, Fp, Dp, Fp2, Dp2
-    except:
+    except (RuntimeError, ValueError, FloatingPointError, TypeError):
         # if fit fails, return zeros
         # print('segnetned fit failed')
         return 0., 0., 0., 0., 0., 0.
@@ -619,7 +619,7 @@ def fit_bayesian_array(bvalues, dw_data, paramslsq, arg):
             output = Parallel(n_jobs=arg.jobs)(delayed(parfun)(i) for i in tqdm(range(len(dw_data)), position=0,
                                                                                      leave=True))
             Dt_pred, Fp_pred, Dp_pred, S0_pred = np.transpose(output)
-        except:
+        except Exception:
             single = True
     else:
         single = True
@@ -665,14 +665,14 @@ def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05, 1], fitS
         else:
             params = minimize(neg_log_posterior, x0=x0[:3], args=(bvalues, dw_data, neg_log_prior), bounds=bounds[:3])
         if not params.success:
-            raise (params.message)
+            raise RuntimeError(params.message)
         if fitS0:
             Dt, Fp, Dp, S0 = params.x[0], params.x[1], params.x[2], params.x[3]
         else:
             Dt, Fp, Dp = params.x[0], params.x[1], params.x[2]
             S0 = 1
         return order(Dt, Fp, Dp, S0)
-    except:
+    except (RuntimeError, ValueError, TypeError):
         # if fit fails, return regular lsq-fit result
         # print('a bayes fit fialed')
         return fit_least_squares(bvalues, dw_data, S0_output=True)
@@ -717,7 +717,7 @@ def goodness_of_fit(bvalues, Dt, Fp, Dp, S0, dw_data, Fp2=None, Dp2=None):
             adjusted_R2 = 1 - ((1 - R2) * (len(bvalues)) / (len(bvalues) - 6 - 1))
         R2[R2 < 0] = 0
         adjusted_R2[adjusted_R2 < 0] = 0
-    except:
+    except (IndexError, ValueError, TypeError):
         if Fp2 is None:
             datasim = ivim(bvalues, Dt, Fp, Dp, S0)
         else:
