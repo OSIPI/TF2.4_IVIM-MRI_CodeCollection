@@ -65,7 +65,7 @@ def generate_ADC_standalone(DWIdata, bvalues, bmin: int = 150, bmax: int = 1000,
 
     return ADClog, b0_intercept, use_bvalues
 
-def generate_IVIMmaps_standalone(DWIdata, bvalues, bminADC=150, bmaxADC=1000, bmaxDstar=50):
+def generate_IVIMmaps_standalone(DWIdata, bvalues, bminADC=150, bmaxADC=1000, bmaxDstar=75):
     """
     Function to calculate IVIM maps (perfusion fraction and D*).
     NOTE: D* is calculated using only the lowest two b-values.

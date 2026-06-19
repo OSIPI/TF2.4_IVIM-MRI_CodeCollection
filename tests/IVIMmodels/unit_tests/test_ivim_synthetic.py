@@ -45,8 +45,8 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
         bounds = data.get("bounds", None)
     else:
         bounds = None
-
-    fit = OsipiBase(algorithm=ivim_algorithm, bounds=bounds, initial_guess=initial_guess)
+    unique_bvals, inverse_idx = np.unique(bvals, return_inverse=True)
+    fit = OsipiBase(algorithm=ivim_algorithm, bounds=bounds, initial_guess=initial_guess, bvalues=unique_bvals)
     # here is a prior
 #    if use_prior and hasattr(fit, "supported_priors") and fit.supported_priors:
 #        prior = [rng.normal(D, D/3, 10), rng.normal(f, f/3, 10), rng.normal(Dp, Dp/3, 10), rng.normal(1, 1/3, 10)]
@@ -61,8 +61,17 @@ def test_generated(algorithmlist, ivim_data, SNR, rtol, atol, fit_count, rician_
         signal = gd.ivim_signal(D, Dp, f, S0, bvals, SNR, rician_noise)
         # else:
         #     signal = data["data"]
+        if len(unique_bvals) != len(bvals):
+            signal_avg = np.zeros(len(unique_bvals))
+            counts = np.zeros(len(unique_bvals))
+
+            for i, idx_unique in enumerate(inverse_idx):
+                signal_avg[idx_unique] += signal[i]
+                counts[idx_unique] += 1
+
+            signal = signal_avg / counts
         start_time = datetime.datetime.now()
-        fit_result = fit.osipi_fit(signal, bvals) #, prior_in=prior
+        fit_result = fit.osipi_fit(signal, unique_bvals) #, prior_in=prior
         time_delta += datetime.datetime.now() - start_time
         if save_file is not None:
             if bounds is None:
