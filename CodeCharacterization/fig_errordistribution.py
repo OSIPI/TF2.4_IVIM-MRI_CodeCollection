@@ -293,7 +293,8 @@ def create_boxplot(df, y_map, main_title, y_label, log=False, harmonization_step
                 y=y_map[param],
                 ax=ax,
                 order=algorithms_ordered,
-                showfliers=False
+                showfliers=False,
+                showmeans=True,
             )
             if log:
                 ax.set_yscale('log')
@@ -343,6 +344,9 @@ def adjust_ylim_to_box_from_data(ax, df, y_col, x_col, x_order, showfliers=False
     """
     y_min = np.inf
     y_max = -np.inf
+
+    # remove all entries in dataframe with Algorithm number 1 or 3
+    df = df[~df[x_col].isin([1, 3])]
 
     for x_val in x_order:
         y_data = df[df[x_col] == x_val][y_col].dropna()
