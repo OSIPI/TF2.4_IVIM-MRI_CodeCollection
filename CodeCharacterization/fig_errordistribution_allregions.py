@@ -90,6 +90,120 @@ def add_category_bands(ax, algorithm_categories, algorithms_ordered, category_la
     ax.figure.subplots_adjust(bottom=0.3)
 
 
+def create_barplot(df, y_map, main_title, y_label, log=False, harmonization_step='no_harmonization'):
+    # Define algorithm categories and which algorithms belong to each
+    df = df.dropna(how='all')
+
+    algorithm_categories = {
+        'Nonlinear LS': [
+            'TCML_TechnionIIT_lsqlm', 'TCML_TechnionIIT_lsqtrf', 'TCML_TechnionIIT_lsq_sls_lm',
+            'TCML_TechnionIIT_lsqBOBYQA', 'TCML_TechnionIIT_lsq_sls_trf', 'TCML_TechnionIIT_lsq_sls_BOBYQA',
+            'ASD_MemorialSloanKettering_QAMPER_IVIM', "IAR_LU_biexp",
+            "OGC_AmsterdamUMC_biexp"
+        ],
+        'Variable Projection': ['IAR_LU_modified_mix', 'IAR_LU_modified_topopro'],
+        'Linear LS': ['ETP_SRI_LinearFitting'],
+        'Segmented Linear LS ': ["TF_reference_IVIMfit", 'PvH_KB_NKI_IVIMfit'],
+        'Segmented Nonlinear LS': [
+                      'TCML_TechnionIIT_SLS', "IAR_LU_segmented_2step", "IAR_LU_segmented_3step",
+                      "IAR_LU_subtracted", 'OGC_AmsterdamUMC_biexp_segmented', 'PV_MUMC_biexp',
+                      "OJ_GU_seg", 'OJ_GU_segMATLAB'],
+        'Bayesian': ['OGC_AmsterdamUMC_Bayesian_biexp', 'OJ_GU_bayesMATLAB'],
+        'Neural network': ['IVIM_NEToptim', 'Super_IVIM_DC']
+    }
+
+    # Step 1: Map algorithm names to integer IDs
+    mapping = {}
+    counter = 1
+    for cat, algos in algorithm_categories.items():
+        for algo in algos:
+            mapping[algo] = counter
+            counter += 1
+
+    df = df.replace(mapping)
+
+    algorithm_categories = {
+        'Nonlinear LS': [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        'Variable Projection': [10, 11],
+        'Linear LS': [12],
+        'Segmented Linear LS ': [13, 14],
+        'Segmented Nonlinear LS': [15, 16, 17, 18, 19, 20, 21, 22],
+        'Bayesian': [23, 24],
+        'Neural network': [25, 26]
+    }
+
+    # Categorize algorithms
+    algo_categories = {}
+    for algo in df['Algorithm'].unique():
+        df_algo = df[df['Algorithm'] == algo]
+        algo_categories[algo] = categorize_algorithm(df_algo)
+
+    # Filter algorithms
+    algorithms_filtered = filter_algorithms_by_harmonization(algo_categories, harmonization_step)
+
+    # Update algorithm_categories and algorithms_ordered
+    # Filter algorithms per category, keeping original membership
+    algorithm_categories_filtered = {
+        cat: [algo for algo in algos if algo in algorithms_filtered]
+        for cat, algos in algorithm_categories.items()
+    }
+    # Remove empty categories
+    algorithm_categories_filtered = {cat: algos for cat, algos in algorithm_categories_filtered.items() if algos}
+
+    algorithms_ordered = []
+    for cat, algos in algorithm_categories_filtered.items():
+        algorithms_ordered.extend(algos)
+
+    # Filter df
+    df = df[df['Algorithm'].isin(algorithms_ordered)]
+
+    # Unique regions
+    regions = df['Region'].unique()
+    n_regions = len(regions)
+
+    fig, axes = plt.subplots(3, n_regions, figsize=(10, 12), squeeze=False)
+
+    for i, region in enumerate(regions):
+        df_region = df[df['Region'] == region]
+
+        for j, param in enumerate(['D', 'f', 'Dp']):
+            ax = axes[j, i]
+            sns.barplot(
+                data=df_region,
+                x='Algorithm',
+                y=y_map[param],
+                ax=ax,
+                order=algorithms_ordered
+            )
+            if log:
+                ax.set_yscale('log')
+
+            if param == 'D':
+                ax.set_ylabel(f'error in $D$' + ' (mm²/s)', fontsize=14)
+                ax.set_title(f'$D$')
+            if param == 'Dp':
+                ax.set_ylabel(f'error in $D^*$' + ' (mm²/s)', fontsize=14)
+                ax.set_title(f'$D^*$')
+            if param == 'f':
+                ax.set_ylabel(f'error in $f$' + ' (a.u.)', fontsize=14)
+                ax.set_title(f'$f$')
+            ax.set_xlabel('')
+            ax.axhline(0, color='gray', linestyle='--', linewidth=1)
+
+            # Add category bands below x-axis
+            if param == 'D' or param == 'f':
+                add_category_bands(ax, algorithm_categories_filtered, algorithms_ordered, category_labels=False)
+            elif param == 'Dp':
+                add_category_bands(ax, algorithm_categories_filtered, algorithms_ordered, category_labels=True)
+
+            # Remove legend if present
+            if ax.legend_:
+                ax.legend_.remove()
+
+        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+        return fig
+
+
 def create_boxplot(df, y_map, main_title, y_label, log=False, harmonization_step='no_harmonization'):
     # Define algorithm categories and which algorithms belong to each
     df = df.dropna(how='all')
@@ -351,7 +465,105 @@ for region in regions:
     fig.savefig(save_path)
     plt.close(fig)
 
-# 1. Boxplot of estimates
-# e_y_map = {'f': 'f_fitted', 'Dp': 'Dp_fitted', 'D': 'D_fitted'}
-# fig2 = create_boxplot(df, e_y_map, 'Estimate vs Estimation Method (grouped by category)', 'error', log=False)
-# plt.savefig('/home/rnga/dkuppens/TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/nobounds_noinitialguess/estimates_map_1000.png')
+# 2. Boxplot of squared errors
+regions = df["Region"].unique()
+e_y_map = {'f': 'f_squared_error', 'Dp': 'Dp_squared_error', 'D': 'D_squared_error'}
+
+for region in regions:
+    print(f"Processing region: {region}")
+
+    # ✅ EXACT line you requested
+    df_region = df[df["Region"] == region].copy()
+
+    fig = create_boxplot(
+        df_region,
+        e_y_map,
+        f'Squared rror vs Estimation Method ({region})',
+        'squared error',
+        log=False,
+        harmonization_step=harmonization_string
+    )
+
+    # Safe folder name
+    safe_region = region.replace(" ", "_").replace("/", "_")
+
+    save_folder = fr'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/{harmonization_string}/{safe_region}/'
+    os.makedirs(save_folder, exist_ok=True)
+
+    save_path = os.path.join(
+        save_folder,
+        rf'se_map_{safe_region}_SNR{str(SNR)}_{harmonization_string}_corrected.png'
+    )
+
+    print(f"Saving figure to {save_path}")
+    fig.savefig(save_path)
+    plt.close(fig)
+
+# 3. Barplot of variance
+regions = df["Region"].unique()
+e_y_map = {'f': 'f_var', 'Dp': 'Dp_var', 'D': 'D_var'}
+
+for region in regions:
+    print(f"Processing region: {region}")
+
+    # ✅ EXACT line you requested
+    df_region = df[df["Region"] == region].copy()
+
+    fig = create_barplot(
+        df_region,
+        e_y_map,
+        f'Variance vs Estimation Method ({region})',
+        'variance',
+        log=False,
+        harmonization_step=harmonization_string
+    )
+
+    # Safe folder name
+    safe_region = region.replace(" ", "_").replace("/", "_")
+
+    save_folder = fr'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/{harmonization_string}/{safe_region}/'
+    os.makedirs(save_folder, exist_ok=True)
+
+    save_path = os.path.join(
+        save_folder,
+        rf'var_map_{safe_region}_SNR{str(SNR)}_{harmonization_string}_corrected.png'
+    )
+
+    print(f"Saving figure to {save_path}")
+    fig.savefig(save_path)
+    plt.close(fig)
+
+# 4. Barplot of bias
+regions = df["Region"].unique()
+e_y_map = {'f': 'f_bias', 'Dp': 'Dp_bias', 'D': 'D_bias'}
+
+for region in regions:
+    print(f"Processing region: {region}")
+
+    # ✅ EXACT line you requested
+    df_region = df[df["Region"] == region].copy()
+
+    fig = create_barplot(
+        df_region,
+        e_y_map,
+        f'Bias vs Estimation Method ({region})',
+        'bias',
+        log=False,
+        harmonization_step=harmonization_string
+    )
+
+    # Safe folder name
+    safe_region = region.replace(" ", "_").replace("/", "_")
+
+    save_folder = fr'C:\TF_IVIM_OSIPI\TF2.4_IVIM-MRI_CodeCollection/CodeCharacterization/{harmonization_string}/{safe_region}/'
+    os.makedirs(save_folder, exist_ok=True)
+
+    save_path = os.path.join(
+        save_folder,
+        rf'bias_map_{safe_region}_SNR{str(SNR)}_{harmonization_string}_corrected.png'
+    )
+
+    print(f"Saving figure to {save_path}")
+    fig.savefig(save_path)
+    plt.close(fig)
+
