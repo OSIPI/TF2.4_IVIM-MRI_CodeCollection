@@ -50,7 +50,7 @@ class IvimModelSegmented2Step(ReconstModel):
             data = data / data_max
         
         ### Fit the diffusion signal to bvals >= diff_b_threshold_lower
-        diff_bounds = [(self.bounds[0][0], self.bounds[0][3]), \
+        diff_bounds = [(0, self.bounds[0][3]), \
             (self.bounds[1][0], self.bounds[1][3])] # Bounds for S0 and D
         
         diff_bval_indices = np.where(self.bvals >= self.diff_b_threshold_lower)[0]

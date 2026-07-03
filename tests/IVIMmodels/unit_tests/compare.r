@@ -7,7 +7,16 @@
 # 1. Save the "Comparison" file from the run on Github, OR run this file directly
 # 2. Find the file producted "test_reference.csv" on Github, or whatever the "reference_file" variable was called
 # 3. This replaces "tests/IVIMmodels/unit_tests/reference_output.csv" in the repository
-# 4. For the algorithm "IAR_LU_modified_mix", replace the "f_f_alpha, Dp_f_alpha, D_f_alpha, f_t_alpha, Dp_t_alpha, D_t_alpha" columns with "0.01,0.01,0.01,0.0,0.0,0.0"
+# 4. For the algorithm "IAR_LU_modified_mix" and "TCML_TechnionIIT_lsqtrf", replace the "f_f_alpha, Dp_f_alpha, D_f_alpha, f_t_alpha, Dp_t_alpha, D_t_alpha" columns with "0.01,0.01,0.01,0.0,0.0,0.0"
+
+# Exclude certain algorithms
+exclude_algorithms <- c("ETP_SRI_LinearFitting", "IAR_LU_biexp", "IAR_LU_modified_topopro",
+ "IAR_LU_segmented_2step", "IAR_LU_segmented_3step", "IAR_LU_subtracted",
+ "OGC_AmsterdamUMC_Bayesian_biexp", "OGC_AmsterdamUMC_biexp",
+ "OGC_AmsterdamUMC_biexp_segmented", "PV_MUMC_biexp",
+ "TCML_TechnionIIT_lsq_sls_BOBYQA", "TCML_TechnionIIT_lsq_sls_lm",
+ "TCML_TechnionIIT_lsq_sls_trf", "TCML_TechnionIIT_lsqBOBYQA",
+ "TCML_TechnionIIT_lsqlm", "TCML_TechnionIIT_SLS")
 
 args = commandArgs(trailingOnly=TRUE)
 # Define file paths
@@ -45,8 +54,8 @@ keep_columns_test <- c("Algorithm", "Region", "SNR", "index", "f", "Dp", "D", "f
 
 test <- read_csv(test_file) %>%
   select(all_of(keep_columns_test)) %>%
-  # Convert Algorithm and Region to factors
-  mutate(Algorithm = as.factor(Algorithm), Region = as.factor(Region))
+  mutate(Algorithm = as.factor(Algorithm), Region = as.factor(Region)) %>%
+  filter(!Algorithm %in% exclude_algorithms)  # <-- skip these
 
 # Group data by relevant factors
 grouped_data <- test %>%

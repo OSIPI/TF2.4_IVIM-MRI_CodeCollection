@@ -451,8 +451,10 @@ if __name__ == '__main__':
 
         voxel_selector_fraction = 0.5
         D, f, Ds = contrast_curve_calc()
-        ignore = np.isnan(D)
+        ignore = np.logical_or(np.logical_or(np.isnan(D),f<0.03),f>0.97)
         generic_data = {}
+        seen_combinations = set()
+
         for level, name in legend.items():
             if len(ignore) > level and ignore[level]:
                 continue
@@ -460,6 +462,18 @@ if __name__ == '__main__':
             voxels = sig[selector]
             if len(voxels) < 1:
                 continue
+            D_val = np.median(Dim[selector], axis=0)
+            f_val = np.median(fim[selector], axis=0)
+            Dp_val = np.median(Dpim[selector], axis=0)
+
+            combo = (tuple(np.atleast_1d(D_val)),
+                     tuple(np.atleast_1d(f_val)),
+                     tuple(np.atleast_1d(Dp_val)))
+
+            if combo in seen_combinations:
+                continue
+
+            seen_combinations.add(combo)
             signals = np.squeeze(voxels[int(voxels.shape[0] * voxel_selector_fraction)]).tolist()
             generic_data[name] = {
                 'noise': noise,

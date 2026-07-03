@@ -1,6 +1,6 @@
 import numpy as np
 from src.wrappers.OsipiBase import OsipiBase
-from src.original.PV_MUMC.two_step_IVIM_fit import fit_least_squares_array, fit_least_squares
+from src.original.PV_MUMC.two_step_IVIM_fit import fit_least_squares
 
 
 class PV_MUMC_biexp(OsipiBase):
@@ -39,10 +39,9 @@ class PV_MUMC_biexp(OsipiBase):
         """
         super(PV_MUMC_biexp, self).__init__(bvalues=bvalues, thresholds=thresholds, bounds=bounds, initial_guess=initial_guess)
         self.PV_algorithm = fit_least_squares
-        if bounds is not None:
-            print('warning, bounds from wrapper are not (yet) used in this algorithm')
-        self.use_bounds = False
-        self.use_initial_guess = False
+
+        self.use_bounds = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
+        self.use_initial_guess = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
         
     
     def ivim_fit(self, signals, bvalues=None):
@@ -55,14 +54,24 @@ class PV_MUMC_biexp(OsipiBase):
         Returns:
             _type_: _description_
         """
+        if self.bounds is None:
+            self.bounds = ([0.9, 0.0001, 0.0, 0.0025], [1.1, 0.003, 1, 0.2])
+        else:
+            bounds = ([self.bounds["S0"][0], self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0]],
+                    [self.bounds["S0"][1], self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1]])
         
         if self.thresholds is None:
             self.thresholds = 200
-        
-        if self.bounds is None:
-            self.bounds = ([0.9, 0.0001, 0.0, 0.0025], [1.1, 0.003, 1, 0.2])
 
-        fit_results = self.PV_algorithm(bvalues, signals, bounds=self.bounds, cutoff=self.thresholds)
+        DEFAULT_PARAMS = [0.003,0.1,0.05]
+
+        try:
+            fit_results = self.PV_algorithm(bvalues, signals, bounds=bounds, cutoff=self.thresholds)
+        except RuntimeError as e:
+            if "maximum number of function evaluations" in str(e):
+                fit_results = DEFAULT_PARAMS
+            else:
+                raise
 
         results = {} 
         results["f"] = fit_results[1]

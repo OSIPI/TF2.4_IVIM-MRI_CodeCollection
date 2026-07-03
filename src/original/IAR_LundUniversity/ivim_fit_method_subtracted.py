@@ -52,7 +52,7 @@ class IvimModelSubtracted(ReconstModel):
             data = data / data_max
         
         ### Fit the diffusion signal to bvals >= diff_b_threshold_lower
-        diff_bounds = [(self.bounds[0][0], self.bounds[0][3]), \
+        diff_bounds = [(0, self.bounds[0][3]), \
             (self.bounds[1][0], self.bounds[1][3])] # Bounds for S0 and D
         
         diff_bval_indices = np.where(self.bvals >= self.diff_b_threshold_lower)[0]
@@ -64,7 +64,7 @@ class IvimModelSubtracted(ReconstModel):
         
         
         ### Fit the perfusion signal to bvals <= perf_b_threshold_upper
-        perf_bounds = [(self.bounds[0][0], self.bounds[0][2]), \
+        perf_bounds = [(0, self.bounds[0][2]), \
             (self.bounds[1][0], self.bounds[1][2])] # Bounds for S0 and D*
         
         perf_bvals = self.bvals[self.bvals <= self.perf_b_threshold_upper]

@@ -9,6 +9,8 @@ def summarize_test_report(input_file:str, output_file:str):
         report_info = json.load(f)
     summary = []
     for test_case in report_info['tests']:
+        if 'user_properties' not in test_case:
+            continue
         values = test_case['user_properties'][0]['test_data']
         values['status'] = test_case['outcome']
         summary.append(values)

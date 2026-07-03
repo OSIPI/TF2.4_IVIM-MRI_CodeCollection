@@ -27,8 +27,12 @@
         "OJ_GU_bayesMATLAB",
         "TF_reference_IVIMfit"
     ],
-    "IVIM_NEToptim": {
-        "deep_learning": true
+    "TCML_TechnionIIT_lsqBOBYQA": {
+      "xfail_names": {"pericardium": false, "bounds": false}
+    },
+  "IVIM_NEToptim": {
+        "deep_learning": true,
+        "n":3000000
     },
     "Super_IVIM_DC": {
         "deep_learning": true

@@ -19,7 +19,7 @@ class IVIM_NEToptim(OsipiBase):
     id_algorithm_type = "Deep learnt bi-exponential fit"
     id_return_parameters = "f, D*, D, S0"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
-
+    id_ref = "https://doi.org/10.1002/mrm.28852"
     # Algorithm requirements
     required_bvalues = 4
     required_thresholds = [0,
@@ -36,7 +36,7 @@ class IVIM_NEToptim(OsipiBase):
     supported_initial_guess = False
     supported_thresholds = False
 
-    def __init__(self, SNR=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, fitS0=True, traindata=None):
+    def __init__(self, SNR=None, bvalues=None, thresholds=None, bounds=None, initial_guess=None, fitS0=True, traindata=None, n=5000000):
         """
             Everything this algorithm requires should be implemented here.
             Number of segmentation thresholds, bounds, etc.
@@ -50,9 +50,9 @@ class IVIM_NEToptim(OsipiBase):
         super(IVIM_NEToptim, self).__init__(bvalues=bvalues, bounds=bounds, initial_guess=initial_guess)
         self.fitS0=fitS0
         self.bvalues=np.array(bvalues)
-        self.initialize(bounds, initial_guess, fitS0, traindata, SNR)
+        self.initialize(bounds, initial_guess, fitS0, traindata, SNR, n)
 
-    def initialize(self, bounds, initial_guess, fitS0, traindata, SNR):
+    def initialize(self, bounds, initial_guess, fitS0, traindata, SNR, n):
         self.fitS0=fitS0
         self.deep_learning = True
         self.supervised = False
@@ -62,13 +62,26 @@ class IVIM_NEToptim(OsipiBase):
         if traindata is None:
             warnings.warn('no training data provided (traindata = None). Training data will be simulated')
             if SNR is None:
-                warnings.warn('No SNR indicated. Data simulated with SNR = (5-1000)')
-                SNR = (5, 1000)
-            self.training_data(self.bvalues,n=1000000,SNR=SNR)
+                warnings.warn('No SNR indicated. Data simulated with SNR = (5-100)')
+                SNR = (5, 100)
+            self.training_data(self.bvalues,n=n,SNR=SNR)
         self.arg=Arg()
+        print('note that the bounds in the network are soft bounds and implemented by a sigmoid transform. In order for the network to be sensitive over the range, we extend the bounds ny 30%')
         if bounds is not None:
-            self.arg.net_pars.cons_min = bounds[0]  # Dt, Fp, Ds, S0
-            self.arg.net_pars.cons_max = bounds[1]  # Dt, Fp, Ds, S0
+            self.bounds = bounds
+        else:
+            warnings.warn('No bounds indicated. default bounds are used of         self.cons_min = [0, 0, 0.005, 0]   and self.cons_max = [0.005, 1, 0.2, 2.0]  # Dt, Fp, Ds, S0')
+            self.bounds = {"S0" : [0, 2], "f" : [0, 1], "Dp" : [0.005, 0.2], "D" : [0, 0.005]} # These are defined as [lower, upper]
+        self.arg.net_pars.cons_min = np.array([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]])#bounds[0]  # Dt, Fp, Ds, S0
+        self.arg.net_pars.cons_max = np.array([self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])#bounds[1]  # Dt, Fp, Ds, S0
+
+        boundsrange = 0.3 * (np.array(self.arg.net_pars.cons_max)-np.array(self.arg.net_pars.cons_min)) # ensure that we are on the most lineair bit of the sigmoid function
+        self.arg.net_pars.cons_min = np.array(self.arg.net_pars.cons_min) - boundsrange
+        self.arg.net_pars.cons_max = np.array(self.arg.net_pars.cons_max) + boundsrange
+        self.bounds={"S0" : [self.arg.net_pars.cons_min[3], self.arg.net_pars.cons_max[3]], "f" : [self.arg.net_pars.cons_min[1], self.arg.net_pars.cons_max[1]], "Dp" : [self.arg.net_pars.cons_min[2], self.arg.net_pars.cons_max[2]], "D" : [self.arg.net_pars.cons_min[0], self.arg.net_pars.cons_max[0]]} # These are defined as [lower, upper]
+
+        self.use_bounds = {"f": True, "Dp": True, "D": True}
+        self.use_initial_guess = {"f": False, "Dp": False, "D": False}
         if traindata is None:
             self.net = deep.learn_IVIM(self.train_data['data'], self.bvalues, self.arg)
         else:
@@ -111,6 +124,10 @@ class IVIM_NEToptim(OsipiBase):
         """
         if not np.array_equal(bvalues, self.bvalues):
             raise ValueError("bvalue list at fitting must be identical as the one at initiation, otherwise it will not run")
+        minimum_bvalue = np.min(self.bvalues) # We normalize the signal to the minimum bvalue. Should be 0 or very close to 0.
+        b0_indices = np.where(self.bvalues == minimum_bvalue)[0]
+        normalization_factor = np.mean(signals[..., b0_indices],axis=-1)
+        signals = signals / np.repeat(normalization_factor[...,np.newaxis],np.shape(signals)[-1],-1)
 
         signals, shape = self.reshape_to_voxelwise(signals)
         if retrain_on_input_data:
@@ -137,7 +154,7 @@ class IVIM_NEToptim(OsipiBase):
         return data.reshape(voxels, B), data.shape
 
 
-    def training_data(self, bvalues, data=None, SNR=(5,1000), n=1000000,Drange=(0.0005,0.0034),frange=(0,1),Dprange=(0.005,0.1),rician_noise=False):
+    def training_data(self, bvalues, data=None, SNR=(5,100), n=5000000,Drange=(0.0003,0.0035),frange=(0,1),Dprange=(0.005,0.12),rician_noise=False):
         rng = np.random.RandomState(42)
         if data is None:
             gen = GenerateData(rng=rng)

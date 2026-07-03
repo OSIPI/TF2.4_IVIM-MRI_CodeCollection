@@ -21,6 +21,7 @@ class Super_IVIM_DC(OsipiBase):
     id_algorithm_type = "Supervised Deep learnt bi-exponential fit with data consistency"
     id_return_parameters = "f, D*, D, S0"
     id_units = "seconds per milli metre squared or milliseconds per micro metre squared"
+    id_ref = "https://doi.org/10.1007/978-3-031-16434-7_71"
 
     # Algorithm requirements
     required_bvalues = 4
@@ -58,8 +59,8 @@ class Super_IVIM_DC(OsipiBase):
             warnings.warn('No SNR indicated. Data simulated with SNR = 100')
             SNR=100
         self.fitS0=fitS0
-        self.use_initial_guess = False
-        self.use_bounds = False
+        self.use_initial_guess = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
+        self.use_bounds = {"f" : False, "D" : False, "Dp" : False, "S0" : False}
         self.deep_learning = True
         self.supervised = True
 
