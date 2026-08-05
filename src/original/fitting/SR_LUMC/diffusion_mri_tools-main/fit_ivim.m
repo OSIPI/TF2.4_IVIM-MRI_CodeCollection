@@ -186,7 +186,7 @@ for v = 1:size(datafit, 2)
         case 'segmented'
             %optional: select desired b-value range (if full range was
             %acquired)
-            if options.seg_data && v == 1
+            if options.seg_data
                 tmpdat = [tmpdat(tmpb==0); tmpdat(tmpb>=options.bcut)];
                 tmpb = [tmpb(tmpb==0); tmpb(tmpb>=options.bcut)];
             end
