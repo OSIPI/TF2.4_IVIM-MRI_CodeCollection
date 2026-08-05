@@ -5,21 +5,23 @@ arguments
     options.bval = []
 end
 
+idx = data == 0;
+
 if isstruct(diffparams)
     %IVIM-DTI
-    diffparams.bval(data==0) = [];
-    diffparams.diffdir(data==0,:) = [];
+    diffparams.bval(idx) = [];
+    diffparams.diffdir(idx,:) = [];
 elseif isvector(diffparams)
     %IVIM, diffparams = bval
-    diffparams(data==0) = [];
+    diffparams(idx) = [];
 else
     %DTI, diffparams = b-matrix
-    diffparams(data==0,:) = [];
+    diffparams(idx,:) = [];
 end
-data(data==0) = [];
+data(idx) = [];
 
 if ~isempty(options.bval)
-    options.bval(data==0) = [];
+    options.bval(idx) = [];
     varargout{1} = options.bval;
 end
 
