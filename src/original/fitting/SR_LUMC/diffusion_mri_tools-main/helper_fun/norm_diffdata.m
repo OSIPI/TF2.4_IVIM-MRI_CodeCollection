@@ -19,14 +19,14 @@ if ndims(data) > 2 %#ok<ISMAT>
 end
 
 % check if b0 data is provided
-if min(bval) >= 1
+if min(bval) > 0
     fprintf('No b = 0 data provided. Normalize to minimum b-value data: %.2f s/mm². \n',...
         min(bval))
-    mS0 = mean(data((bval == min(bval)),:), 1);
 else
-    fprintf('Normalize data to b = %.2f data. \n', min(bval))
-    mS0 = mean(data(bval<1, :), 1);
+    fprintf('Normalize data to b = %.2f data. \n', min(bval))   
 end
+
+mS0 = mean(data((bval == min(bval)),:), 1);
 
 normalized = data ./ mS0;
 normalized(isnan(normalized)) = 0;
