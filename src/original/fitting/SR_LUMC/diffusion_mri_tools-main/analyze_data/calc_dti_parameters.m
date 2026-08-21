@@ -83,6 +83,7 @@ if options.clip
     dti_params.eigenval(dti_params.eigenval>10) = 0;
     dti_params.eigenval(dti_params.eigenval<0) = 0;
     dti_params.FA(dti_params.FA>1) = 0;
+    dti_params.FA(~isfinite(dti_params.FA)) = 0;
 end
 
 fprintf('Tensor calculation finished in %.2f seconds. \n', toc);
