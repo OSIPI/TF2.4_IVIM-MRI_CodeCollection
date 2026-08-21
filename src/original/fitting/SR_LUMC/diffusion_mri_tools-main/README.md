@@ -4,6 +4,8 @@ Diffusion MRI Tools contains Matlab code to analyze and process diffusion MRI da
 
 Author: Susi Rauh (s.s.rauh@lumc.nl) 
 
+Run setup.m once before using any project functions to add the subfolders to the path. 
+
 Three types of fitting are currently implemented: 
 * IVIM fit
 * DTI fit
