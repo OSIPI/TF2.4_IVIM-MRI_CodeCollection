@@ -60,8 +60,10 @@ class IAR_LU_modified_mix(OsipiBase):
             bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
-            
-            bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000], 
+            if self.bounds == None:
+                bounds = [[0, 0.005, 0][1, 0.1, 0.004]]
+            else:
+                bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000],
                       [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
 
             self.IAR_algorithm = IvimModelVP(gtab, bounds=bounds, rescale_units=False, rescale_results_to_mm2_s=True)
@@ -80,8 +82,11 @@ class IAR_LU_modified_mix(OsipiBase):
             _type_: _description_
         """
 
-        bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000], 
-                  [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
+        if self.bounds == None:
+            bounds = [[0, 0.005, 0][1, 0.1, 0.004]]
+        else:
+            bounds = [[self.bounds["f"][0], self.bounds["Dp"][0] * 1000, self.bounds["D"][0] * 1000],
+                      [self.bounds["f"][1], self.bounds["Dp"][1] * 1000, self.bounds["D"][1] * 1000]]
         
         if self.IAR_algorithm is None:
             if bvalues is None:

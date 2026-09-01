@@ -66,15 +66,18 @@ class TF_reference_IVIMfit(OsipiBase):
         Returns:
             _type_: _description_
         """
-        bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+        if self.bounds == None:
+            bounds =([0.0001, 0.0, 0.001], [0.004, 0.7, 0.01])
+
+        else:
+            bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
                   [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
 
         bvalues = np.array(bvalues)
 
-        if np.any(signals < 0):
+        if np.any(signals <= 0):
             signals = np.clip(signals,0.01, None)
-            print('warning, negative values in signal: values clipped to 0.01')
-
+            #print('warning, negative values in signal: values clipped to 0.01')
 
         fit_results = self.TF_reference_algorithm(bvalues,signals,b_cutoff=self.thresholds, bounds=bounds)
 

@@ -60,10 +60,15 @@ class IAR_LU_biexp(OsipiBase):
             bvec = np.zeros((self.bvalues.size, 3))
             bvec[:,2] = 1
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
-
-            bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]],
+            if bounds == None:
+                bounds = np.array([(0, 0, 0.005, 0), (np.inf, 1, 0.1, 0.004)])
+            else:
+                bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]],
                       [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
-            initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"],
+            if initial_guess == None:
+                initial_guess = (1, 0.2, 0.03, 0.001)
+            else:
+                initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"],
                              self.initial_guess["D"]]
             
             self.IAR_algorithm = IvimModelBiExp(gtab, bounds=bounds, initial_guess=initial_guess)
@@ -83,10 +88,16 @@ class IAR_LU_biexp(OsipiBase):
         """
 
         # Make sure bounds and initial guess conform to the algorithm requirements
-        bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]], 
-                       [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
-        initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
-        
+        if bounds == None:
+            bounds = np.array([(0, 0, 0.005, 0), (np.inf, 1, 0.1, 0.004)])
+        else:
+            bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]],
+                      [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
+        if initial_guess == None:
+            initial_guess = (1, 0.2, 0.03, 0.001)
+        else:
+            initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"],
+                             self.initial_guess["D"]]
         if self.IAR_algorithm is None:
             if bvalues is None:
                 bvalues = self.bvalues

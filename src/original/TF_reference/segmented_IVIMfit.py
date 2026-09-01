@@ -17,7 +17,7 @@ def ivim_biexp(bvalues, D, f, Dp, S0=1):
 def segmented_IVIM_fit(bvalues, dw_data, b_cutoff = 200, bounds=([0.0001, 0.0, 0.001], [0.004, 0.7, 0.01])):
     """
         A segmented fitting implementation for a bi-exponential model.
-        First D is fitted using a mono exponential model on all signal above the bvalue cutoff using an iterative WLLSVertrekpassage, Schiphol
+        First D is fitted using a mono exponential model on all signal above the bvalue cutoff using an iterative WLLS
         Then f is fitted by using the b=0 intercept from the mono expontential fit and substracting this from the measured signal at b=0
         Then D* is fitted using a bi-exponential model with fixed D and f
 

@@ -61,12 +61,19 @@ class IAR_LU_subtracted(OsipiBase):
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
 
             # Adapt the bounds to the format needed for the algorithm
-            bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]], \
-                        [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
-            
+            if self.bounds == None:
+                bounds = np.array([(0, 0, 0.005, 0), (np.inf, 1, 0.1, 0.004)])
+            else:
+                bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]], \
+                          [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
+
             # Adapt the initial guess to the format needed for the algorithm
-            initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
-            
+            if self.initial_guess:
+                initial_guess = (1, 0.2, 0.03, 0.001)
+            else:
+                initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"],
+                                 self.initial_guess["D"]]
+
             self.IAR_algorithm = IvimModelSubtracted(gtab, bounds=bounds, initial_guess=initial_guess)
         else:
             self.IAR_algorithm = None
@@ -83,11 +90,18 @@ class IAR_LU_subtracted(OsipiBase):
             _type_: _description_
         """
         # Adapt the bounds to the format needed for the algorithm
-        bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]], \
-                       [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
-        
+        if self.bounds == None:
+            bounds = np.array([(0, 0, 0.005, 0), (np.inf, 1, 0.1, 0.004)])
+        else:
+            bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]], \
+                      [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
+
         # Adapt the initial guess to the format needed for the algorithm
-        initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]
+        if self.initial_guess:
+            initial_guess = (1, 0.2, 0.03, 0.001)
+        else:
+            initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"],
+                             self.initial_guess["D"]]
         
         if self.IAR_algorithm is None:
             if bvalues is None:

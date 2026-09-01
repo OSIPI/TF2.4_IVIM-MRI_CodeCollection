@@ -52,6 +52,8 @@ class IAR_LU_modified_topopro(OsipiBase):
         self.stochastic = True
 
         # Check the inputs
+        if self.bounds == None:
+            self.bounds = {"f" : [0, 1.0], "Dp" : [0.005, 0.1], "D" : [0, 0.004]}
         if self.bounds["Dp"][0] == self.bounds["D"][1]:
             print('warning, bounds for D* and D are equal, this will likely cause fitting errors. Setting D_upper to 99 percent of D_upper')
             self.bounds["D"][1] = self.bounds["D"][1]*0.99
@@ -81,6 +83,8 @@ class IAR_LU_modified_topopro(OsipiBase):
         Returns:
             _type_: _description_
         """
+        if self.bounds == None:
+            self.bounds = {"f" : [0, 1.0], "Dp" : [0.005, 0.1], "D" : [0, 0.005]}
         bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000], 
                   [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
         

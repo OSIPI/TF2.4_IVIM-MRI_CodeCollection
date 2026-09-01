@@ -1,3 +1,4 @@
+from CodeCharacterization.ivim_fitting_skippedalgorithms import initial_guess
 from src.wrappers.OsipiBase import OsipiBase
 import numpy as np
 import matlab.engine
@@ -87,10 +88,16 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         Returns:
             _type_: _description_
         """
-        bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
-                  [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
 
-        initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
+        if self.bounds == None:
+            bounds = ([1e-6, 0, 1e-6, 0], [0.003, 1, 5e-2, 2]) # taken from IVIM_standard_bcin.m
+        else:
+            bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
+                      [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
+        if self.initial_guess == None:
+            initial_guess = ([1e-3, 0.2, 1e-2, 1])
+        else:
+            initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
 
         bvalues=np.array(bvalues)
         LB = np.array(bounds[0])[[1,0,2,3]]
