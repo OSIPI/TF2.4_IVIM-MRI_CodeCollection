@@ -1,4 +1,3 @@
-from CodeCharacterization.ivim_fitting_skippedalgorithms import initial_guess
 from src.wrappers.OsipiBase import OsipiBase
 from src.original.OGC_AmsterdamUMC.LSQ_fitting import fit_segmented, fit_segmented_array
 import numpy as np

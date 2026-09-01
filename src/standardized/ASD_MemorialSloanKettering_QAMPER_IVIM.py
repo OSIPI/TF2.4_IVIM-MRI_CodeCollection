@@ -90,7 +90,7 @@ class ASD_MemorialSloanKettering_QAMPER_IVIM(OsipiBase):
         """
 
         if self.bounds == None:
-            bounds = ([1e-6, 0, 1e-6, 0], [0.003, 1, 5e-2, 2]) # taken from IVIM_standard_bcin.m
+            bounds = np.array([1e-6, 0, 1e-6, 0], [0.003, 1, 5e-2, 2]) # taken from IVIM_standard_bcin.m
         else:
             bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
                       [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])

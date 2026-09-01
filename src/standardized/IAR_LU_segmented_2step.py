@@ -68,7 +68,7 @@ class IAR_LU_segmented_2step(OsipiBase):
                           [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
         
             # Adapt the initial guess to the format needed for the algorithm
-            if self.initial_guess:
+            if self.initial_guess == None:
                 initial_guess = (1, 0.2, 0.03, 0.001)
             else:
                 initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["D"]]

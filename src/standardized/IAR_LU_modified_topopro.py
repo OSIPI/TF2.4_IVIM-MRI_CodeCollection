@@ -85,6 +85,7 @@ class IAR_LU_modified_topopro(OsipiBase):
         """
         if self.bounds == None:
             self.bounds = {"f" : [0, 1.0], "Dp" : [0.005, 0.1], "D" : [0, 0.005]}
+
         bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000], 
                   [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
         
