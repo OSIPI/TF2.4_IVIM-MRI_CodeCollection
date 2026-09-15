@@ -25,6 +25,8 @@ If you would like to use code from the repository and/or are new to Github or IV
 If you would like to use MATLAB-based algorithms or apply the testing framework to one of these algorithms, please have a look at these instructions:
 * [MATLAB-related instructions](doc/matlab_instructions.md)
 
+Note that by submitting a contribution to this repository, you agree that your contribution will be licensed under the Apache License, Version 2.0.
+
 ## Repository Organization
 
 The repository is organized in four main folders along with configuration files for automated testing. 
