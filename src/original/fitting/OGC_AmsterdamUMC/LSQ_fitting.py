@@ -641,7 +641,7 @@ def fit_bayesian_array(bvalues, dw_data, paramslsq, arg):
     return Dt_pred, Fp_pred, Dp_pred, S0_pred
 
 
-def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05, 1], fitS0=True, bounds=([0,0,0,0],[0.005,1.5,2,2.5])):
+def fit_bayesian(bvalues, dw_data, neg_log_prior, x0=[0.001, 0.2, 0.05, 1], fitS0=True, bounds=([0,0,0.005,0.7],[0.005,0.7,0.2,1.3])):
     '''
     This is an implementation of the Bayesian IVIM fit. It returns the Maximum a posterior probability.
     The fit is taken from Barbieri et al. which was initially introduced in http://arxiv.org/10.1002/mrm.25765 and
