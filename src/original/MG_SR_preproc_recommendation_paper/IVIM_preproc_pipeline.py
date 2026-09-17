@@ -20,6 +20,11 @@ from dipy.align.metrics import CCMetric
 
 """MUST BE TESTED!"""
 
+DENOISE_METHODS = {
+    "mppca": mppca,
+    "localpca": localpca,
+}
+
 #________________________________________________________________________________________________________________
 # MAIN RUNNER
 
@@ -108,21 +113,12 @@ def load_data(data_path):
 # ________________________________________________________________________________________________________________
 # DENOISING
 
-def denoise(data, bvals, bvecs, cfg):
+def denoise(data, cfg):
     method = cfg.denoise.method
-    patch_radius = cfg.denoise.patch_radius
-    
-    if method == "mppca":
-        data_denoised, sigma = mppca(data, patch_radius=patch_radius, return_sigma=True) #return_sigma=True ?
-    elif method == "localpca":
-        gtab = gradient_table(bvals, bvecs)
-        sigma = pca_noise_estimate(data, gtab, patch_radius=patch_radius)
-        data_denoised = localpca(data, sigma=sigma, patch_radius=patch_radius)
-    else:
-        raise ValueError(f"Invalid denoising method: {method}")
+    method = DENOISE_METHODS[method]
+    data, sigma = method(data, patch_radius=cfg.denoise.patch_radius)
 
-    
-    return data_denoised, sigma
+    return data, sigma
 
 # ______________________________________________________________________________________________________________
 # MOTION CORRECTION
