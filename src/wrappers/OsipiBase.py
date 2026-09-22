@@ -616,7 +616,7 @@ class OsipiBase:
         if self.id_ref:
             lines.append(
                 f"This implementation should additionally be cited according to its "
-                f"original publication: {self.id_ref}.\n"
+                f"original publication: {self.id_ref}"+"\n"
             )
 
         # --- b-values ---
@@ -637,7 +637,7 @@ class OsipiBase:
             bp_note = (
                 f" for {self.body_part} tissue" if defaulted and getattr(self, "body_part", None) else ""
             )
-            source_note = " (default values)" if defaulted else ""
+            source_note = " (OSIPI default values)" if defaulted else ""
             lines.append(
                 f"Initial parameter guesses were set to {', '.join(parts)}{bp_note}{source_note}."
             )
@@ -672,5 +672,5 @@ class OsipiBase:
                 "for reproducibility."
             )
 
-        return citation_text
+        return
 
