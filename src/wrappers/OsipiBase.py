@@ -165,7 +165,6 @@ class OsipiBase:
         self.osipi_bounds = self.bounds # Variable that stores the original bounds before they are passed to the algorithm
         self.osipi_initial_guess = self.initial_guess # Variable that stores the original initial guesses before they are passed to the algorithm
 
-        self.id_ref = None
         # If the user inputs an algorithm to OsipiBase, it is intereprete as initiating
         # an algorithm object with that name.
         if algorithm:
@@ -584,9 +583,94 @@ class OsipiBase:
             results['f']=1-results['f']
         return results
 
-    def cite(self):
-        print("thank you for using our repository. If it was useful for your paper, please cite our upcoming paper in MRM.")
-        if self.id_ref is not None:
-            print("The current fit method you have loaded should be cited with: " + self.id_ref)
-        else:
-            print("The used fit code has not yet provided a code-speicific reference.")
+    def cite(self, verbose=True):
+        """
+        Generate a citation-ready methods-section sentence describing the
+        fitting algorithm, initial guesses, bounds, b-values, and thresholds
+        actually used by this instance.
+
+        Parameters
+        ----------
+        verbose : bool, optional
+            If True (default), also prints the generated text and a reminder
+            to cite the OSIPI repository release.
+
+        Returns
+        -------
+        str
+            The generated citation-ready sentence(s).
+        """
+        self.id_ref = getattr(self, 'id_ref', None)
+        algorithm_name = self.__class__.__name__
+        lines = []
+
+        # --- Algorithm identification ---
+        method_sentence = f"IVIM fitting was performed using the {algorithm_name} algorithm"
+        method_sentence += (
+            ", implemented within the OSIPI IVIM code repository "
+            "(An open-source code repository for intravoxel incoherent motion analysis: ISMRM Open Science Initiative for Perfusion Imaging (OSIPI); "
+            "Jalnefjord et al., MRM 2026, in press)."
+        )
+        lines.append(method_sentence)
+
+        if self.id_ref:
+            lines.append(
+                f"This implementation should additionally be cited according to its "
+                f"original publication: {self.id_ref}"+"\n"
+            )
+
+        # --- b-values ---
+        if self.bvalues is not None:
+            bstr = ", ".join(
+                str(int(b)) if float(b).is_integer() else str(b) for b in self.bvalues
+            )
+            lines.append(f"Fitting was performed using b-values of {bstr} s/mm\u00b2.")
+
+        # --- Initial guesses ---
+        if self.initial_guess is not None:
+            ig = self.initial_guess
+            if isinstance(ig, dict):
+                parts = [f"{k} = {v}" for k, v in ig.items()]
+            else:
+                parts = [str(v) for v in ig]
+            defaulted = getattr(self, "forced_default_initial_guess", False)
+            bp_note = (
+                f" for {self.body_part} tissue" if defaulted and getattr(self, "body_part", None) else ""
+            )
+            source_note = " (OSIPI default values)" if defaulted else ""
+            lines.append(
+                f"Initial parameter guesses were set to {', '.join(parts)}{bp_note}{source_note}."
+            )
+
+        # --- Bounds ---
+        if self.bounds is not None:
+            b = self.bounds
+            if isinstance(b, dict):
+                parts = [f"{k} = [{v[0]}, {v[1]}]" for k, v in b.items()]
+            else:
+                parts = [str(v) for v in b]
+            defaulted = getattr(self, "forced_default_bounds", False)
+            bp_note = (
+                f" for {self.body_part} tissue" if defaulted and getattr(self, "body_part", None) else ""
+            )
+            source_note = " (default values)" if defaulted else ""
+            lines.append(
+                f"Parameter bounds were constrained to {', '.join(parts)}{bp_note}{source_note}."
+            )
+
+        # --- Thresholds ---
+        if self.thresholds is not None and np.size(self.thresholds) > 0 and self.supported_thresholds:
+            tstr = ", ".join(str(t) for t in np.atleast_1d(self.thresholds))
+            lines.append(f"A b-value threshold (or thresholds) of {tstr} s/mm\u00b2 was applied.")
+
+        citation_text = " ".join(lines)
+
+        if verbose:
+            print(citation_text)
+            print(
+                "\nPlease also acknowledge the specific OSIPI code repository release you used "
+                "for reproducibility."
+            )
+
+        return
+
