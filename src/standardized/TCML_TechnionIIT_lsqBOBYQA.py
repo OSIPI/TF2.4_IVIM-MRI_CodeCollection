@@ -71,8 +71,12 @@ class TCML_TechnionIIT_lsqBOBYQA(OsipiBase):
         """
 
         bvalues=np.array(bvalues)
+        if self.bounds == None:
+            self.bounds = {"S0" : [0.7, 1.3], "f" : [0, 1.0], "Dp" : [0.005, 0.2], "D" : [0, 0.005]}
         bounds = ([self.bounds["D"][0], self.bounds["Dp"][0], self.bounds["f"][0], self.bounds["S0"][0]],
                        [self.bounds["D"][1], self.bounds["Dp"][1], self.bounds["f"][1], self.bounds["S0"][1]])
+        if self.initial_guess == None:
+            self.initial_guess = {"S0": 1, "f": 0.1, "Dp": 0.01, "D": 0.001}
         initial_guess = [self.initial_guess["D"], self.initial_guess["Dp"], self.initial_guess["f"], self.initial_guess["S0"]]
 
         fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], bounds, initial_guess.copy())

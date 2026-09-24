@@ -69,6 +69,9 @@ class TCML_TechnionIIT_lsq_sls_BOBYQA(OsipiBase):
         """
         signals[signals<0]=0
         bvalues=np.array(bvalues)
+
+        if self.bounds == None:
+            self.bounds = {"S0" : [0.7, 1.3], "f" : [0, 1.0], "Dp" : [0.005, 0.2], "D" : [0, 0.005]}
         bounds = ([self.bounds["D"][0], self.bounds["Dp"][0], self.bounds["f"][0], self.bounds["S0"][0]],
                        [self.bounds["D"][1], self.bounds["Dp"][1], self.bounds["f"][1], self.bounds["S0"][1]])
         

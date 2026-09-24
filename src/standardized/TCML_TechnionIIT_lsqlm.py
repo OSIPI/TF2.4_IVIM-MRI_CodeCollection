@@ -68,6 +68,8 @@ class TCML_TechnionIIT_lsqlm(OsipiBase):
         """
 
         bvalues=np.array(bvalues)
+        if self.initial_guess == None:
+            self.initial_guess = {"S0": 1, "f": 0.1, "Dp": 0.01, "D": 0.001}
         initial_guess = [self.initial_guess["D"], self.initial_guess["Dp"], self.initial_guess["f"], self.initial_guess["S0"]]
         fit_results = self.fit_least_squares(bvalues, np.array(signals)[:,np.newaxis], initial_guess)
 

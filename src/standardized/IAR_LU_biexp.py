@@ -88,12 +88,12 @@ class IAR_LU_biexp(OsipiBase):
         """
 
         # Make sure bounds and initial guess conform to the algorithm requirements
-        if bounds == None:
+        if self.bounds == None:
             bounds = np.array([(0, 0, 0.005, 0), (np.inf, 1, 0.1, 0.004)])
         else:
             bounds = [[self.bounds["S0"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["D"][0]],
                       [self.bounds["S0"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["D"][1]]]
-        if initial_guess == None:
+        if self.initial_guess == None:
             initial_guess = (1, 0.2, 0.03, 0.001)
         else:
             initial_guess = [self.initial_guess["S0"], self.initial_guess["f"], self.initial_guess["Dp"],

@@ -108,6 +108,8 @@ class Super_IVIM_DC(OsipiBase):
         )
 
         results = {}
+        if Dt.shape[0] == 0 or np.isnan(Dt).any():
+            breakpoint()
         results["D"] = Dt
         results["f"] = f
         results["Dp"] = Dp

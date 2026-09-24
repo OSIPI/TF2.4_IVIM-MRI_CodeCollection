@@ -61,7 +61,7 @@ class IAR_LU_modified_mix(OsipiBase):
             bvec[:,2] = 1
             gtab = gradient_table(self.bvalues, bvec, b0_threshold=0)
             if self.bounds == None:
-                bounds = [[0, 0.005, 0][1, 0.1, 0.004]]
+                bounds = np.array([[0, 0.005, 0],[1, 0.1, 0.004]])
             else:
                 bounds = [[self.bounds["f"][0], self.bounds["Dp"][0]*1000, self.bounds["D"][0]*1000],
                       [self.bounds["f"][1], self.bounds["Dp"][1]*1000, self.bounds["D"][1]*1000]]
@@ -83,7 +83,7 @@ class IAR_LU_modified_mix(OsipiBase):
         """
 
         if self.bounds == None:
-            bounds = np.array([[0, 0.005, 0][1, 0.1, 0.004]])
+            bounds = np.array([[0, 0.005, 0], [1, 0.1, 0.004]])
         else:
             bounds = [[self.bounds["f"][0], self.bounds["Dp"][0] * 1000, self.bounds["D"][0] * 1000],
                       [self.bounds["f"][1], self.bounds["Dp"][1] * 1000, self.bounds["D"][1] * 1000]]

@@ -15,9 +15,10 @@ import matlab.engine
 import ast
 
 SNR = 20
-data_path = '../'
-data_filename = rf"test_output_no_harmonization_SNR{SNR}_corrected.csv"
-data = pd.read_csv(os.path.join(data_path, data_filename))
+data_path = rf'Simulated_Data/SNR{SNR}'
+folder = rf'strict_bounds_initialguess'
+data_filename = rf"test_output_bounds_initialguess_harmonized_SNR{SNR}_corrected_implementation_brain_tightbounds.csv"
+data = pd.read_csv(os.path.join(data_path, folder, data_filename))
 data = data.dropna(how="all")
 single_algorithm = data['Algorithm'].iloc[0]
 single_dataset = data[data['Algorithm'] == single_algorithm]
@@ -46,17 +47,24 @@ for name in algorithmlist:
 	for anatomy in single_dataset["Region"].unique():
 		print(f"Working on region: {anatomy}")
 		bvals = data_json[anatomy]["bvalues"]
+		unique_bvals, inverse_idx = np.unique(bvals, return_inverse=True)
 		data_region = single_dataset[single_dataset["Region"] == anatomy]
 		try:
 			initial_guess_f = np.fromstring(single_dataset["f_initial_guess"][0])[0]
 			initial_guess_D = np.fromstring(single_dataset["D_initial_guess"][0])[0]
 			initial_guess_Dp = np.fromstring(single_dataset["Dp_initial_guess"][0])[0]
+
+			# Fail if any value is NaN
+			if np.isnan(initial_guess_f) or np.isnan(initial_guess_D) or np.isnan(initial_guess_Dp):
+				raise ValueError("One or more initial guesses are NaN")
+
 			initial_guess = {
 				"D": initial_guess_D,
 				"f": initial_guess_f,
 				"Dp": initial_guess_f,
 				"S0": 1.0}
 		except:
+			initial_guess = None
 			print("initial guess not found")
 
 		try:
@@ -69,20 +77,21 @@ for name in algorithmlist:
 				"Dp": bounds_Dp,
 				"S0": [0.5, 1.5]}
 		except:
+			bounds = None
 			print("bounds not found")
 
-		fit = OsipiBase(algorithm=name[0], bvalues=bvals, initial_guess=None, bounds=None)
+		fit = OsipiBase(algorithm=name[0], bvalues=unique_bvals, initial_guess=initial_guess, bounds=bounds)
 		fit_results = []
 		for i in range(len(data_region)):
 			row = data_region.iloc[i].copy()
 			row["Algorithm"] = name[0]
 			signals = data_region.iloc[i]["measured_signals"]
 			signals = np.fromstring(signals.strip("[]"), sep=" ")
-			maps = fit.osipi_fit(signals, bvals, initial_guess=None, bounds=None)
+			maps = fit.osipi_fit(signals, unique_bvals, initial_guess=initial_guess, bounds=bounds)
 			row["f_fitted"] = maps["f"]
 			row["Dp_fitted"] = maps["Dp"]
 			row["D_fitted"] = maps["D"]
 			results_rows.append(row)
 df_fitted = pd.DataFrame(results_rows)
-save_filename = rf"test_output_skippedalgorithms_no_harmonization_SNR{SNR}_corrected.csv"
-df_fitted.to_csv(os.path.join(data_path,save_filename), index=False)
+save_filename = rf"test_output_bounds_initialguess_harmonized_SNR{SNR}_corrected_implementation_brain_tightbounds_skippedalgorithms.csv"
+df_fitted.to_csv(os.path.join(data_path,folder,save_filename), index=False)

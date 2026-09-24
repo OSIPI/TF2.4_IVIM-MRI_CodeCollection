@@ -61,7 +61,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         self.use_bounds = {"f" : True, "D" : True, "Dp" : True, "S0" : True}
         self.thresholds = thresholds
         if self.bounds == None:
-            self.bounds = {"S0" : [0, 2.5], "f" : [0, 1.5], "Dp" : [0, 2], "D" : [0, 0.005]}
+            self.bounds = {"S0" : [0.7, 1.3], "f" : [0, 0.7], "Dp" : [0.005, 0.2], "D" : [0, 0.005]}
         if prior_in is None:
             print('using a flat prior between bounds')
             self.neg_log_prior=flat_neg_log_prior([self.bounds["D"][0],self.bounds["D"][1]],[self.bounds["f"][0],self.bounds["f"][1]],[self.bounds["Dp"][0],self.bounds["Dp"][1]],[self.bounds["S0"][0],self.bounds["S0"][1]])
@@ -84,7 +84,7 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             _type_: _description_
         """
         if self.bounds == None:
-            bounds = ([0,0,0,0],[0.005,1.5,2,2.5])
+            bounds = ([0, 0, 0.005, 0.7],[0.005, 0.7, 0.2, 1.3])
         else:
             bounds = ([self.bounds["D"][0], self.bounds["f"][0], self.bounds["Dp"][0], self.bounds["S0"][0]],
                       [self.bounds["D"][1], self.bounds["f"][1], self.bounds["Dp"][1], self.bounds["S0"][1]])
@@ -92,7 +92,9 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
             initial_guess = [0.001, 0.2, 0.05, 1]
         else:
             initial_guess = [self.initial_guess["D"], self.initial_guess["f"], self.initial_guess["Dp"], self.initial_guess["S0"]]
-
+        if self.thresholds == None:
+            thresholds = 200
+            self.thresholds = 200
         bvalues=np.array(bvalues)
 
         epsilon = 0.000001
