@@ -47,3 +47,8 @@ models
 temp
 .vscode
 .env
+.DS_Store
+!phantoms/epi-distortion_phantom/data/*.nii
+!phantoms/epi-distortion_phantom/b0-flipped/*.nii
+!phantoms/epi-distortion_phantom/*.bval
+!phantoms/epi-distortion_phantom/*.bvec
