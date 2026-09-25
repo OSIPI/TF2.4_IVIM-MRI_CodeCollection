@@ -1,14 +1,76 @@
 '''
 Preprocessing of abdomen IVIM data
+Siria Pasini — Istituto di Ricerche Farmacologiche Mario Negri IRCCS, Milan, Italy
 
-Requirements:
-- MRtrix3  (dwidenoise, mrdegibbs)
-- FSL      (fslroi, fslmerge, topup, applytopup)
-- SimpleITK
+Overview
+--------
+This script implements a full preprocessing pipeline for abdomen IVIM (Intravoxel
+Incoherent Motion) diffusion-weighted MRI data. It is organized as a set of
+independent step functions, each handling one preprocessing stage, plus a master
+function (abdomen_preproc) that chains them in order.
+
+The pipeline runs the following steps:
+
+  Step 1 — denoise()
+      PCA-based denoising to suppress thermal noise while preserving signal
+      structure. Uses MRtrix3 dwidenoise, which exploits the redundancy across
+      diffusion directions via Marchenko-Pastur PCA.
+      Tool: MRtrix3 (dwidenoise)
+
+  Step 2 — degibbs()
+      Gibbs ringing artifact removal using local subvoxel-shifts. Gibbs ringing
+      arises from k-space truncation and can bias IVIM parameter estimates,
+      particularly at tissue boundaries.
+      Tool: MRtrix3 (mrdegibbs)
+
+  Step 3 — motion_correction_dipy() / motion_correction_mirtk()
+      Volume-to-volume motion correction, registering each 3D volume to a
+      reference (default: first volume, b=0). Two backends are available:
+
+        - motion_correction_dipy  [backend='dipy']
+            Pure-Python affine registration using mutual information metric.
+            No external binary required. Suitable for moderate motion.
+            Tool: dipy (AffineRegistration, MutualInformationMetric)
+
+        - motion_correction_mirtk  [backend='mirtk']
+            Rigid or affine registration using the MIRTK command-line tool.
+            More robust for large motion; requires MIRTK to be installed.
+            Tool: MIRTK (mirtk register), FSL (fslroi, fslmerge)
+
+      The backend is selected via the moco_backend argument of abdomen_preproc().
+      When using MIRTK, the registration model ('rigid' or 'affine') is set via
+      mirtk_method.
+
+  Step 4 — topup()
+      Susceptibility-induced geometric distortion correction using a reversed
+      phase-encoding b=0 acquisition. topup estimates the field map from the
+      two opposing phase-encoding directions; applytopup corrects the full DWI
+      series. The phase-encoding direction and total readout time must match
+      your acquisition protocol.
+      Tool: FSL (fslroi, fslmerge, topup, applytopup)
+
+  Step 5 — n4_bias_correction()
+      N4 bias field correction to remove smooth, low-frequency intensity
+      non-uniformities caused by RF coil inhomogeneities. Applied
+      volume-by-volume, since signal intensity varies strongly across b-values
+      in IVIM acquisitions and a single 4D correction would be unreliable.
+      Tool: SimpleITK (N4BiasFieldCorrectionImageFilter)
+
+Entry point
+-----------
+abdomen_preproc(im_file, bval_file, b0rev_file, b0rev_bval_file, ...)
+    Runs all five steps in sequence. See the function docstring for the full
+    list of parameters and the commented usage examples at the bottom of the
+    script.
+
+Requirements
+------------
+- MRtrix3   (dwidenoise, mrdegibbs)
+- FSL       (fslroi, fslmerge, topup, applytopup)
+- SimpleITK  (pip install SimpleITK)
 - nibabel, numpy
-- ivim     (extract, combine, read_bval)
-- dipy     [motion correction option: dipy]
-- MIRTK    [motion correction option: mirtk]
+- dipy      [required only for motion correction backend: dipy]
+- MIRTK     [required only for motion correction backend: mirtk]
 '''
 
 import os
@@ -16,8 +78,7 @@ import subprocess
 import numpy as np
 import nibabel as nib
 import SimpleITK as sitk
-from ivim.io.base import read_bval
-from ivim.preproc.base import extract, combine
+
 
 
 # ---------------------------------------------------------------------------
@@ -168,14 +229,25 @@ def topup(im_file, bval_file, b0rev_file, b0rev_bval_file,
     im_file_unwarp = im_file.replace('.nii.gz', '-unwarp.nii.gz')
     interbase      = im_file.replace('.nii.gz', '-b0-b0rev')
 
-    extract(im_file=im_file, bval_file=bval_file,
-            outbase=im_file.replace('.nii.gz', '-b0'), b_ex=0)
-    combine(dwi_files=[im_file.replace('.nii.gz', '-b0.nii.gz'), b0rev_file],
-            bval_files=[im_file.replace('.nii.gz', '-b0.bval'), b0rev_bval_file],
-            outbase=interbase)
+    # Load bvals and identify b=0 indices
+    b    = np.atleast_1d(np.loadtxt(bval_file))
+    brev = np.atleast_1d(np.loadtxt(b0rev_bval_file))
+    b0_indices = np.where(b == 0)[0]
 
-    b    = read_bval(im_file.replace('.nii.gz', '-b0.bval'))
-    brev = read_bval(b0rev_bval_file)
+    # Extract b=0 volumes from forward acquisition and merge into one file
+    b0_base = im_file.replace('.nii.gz', '-b0')
+    b0_vols = []
+    for i, idx in enumerate(b0_indices):
+        tmp = b0_base + f'_tmp{i}.nii.gz'
+        subprocess.run(['fslroi', im_file, tmp, str(idx), '1'])
+        b0_vols.append(tmp)
+    subprocess.run(['fslmerge', '-t', b0_base + '.nii.gz'] + b0_vols)
+    for tmp in b0_vols:
+        os.remove(tmp)
+
+    # Concatenate forward b=0 and reversed b=0 into one file for topup
+    subprocess.run(['fslmerge', '-t', interbase + '.nii.gz',
+                    b0_base + '.nii.gz', b0rev_file])
 
     acqp_file = interbase + '_acqparams.txt'
     with open(acqp_file, 'w') as f:
