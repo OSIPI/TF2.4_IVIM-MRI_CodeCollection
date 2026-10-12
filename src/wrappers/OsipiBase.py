@@ -7,6 +7,16 @@ import warnings
 from tqdm import tqdm
 from joblib import Parallel, delayed
 
+# Realistic ranges for the lower and upper bounds of each IVIM parameter, as also used in
+# test_default_bounds_and_initial_guesses. D and Dp are in mm2/s and the signal is normalised.
+# Initial guesses are considered realistic between the smallest lower and largest upper bound.
+REALISTIC_BOUND_RANGES = {
+    "S0": {"lower": [0, 1], "upper": [1, 1000]},
+    "f": {"lower": [0, 1], "upper": [0, 1]},
+    "Dp": {"lower": [0.003, 0.05], "upper": [0.003, 0.5]},
+    "D": {"lower": [0, 0.003], "upper": [0, 0.01]},
+}
+
 
 class OsipiBase:
     """
@@ -170,7 +180,47 @@ class OsipiBase:
         # an algorithm object with that name.
         if algorithm:
             self.osipi_initiate_algorithm(algorithm, bvalues=self.bvalues, thresholds=self.thresholds, bounds=self.bounds, initial_guess=self.initial_guess, **kwargs)
-            
+        else:
+            # Only checked here, as initiating an algorithm calls __init__ again without it
+            self.osipi_check_bounds_and_initial_guess()
+
+    def osipi_check_bounds_and_initial_guess(self):
+        """Warn if the bounds or initial guesses look unrealistic.
+
+        Each lower bound should be below its upper bound, bounds and initial guesses
+        should lie within ``REALISTIC_BOUND_RANGES`` (D and Dp in mm2/s, normalised
+        signal), the upper bound of D should not exceed the lower bound of Dp, and
+        initial guesses should lie within the bounds.
+        """
+        bounds = self.bounds if isinstance(self.bounds, dict) else {}
+        initial_guess = self.initial_guess if isinstance(self.initial_guess, dict) else {}
+
+        def warn(message):
+            warnings.warn(f"Possibly unrealistic fit setting: the {message}", UserWarning, stacklevel=3)
+
+        for param, ranges in REALISTIC_BOUND_RANGES.items():
+            if param in bounds:
+                lower, upper = bounds[param]
+                if lower >= upper:
+                    warn(f"lower bound of {param} ({lower}) is not below its upper bound ({upper}).")
+                for name, value in (("lower", lower), ("upper", upper)):
+                    low, high = ranges[name]
+                    if not low <= value <= high:
+                        warn(f"{name} bound of {param} ({value}) is outside the realistic range [{low}, {high}]. "
+                             "Note that D and Dp are expected in mm2/s and the signal to be normalised.")
+            if param in initial_guess:
+                value = initial_guess[param]
+                low, high = ranges["lower"][0], ranges["upper"][1]
+                if not low <= value <= high:
+                    warn(f"initial guess of {param} ({value}) is outside the realistic range [{low}, {high}]. "
+                         "Note that D and Dp are expected in mm2/s and the signal to be normalised.")
+                if param in bounds and not bounds[param][0] <= value <= bounds[param][1]:
+                    warn(f"initial guess of {param} ({value}) is outside its bounds "
+                         f"[{bounds[param][0]}, {bounds[param][1]}].")
+
+        if "D" in bounds and "Dp" in bounds and bounds["D"][1] > bounds["Dp"][0]:
+            warn(f"upper bound of D ({bounds['D'][1]}) is above the lower bound of Dp ({bounds['Dp'][0]}).")
+
     def osipi_initiate_algorithm(self, algorithm, **kwargs):
         """Turns the class into a specified one by the input.
         This method can be used instead of specifically importing that class and initiating it.
