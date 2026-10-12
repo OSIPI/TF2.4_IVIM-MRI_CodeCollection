@@ -75,6 +75,8 @@ Requirements
 
 import os
 import subprocess
+import os as _os
+_os.environ['MallocStackLogging'] = '0'
 import numpy as np
 import nibabel as nib
 import SimpleITK as sitk
@@ -163,48 +165,294 @@ def motion_correction_dipy(im_file, ref_idx=0):
     return out_file
 
 
+def detect_unstable_early_volumes(data, bvals, n_check=12,
+                                   z_threshold=2.0):
+    '''
+    Detect early volumes acquired before breathing stabilised.
+
+    Strategy: estimate the SI (superior-inferior) centroid of signal for
+    each of the first n_check volumes. Volumes whose centroid is shifted
+    significantly upward (z_threshold MAD above the median) are flagged
+    as unstable — the kidney was higher due to irregular respiration.
+
+    Returns
+    -------
+    unstable_idx : np.ndarray of int — indices of unstable early volumes
+    centroids    : np.ndarray of float — SI centroid per checked volume
+    '''
+    import numpy as _np
+
+    n_check  = min(n_check, data.shape[3])
+    slice_ax = 2   # z-axis = SI direction
+
+    # Mean signal per slice for each early volume
+    centroids = _np.zeros(n_check)
+    for t in range(n_check):
+        vol  = data[..., t].astype(_np.float64)
+        prof = vol.mean(axis=(0, 1))   # signal profile along z
+        prof = _np.maximum(prof, 0)
+        total = prof.sum()
+        if total > 0:
+            centroids[t] = (_np.arange(len(prof)) * prof).sum() / total
+        else:
+            centroids[t] = len(prof) / 2.0
+
+    # Volumes with centroid significantly ABOVE (higher index = more superior
+    # in scanner coords → lower centroid value = shifted up)
+    median_c = _np.median(centroids)
+    mad_c    = _np.median(_np.abs(centroids - median_c)) + 1e-6
+    # Shifted UP = lower centroid value
+    unstable = _np.where(centroids < median_c - z_threshold * mad_c)[0]
+
+    print(f'  Early volume centroid analysis (first {n_check} vols):')
+    for t in range(n_check):
+        flag = ' ← UNSTABLE (shifted up)' if t in unstable else ''
+        print(f'    vol {t:3d} (b={int(bvals[t]):4d}): centroid={centroids[t]:.2f}{flag}')
+    print(f'  Detected {len(unstable)} unstable early volume(s): {unstable.tolist()}')
+
+    return unstable, centroids
+
+
 def motion_correction_mirtk(im_file, ref_idx=0, method='rigid'):
     '''
-    Motion correction using MIRTK register.
-    method: 'rigid' or 'affine'
+    Two-stage motion correction using MIRTK register.
+
+    Stage 1 — Intra-shell (NCC, same contrast):
+      Detect unstable volumes (centroid outliers per shell).
+      Register every volume to its shell median (excluding unstable ones
+      from the median computation so the reference is stable).
+
+    Stage 2 — Template registration (NMI):
+      Build an overall median template from all intra-shell corrected volumes.
+      Register every volume to this template.
+      Unstable volumes get 5 resolution levels instead of 4.
     '''
-    print(f'Step 3 [mirtk/{method}]: Motion correction...')
-    n_vols  = nib.load(im_file).shape[3]
-    tmp_ref = _extract_volume(im_file, ref_idx)
+    import nibabel as _nib
+    import numpy  as _np
 
-    registered_vols = []
+    print(f'Step 3 [mirtk/3-stage-{method}]: Motion correction...')
+
+    img    = _nib.load(im_file)
+    data   = img.get_fdata(dtype=_np.float32)
+    affine = img.affine
+    n_vols = data.shape[3]
+
+    bval_file = im_file.replace('.nii.gz', '.bval')
+    bvals = _np.genfromtxt(bval_file).flatten() if os.path.isfile(bval_file)             else _np.zeros(n_vols)
+
+    # Sort by b-value
+    sort_idx = _np.argsort(bvals, kind='stable')
+    if not _np.array_equal(sort_idx, _np.arange(n_vols)):
+        print(f'  Reordering volumes by b-value...')
+        bvals = bvals[sort_idx]
+        data  = data[..., sort_idx]
+        _np.savetxt(bval_file, bvals.reshape(1,-1), fmt='%d', delimiter=' ')
+        bvec_file = im_file.replace('.nii.gz', '.bvec')
+        if os.path.isfile(bvec_file):
+            bvecs = _np.genfromtxt(bvec_file)
+            if bvecs.ndim == 2 and bvecs.shape[1] == n_vols:
+                _np.savetxt(bvec_file, bvecs[:, sort_idx], fmt='%.6f', delimiter=' ')
+
+    unique_bvals = _np.unique(bvals)
+    print(f'  Shells before reordering: {bvals.astype(int).tolist()}')
+    print(f'  Shells: {unique_bvals.astype(int).tolist()}')
+
+    corrected = data.copy()
+
+    def _save_vol(arr, path):
+        _nib.save(_nib.Nifti1Image(arr.astype(_np.float32), affine), path)
+
+    def _mirtk_reg(ref_path, mov_path, dof_path, sim='NMI', levels='4'):
+        ret = subprocess.run([
+            'mirtk', 'register', ref_path, mov_path,
+            '-model',  method.capitalize(),
+            '-sim',    sim,
+            '-levels', levels,
+            '-bg',     '0',
+            '-dofout', dof_path,
+        ], capture_output=True, text=True)
+        return ret.returncode == 0 and os.path.isfile(dof_path)
+
+    def _apply_dof(mov_path, out_path, dof_path, ref_path):
+        ret = subprocess.run([
+            'mirtk', 'transform-image', mov_path, out_path,
+            '-dofin',  dof_path,
+            '-target', ref_path,
+            '-interp', 'Linear'
+        ], capture_output=True, text=True)
+        return ret.returncode == 0 and os.path.isfile(out_path)
+
+    def _check_mass(orig, reg, threshold=0.7):
+        orig_mass = _np.abs(orig).sum()
+        reg_mass  = _np.abs(reg).sum()
+        if orig_mass == 0:
+            return True, 1.0
+        ratio = reg_mass / orig_mass
+        return ratio > threshold, ratio
+
+    def _si_centroid(vol):
+        prof  = _np.maximum(vol.mean(axis=(0, 1)), 0)
+        total = prof.sum()
+        return float((_np.arange(len(prof)) * prof).sum() / total)                if total > 0 else vol.shape[2] / 2.0
+
+    # ── Detect unstable volumes from overall centroid distribution ──────────────
+    # Overall median is more robust than per-shell median (only 6 vols/shell).
+    print(f'\n  Pre-stage: Detecting unstable volumes (overall centroid)...')
+    centroids     = _np.array([_si_centroid(data[..., t]) for t in range(n_vols)])
+    MAD_THRESHOLD = 2.0
+
+    overall_med   = _np.median(centroids)
+    overall_mad   = _np.median(_np.abs(centroids - overall_med)) + 1e-6
+    # Initial stable set: within 2 MAD of overall median
+    init_stable   = _np.abs(centroids - overall_med) <= 2.0 * overall_mad
+    # Unstable = outside the [min, max] range of initially stable centroids
+    stable_min    = centroids[init_stable].min() - 0.5
+    stable_max    = centroids[init_stable].max() + 0.5
+    unstable_mask = (centroids < stable_min) | (centroids > stable_max)
+    print(f'  Overall centroid: median={overall_med:.2f}  '
+          f'stable range=[{stable_min:.2f}, {stable_max:.2f}]')
     for t in range(n_vols):
-        if t == ref_idx:
-            registered_vols.append(tmp_ref)
-            continue
-        tmp_moving = _extract_volume(im_file, t)
-        tmp_out    = im_file.replace('.nii.gz', f'-mirtk-tmp{t}.nii.gz')
-        dof_out    = im_file.replace('.nii.gz', f'-mirtk-dof{t}.dof')
-        print(f'  Registering volume {t} to reference {ref_idx}...')
-        subprocess.run(['mirtk', 'register', tmp_ref, tmp_moving,
-                        '-model', method, '-dofout', dof_out, '-output', tmp_out])
-        os.remove(tmp_moving)
-        registered_vols.append(tmp_out)
+        flag = ' ← UNSTABLE' if unstable_mask[t] else ''
+        print(f'    vol {t:3d} (b={int(bvals[t]):4d}): centroid={centroids[t]:.2f}{flag}')
 
+    unstable_idx = _np.where(unstable_mask)[0]
+    stable_mask  = ~unstable_mask
+    print(f'  Total unstable volumes: {len(unstable_idx)} → {unstable_idx.tolist()}')
+
+    # =========================================================================
+    # STAGE 1 — Intra-shell registration (NCC)
+    # Shell median is built from stable volumes only.
+    # =========================================================================
+    print(f'\n  Stage 1: Intra-shell registration (NCC)...')
+
+    for bv in unique_bvals:
+        idx         = _np.where(bvals == bv)[0]
+        stable_idx  = idx[stable_mask[idx]]
+        use_idx     = stable_idx if len(stable_idx) >= 1 else idx
+
+        # Shell reference: median of stable volumes
+        shell_med = _np.median(data[..., use_idx], axis=-1)
+        sref_path = im_file.replace('.nii.gz', f'-s1ref{int(bv)}.nii.gz')
+        _save_vol(shell_med, sref_path)
+
+        if len(idx) <= 1:
+            os.remove(sref_path)
+            continue
+
+        n_levels = '5' if bv >= 200 else '4'
+        print(f'    b={int(bv):4d}: {len(idx)} volumes ({len(use_idx)} stable for ref, levels={n_levels})')
+
+        for vi in idx:
+            mov = im_file.replace('.nii.gz', f'-s1mov{vi}.nii.gz')
+            out = im_file.replace('.nii.gz', f'-s1out{vi}.nii.gz')
+            dof = im_file.replace('.nii.gz', f'-s1dof{vi}.dof')
+            _save_vol(data[..., vi], mov)
+            ok = _mirtk_reg(sref_path, mov, dof, sim='NCC', levels=n_levels)
+            if ok:
+                ok_t = _apply_dof(mov, out, dof, sref_path)
+                if ok_t:
+                    reg_arr = _nib.load(out).get_fdata(dtype=_np.float32)
+                    ok_mass, ratio = _check_mass(data[..., vi], reg_arr)
+                    if ok_mass:
+                        corrected[..., vi] = reg_arr
+                    else:
+                        print(f'      vol {vi}: mass={ratio:.2f} degraded, keeping original')
+            for p in [mov, out, dof]:
+                if os.path.isfile(p): os.remove(p)
+        os.remove(sref_path)
+
+    # =========================================================================
+    # STAGE 2 — Iterative template registration (NMI)
+    # Register all volumes to overall median template, then iterate:
+    # rebuild template → re-detect unstable → re-register still-unstable.
+    # =========================================================================
+    print(f'\n  Stage 2: Iterative template registration (NMI)...')
+
+    MAX_ITERATIONS      = 3
+    CENTROID_STABLE_THR = 2.0
+
+    def _detect_unstable_centroids(data_arr):
+        c      = _np.array([_si_centroid(data_arr[..., t])
+                             for t in range(data_arr.shape[3])])
+        med    = _np.median(c)
+        mad    = _np.median(_np.abs(c - med)) + 1e-6
+        init_s = _np.abs(c - med) <= CENTROID_STABLE_THR * mad
+        if init_s.sum() == 0:
+            init_s = _np.ones(len(c), dtype=bool)
+        s_min  = c[init_s].min() - 0.5
+        s_max  = c[init_s].max() + 0.5
+        return (c < s_min) | (c > s_max), c
+
+    def _reg_volumes(vols, corrected_arr, tmpl_p, unstable_cur):
+        for t in vols:
+            mov = im_file.replace('.nii.gz', f'-s2mov{t}.nii.gz')
+            out = im_file.replace('.nii.gz', f'-s2out{t}.nii.gz')
+            dof = im_file.replace('.nii.gz', f'-s2dof{t}.dof')
+            _save_vol(corrected_arr[..., t], mov)
+            n_lev = '5' if (unstable_cur[t] or bvals[t] >= 300) else '4'
+            print(f'  Registering volume {t} to reference {ref_idx}...')
+            ok = _mirtk_reg(tmpl_p, mov, dof, sim='NMI', levels=n_lev)
+            if ok:
+                ok_t = _apply_dof(mov, out, dof, tmpl_p)
+                if ok_t and os.path.isfile(out):
+                    reg_arr = _nib.load(out).get_fdata(dtype=_np.float32)
+                    ok_mass, ratio = _check_mass(corrected_arr[..., t], reg_arr)
+                    if ok_mass:
+                        corrected_arr[..., t] = reg_arr
+                    else:
+                        print(f'    WARNING: vol {t} degraded (mass={ratio:.2f}), keeping previous')
+            for p in [mov, out, dof]:
+                if os.path.isfile(p): os.remove(p)
+
+    # Initial template from intra-shell corrected data
+    tmpl_arr  = _np.median(corrected, axis=-1).astype(_np.float32)
+    tmpl_path = im_file.replace('.nii.gz', '-s2tmpl.nii.gz')
+    _save_vol(tmpl_arr, tmpl_path)
+
+    # Pass 1: stable first, unstable last
+    vol_order = list(_np.where(stable_mask)[0]) + list(unstable_idx)
+    print(f'  Pass 1/{MAX_ITERATIONS}: {n_vols} volumes '
+          f'({len(unstable_idx)} unstable with 5 levels)...')
+    _reg_volumes(vol_order, corrected, tmpl_path, unstable_mask)
+
+    # Iterative passes: re-register volumes still off centroid
+    for iteration in range(2, MAX_ITERATIONS + 1):
+        tmpl_arr = _np.median(corrected, axis=-1).astype(_np.float32)
+        _save_vol(tmpl_arr, tmpl_path)
+
+        still_unstable, new_centroids = _detect_unstable_centroids(corrected)
+        still_idx = _np.where(still_unstable)[0]
+        med_c = _np.median(new_centroids)
+        mad_c = _np.median(_np.abs(new_centroids - med_c)) + 1e-6
+        print(f'  Pass {iteration}/{MAX_ITERATIONS}: centroid median={med_c:.2f} '
+              f'MAD={mad_c:.3f} — {len(still_idx)} still unstable: '
+              f'{still_idx.tolist()}')
+
+        if len(still_idx) == 0:
+            print(f'  ✔ All volumes stable — stopping early.')
+            break
+
+        _reg_volumes(still_idx, corrected, tmpl_path, still_unstable)
+
+    if os.path.isfile(tmpl_path): os.remove(tmpl_path)
+
+    # Final report
+    _, final_c = _detect_unstable_centroids(corrected)
+    med_f = _np.median(final_c)
+    mad_f = _np.median(_np.abs(final_c - med_f)) + 1e-6
+    final_bad = _np.where(_np.abs(final_c - med_f) > CENTROID_STABLE_THR * mad_f)[0]
+    print(f'  Final unstable after registration: '
+          f'{final_bad.tolist() if len(final_bad) else "none ✔"}')
+
+    # ── Save output ───────────────────────────────────────────────────────────
     out_file = im_file.replace('.nii.gz', '-moco-mirtk.nii.gz')
-    subprocess.run(['fslmerge', '-t', out_file] + registered_vols)
-
-    # Clean up
-    os.remove(tmp_ref)
-    for t in range(n_vols):
-        if t == ref_idx:
-            continue
-        for f in [im_file.replace('.nii.gz', f'-mirtk-tmp{t}.nii.gz'),
-                  im_file.replace('.nii.gz', f'-mirtk-dof{t}.dof')]:
-            if os.path.exists(f):
-                os.remove(f)
-
+    _nib.save(_nib.Nifti1Image(corrected, affine), out_file)
     for ext in ['.bval', '.bvec']:
-        subprocess.run(['cp', im_file.replace('.nii.gz', ext),
-                              out_file.replace('.nii.gz', ext)])
+        src = im_file.replace('.nii.gz', ext)
+        dst = out_file.replace('.nii.gz', ext)
+        if os.path.isfile(src):
+            subprocess.run(['cp', src, dst])
     return out_file
-
-
 # ---------------------------------------------------------------------------
 # Step 4 — Susceptibility distortion correction
 # ---------------------------------------------------------------------------
@@ -305,6 +553,158 @@ def n4_bias_correction(im_file, n_fitting_levels=4, n_iterations=50,
 # ---------------------------------------------------------------------------
 # Full pipeline
 # ---------------------------------------------------------------------------
+
+def detect_signal_outliers(im_file, bval_threshold=100, rmse_factor=2.5,
+                            min_b0_fraction=0.1):
+    '''
+    Detect DWI volumes whose signal is inconsistent with the expected
+    mono-exponential ADC decay, indicating motion corruption.
+
+    Strategy
+    --------
+    1. Fit a log-linear model  ln(S) = ln(S0) - ADC*b  per voxel using
+       only b >= bval_threshold (above perfusion regime).
+    2. Compute per-volume RMSE of the fit residuals across all voxels
+       with sufficient signal.
+    3. Flag volumes whose RMSE exceeds the median + rmse_factor * MAD
+       (median absolute deviation — robust to outliers).
+    4. Also flag b=0 volumes whose mean signal deviates >3 MAD from the
+       median b=0 signal (catches motion-corrupted b=0s).
+
+    Returns
+    -------
+    outlier_mask : np.ndarray bool (n_vols,) — True = outlier
+    rmse_per_vol : np.ndarray float (n_vols,) — per-volume RMSE
+    report       : dict with summary statistics
+    '''
+    import nibabel as _nib
+    import numpy  as _np
+
+    img   = _nib.load(im_file)
+    data  = img.get_fdata(dtype=_np.float32)
+    n_vols = data.shape[3]
+
+    bval_file = im_file.replace('.nii.gz', '.bval')
+    bvals = _np.genfromtxt(bval_file).flatten() if os.path.isfile(bval_file)             else _np.zeros(n_vols)
+
+    # Signal mask: voxels with b=0 signal above 10th percentile
+    b0_mean = data[..., bvals == bvals.min()].mean(axis=-1)
+    sig_mask = b0_mean > _np.percentile(b0_mean[b0_mean > 0], 10)
+    n_vox = sig_mask.sum()
+
+    # ── ADC fit on high-b volumes ─────────────────────────────────────────────
+    fit_idx  = _np.where(bvals >= bval_threshold)[0]
+    b0_idx   = _np.where(bvals == bvals.min())[0]
+
+    rmse_per_vol = _np.zeros(n_vols)
+
+    if len(fit_idx) >= 2:
+        S0_mean = data[..., b0_idx].mean(axis=-1)
+        S0_flat = S0_mean[sig_mask].astype(_np.float64)
+
+        b_fit   = bvals[fit_idx].astype(_np.float64)
+        # Least-squares ADC per voxel across fit_idx volumes
+        flat_fit = data[sig_mask][..., fit_idx].astype(_np.float64)  # (n_vox, n_fit)
+        with _np.errstate(divide='ignore', invalid='ignore'):
+            ratio = flat_fit / S0_flat[:, _np.newaxis]
+            log_r = _np.log(_np.where(ratio > 0, ratio, _np.nan))
+
+        # ADC = -sum(b * log_r) / sum(b^2)
+        num  = -_np.nansum(b_fit[_np.newaxis,:] * log_r, axis=1)
+        den  =  _np.nansum(b_fit[_np.newaxis,:]**2 * _np.isfinite(log_r), axis=1)
+        adc  = _np.where(den > 0, num / den, 0.0)        # (n_vox,)
+
+        # Per-volume RMSE of log-residuals across signal voxels
+        for vi in fit_idx:
+            S      = data[sig_mask, vi].astype(_np.float64)
+            with _np.errstate(divide='ignore', invalid='ignore'):
+                log_S  = _np.log(_np.where(S > 0, S / S0_flat, _np.nan))
+            log_pred   = -adc * bvals[vi]
+            resid      = log_S - log_pred
+            resid[~_np.isfinite(resid)] = 0.0
+            rmse_per_vol[vi] = _np.sqrt(_np.mean(resid**2))
+
+    # ── b=0 outlier detection ─────────────────────────────────────────────────
+    b0_signals = _np.array([data[sig_mask, t].mean() for t in b0_idx])
+    b0_median  = _np.median(b0_signals)
+    b0_mad     = _np.median(_np.abs(b0_signals - b0_median))
+    b0_outlier_mask = _np.zeros(n_vols, dtype=bool)
+    for i, t in enumerate(b0_idx):
+        if _np.abs(b0_signals[i] - b0_median) > 3 * b0_mad:
+            b0_outlier_mask[t] = True
+
+    # ── RMSE-based outlier detection ──────────────────────────────────────────
+    fit_rmse   = rmse_per_vol[fit_idx]
+    rmse_med   = _np.median(fit_rmse)
+    rmse_mad   = _np.median(_np.abs(fit_rmse - rmse_med))
+    rmse_threshold = rmse_med + rmse_factor * rmse_mad
+
+    rmse_outlier_mask = _np.zeros(n_vols, dtype=bool)
+    for t in fit_idx:
+        if rmse_per_vol[t] > rmse_threshold:
+            rmse_outlier_mask[t] = True
+
+    outlier_mask = rmse_outlier_mask | b0_outlier_mask
+
+    report = {
+        'n_vols'         : n_vols,
+        'n_outliers'     : int(outlier_mask.sum()),
+        'outlier_idx'    : _np.where(outlier_mask)[0].tolist(),
+        'rmse_per_vol'   : rmse_per_vol.tolist(),
+        'rmse_threshold' : float(rmse_threshold),
+        'rmse_median'    : float(rmse_med),
+        'rmse_mad'       : float(rmse_mad),
+        'b0_outlier_idx' : _np.where(b0_outlier_mask)[0].tolist(),
+    }
+
+    print(f'  Signal outlier detection:')
+    print(f'    RMSE median={rmse_med:.4f}  MAD={rmse_mad:.4f}  threshold={rmse_threshold:.4f}')
+    print(f'    Outlier volumes ({outlier_mask.sum()}): {_np.where(outlier_mask)[0].tolist()}')
+    if b0_outlier_mask.any():
+        print(f'    b=0 outliers: {_np.where(b0_outlier_mask)[0].tolist()}')
+
+    return outlier_mask, rmse_per_vol, report
+
+
+def remove_outlier_volumes(im_file, outlier_mask):
+    '''
+    Remove flagged outlier volumes from the 4-D NIfTI and matching
+    .bval / .bvec files. Saves a cleaned file with suffix -clean.nii.gz.
+
+    Returns the path of the cleaned NIfTI.
+    '''
+    import nibabel as _nib
+    import numpy  as _np
+
+    img    = _nib.load(im_file)
+    data   = img.get_fdata(dtype=_np.float32)
+    affine = img.affine
+    n_vols = data.shape[3]
+
+    keep_idx = _np.where(~outlier_mask)[0]
+    print(f'  Removing {outlier_mask.sum()} outlier volumes, keeping {len(keep_idx)}/{n_vols}')
+
+    data_clean = data[..., keep_idx]
+    out_file   = im_file.replace('.nii.gz', '-clean.nii.gz')
+    _nib.save(_nib.Nifti1Image(data_clean, affine), out_file)
+
+    for ext in ['.bval', '.bvec']:
+        src = im_file.replace('.nii.gz', ext)
+        if not os.path.isfile(src):
+            continue
+        arr = _np.genfromtxt(src)
+        if arr.ndim == 1:
+            arr_clean = arr[keep_idx]
+            _np.savetxt(out_file.replace('.nii.gz', ext),
+                        arr_clean.reshape(1, -1), fmt='%d', delimiter=' ')
+        else:
+            arr_clean = arr[:, keep_idx]
+            _np.savetxt(out_file.replace('.nii.gz', ext),
+                        arr_clean, fmt='%.6f', delimiter=' ')
+
+    print(f'  Cleaned file → {out_file}')
+    return out_file
+
 
 def abdomen_preproc(im_file, bval_file, b0rev_file, b0rev_bval_file,
                     moco_backend='dipy', moco_ref_idx=0, mirtk_method='rigid',
