@@ -61,7 +61,7 @@ def preproc_ivim(datapath, config=None, bvalfile=None):
     cfg = IVIMPreprocConfig.load_or_create(config)
     # NOTE: we want to be able to run separate functions for teting. thereby we add flags 'enabled' to config
 
-
+    print("Data loaded. Start pre-processing.")
     # DENOISING____________________________________
     if cfg.denoise.enabled:
         data, sigma = denoise(data, cfg) #bvals, bvecs for localpca
@@ -71,7 +71,7 @@ def preproc_ivim(datapath, config=None, bvalfile=None):
     # motion correction is always enables in the config rn. 
     # get inputs config inputs as kwargs
     if cfg.motion.enabled:
-        data = motion(data, affine, bvals, bvecs, **vars(cfg.motion))
+        data = motion(data, affine, bvals, cfg.motion.method)
 
     # DISTORTION_CORRECTION________________________
     # WIP: Needs to be adjusted to be compatible with config file
@@ -83,6 +83,8 @@ def preproc_ivim(datapath, config=None, bvalfile=None):
     # WIP: Needs to be adjusted to be compatible with config file
     if cfg.signal_void.enabled:
         data = signal_void(data, **vars(cfg.signal_void))
+
+    print("Pre-processing finsihed.")
 
     return data, bvals, bvecs, affine
 
@@ -126,16 +128,18 @@ def load_data(data_path, bvalfile):
 # DENOISING
 
 def denoise(data, cfg):
+    print("Denoising...")
     method = cfg.denoise.method
     method = DENOISE_METHODS[method]
-    data, sigma = method(data, patch_radius=cfg.denoise.patch_radius)
+    data, sigma = method(data, patch_radius=cfg.denoise.patch_radius, return_sigma=True)
 
     return data, sigma
 
 # ______________________________________________________________________________________________________________
 # MOTION CORRECTION
 
-def motion(data, affine, bvals, method='rigid', **kwargs):
+def motion(data, affine, bvals, method):
+    print("Motion correction...")
     # rigid/affine registration
     # use the b0 image as reference for registration
     # paramters are not yet configured in config. not tested.
@@ -175,6 +179,7 @@ def motion(data, affine, bvals, method='rigid', **kwargs):
 # SIGNAL VOID EXCLUSION
 
 def signal_void(data, **kwargs):
+    print("Signal void correction...")
     # identify signal voids and exclude them from further analysis
     # currently basic thresholding.
     threshold = kwargs.get("threshold", 0.1)  # example threshold value
@@ -260,6 +265,8 @@ def distortion(data, affine, bvals, bvecs, blip_down_path='', acqparams_path='',
     need it), but is kept in the signature for consistency with the other
     pipeline steps and in case a directionally-aware method is added later.
     """
+
+    print("Distortion correction...")
 
     ready, problems = check_topup_requirements(bvals, blip_down_path, acqparams_path, working_dir, b0_threshold=b0_threshold)
     if ready:
