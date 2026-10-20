@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 import shutil
 
-from IVIM_preproc_config import IVIMPreprocConfig
+from src.original.preprocessing.TF_recommendation_paper.IVIM_preproc_config import IVIMPreprocConfig
 
 from dipy.io.image import load_nifti
 from dipy.io.gradients import read_bvals_bvecs
@@ -28,7 +28,7 @@ DENOISE_METHODS = {
 #________________________________________________________________________________________________________________
 # MAIN RUNNER
 
-def preproc_ivim(datapath, config=None):
+def preproc_ivim(datapath, config=None, bvalfile=None):
     """ WIP: We could include "body region" here and double-check if it's consistent
     with the provided config file....
 
@@ -47,6 +47,8 @@ def preproc_ivim(datapath, config=None):
         datapath:   Path to the IVIM data. Expected to be in nifti format
         config:     Path to the *.yml config file. If not provided, currently a default config
                     file (for brain) will be created and used.
+        bvalfile:   Optionally, specify a file containing the b-values. If not specified, the
+                    script will look for a *.bval file with the same name as the data file.
 
     Returns:
         data:       Pre-processed data (np.array)
@@ -55,14 +57,14 @@ def preproc_ivim(datapath, config=None):
         affine:     Affine transformation matrix (np.array)
     """
 
-    data, bvals, bvecs, affine = load_data(datapath)
+    data, bvals, bvecs, affine = load_data(datapath, bvalfile)
     cfg = IVIMPreprocConfig.load_or_create(config)
     # NOTE: we want to be able to run separate functions for teting. thereby we add flags 'enabled' to config
 
 
     # DENOISING____________________________________
     if cfg.denoise.enabled:
-        data, sigma = denoise(data, bvals, bvecs, cfg) #bvals, bvecs for localpca
+        data, sigma = denoise(data, cfg) #bvals, bvecs for localpca
 
     # MOTION_CORRECTOIN____________________________
     # WIP: Needs to be adjusted to be compatible with config file
@@ -85,11 +87,12 @@ def preproc_ivim(datapath, config=None):
     return data, bvals, bvecs, affine
 
 
-def load_data(data_path):
+def load_data(data_path, bvalfile):
     """
     Loads files and data from the given path.
     Expects nifti files, and corresponding bval and bvec files with
     the same name but different extensions (*.bval, *.bvec).
+    Optionally, a bvalfile, containing the b-vaues, can be specified.
     """
     pre, ext = os.path.splitext(data_path)
     if ext != ".nii" and ext != ".gz":
@@ -97,15 +100,24 @@ def load_data(data_path):
  
     data, affine = load_nifti(data_path)
 
-    if ext == ".gz":
-        # data_path was e.g. "scan.nii.gz" -> pre is "scan.nii", strip
-        # the remaining ".nii" so bval/bvec paths come out as "scan.bval"
-        pre, _ = os.path.splitext(pre)
- 
-    bval_file = pre + ".bval"
-    bvec_file = pre + ".bvec"
- 
-    bvals, bvecs = read_bvals_bvecs(bval_file, bvec_file)
+    if bvalfile:
+        try:
+            bvals = np.loadtxt(bvalfile)
+            bvecs = None
+        except FileNotFoundError:
+            raise Exception("The specified b-value file does not exist: " + bvalfile)
+    else:
+        if ext == ".gz":
+            # data_path was e.g. "scan.nii.gz" -> pre is "scan.nii", strip
+            # the remaining ".nii" so bval/bvec paths come out as "scan.bval"
+            pre, _ = os.path.splitext(pre)
+
+        bval_file = pre + ".bval"
+        bvec_file = pre + ".bvec"
+        try:
+            bvals, bvecs = read_bvals_bvecs(bval_file, bvec_file)
+        except FileNotFoundError:
+            raise Exception("The *.bval and *bvec files corresponding to the data do not exist.")
  
     return data, bvals, bvecs, affine
 
@@ -123,7 +135,7 @@ def denoise(data, cfg):
 # ______________________________________________________________________________________________________________
 # MOTION CORRECTION
 
-def motion(data, affine, bvals, bvecs, method='rigid', **kwargs):
+def motion(data, affine, bvals, method='rigid', **kwargs):
     # rigid/affine registration
     # use the b0 image as reference for registration
     # paramters are not yet configured in config. not tested.
