@@ -1,0 +1,17 @@
+region: brain
+denoise:
+  enabled: true
+  method: mppca
+  patch_radius: 2
+motion:
+  enabled: false
+  method: rigid
+signal_void:
+  enabled: false
+  threshold: 0.1
+distortion:
+  enabled: false
+  blip_down_path: ''
+  acqparams_path: ''
+  working_dir: ''
+  b0_threshold: 50
