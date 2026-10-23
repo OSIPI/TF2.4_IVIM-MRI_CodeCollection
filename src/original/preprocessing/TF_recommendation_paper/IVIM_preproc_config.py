@@ -36,10 +36,10 @@ class MotionConfig:
 
     Currently supported parameters:
         enabled:         boolean, whether to perform motion correction (default: True)
-        method:          rigid (default) or affine registration between image volumes and b0.
+        method:          affine (default) or rigid registration between image volumes and b0.
     """
 
-    def __init__(self, enabled=True, method='rigid'):
+    def __init__(self, enabled=True, method='affine'):
         self.enabled = enabled
         self.method = method
         self.validate()
