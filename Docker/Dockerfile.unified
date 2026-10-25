@@ -1,0 +1,85 @@
+# Multi-Stage Unified Dockerfile for IVIM Fitting Method
+
+# Supports both standalone and Kaapana deployment using multi-stage builds.
+# This approach is cleaner than using if statements throughout.
+#
+# BUILD COMMANDS:
+# Note: Run from PROJECT ROOT, not from Docker/ folder!
+# 
+# For standalone:
+# $ docker build --target standalone -t ivim-fitting:standalone -f Docker/Dockerfile.unified .
+#
+# For Kaapana:
+# $ docker build --target kaapana \
+#                --build-arg BASE_IMAGE=local-only/base-python-cpu:latest \
+#                -t ivim-fitting:kaapana \
+#                -f Docker/Dockerfile.unified .
+#
+
+# Build argument for base image (default for standalone)
+ARG BASE_IMAGE=python:3.11-slim
+
+# Stage: BASE - Common setup shared by both environments
+FROM ${BASE_IMAGE} AS base
+
+# Metadata labels
+LABEL IMAGE="ivim-fitting-method"
+LABEL VERSION="0.2.4"
+LABEL BUILD_IGNORE="False"
+
+# Install common system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Stage: STANDALONE - For standalone IVIM fitting
+FROM base AS standalone
+
+WORKDIR /usr/src/app
+
+# Copy requirements and source code
+COPY requirements.txt ./
+COPY WrapImage ./WrapImage/
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Create entrypoint script
+RUN echo '#!/bin/bash' > /entrypoint.sh && \
+    echo 'cd /usr/src/app' >> /entrypoint.sh && \
+    echo 'exec python3 -m WrapImage.nifti_wrapper "$@"' >> /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD []
+
+# Stage: KAAPANA - For Kaapana platform deployment
+FROM base AS kaapana
+
+# Install additional Kaapana dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    texlive-xetex \
+    texlive-fonts-recommended \
+    texlive-plain-generic \
+    git && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /kaapana/app
+
+# Clone IVIM code collection and install dependencies
+RUN git clone https://github.com/OSIPI/TF2.4_IVIM-MRI_CodeCollection.git && \
+    cd TF2.4_IVIM-MRI_CodeCollection && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Set final working directory
+WORKDIR /kaapana/app/TF2.4_IVIM-MRI_CodeCollection
+
+# Create entrypoint script
+RUN echo '#!/bin/bash' > /entrypoint.sh && \
+    echo 'cd /kaapana/app/TF2.4_IVIM-MRI_CodeCollection' >> /entrypoint.sh && \
+    echo 'exec python3 -u -m WrapImage.nifti_wrapper_kaapana "$@"' >> /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD []
