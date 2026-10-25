@@ -1,6 +1,6 @@
 region: brain
 denoise:
-  enabled: true
+  enabled: false
   method: mppca
   patch_radius: 2
 motion:
@@ -10,7 +10,7 @@ signal_void:
   enabled: false
   threshold: 0.1
 distortion:
-  enabled: false
+  enabled: true
   blip_down_path: ''
   acqparams_path: ''
   working_dir: ''
