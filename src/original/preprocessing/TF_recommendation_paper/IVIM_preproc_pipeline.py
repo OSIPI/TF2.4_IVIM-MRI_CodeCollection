@@ -278,13 +278,10 @@ def distortion(data, affine, bvals, bvecs, blip_down_path='', acqparams_path='',
                                         working_dir=working_dir)
 
     else:
-        print("[distortion_correction] Topup requirements not met. Falling back to registration-based distortion correction.")
+        print("[distortion_correction]")
         for problem in problems:
             print(f"  - {problem}")
-        data_dist_corr = registration_distcorr(data, affine, bvals,
-                                               b0_threshold=b0_threshold,
-                                               **kwargs)
-
+        raise ValueError("Distortion correction failed due to missing or invalid input files.")
     return data_dist_corr
 
 
