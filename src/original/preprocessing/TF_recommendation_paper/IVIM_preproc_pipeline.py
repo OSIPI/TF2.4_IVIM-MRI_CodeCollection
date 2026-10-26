@@ -222,7 +222,7 @@ def check_topup_requirements(bvals, blip_down_path, acqparams_path, working_dir,
     # same check for blipdown data:
     if blip_down_path and os.path.isfile(blip_down_path):
         try:
-            _, bvals_bd, _, _ = load_data(blip_down_path)
+            _, bvals_bd, _, _ = load_data(blip_down_path, blip_down_path.replace('.nii.gz', '.bval'))
             if not np.any(bvals_bd <= b0_threshold):
                 problems.append(
                     f"blip-down image has no b0 volumes (all bval > {b0_threshold}): {blip_down_path}")
@@ -287,7 +287,7 @@ def distortion(data, affine, bvals, bvecs, blip_down_path='', acqparams_path='',
 
 # topup_helper_funcions________________________________________
 def load_bd(blip_down_path, b0_threshold):
-    data_bd, bvals_bd, _, _ = load_data(blip_down_path)
+    data_bd, bvals_bd, _, _ = load_data(blip_down_path, blip_down_path.replace('.nii.gz', '.bval'))
     if not np.all(bvals_bd <= b0_threshold):
         print(f"[distortion_correction] Warning: Blip-down contains volumes with bval > {b0_threshold}. "
               f"Only b0 <= {b0_threshold} volumes will be used for topup.")
@@ -361,16 +361,16 @@ def topup_distcorr(data, affine, bvals, blip_down_path, acqparams_path, working_
           f"{n_down} blip-down b0s. b0s decided by b0_threshold={b0_threshold}.")
     
 
-    field_out = os.path.join(tmpdir, "topup_field")
-    movpar_out = os.path.join(tmpdir, "topup_movpar.txt")
+    outbase = os.path.join(tmpdir, "topup_out")
+    # movpar_out = os.path.join(tmpdir, "topup_movpar.txt")
 
     topup_cmd = [
         "topup",
         f"--imain={imain_path}",
         f"--datain={acqparams_path}",
-        "--config=b02b0.cnf",
-        f"--out={field_out}",
-        f"--movpar={movpar_out}"
+        "--config=b02b0_1.cnf", # changed to 1 here as the phantom has one uneven dimension
+        f"--out={outbase}",
+        # f"--movpar={movpar_out}"
     ]
     print("[distortion_correction] Running topup with command: " +
           " ".join(topup_cmd))
@@ -386,8 +386,8 @@ def topup_distcorr(data, affine, bvals, blip_down_path, acqparams_path, working_
         "applytopup",
         f"--imain={series_path}",
         f"--datain={acqparams_path}",
-        f"--inindex={index_path}",
-        f"--topup={field_out}",
+        f"--inindex=1",
+        f"--topup={outbase}",
         f"--out={corrected_path}",
         "--method=jac",
     ]
