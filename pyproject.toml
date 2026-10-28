@@ -20,17 +20,17 @@ authors = [
     {name = "Oliver J. Gurney-Champion", email = "o.j.gurney-champion@amsterdamumc.nl"},
 ]
 dependencies = [
-    "numpy",
-    "scipy",
+    "numpy>=2,<3",
+    "scipy>=1.13",
     "nibabel",
-    "torch",
-    "torchio",
+    "torch>=2.2,<3",
+    "torchio>=1.2,<2",
     "joblib",
-    "dipy",
+    "dipy>=1.12.1,<2",
     "cvxpy",
     "nlopt",
     "tqdm",
-    "pandas",
+    "pandas>=2.2,<4",
     "statsmodels",
     "ivimnet",
     "super-ivim-dc>1.0.0",
@@ -50,8 +50,13 @@ plot = [
     "matplotlib",
     "scienceplots",
 ]
+preproc = [
+    "nipype",
+    "itk",
+    "pyyaml",
+]
 all = [
-    "osipi-ivim[test,docs,plot]",
+    "osipi-ivim[test,docs,plot,preproc]",
 ]
 
 [project.urls]
