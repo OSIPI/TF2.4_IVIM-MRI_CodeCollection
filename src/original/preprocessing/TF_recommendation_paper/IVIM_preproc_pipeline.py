@@ -362,15 +362,13 @@ def topup_distcorr(data, affine, bvals, blip_down_path, acqparams_path, working_
     
 
     outbase = os.path.join(tmpdir, "topup_out")
-    # movpar_out = os.path.join(tmpdir, "topup_movpar.txt")
 
     topup_cmd = [
         "topup",
         f"--imain={imain_path}",
         f"--datain={acqparams_path}",
-        "--config=b02b0_1.cnf", # changed to 1 here as the phantom has one uneven dimension
+        "--config=b02b0_1.cnf", # have b02b0_1 here as the phantom could have one odd dimension
         f"--out={outbase}",
-        # f"--movpar={movpar_out}"
     ]
     print("[distortion_correction] Running topup with command: " +
           " ".join(topup_cmd))
