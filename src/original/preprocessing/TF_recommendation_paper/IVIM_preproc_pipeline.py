@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 import shutil
 
-from .IVIM_preproc_config import IVIMPreprocConfig
+from src.original.preprocessing.TF_recommendation_paper.IVIM_preproc_config import IVIMPreprocConfig
 
 from dipy.io.image import load_nifti
 from dipy.io.gradients import read_bvals_bvecs
