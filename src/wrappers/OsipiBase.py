@@ -535,11 +535,6 @@ class OsipiBase:
             #return True
         return True
 
-    
-    def osipi_check_required_bvalues(self):
-        """Minimum number of b-values required"""
-        pass
-
     def osipi_author(self):
         """Author identification"""
         return ''
