@@ -1,4 +1,3 @@
-#%%
 # ----------------------------------------------------------------
 # perform denoising using TF_recommendation_paper pipeline
 # ----------------------------------------------------------------
@@ -76,7 +75,6 @@ shutil.copy(DATA_PATH.replace('.nii.gz','')+'.bvec', OUTPUT_PATH.replace('.nii.g
 # ----------------------------------------------------------------
 # perform distortion correction using TF_recommendation_paper pipeline
 # ----------------------------------------------------------------
-#%%
 DATA_PATH = "phantoms/brain/data/diffusive_snr50_distorted_motion_denoised_motioncorr.nii.gz"              # <-- ADJUST
 OUTPUT_PATH = "phantoms/brain/data/diffusive_snr50_distorted_motion_denoised_motioncorr_distortioncorr.nii.gz"          # <-- ADJUST
 CONFIG_PATH = "phantoms/brain/data/diffusive_snr50_config.yml"             # <-- ADJUST

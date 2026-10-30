@@ -1,4 +1,4 @@
-#%% Susceptibility distortion simulation for a brain phantom
+# Susceptibility distortion simulation for a brain phantom
 
 import numpy as np
 from scipy.ndimage import gaussian_filter
@@ -166,32 +166,8 @@ nib.save(nib.Nifti1Image(b0rev, nib.load(base_name + '.nii.gz').affine), base_na
 np.savetxt(base_name+'_distorted_b0rev.bval',np.array([0]))
 np.savetxt(base_name+'_distorted_b0rev.bvec',np.array([[0,0,0]]))
 
-# slc_idx = im.shape[2]//2-18
-# import matplotlib.pyplot as plt
-# plt.figure(figsize=(15, 3))
-# plt.subplot(1,5,1)
-# plt.imshow(np.rot90(fieldmap[:,:,slc_idx]))
-# plt.axis('off')
-# plt.title('Fieldmap (Hz)')
-# plt.subplot(1,5,2)
-# plt.imshow(np.rot90(im[:,:,slc_idx,0]),cmap='gray')
-# plt.axis('off')
-# plt.title('Original Image')
-# plt.subplot(1,5,3)
-# plt.imshow(np.rot90(distorted_im[:,:,slc_idx,0]),cmap='gray')
-# plt.axis('off')
-# plt.title('Distorted Image')
-# plt.subplot(1,5,4)
-# plt.imshow(np.rot90(b0rev[:,:,slc_idx]),cmap='gray')
-# plt.axis('off')
-# plt.title('B0 Reverse Image')
-# plt.subplot(1,5,5)
-# plt.imshow(np.rot90(distorted_im[:,:,slc_idx]-b0rev[:,:,slc_idx]),cmap='RdBu_r',vmin=-0.5,vmax=0.5)
-# plt.colorbar()
-# plt.title('Difference Image')
-# plt.axis('off')
 
-#%% Motion 
+# Motion 
 import numpy as np
 from scipy.ndimage import affine_transform
 from scipy.spatial.transform import Rotation 
