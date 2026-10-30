@@ -4,12 +4,11 @@ import json
 import numpy as np
 import nibabel as nib
 from scipy.ndimage import zoom
-from utilities.data_simulation.Download_data import download_data
 
 DIFFUSIVE_REGIME = 'diffusive'
 BALLISTIC_REGIME = 'ballistic'
 
-def simulate_brain_phantom(regime=DIFFUSIVE_REGIME, snr=100, sim_relaxation=True, TE=60e-3, TR=5, resolution=[3,3,3]):
+def simulate_brain_phantom(regime=DIFFUSIVE_REGIME, snr=50, sim_relaxation=True, TE=60e-3, TR=5, resolution=[3,3,3]):
     '''
     Simulation parameters can be set by changing the default values of the function arguments. 
     The default values are chosen to be suitable for a diffusive regime phantom, but can be changed to simulate a ballistic regime phantom as well. 
@@ -23,13 +22,19 @@ def simulate_brain_phantom(regime=DIFFUSIVE_REGIME, snr=100, sim_relaxation=True
     TR: repetition time in seconds
     resolution: voxel size in mm
     '''
-    download_data()
-
-
+    
     folder = os.path.dirname(__file__)
 
+    nii_path = os.path.join(os.path.split(os.path.split(folder)[0])[0],'download','Phantoms','brain','ground_truth','hrgt_icbm_2009a_nls_3t.nii.gz')
+    
+    if not os.path.exists(nii_path):
+        from utilities.data_simulation.Download_data import download_data
+
+        print('Downloading ground truth data...')
+        download_data()
+
     # Ground truth
-    nii = nib.load(os.path.join(os.path.split(os.path.split(folder)[0])[0],'download','Phantoms','brain','ground_truth','hrgt_icbm_2009a_nls_3t.nii.gz'))
+    nii = nib.load(os.path.join(nii_path))
     segmentation = np.squeeze(nii.get_fdata()[...,-1])
 
     with open(os.path.join(folder,'ground_truth',regime+'_groundtruth.json'), 'r') as f:
@@ -67,6 +72,7 @@ def simulate_brain_phantom(regime=DIFFUSIVE_REGIME, snr=100, sim_relaxation=True
     base_name = os.path.join(folder,'data','{}_reference'.format(regime,snr))
     nib.save(nii_out,base_name+'.nii.gz')
     shutil.copyfile(bval_file,base_name+'.bval')
+    
 
     # Add Rician noise
     im_noise = np.abs(im + S0/snr*(np.random.randn(sz[0],sz[1],sz[2],sz[3])+1j*np.random.randn(sz[0],sz[1],sz[2],sz[3])))
@@ -78,7 +84,10 @@ def simulate_brain_phantom(regime=DIFFUSIVE_REGIME, snr=100, sim_relaxation=True
     shutil.copyfile(bval_file,base_name+'.bval')
     if regime == BALLISTIC_REGIME:
         shutil.copyfile(cval_file,base_name+'.cval')
-
+    bvecs = np.zeros((3,b.size))
+    bvecs[2,1:] = 1
+    np.savetxt(base_name+'.bvec',bvecs)
+    
     # Resample and save segmentation
     segmentation = zoom(segmentation,np.diag(nii.affine)[:3]/np.array(resolution),order=0)
     nii_out = nib.Nifti1Image(segmentation,np.eye(4))
