@@ -91,8 +91,8 @@ class OGC_AmsterdamUMC_Bayesian_biexp(OsipiBase):
         fit_results = fit_segmented(self.bvalues, signals, bounds=bounds, cutoff=self.thresholds, p0=initial_guess)
         fit_results=np.array(fit_results+(1,))
         for i in range(4):
-            if fit_results[i] < bounds[0][i] : fit_results[0] = bounds[0][i]+epsilon
-            if fit_results[i] > bounds[1][i] : fit_results[0] = bounds[1][i]-epsilon
+            if fit_results[i] < bounds[0][i] : fit_results[i] = bounds[0][i]+epsilon
+            if fit_results[i] > bounds[1][i] : fit_results[i] = bounds[1][i]-epsilon
         fit_results = self.OGC_algorithm(self.bvalues, signals, self.neg_log_prior, x0=fit_results, fitS0=self.fitS0, bounds=bounds)
 
         results = {}
