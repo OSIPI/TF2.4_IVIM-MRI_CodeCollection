@@ -323,3 +323,33 @@ def test_invalid_algorithm_name():
     # A valid algorithm should still work without errors
     fit = OsipiBase(algorithm="IAR_LU_biexp")
     assert fit is not None
+
+
+def test_no_duplicate_method_definitions_in_osipibase():
+    """Regression test for issue #150.
+
+    OsipiBase defined osipi_check_required_bvalues twice. The second definition
+    was a bare `pass` stub that shadowed the first, so the method returned None
+    instead of a boolean. Guard against any method being defined twice, and
+    check that the requirement-checking methods return booleans.
+    """
+    import ast
+    import inspect
+    import textwrap
+
+    class_source = textwrap.dedent(inspect.getsource(OsipiBase))
+    class_def = ast.parse(class_source).body[0]
+    method_names = [node.name for node in class_def.body
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))]
+    duplicates = sorted({name for name in method_names if method_names.count(name) > 1})
+    assert not duplicates, f"OsipiBase defines these methods more than once: {duplicates}"
+
+    # The requirement checks must return a boolean, never None
+    fit = OsipiBase(bvalues=np.array([0, 50, 200, 800]))
+    for check in ("osipi_check_required_bvalues",
+                  "osipi_check_required_thresholds",
+                  "osipi_check_required_bounds",
+                  "osipi_check_required_initial_guess"):
+        result = getattr(fit, check)()
+        assert isinstance(result, (bool, np.bool_)), \
+            f"{check}() returned {result!r} ({type(result).__name__}), expected a bool"
