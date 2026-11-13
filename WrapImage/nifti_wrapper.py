@@ -1,10 +1,10 @@
 import argparse
 import json
 import os
+import sys
 import nibabel as nib
 from src.wrappers.OsipiBase import OsipiBase
 import numpy as np
-from tqdm import tqdm
 
 
 def read_nifti_file(input_file):
@@ -13,6 +13,12 @@ def read_nifti_file(input_file):
     """
     nifti_img = nib.load(input_file)
     return nifti_img.get_fdata(), nifti_img.header
+
+def read_nifti_affine(input_file):
+    """
+    For reading the affine of a nifti image, so that the outputs can be saved in the same space
+    """
+    return nib.load(input_file).affine
 
 def read_json_file(json_file):
     """
@@ -58,7 +64,7 @@ def save_nifti_file(data, output_file, affine=None, **kwargs):
     if affine is None:
         affine = np.eye(4)
     else:
-        affine = np.array(affine.reshape(4, 4))
+        affine = np.array(affine).reshape(4, 4)
     output_img = nib.nifti1.Nifti1Image(data, affine , **kwargs)
     nib.save(output_img, output_file)
 
@@ -79,55 +85,65 @@ def loop_over_first_n_minus_1_dimensions(arr):
 
 
 
-if __name__ == "__main__":
+def parse_args(argv=None):
     parser = argparse.ArgumentParser(description="Read a 4D NIfTI phantom file along with BIDS JSON, b-vector, and b-value files.")
     parser.add_argument("input_file", type=str, help="Path to the input 4D NIfTI file.")
     parser.add_argument("bvec_file", type=str, help="Path to the b-vector file.")
     parser.add_argument("bval_file", type=str, help="Path to the b-value file.")
-    parser.add_argument("--affine", type=float, nargs="+", help="Affine matrix for NIfTI image.")
+    parser.add_argument("--affine", type=float, nargs=16, help="Affine matrix (16 values, row-major) for the output NIfTI images. Defaults to the affine of the input image.")
     parser.add_argument("--algorithm", type=str, default="OJ_GU_seg", help="Select the algorithm to use.")
+    parser.add_argument("--output_dir", type=str, default=".", help="Directory in which the parameter maps are saved. It is created if it does not exist.")
+    parser.add_argument("--mask", type=str, help="Path to a 3D NIfTI mask. Only voxels with a non-zero mask value are fitted; the others are set to zero in the output.")
+    parser.add_argument("--body_part", type=str, help="Body part (e.g. brain, liver) used to select literature based default bounds and initial guesses.")
+    parser.add_argument("--njobs", type=int, default=1, help="Number of parallel jobs used for the voxel-wise fit. -1 uses all available CPUs.")
     parser.add_argument("--algorithm_args", nargs=argparse.REMAINDER, help="Additional arguments for the algorithm.")
+    return parser.parse_args(argv)
 
-    args = parser.parse_args()
 
+def apply_mask(data, mask):
+    """
+    Marks the voxels outside of the mask as NaN, which OsipiBase.osipi_fit skips and reports as zeros.
+
+    Args:
+        data: 4D numpy array, with the b-values along the last dimension.
+        mask: numpy array with the shape of the first n-1 dimensions of data.
+    """
+    if mask.shape != data.shape[:-1]:
+        raise ValueError(f"Mask shape {mask.shape} does not match the image shape {data.shape[:-1]}.")
+    data = np.array(data, dtype=float)
+    data[mask == 0] = np.nan
+    return data
+
+
+def main(argv=None):
+    args = parse_args(argv)
+
+    # Read the 4D NIfTI file
+    data, _ = read_nifti_file(args.input_file)
+    affine = args.affine if args.affine is not None else read_nifti_affine(args.input_file)
+
+    # Read the b-vector, and b-value files
+    bvecs = read_bvec_file(args.bvec_file)
+    bvals = read_bval_file(args.bval_file)
+
+    if data.shape[-1] != bvals.size:
+        raise ValueError(f"The image has {data.shape[-1]} volumes but {bvals.size} b-values were given.")
+
+    if args.mask is not None:
+        mask, _ = read_nifti_file(args.mask)
+        data = apply_mask(data, mask)
+
+    fit = OsipiBase(algorithm=args.algorithm, bvalues=bvals, body_part=args.body_part)
+    results = fit.osipi_fit(data, njobs=args.njobs)
+
+    os.makedirs(args.output_dir, exist_ok=True)
+    for key, image in results.items():
+        save_nifti_file(image, os.path.join(args.output_dir, f"{key.lower()}.nii.gz"), affine)
+
+
+if __name__ == "__main__":
     try:
-        # Read the 4D NIfTI file
-        data, _ = read_nifti_file(args.input_file)
-
-        # Read the b-vector, and b-value files
-        bvecs = read_bvec_file(args.bvec_file)
-        bvals = read_bval_file(args.bval_file)
-
-        # Pass additional arguments to the algorithm
-
-        fit = OsipiBase(algorithm=args.algorithm, bvalues=bvals)
-        f_image = []
-        Dp_image = []
-        D_image = []
-
-        # This is necessary for the tqdm to display progress bar.
-        n = data.ndim
-        total_iteration = np.prod(data.shape[:n-1])
-        for idx, view in tqdm(loop_over_first_n_minus_1_dimensions(data), desc=f"{args.algorithm} is fitting", dynamic_ncols=True, total=total_iteration):
-            fit_result = fit.osipi_fit(view)
-            f_image.append(fit_result["f"])
-            Dp_image.append(fit_result["Dp"])
-            D_image.append(fit_result["D"])
-
-        # Convert lists to NumPy arrays
-        f_image = np.array(f_image)
-        Dp_image = np.array(Dp_image)
-        D_image = np.array(D_image)
-
-        # Reshape arrays if needed
-        f_image = f_image.reshape(data.shape[:data.ndim-1])
-        Dp_image = Dp_image.reshape(data.shape[:data.ndim-1])
-        D_image = D_image.reshape(data.shape[:data.ndim-1])
-
-        save_nifti_file(f_image, "f.nii.gz", args.affine)
-        save_nifti_file(Dp_image, "dp.nii.gz", args.affine)
-        save_nifti_file(D_image, "d.nii.gz", args.affine)
-
+        main()
     except Exception as e:
         print(f"Error: {e}")
-
+        sys.exit(1)
