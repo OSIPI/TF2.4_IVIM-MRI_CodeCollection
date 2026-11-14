@@ -33,6 +33,12 @@ def tolerances_helper(tolerances, data):
 class PerformanceWarning(UserWarning):
     pass
 
+def assert_fit_time_within_limit(name, elapsed_time, max_time):
+    assert elapsed_time < max_time, (
+        f"Algorithm {name} took {elapsed_time:.3f} seconds, "
+        f"exceeding the {max_time:g}-second limit per voxel"
+    )
+
 def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
     name, bvals, data, algorithm, xfail, kwargs, tolerances, skiptime, requires_matlab = data_ivim_fit_saved
     max_time = 0.5
@@ -79,7 +85,22 @@ def test_ivim_fit_saved(data_ivim_fit_saved, eng, request, record_property):
         npt.assert_allclose(fit_result['Dp'],data['Dp'], rtol=tolerances["rtol"]["Dp"], atol=tolerances["atol"]["Dp"])
     #assert fit_result['D'] < fit_result['Dp'], f"D {fit_result['D']} is larger than D* {fit_result['Dp']} for {name}"
     if not skiptime:
-        assert elapsed_time < max_time, f"Algorithm {name} took {elapsed_time} seconds, which is longer than 2 second to fit per voxel" #less than 0.5 seconds per voxel
+        assert_fit_time_within_limit(name, elapsed_time, max_time)
+
+
+@pytest.mark.parametrize("max_time", [0.5, 2.0])
+def test_fit_time_failure_reports_configured_limit(max_time):
+    name = "Example Algorithm"
+
+    # A fit below the limit should pass.
+    assert_fit_time_within_limit(name, max_time - 0.1, max_time)
+
+    # A fit above the limit must report the correct threshold.
+    with pytest.raises(
+        AssertionError,
+        match=rf"exceeding the {max_time:g}-second limit per voxel",
+    ):
+        assert_fit_time_within_limit(name, max_time + 0.1, max_time)
 
 def test_default_bounds_and_initial_guesses(algorithmlist,eng):
     algorithm, requires_matlab, deep_learning = algorithmlist
