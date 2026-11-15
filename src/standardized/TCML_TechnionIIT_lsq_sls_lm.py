@@ -84,7 +84,8 @@ class TCML_TechnionIIT_lsq_sls_lm(OsipiBase):
         if fit_results[0].size > 0:
             results["D"] = get_scalar(fit_results[0])
             results["f"] = get_scalar(fit_results[2])
-            results["Dp"] = get_scalar(fit_results[1])
+            # SUPER-IVIM-DC models the perfusion compartment as exp(-b*(D+D*)), so Dp = D + D*
+            results["Dp"] = results["D"] + get_scalar(fit_results[1])
         else:
             results["D"] = 0
             results["f"] = 0
