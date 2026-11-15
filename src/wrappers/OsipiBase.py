@@ -362,7 +362,7 @@ class OsipiBase:
             njobs=1
         if data.shape[0] < njobs:
             njobs = 1
-        if njobs > 1:
+        if njobs > 1 or njobs < 0:
             # Flatten the indices first
             all_indices = list(np.ndindex(data.shape[:-1]))
             #np.save('data.npy', data)

@@ -1,9 +1,10 @@
+import os
 import numpy as np
 import numpy.testing as npt
 import pytest
 import time
 from src.wrappers.OsipiBase import OsipiBase
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, cpu_count
 import warnings
 #run using python -m pytest from the root folder
 
@@ -244,6 +245,21 @@ def test_parallel(algorithmlist,eng,threeddata):
             f"[PERFORMANCE WARNING] Parallel code is not significantly faster than serial: "
             f"{time_parallel:.3f}s vs {time_serial:.3f}s", PerformanceWarning
         )
+
+
+def test_parallel_all_cpus():
+    """njobs=-1 should fit in parallel on all cpus, as documented, instead of serially."""
+    if cpu_count() < 2:
+        pytest.skip(reason="Parallel fitting needs more than one cpu")
+
+    class ProcessID(OsipiBase):
+        """Returns the id of the process that ran the fit as f"""
+        def ivim_fit(self, signals, **kwargs):
+            return {"f": os.getpid(), "Dp": 0, "D": 0}
+
+    fit = ProcessID(bvalues=np.array([0, 50, 200, 800]))
+    fit_result = fit.osipi_fit(np.ones((8, 4)), njobs=-1)
+    assert os.getpid() not in fit_result["f"], "The fit ran in the main process, so not in parallel"
 
 
 def test_deep_learning_algorithms(deep_learning_algorithms, record_property):
