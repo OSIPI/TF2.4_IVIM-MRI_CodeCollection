@@ -1,5 +1,6 @@
 {
     "algorithms": [
+        "OGC_AmsterdamUMC_consensus",
         "IVIM_NEToptim",
         "TCML_TechnionIIT_lsqlm",
         "TCML_TechnionIIT_lsqtrf",
