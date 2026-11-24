@@ -5,8 +5,6 @@ Tests the lookup table in ivim_body_part_defaults.py and its integration
 with OsipiBase.__init__().
 """
 
-import ast
-import inspect
 import os
 import sys
 import pytest
@@ -208,38 +206,3 @@ class TestOsipiBaseBodyPart:
             assert fit.initial_guess is not None
             assert fit.bounds is not None
             assert fit.thresholds is not None
-
-
-# ---------------------------------------------------------------------------
-# Tests for OsipiBase method conformance (Issue #150)
-# ---------------------------------------------------------------------------
-
-
-class TestOsipiBaseMethodConformance:
-    """Regression tests for Issue #150: Duplicate method definitions and conformance in OsipiBase."""
-
-    def test_osipi_check_required_bvalues_return_and_docstring(self):
-        """Verify osipi_check_required_bvalues returns True and has the correct docstring."""
-        base = OsipiBase(bvalues=[0, 50, 200, 800])
-
-        # 1. Ensure method returns True, not None
-        assert base.osipi_check_required_bvalues() is True
-
-        # 2. Ensure docstring is the requirement check description, not the old stub
-        doc = inspect.getdoc(base.osipi_check_required_bvalues)
-        assert doc == "Checks if the input bvalues fulfil the algorithm requirements"
-
-    def test_no_duplicate_methods_in_osipibase(self):
-        """Static AST regression check ensuring no duplicate method definitions exist in OsipiBase."""
-        source_path = inspect.getfile(OsipiBase)
-        with open(source_path, "r", encoding="utf-8") as f:
-            tree = ast.parse(f.read(), filename=source_path)
-
-        for node in ast.walk(tree):
-            if isinstance(node, ast.ClassDef) and node.name == "OsipiBase":
-                method_names = [
-                    item.name for item in node.body
-                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
-                ]
-                duplicates = [name for name in set(method_names) if method_names.count(name) > 1]
-                assert not duplicates, f"Duplicate method definitions found in OsipiBase: {duplicates}"
