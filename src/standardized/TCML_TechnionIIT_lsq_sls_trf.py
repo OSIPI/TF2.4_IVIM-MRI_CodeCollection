@@ -86,7 +86,9 @@ class TCML_TechnionIIT_lsq_sls_trf(OsipiBase):
         if fit_results[0].size > 0:
             results["D"] = get_scalar(fit_results[0])
             results["f"] = get_scalar(fit_results[2])
-            results["Dp"] = get_scalar(fit_results[1])
+            # SUPER-IVIM-DC models the perfusion compartment as exp(-b*(D+D*)), so Dp = D + D*.
+            # The bounds of Dp are applied to D*, so D + D* is limited to the upper bound of Dp.
+            results["Dp"] = min(results["D"] + get_scalar(fit_results[1]), self.bounds["Dp"][1])
         else:
             results["D"] = 0
             results["f"] = 0

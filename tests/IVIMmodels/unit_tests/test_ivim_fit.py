@@ -323,3 +323,25 @@ def test_invalid_algorithm_name():
     # A valid algorithm should still work without errors
     fit = OsipiBase(algorithm="IAR_LU_biexp")
     assert fit is not None
+
+
+@pytest.mark.parametrize("algorithm", [
+    "TCML_TechnionIIT_lsqlm",
+    "TCML_TechnionIIT_lsqtrf",
+    "TCML_TechnionIIT_SLS",
+    "TCML_TechnionIIT_lsq_sls_lm",
+    "TCML_TechnionIIT_lsq_sls_trf",
+    "TCML_TechnionIIT_lsq_sls_BOBYQA",
+])
+def test_TCML_TechnionIIT_Dp_definition(algorithm):
+    """SUPER-IVIM-DC models the perfusion compartment as exp(-b*(D+D*)), whereas
+    this repository uses exp(-b*Dp). The wrappers should hence return Dp = D + D*,
+    such that the parameters of a noise-free signal are recovered.
+    TCML_TechnionIIT_lsqBOBYQA is left out, as its fit does not converge well enough for this check.
+    """
+    bvals = np.array([0, 1, 2, 5, 10, 20, 30, 50, 75, 100, 150, 250, 350, 400, 550, 700, 850, 1000])
+    f, D, Dp = 0.3, 0.003, 0.05
+    signal = f * np.exp(-bvals * Dp) + (1 - f) * np.exp(-bvals * D)
+    fit = OsipiBase(algorithm=algorithm, bvalues=bvals)
+    fit_result = fit.osipi_fit(signal)
+    npt.assert_allclose([fit_result["f"], fit_result["D"], fit_result["Dp"]], [f, D, Dp], rtol=1e-3)
