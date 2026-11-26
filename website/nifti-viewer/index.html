@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta name="charset" content="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" type="image/x-icon" href="../favicon-32x32.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <link href="index.css" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h1 class="bar-title">NIFTI Image Viewer  </h1>
+        <hr class="divider" />
+    </header>
+    <div class="container-fluid">
+        <h2><small class="text-muted">Example of displaying a NIFTI image using Cornerstone</small></h2>
+        <ul>
+            <li class="lead">
+                Upload a NIFTI file to view it using cornerstone.
+            </li>
+            <li class="lead">
+                Scroll to navigate between different slices.
+            </li>
+            <li class="lead">
+                Drag the mouse to get the synchronized view for the selected area.
+            </li>
+            <li class="lead">
+                A voxel intensity plot will be displayed when you drag or scroll through an image viewport.
+            </li>
+        </ul>
+
+        <div class="row">
+            <div class="col">
+                <form id="form">
+                    <div class="form-group form-row">
+                        <label class="col-form-label" for="nifti-file">NIFTI File</label>
+                        <div class="col-sm-5">
+                            <input class="form-control" type="file" id="nifti-file">
+                        </div>
+                        <div class="col-sm-3">
+                            <button class="btn btn-primary" type="button" id="upload-and-view">Upload and View</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <section id="image-and-data-info">
+            <div class="nifti-image-container" id="nifti-image-z"></div>
+            <div class="nifti-image-container" id="nifti-image-x"></div>
+            <div class="nifti-image-container" id="nifti-image-y"></div>
+            <div id="plot"></div>
+        </section>
+        <div id="voxel-info" class="mt-4">
+            <h5>Cursor Position</h5>
+            <p id="voxel-coordinates">(x, y, z): (0, 0, 0)</p>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/cornerstone-core@2.6.1/dist/cornerstone.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cornerstone-math@0.1.6/dist/cornerstoneMath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cornerstone-tools@2.1.0/dist/cornerstoneTools.min.js"></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/@cornerstonejs/nifti-image-loader@1.0.9/dist/cornerstoneNIFTIImageLoader.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+<script src="index.js"></script>
+
+</html>
