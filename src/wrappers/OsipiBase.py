@@ -717,5 +717,5 @@ class OsipiBase:
                 "for reproducibility."
             )
 
-        return
+        return citation_text
 
