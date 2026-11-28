@@ -236,7 +236,9 @@ class OsipiBase:
         
         # Import the algorithm
         root_path = pathlib.Path(__file__).resolve().parents[2]
-        if str(root_path) not in sys.path:
+        # Compare resolved paths, not strings: sys.path can hold '' (the current folder),
+        # relative paths, or on Windows the same folder spelled in another case
+        if root_path not in (pathlib.Path(entry).resolve() for entry in sys.path):
             raise RuntimeError(
                 "Root folder not found in PYTHONPATH. "
                 "Please ensure the project root is in sys.path."
